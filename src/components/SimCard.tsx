@@ -12,7 +12,11 @@ interface SimCardProps {
 
 export function SimCard({ type, title, description, price, features }: SimCardProps) {
   return (
-    <Card className="w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40">
+    <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 ${
+      type === "physical" 
+        ? "bg-gradient-to-br from-[#F2FCE2]/80 to-[#F2FCE2]/40" 
+        : "bg-gradient-to-br from-[#D3E4FD]/80 to-[#D3E4FD]/40"
+    }`}>
       {/* Efecto de brillo en hover */}
       <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 animate-shimmer" />
