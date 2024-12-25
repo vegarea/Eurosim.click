@@ -25,12 +25,12 @@ export default function ESims() {
     },
     {
       type: "esim" as const,
-      title: "eSIM S",
-      description: "8GB Europa / 80GB España",
-      price: 690,
+      title: "Tarifa L",
+      description: "11GB Europa / 140GB España",
+      price: 587,
       features: [
-        "8GB datos en toda Europa",
-        "80GB exclusivo España",
+        "11GB datos en toda Europa",
+        "140GB exclusivo España",
         "300 min llamadas internacionales",
         "Número local gratuito",
         "Velocidad 5G/4G/3G+",
@@ -41,25 +41,9 @@ export default function ESims() {
     },
     {
       type: "esim" as const,
-      title: "eSIM M",
-      description: "12GB Europa / 120GB España",
-      price: 790,
-      features: [
-        "12GB datos en toda Europa",
-        "120GB exclusivo España",
-        "300 min llamadas internacionales",
-        "Número local gratuito",
-        "Velocidad 5G/4G/3G+",
-        "Activación inmediata",
-        "30 días de validez",
-        "Hotspot incluido"
-      ]
-    },
-    {
-      type: "esim" as const,
-      title: "eSIM L",
+      title: "Tarifa XL",
       description: "16GB Europa / 160GB España",
-      price: 890,
+      price: 817,
       features: [
         "16GB datos en toda Europa",
         "160GB exclusivo España",
@@ -73,9 +57,9 @@ export default function ESims() {
     },
     {
       type: "esim" as const,
-      title: "eSIM XL",
+      title: "Tarifa XXL",
       description: "22GB Europa / 190GB España",
-      price: 1090,
+      price: 1027,
       features: [
         "22GB datos en toda Europa",
         "190GB exclusivo España",
