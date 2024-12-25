@@ -21,12 +21,12 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
       <CardHeader className="relative">
         <div className="flex items-center gap-3">
           {type === "physical" ? (
-            <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl backdrop-blur-sm">
-              <CreditCard className="h-6 w-6 text-primary animate-pulse" />
+            <div className="p-3 bg-gradient-to-br from-[#F2FCE2] to-[#E5F7D3] rounded-xl backdrop-blur-sm">
+              <CreditCard className="h-6 w-6 text-green-600 animate-pulse" />
             </div>
           ) : (
-            <div className="p-3 bg-gradient-to-br from-secondary/20 to-secondary/5 rounded-xl backdrop-blur-sm">
-              <Wifi className="h-6 w-6 text-secondary animate-pulse" />
+            <div className="p-3 bg-gradient-to-br from-[#D3E4FD] to-[#C4D9F7] rounded-xl backdrop-blur-sm">
+              <Wifi className="h-6 w-6 text-blue-600 animate-pulse" />
             </div>
           )}
           <div>
