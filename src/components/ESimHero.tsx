@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Smartphone, HelpCircle } from "lucide-react";
+import { Smartphone, HelpCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -127,11 +127,6 @@ export function ESimHero() {
                     </div>
                   </DialogContent>
                 </Dialog>
-
-                <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20">
-                  Ver Planes
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
               </div>
             </div>
           </div>
