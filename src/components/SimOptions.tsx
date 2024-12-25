@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Smartphone, Globe2, CreditCard, Wifi } from "lucide-react";
+import { ArrowRight, Smartphone, Globe2, CreditCard, Wifi, Flag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export function SimOptions() {
@@ -36,7 +36,10 @@ export function SimOptions() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold mb-2">SIM Física</h3>
-                  <p className="text-gray-600">Entrega a domicilio</p>
+                  <p className="text-gray-600 flex items-center gap-2">
+                    Entrega a domicilio a todo México
+                    <Flag className="w-4 h-4 text-primary" />
+                  </p>
                 </div>
               </div>
               
