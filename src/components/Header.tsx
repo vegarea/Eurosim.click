@@ -21,8 +21,8 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/20 bg-gradient-to-r from-brand-500/5 via-brand-500/10 to-brand-500/5 backdrop-blur-xl">
-      <div className="absolute inset-0 bg-white/60" />
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-gradient-to-r from-brand-500/80 via-brand-500/90 to-brand-500/80 backdrop-blur-xl">
+      <div className="absolute inset-0 bg-white/10" />
       
       <div className="container relative flex h-16 items-center justify-between">
         {/* Logo */}
@@ -39,7 +39,7 @@ export function Header() {
             <Link
               key={item.label}
               to={item.href}
-              className="text-sm font-medium text-gray-700 transition-all duration-200 hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full"
+              className="text-sm font-medium text-white transition-all duration-200 hover:text-brand-100 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all after:duration-200 hover:after:w-full"
             >
               {item.label}
             </Link>
@@ -51,11 +51,11 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative hover:bg-brand-100/50 transition-colors"
+            className="relative hover:bg-white/10 transition-colors"
           >
-            <ShoppingCart className="h-5 w-5 text-gray-700" />
+            <ShoppingCart className="h-5 w-5 text-white" />
             {cartItems > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-white flex items-center justify-center animate-pulse">
+              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-white text-[10px] font-medium text-brand-500 flex items-center justify-center animate-pulse">
                 {cartItems}
               </span>
             )}
@@ -63,7 +63,7 @@ export function Header() {
 
           <Button 
             variant="ghost" 
-            className="gap-2 text-gray-700 hover:bg-brand-100/50 hover:text-brand-700 transition-all duration-200"
+            className="gap-2 text-white hover:bg-white/10 hover:text-brand-100 transition-all duration-200"
           >
             <User className="h-4 w-4" />
             Iniciar Sesión
@@ -76,22 +76,22 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="icon"
-              className="hover:bg-brand-100/50 transition-colors"
+              className="hover:bg-white/10 transition-colors"
             >
-              <Menu className="h-6 w-6 text-gray-700" />
+              <Menu className="h-6 w-6 text-white" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent 
             side="right" 
-            className="w-[300px] sm:w-[400px] bg-gradient-to-b from-white to-brand-50"
+            className="w-[300px] sm:w-[400px] bg-gradient-to-b from-brand-500 to-brand-600"
           >
             <nav className="flex flex-col gap-4">
               {menuItems.map((item) => (
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="text-lg font-medium text-gray-700 transition-colors hover:text-primary"
+                  className="text-lg font-medium text-white transition-colors hover:text-brand-100"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
@@ -100,14 +100,14 @@ export function Header() {
               <div className="flex flex-col gap-4 mt-4">
                 <Button 
                   variant="outline" 
-                  className="gap-2 w-full bg-white/80 hover:bg-white transition-colors"
+                  className="gap-2 w-full bg-white/10 hover:bg-white/20 text-white border-white/20 transition-colors"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   Carrito ({cartItems})
                 </Button>
                 <Button 
                   variant="ghost"
-                  className="gap-2 w-full text-gray-700 hover:bg-brand-100/50 hover:text-brand-700 transition-all duration-200"
+                  className="gap-2 w-full text-white hover:bg-white/10 hover:text-brand-100 transition-all duration-200"
                 >
                   <User className="h-4 w-4" />
                   Iniciar Sesión

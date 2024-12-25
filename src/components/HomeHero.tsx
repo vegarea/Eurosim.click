@@ -9,7 +9,7 @@ import SimQuiz from "@/components/SimQuiz";
 
 export function HomeHero() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 to-white">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white to-brand-50">
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       
