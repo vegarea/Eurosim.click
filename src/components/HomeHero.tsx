@@ -28,7 +28,7 @@ export function HomeHero() {
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                 Viaja por Europa con Internet
-                <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary animate-gradient bg-300%">
+                <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-500 animate-gradient bg-300%">
                   ¡Siempre Conectado!
                 </span>
               </h1>
