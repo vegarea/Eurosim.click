@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wifi } from "lucide-react";
+import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
   type: "physical" | "esim";
@@ -44,6 +45,17 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
 
   const colorScheme = getColorScheme(title);
 
+  // Function to format description with flags
+  const formatDescription = (desc: string) => {
+    return desc.replace(
+      /(\d+)GB Europa/,
+      `$1GB <span class="fi fi-eu"></span>`
+    ).replace(
+      /(\d+)GB España/,
+      `$1GB <span class="fi fi-es"></span>`
+    );
+  };
+
   return (
     <Card className="w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40">
       {/* Efecto de brillo en hover */}
@@ -60,7 +72,10 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               {title}
             </CardTitle>
-            <CardDescription className="text-base mt-1">{description}</CardDescription>
+            <CardDescription 
+              className="text-base mt-1"
+              dangerouslySetInnerHTML={{ __html: formatDescription(description) }}
+            />
           </div>
         </div>
       </CardHeader>
