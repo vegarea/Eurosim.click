@@ -1,12 +1,54 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Hero } from "@/components/Hero";
+import { SimCard } from "@/components/SimCard";
 
 const Index = () => {
+  const simOptions = [
+    {
+      type: "physical" as const,
+      title: "SIM Física",
+      description: "Tarjeta SIM tradicional con envío a domicilio en México",
+      price: 599,
+      features: [
+        "Envío a domicilio en México",
+        "Datos 4G/5G ilimitados",
+        "Cobertura en toda Europa",
+        "Activación sencilla",
+        "Soporte en español 24/7",
+      ],
+    },
+    {
+      type: "esim" as const,
+      title: "eSIM Digital",
+      description: "Activación instantánea para dispositivos compatibles",
+      price: 499,
+      features: [
+        "Activación instantánea",
+        "Datos 4G/5G ilimitados",
+        "Cobertura en toda Europa",
+        "Sin espera de envío",
+        "Soporte en español 24/7",
+      ],
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <Hero />
+      
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">Elige tu Plan</h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Selecciona el tipo de SIM que mejor se adapte a tus necesidades. Ambas opciones te brindan la mejor cobertura en Europa.
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-8 justify-items-center">
+            {simOptions.map((option) => (
+              <SimCard key={option.type} {...option} />
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
