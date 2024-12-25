@@ -1,4 +1,10 @@
-import { Shield, Star, Clock, Globe2, Users, Headphones, CheckCircle } from "lucide-react";
+import { Shield, Star, Clock, Globe2, Users, Headphones, CheckCircle, MapPin } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function TrustElements() {
   const features = [
@@ -20,7 +26,7 @@ export function TrustElements() {
     {
       icon: <Globe2 className="w-8 h-8" />,
       title: "Cobertura Total",
-      description: "Conectividad en todos los países de la Unión Europea"
+      description: "Conectividad garantizada en 44 países y territorios europeos"
     }
   ];
 
@@ -31,8 +37,8 @@ export function TrustElements() {
       icon: <Users className="w-6 h-6" />
     },
     {
-      value: "30+",
-      label: "Países Cubiertos",
+      value: "44",
+      label: "Países y Territorios",
       icon: <Globe2 className="w-6 h-6" />
     },
     {
@@ -45,6 +51,17 @@ export function TrustElements() {
       label: "Garantía de Servicio",
       icon: <CheckCircle className="w-6 h-6" />
     }
+  ];
+
+  const countries = [
+    "Alemania", "Austria", "Azores", "Bélgica", "Bulgaria", "Channel Islands", 
+    "Chipre", "Croacia", "Dinamarca", "Escocia", "Eslovaquia", "Eslovenia", 
+    "España", "Estonia", "Finlandia", "Francia", "Gales", "Gibraltar", "Grecia",
+    "Guernsey", "Holanda", "Hungría", "Inglaterra", "Irlanda", "Irlanda del Norte",
+    "Islandia", "Islas Aland", "Islas Baleares", "Islas Canarias", "Isla de Man",
+    "Italia", "Jersey", "Letonia", "Liechtenstein", "Lituania", "Luxemburgo",
+    "Madeira", "Malta", "Noruega", "Polonia", "Portugal", "República Checa",
+    "Rumania", "San Marino", "Suecia", "Suiza", "Vaticano"
   ];
 
   return (
@@ -74,7 +91,7 @@ export function TrustElements() {
         </div>
 
         {/* Stats Section - Estadísticas */}
-        <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-2xl p-8">
+        <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-2xl p-8 mb-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div 
@@ -91,6 +108,36 @@ export function TrustElements() {
                   {stat.label}
                 </span>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Nueva sección de cobertura */}
+        <div className="bg-white rounded-2xl p-8 shadow-lg">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <MapPin className="w-6 h-6 text-primary" />
+            <h3 className="text-2xl font-bold text-gray-900">Cobertura en Europa</h3>
+          </div>
+          
+          <p className="text-center text-gray-600 mb-8">
+            Navega sin preocupaciones en cualquiera de estos {countries.length} países y territorios
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {countries.map((country, index) => (
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="w-2 h-2 rounded-full bg-primary"></div>
+                      <span className="text-sm text-gray-700">{country}</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Cobertura garantizada</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           </div>
         </div>
