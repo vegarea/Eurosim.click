@@ -9,6 +9,7 @@ const MexicoFlag = ({ className = "" }: { className?: string }) => {
       <rect x="0" y="0" width="8" height="16" fill="#006847" />
       <rect x="8" y="0" width="8" height="16" fill="#FFFFFF" />
       <rect x="16" y="0" width="8" height="16" fill="#CE1126" />
+      <circle cx="12" cy="8" r="2.5" fill="#C09300" />
     </svg>
   );
 };
