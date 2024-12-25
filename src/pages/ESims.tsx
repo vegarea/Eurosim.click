@@ -5,8 +5,16 @@ import { CountryCoverage } from "@/components/CountryCoverage";
 import { motion } from "framer-motion";
 import { ESimHero } from "@/components/ESimHero";
 import { CommonFeatures } from "@/components/CommonFeatures";
+import { UsageMeter } from "@/components/UsageMeter";
+import { useState } from "react";
 
 export default function ESims() {
+  const [selectedPlan, setSelectedPlan] = useState({
+    title: "Tarifa XL",
+    europeGB: 16,
+    spainGB: 160,
+  });
+
   const simCards = [
     {
       type: "esim" as const,
@@ -16,7 +24,9 @@ export default function ESims() {
       features: [
         "8GB datos en toda Europa",
         "100GB exclusivo España",
-      ]
+      ],
+      europeGB: 8,
+      spainGB: 100
     },
     {
       type: "esim" as const,
@@ -26,7 +36,9 @@ export default function ESims() {
       features: [
         "11GB datos en toda Europa",
         "140GB exclusivo España",
-      ]
+      ],
+      europeGB: 11,
+      spainGB: 140
     },
     {
       type: "esim" as const,
@@ -37,7 +49,9 @@ export default function ESims() {
         "16GB datos en toda Europa",
         "160GB exclusivo España",
       ],
-      isHighlighted: true
+      isHighlighted: true,
+      europeGB: 16,
+      spainGB: 160
     },
     {
       type: "esim" as const,
@@ -47,9 +61,15 @@ export default function ESims() {
       features: [
         "22GB datos en toda Europa",
         "190GB exclusivo España",
-      ]
+      ],
+      europeGB: 22,
+      spainGB: 190
     }
   ];
+
+  const handlePlanSelect = (plan: { title: string; europeGB: number; spainGB: number }) => {
+    setSelectedPlan(plan);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
@@ -66,10 +86,35 @@ export default function ESims() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
               >
-                <SimCard {...card} />
+                <SimCard 
+                  {...card} 
+                  onSelect={() => handlePlanSelect({
+                    title: card.title,
+                    europeGB: card.europeGB,
+                    spainGB: card.spainGB
+                  })}
+                  isSelected={selectedPlan.title === card.title}
+                />
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-16"
+          >
+            <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+              <h3 className="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                Días estimados de uso para {selectedPlan.title}
+              </h3>
+              <UsageMeter 
+                europeGB={selectedPlan.europeGB} 
+                spainGB={selectedPlan.spainGB}
+                isHighlighted={true}
+              />
+            </div>
+          </motion.div>
 
           <CommonFeatures />
           <SimFeatures />

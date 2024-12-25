@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wifi } from "lucide-react";
-import { UsageMeter } from "./UsageMeter";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
@@ -11,6 +10,8 @@ interface SimCardProps {
   price: number;
   features: string[];
   isHighlighted?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 // Función para formatear la descripción con GB en negrita
@@ -21,11 +22,16 @@ const formatDescription = (description: string) => {
   );
 };
 
-export function SimCard({ type, title, description, price, features, isHighlighted = false }: SimCardProps) {
-  // Extraer los GB de la descripción
-  const europeGB = parseInt(description.match(/(\d+)GB Europa/)?.[1] || "0");
-  const spainGB = parseInt(description.match(/(\d+)GB España/)?.[1] || "0");
-
+export function SimCard({ 
+  type, 
+  title, 
+  description, 
+  price, 
+  features, 
+  isHighlighted = false,
+  isSelected = false,
+  onSelect 
+}: SimCardProps) {
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
@@ -60,7 +66,9 @@ export function SimCard({ type, title, description, price, features, isHighlight
   const colorScheme = getColorScheme(title);
 
   return (
-    <Card className="w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40">
+    <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
+      isSelected ? 'ring-2 ring-primary shadow-lg' : ''
+    }`}>
       {/* Efecto de brillo en hover */}
       <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 animate-shimmer" />
@@ -95,12 +103,6 @@ export function SimCard({ type, title, description, price, features, isHighlight
           </p>
         </div>
 
-        <UsageMeter 
-          europeGB={europeGB} 
-          spainGB={spainGB}
-          isHighlighted={isHighlighted}
-        />
-
         <ul className="space-y-4 my-8">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-3 group">
@@ -112,8 +114,11 @@ export function SimCard({ type, title, description, price, features, isHighlight
           ))}
         </ul>
 
-        <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20">
-          Comprar Ahora
+        <Button 
+          className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
+          onClick={onSelect}
+        >
+          {isSelected ? 'Plan Seleccionado' : 'Seleccionar Plan'}
         </Button>
       </CardContent>
 
