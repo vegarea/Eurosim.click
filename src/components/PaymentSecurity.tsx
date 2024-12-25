@@ -1,4 +1,4 @@
-import { Shield, CreditCard, Lock } from "lucide-react";
+import { Shield, Lock } from "lucide-react";
 
 export function PaymentSecurity() {
   return (
@@ -11,18 +11,31 @@ export function PaymentSecurity() {
         <div className="max-w-4xl mx-auto">
           {/* Payment Methods */}
           <div className="flex flex-wrap justify-center items-center gap-8 mb-12">
-            <div className="flex items-center gap-2 text-gray-600">
-              <CreditCard className="w-8 h-8" />
-              <span className="font-semibold">Visa</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <CreditCard className="w-8 h-8" />
-              <span className="font-semibold">Mastercard</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <CreditCard className="w-8 h-8" />
-              <span className="font-semibold">PayPal</span>
-            </div>
+            <img 
+              src="https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png" 
+              alt="Visa"
+              className="h-8 object-contain"
+            />
+            <img 
+              src="https://www.mastercard.es/content/dam/public/mastercardcom/eu/es/images/Mastercard-logo.png" 
+              alt="Mastercard"
+              className="h-8 object-contain"
+            />
+            <img 
+              src="https://www.paypalobjects.com/digitalassets/c/website/marketing/na/us/logo-center/Badge_2.png" 
+              alt="PayPal"
+              className="h-8 object-contain"
+            />
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 
+              alt="Stripe"
+              className="h-8 object-contain"
+            />
+            <img 
+              src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" 
+              alt="Google Pay"
+              className="h-8 object-contain grayscale"
+            />
           </div>
 
           {/* Security Features */}
