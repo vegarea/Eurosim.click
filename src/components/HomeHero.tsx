@@ -39,7 +39,7 @@ export function HomeHero() {
                 Viaja por Europa con Internet
                 <span className="block mt-2 text-primary flex items-center gap-1">
                   ¡Siempre Conectado!
-                  <WifiIcon className="w-15 h-15 text-primary animate-float -ml-1" />
+                  <WifiIcon className="w-20 h-20 text-primary animate-float -ml-1" />
                 </span>
               </h1>
               <p className="text-lg text-gray-600 max-w-xl">
