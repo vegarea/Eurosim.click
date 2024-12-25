@@ -3,7 +3,7 @@ import { SimCard } from "@/components/SimCard";
 import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { ArrowRight, WifiIcon, Truck } from "lucide-react";
+import { ArrowRight, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Sims = () => {
@@ -45,14 +45,6 @@ const Sims = () => {
       <div className="relative min-h-screen overflow-hidden">
         {/* Fondo con patrón de puntos */}
         <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
-        
-        {/* Iconos flotantes de WiFi */}
-        <div className="absolute inset-0 pointer-events-none">
-          <WifiIcon className="absolute top-20 right-[20%] text-primary/30 w-8 h-8 animate-float" />
-          <WifiIcon className="absolute bottom-32 right-[30%] text-primary/25 w-6 h-6 animate-float delay-700" />
-          <WifiIcon className="absolute top-1/2 left-[25%] text-primary/30 w-8 h-8 animate-float delay-500" />
-          <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-7 h-7 animate-float delay-1000" />
-        </div>
 
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
           <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-4rem)]">
