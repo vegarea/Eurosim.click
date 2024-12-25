@@ -43,7 +43,7 @@ export function TrustElements() {
       icon: <Users className="w-6 h-6" />
     },
     {
-      value: "44",
+      value: "34",
       label: "Países y Territorios",
       icon: <Globe2 className="w-6 h-6" />
     },
