@@ -1,4 +1,4 @@
-import { Shield, Star, Clock, Globe2, Users, Headphones, CheckCircle, MapPin } from "lucide-react";
+import { Shield, Star, Clock, Globe2, Users, Headphones, CheckCircle, ChevronDown } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -149,13 +149,17 @@ export function TrustElements() {
         <div className="bg-white rounded-2xl p-6 shadow-lg">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="coverage">
-              <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold">
+              <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold hover:no-underline">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary" />
+                  <span className="fi fi-eu w-6 h-6 rounded-sm shadow-sm"></span>
                   <span>Cobertura en Europa</span>
                   <span className="text-sm font-normal text-gray-500 ml-2">
                     ({countries.length} países y territorios)
                   </span>
+                </div>
+                <div className="flex items-center gap-2 ml-auto text-sm font-normal text-primary hover:text-primary/80">
+                  <span>Ver cobertura</span>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-primary transition-transform duration-200" />
                 </div>
               </AccordionTrigger>
               <AccordionContent>
