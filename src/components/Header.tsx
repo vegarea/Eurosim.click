@@ -62,9 +62,18 @@ export function Header() {
               <SelectValue placeholder="MXN" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="MXN">MXN</SelectItem>
-              <SelectItem value="USD">USD</SelectItem>
-              <SelectItem value="EUR">EUR</SelectItem>
+              <SelectItem value="MXN" className="flex items-center gap-2">
+                <span className="fi fi-mx"></span>
+                MXN
+              </SelectItem>
+              <SelectItem value="USD" className="flex items-center gap-2">
+                <span className="fi fi-us"></span>
+                USD
+              </SelectItem>
+              <SelectItem value="EUR" className="flex items-center gap-2">
+                <span className="fi fi-eu"></span>
+                EUR
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -124,9 +133,18 @@ export function Header() {
                     <SelectValue placeholder="MXN" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MXN">MXN</SelectItem>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
+                    <SelectItem value="MXN" className="flex items-center gap-2">
+                      <span className="fi fi-mx"></span>
+                      MXN
+                    </SelectItem>
+                    <SelectItem value="USD" className="flex items-center gap-2">
+                      <span className="fi fi-us"></span>
+                      USD
+                    </SelectItem>
+                    <SelectItem value="EUR" className="flex items-center gap-2">
+                      <span className="fi fi-eu"></span>
+                      EUR
+                    </SelectItem>
                   </SelectContent>
                 </Select>
 
