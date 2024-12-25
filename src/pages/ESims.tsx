@@ -2,14 +2,10 @@ import { Header } from "@/components/Header";
 import { SimCard } from "@/components/SimCard";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { Wifi, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Wifi } from "lucide-react";
 import { motion } from "framer-motion";
 
 const ESims = () => {
-  const navigate = useNavigate();
-
   const simCards = [
     {
       type: "esim" as const,
@@ -81,11 +77,13 @@ const ESims = () => {
             <div className="flex flex-col justify-center space-y-8">
               <div>
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
-                  <span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">eSIM</span> para Europa
+                  <span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">eSIM</span> para tu viaje a Europa
                 </h1>
                 <p className="text-lg text-gray-600 max-w-xl">
-                  Conectividad instantánea en toda la Unión Europea. 
-                  Activa tu eSIM en segundos y comienza a navegar inmediatamente.
+                  Conéctate de manera instantánea y disfruta de internet de alta velocidad dondequiera que estés en Europa.
+                </p>
+                <p className="text-lg text-gray-600 max-w-xl mt-4">
+                  Compra, recibe el QR en tu correo, y actívalo al instante. Así de fácil es tener el mejor internet en Europa, sin complicaciones ni sorpresas.
                 </p>
               </div>
             </div>
