@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,11 +37,11 @@ export function HomeHero() {
               </p>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+            {/* Botones de acción y testimonios */}
+            <div className="flex flex-col gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg">
+                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-fit">
                     ¿No sabes qué SIM necesitas? Descúbrelo aquí
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -51,11 +51,18 @@ export function HomeHero() {
                 </DialogContent>
               </Dialog>
               
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-primary" aria-hidden="true">
-                  <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm-1-5h2v2h-2v-2zm2-1.645V14h-2v-1.5a1 1 0 0 1 1-1 1.5 1.5 0 1 0-1.471-1.794l-1.962-.393A3.5 3.5 0 1 1 13 13.355z"/>
-                </svg>
-                Activación inmediata
+              {/* Nuevo texto de testimonios */}
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                  <span className="ml-2 font-medium">4.9/5</span>
+                </div>
+                <span className="mx-2">•</span>
+                <span>+10,000 viajeros satisfechos</span>
+                <span className="mx-2">•</span>
+                <span className="text-primary font-medium">Garantía de servicio</span>
               </div>
             </div>
           </div>
