@@ -1,5 +1,11 @@
 import { Shield, Star, Clock, Globe2, Users, Headphones, CheckCircle, MapPin } from "lucide-react";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -112,34 +118,43 @@ export function TrustElements() {
           </div>
         </div>
 
-        {/* Nueva sección de cobertura */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg">
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <MapPin className="w-6 h-6 text-primary" />
-            <h3 className="text-2xl font-bold text-gray-900">Cobertura en Europa</h3>
-          </div>
-          
-          <p className="text-center text-gray-600 mb-8">
-            Navega sin preocupaciones en cualquiera de estos {countries.length} países y territorios
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {countries.map((country, index) => (
-              <TooltipProvider key={index}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="w-2 h-2 rounded-full bg-primary"></div>
-                      <span className="text-sm text-gray-700">{country}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Cobertura garantizada</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
+        {/* Sección de cobertura con acordeón */}
+        <div className="bg-white rounded-2xl p-6 shadow-lg">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="coverage">
+              <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-primary" />
+                  <span>Cobertura en Europa</span>
+                  <span className="text-sm font-normal text-gray-500 ml-2">
+                    ({countries.length} países y territorios)
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <p className="text-gray-600 mb-4 text-sm">
+                  Navega sin preocupaciones en cualquiera de estos destinos:
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {countries.map((country, index) => (
+                    <TooltipProvider key={index}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            <span className={`fi fi-${country.toLowerCase().replace(/\s+/g, '')}`}></span>
+                            <span className="text-sm text-gray-700">{country}</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Cobertura garantizada</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </div>
     </section>

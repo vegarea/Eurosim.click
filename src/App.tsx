@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import PhysicalSim from "./pages/PhysicalSim";
 import ESim from "./pages/ESim";
+import "flag-icons/css/flag-icons.min.css";
 
 const queryClient = new QueryClient();
 
