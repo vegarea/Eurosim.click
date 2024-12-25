@@ -15,22 +15,22 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
-      case "eSIM S":
+      case "Tarifa M":
         return {
           iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
           iconColor: "text-green-600"
         };
-      case "eSIM M":
+      case "Tarifa L":
         return {
           iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
           iconColor: "text-blue-600"
         };
-      case "eSIM L":
+      case "Tarifa XL":
         return {
           iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
           iconColor: "text-purple-600"
         };
-      case "eSIM XL":
+      case "Tarifa XXL":
         return {
           iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
           iconColor: "text-pink-600"
