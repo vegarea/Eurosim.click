@@ -16,8 +16,13 @@ const Index = () => {
       
       {/* Contenido principal */}
       <div className="container mx-auto px-4 py-12 relative">
-        {/* Hero Section */}
+        {/* Logo y Hero Section */}
         <div className="text-center mb-16">
+          <img 
+            src="/logo.png" 
+            alt="EuroSim Logo" 
+            className="h-24 mx-auto mb-8 animate-float"
+          />
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             Internet en Europa
           </h1>
