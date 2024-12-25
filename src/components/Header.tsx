@@ -21,8 +21,8 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-gradient-to-r from-white via-brand-50 to-white backdrop-blur-xl">
-      <div className="absolute inset-0 bg-white/40" />
+    <header className="sticky top-0 z-50 w-full border-b border-white/20 bg-gradient-to-r from-brand-500/5 via-brand-500/10 to-brand-500/5 backdrop-blur-xl">
+      <div className="absolute inset-0 bg-white/60" />
       
       <div className="container relative flex h-16 items-center justify-between">
         {/* Logo */}
@@ -39,7 +39,7 @@ export function Header() {
             <Link
               key={item.label}
               to={item.href}
-              className="text-sm font-medium text-gray-600 transition-all duration-200 hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full"
+              className="text-sm font-medium text-gray-700 transition-all duration-200 hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-200 hover:after:w-full"
             >
               {item.label}
             </Link>
@@ -51,9 +51,9 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative hover:bg-white/50 transition-colors"
+            className="relative hover:bg-brand-100/50 transition-colors"
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5 text-gray-700" />
             {cartItems > 0 && (
               <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-white flex items-center justify-center animate-pulse">
                 {cartItems}
@@ -62,8 +62,8 @@ export function Header() {
           </Button>
 
           <Button 
-            variant="outline" 
-            className="gap-2 border-brand-200 bg-white/50 text-brand-700 hover:bg-white/80 hover:text-brand-800 transition-all duration-200"
+            variant="ghost" 
+            className="gap-2 text-gray-700 hover:bg-brand-100/50 hover:text-brand-700 transition-all duration-200"
           >
             <User className="h-4 w-4" />
             Iniciar Sesión
@@ -76,9 +76,9 @@ export function Header() {
             <Button 
               variant="ghost" 
               size="icon"
-              className="hover:bg-white/50 transition-colors"
+              className="hover:bg-brand-100/50 transition-colors"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6 text-gray-700" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
@@ -91,7 +91,7 @@ export function Header() {
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="text-lg font-medium text-gray-600 transition-colors hover:text-primary"
+                  className="text-lg font-medium text-gray-700 transition-colors hover:text-primary"
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
@@ -100,13 +100,14 @@ export function Header() {
               <div className="flex flex-col gap-4 mt-4">
                 <Button 
                   variant="outline" 
-                  className="gap-2 w-full bg-white/50 hover:bg-white/80 transition-colors"
+                  className="gap-2 w-full bg-white/80 hover:bg-white transition-colors"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   Carrito ({cartItems})
                 </Button>
                 <Button 
-                  className="gap-2 w-full border-brand-200 bg-white/50 text-brand-700 hover:bg-white/80 hover:text-brand-800 transition-all duration-200"
+                  variant="ghost"
+                  className="gap-2 w-full text-gray-700 hover:bg-brand-100/50 hover:text-brand-700 transition-all duration-200"
                 >
                   <User className="h-4 w-4" />
                   Iniciar Sesión
