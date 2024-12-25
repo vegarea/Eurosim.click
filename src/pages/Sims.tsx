@@ -75,7 +75,6 @@ const Sims = () => {
             <DeliveryBenefits />
             <SimFeatures />
             <CountryCoverage />
-
           </div>
         </div>
       </div>
