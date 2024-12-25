@@ -29,8 +29,8 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/20 bg-gradient-to-r from-brand-500/5 via-brand-500/10 to-brand-500/5 backdrop-blur-xl">
-      <div className="absolute inset-0 bg-white/60" />
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white">
+      <div className="absolute inset-0 bg-white" />
       
       <div className="container relative flex h-16 items-center justify-between">
         {/* Logo */}
