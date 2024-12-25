@@ -29,15 +29,15 @@ const Sims = () => {
     {
       type: "physical" as const,
       title: "Prepago XXL",
-      description: "25GB para toda la UE",
-      price: 999,
+      description: "22GB Europa / 190GB España",
+      price: 1090,
       features: [
-        "25GB de datos 4G/5G",
-        "30 días de validez",
-        "Llamadas ilimitadas",
-        "SMS ilimitados",
-        "Hotspot incluido",
-        "eSIM disponible"
+        "22GB datos en toda Europa",
+        "190GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Velocidad 5G/4G/3G+",
+        "SIM card incluida",
+        "30 días de validez"
       ]
     }
   ];
