@@ -71,7 +71,6 @@ const Sims = () => {
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                   SIM Física para Europa
                   <span className="block mt-2 text-primary flex items-center gap-1">
-                    Simple y Sin Complicaciones
                     <WifiIcon className="w-20 h-20 text-primary animate-float -ml-1" />
                   </span>
                 </h1>
