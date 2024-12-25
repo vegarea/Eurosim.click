@@ -17,7 +17,7 @@ export function PaymentSecurity() {
               className="h-8 object-contain"
             />
             <img 
-              src="https://cdn.worldvectorlogo.com/logos/mastercard-2.svg" 
+              src="https://www.mastercard.es/content/dam/public/mastercardcom/eu/es/images/Mastercard_logo.png" 
               alt="Mastercard"
               className="h-8 object-contain"
             />
