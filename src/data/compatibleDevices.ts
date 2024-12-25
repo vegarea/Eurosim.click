@@ -66,6 +66,7 @@ export const compatibleDevices: BrandDevices[] = [
       { name: "Xiaomi Mi 11 Lite 5G", compatible: true },
       { name: "DOOGEE V30", compatible: true },
       { name: "Fairphone 4", compatible: true },
+      { name: "Mi dispositivo no está en la lista", compatible: false },
     ]
   }
 ];
