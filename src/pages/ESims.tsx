@@ -79,14 +79,6 @@ const ESims = () => {
         <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
           <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-4rem)]">
             <div className="flex flex-col justify-center space-y-8">
-              <Button 
-                variant="ghost" 
-                className="w-fit"
-                onClick={() => navigate("/")}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" /> Volver
-              </Button>
-              
               <div>
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                   <span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">eSIM</span> para Europa
