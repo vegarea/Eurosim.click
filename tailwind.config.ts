@@ -34,21 +34,6 @@ export default {
           hover: "#e32703",
           foreground: "#ffffff",
         },
-        trust: {
-          DEFAULT: "#D3E4FD",
-          hover: "#bfd7fc",
-          foreground: "#1a365d",
-        },
-        success: {
-          DEFAULT: "#F2FCE2",
-          hover: "#e5f9c5",
-          foreground: "#2f4c1f",
-        },
-        neutral: {
-          DEFAULT: "#8E9196",
-          hover: "#757980",
-          foreground: "#ffffff",
-        },
         brand: {
           50: "#fdf2f4",
           100: "#fce7eb",
