@@ -1,21 +1,23 @@
+import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, Zap, Globe2, QrCode } from "lucide-react";
+import { ArrowLeft, Check, Package2, Signal, Globe2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const ESim = () => {
+const Sims = () => {
   const navigate = useNavigate();
 
   const features = [
-    "Activación instantánea con código QR",
-    "Planes desde 8GB hasta 25GB",
-    "Sin necesidad de envío físico",
-    "Perfecto para múltiples destinos",
+    "Cobertura en toda la Unión Europea",
+    "Entrega a domicilio en todo México",
+    "Activación sencilla y rápida",
     "Soporte técnico en español 24/7",
-    "Cobertura en toda la Unión Europea"
+    "Compatible con todos los dispositivos",
+    "Planes desde 8GB hasta 25GB"
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-brand-50/50">
+      <Header />
       <div className="container mx-auto px-4 py-12">
         <Button 
           variant="ghost" 
@@ -27,32 +29,32 @@ const ESim = () => {
 
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">
-              eSIM: Conectividad Instantánea
+            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-brand-600 bg-clip-text text-transparent">
+              SIM Física para Europa
             </h1>
             <p className="text-xl text-gray-600">
-              La solución digital moderna para mantenerte conectado en Europa
+              Tu conexión garantizada en toda la Unión Europea
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 mb-16">
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-xl shadow-lg">
-                <Zap className="w-12 h-12 text-secondary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Activación Inmediata</h3>
+                <Package2 className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Entrega a Domicilio</h3>
                 <p className="text-gray-600">
-                  Configura tu eSIM en minutos y comienza a navegar al instante
+                  Recibe tu SIM en la comodidad de tu hogar en cualquier parte de México
                 </p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-lg">
-                <QrCode className="w-12 h-12 text-secondary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Instalación Simple</h3>
+                <Signal className="w-12 h-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Conexión Estable</h3>
                 <p className="text-gray-600">
-                  Escanea el código QR y sigue las instrucciones paso a paso
+                  Red 4G/LTE de alta velocidad en toda Europa
                 </p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-lg">
-                <Globe2 className="w-12 h-12 text-secondary mb-4" />
+                <Globe2 className="w-12 h-12 text-primary mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Cobertura Total</h3>
                 <p className="text-gray-600">
                   Navega sin preocupaciones en cualquier país de la UE
@@ -65,14 +67,13 @@ const ESim = () => {
               <ul className="space-y-4">
                 {features.map((feature, index) => (
                   <li key={index} className="flex items-center text-gray-700">
-                    <Check className="w-5 h-5 text-secondary mr-3 flex-shrink-0" />
+                    <Check className="w-5 h-5 text-primary mr-3 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <Button 
-                className="w-full mt-8 bg-gradient-to-r from-secondary to-primary"
-                variant="secondary"
+                className="w-full mt-8 bg-gradient-to-r from-primary to-brand-600"
               >
                 Ver Planes Disponibles
               </Button>
@@ -84,4 +85,4 @@ const ESim = () => {
   );
 };
 
-export default ESim;
+export default Sims;

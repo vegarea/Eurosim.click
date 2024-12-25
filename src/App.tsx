@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import PhysicalSim from "./pages/PhysicalSim";
-import ESim from "./pages/ESim";
+import Sims from "./pages/Sims";
+import ESims from "./pages/ESims";
 import "flag-icons/css/flag-icons.min.css";
 
 const queryClient = new QueryClient();
@@ -18,8 +18,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/physical-sim" element={<PhysicalSim />} />
-          <Route path="/esim" element={<ESim />} />
+          <Route path="/sims" element={<Sims />} />
+          <Route path="/e-sims" element={<ESims />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
