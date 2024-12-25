@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, WifiIcon, SignalHigh } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,15 @@ export function HomeHero() {
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 to-white">
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
+      
+      {/* Iconos flotantes de WiFi y señal */}
+      <div className="absolute inset-0 pointer-events-none">
+        <WifiIcon className="absolute top-20 right-[20%] text-[#0EA5E9]/30 w-8 h-8 animate-float" />
+        <SignalHigh className="absolute top-40 left-[15%] text-[#0EA5E9]/20 w-6 h-6 animate-float delay-300" />
+        <WifiIcon className="absolute bottom-32 right-[30%] text-[#0EA5E9]/25 w-6 h-6 animate-float delay-700" />
+        <SignalHigh className="absolute top-1/2 left-[25%] text-[#0EA5E9]/30 w-8 h-8 animate-float delay-500" />
+        <WifiIcon className="absolute bottom-20 left-[35%] text-[#0EA5E9]/20 w-7 h-7 animate-float delay-1000" />
+      </div>
       
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
         <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-4rem)]">
@@ -28,7 +37,7 @@ export function HomeHero() {
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                 Viaja por Europa con Internet
-                <span className="block mt-2 text-[#E02653]">
+                <span className="block mt-2 text-[#0EA5E9]">
                   ¡Siempre Conectado!
                 </span>
               </h1>
