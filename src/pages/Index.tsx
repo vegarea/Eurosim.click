@@ -5,9 +5,66 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import SimQuiz from "@/components/SimQuiz";
-import { ArrowRight, Smartphone, Globe2, Zap } from "lucide-react";
+import { ArrowRight, Smartphone, Globe2, Zap, Check, X } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Index = () => {
+  const comparisonData = [
+    {
+      feature: "Instalación",
+      physical: "Inserción manual de la tarjeta SIM",
+      esim: "Escaneo de QR code o activación remota",
+    },
+    {
+      feature: "Tiempo de activación",
+      physical: "24-72 horas (envío físico)",
+      esim: "Inmediata",
+    },
+    {
+      feature: "Compatibilidad",
+      physical: "Todos los dispositivos",
+      esim: "Dispositivos modernos compatibles con eSIM",
+    },
+    {
+      feature: "Planes disponibles",
+      physical: "20GB o 30GB",
+      esim: "8GB hasta 25GB",
+    },
+    {
+      feature: "Ideal para",
+      physical: "Viajeros con dispositivos antiguos o que prefieren método tradicional",
+      esim: "Viajeros que necesitan conexión inmediata o tienen múltiples destinos",
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "¿Qué es una eSIM?",
+      answer: "Una eSIM es una SIM digital que se instala directamente en tu dispositivo sin necesidad de una tarjeta física. Funciona exactamente igual que una SIM tradicional pero de forma virtual."
+    },
+    {
+      question: "¿Cómo sé si mi dispositivo es compatible con eSIM?",
+      answer: "La mayoría de smartphones modernos (iPhone XS o posterior, Samsung S20 o posterior, Google Pixel 2 o posterior) son compatibles con eSIM. Puedes verificar en los ajustes de tu dispositivo o en nuestro verificador de compatibilidad."
+    },
+    {
+      question: "¿Cuál es más conveniente para mi viaje?",
+      answer: "Si tu dispositivo es compatible con eSIM y necesitas conexión inmediata, la eSIM es tu mejor opción. Si prefieres el método tradicional o tu dispositivo no es compatible con eSIM, la SIM física es la elección correcta."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-brand-50/50 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
@@ -104,6 +161,54 @@ const Index = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Nueva sección de comparación detallada */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Comparativa Detallada
+          </h2>
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-1/3">Característica</TableHead>
+                  <TableHead className="w-1/3">SIM Física</TableHead>
+                  <TableHead className="w-1/3">eSIM</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {comparisonData.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{item.feature}</TableCell>
+                    <TableCell>{item.physical}</TableCell>
+                    <TableCell>{item.esim}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Sección de FAQs */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Preguntas Frecuentes
+          </h2>
+          <div className="max-w-3xl mx-auto">
+            <Accordion type="single" collapsible className="bg-white rounded-xl shadow-lg p-6">
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="text-left">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
           </div>
         </div>
 
