@@ -58,8 +58,13 @@ export function Header() {
         <div className="hidden md:flex items-center gap-4">
           {/* Currency Selector */}
           <Select value={currency} onValueChange={setCurrency}>
-            <SelectTrigger className="w-[80px] h-9 bg-transparent border-none hover:bg-brand-100/50 transition-colors">
-              <SelectValue placeholder="MXN" />
+            <SelectTrigger className="w-[100px] h-9 bg-transparent border-none hover:bg-brand-100/50 transition-colors">
+              <SelectValue>
+                <div className="flex items-center gap-2">
+                  <span className={`fi fi-${currency === 'EUR' ? 'eu' : currency === 'USD' ? 'us' : 'mx'}`}></span>
+                  {currency}
+                </div>
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="MXN" className="flex items-center gap-2">
@@ -130,7 +135,12 @@ export function Header() {
                 {/* Mobile Currency Selector */}
                 <Select value={currency} onValueChange={setCurrency}>
                   <SelectTrigger className="w-full bg-white/80 hover:bg-white transition-colors">
-                    <SelectValue placeholder="MXN" />
+                    <SelectValue>
+                      <div className="flex items-center gap-2">
+                        <span className={`fi fi-${currency === 'EUR' ? 'eu' : currency === 'USD' ? 'us' : 'mx'}`}></span>
+                        {currency}
+                      </div>
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="MXN" className="flex items-center gap-2">
