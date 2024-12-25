@@ -6,8 +6,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-brand-50/50">
       <HomeHero />
-      <TrustElements />
       <SimOptions />
+      <TrustElements />
     </div>
   );
 };
