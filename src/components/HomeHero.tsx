@@ -28,7 +28,7 @@ export function HomeHero() {
             <div>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                 Viaja por Europa con Internet
-                <span className="block mt-2 text-[#E02653]">
+                <span className="block mt-2 text-[#0EA5E9]">
                   ¡Siempre Conectado!
                 </span>
               </h1>
