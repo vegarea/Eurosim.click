@@ -1,19 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, Globe, ShoppingCart, User } from "lucide-react";
+import { Menu, ShoppingCart, User } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,17 +48,6 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
-          <Select defaultValue="es">
-            <SelectTrigger className="w-[110px] gap-2 border-white/20 bg-white/50 backdrop-blur-sm hover:bg-white/80 transition-colors">
-              <Globe className="h-4 w-4" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="es">Español</SelectItem>
-              <SelectItem value="en">English</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Button 
             variant="ghost" 
             size="icon" 
@@ -116,16 +98,6 @@ export function Header() {
                 </Link>
               ))}
               <div className="flex flex-col gap-4 mt-4">
-                <Select defaultValue="es">
-                  <SelectTrigger className="w-full gap-2 bg-white/50">
-                    <Globe className="h-4 w-4" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="es">Español</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                  </SelectContent>
-                </Select>
                 <Button 
                   variant="outline" 
                   className="gap-2 w-full bg-white/50 hover:bg-white/80 transition-colors"
