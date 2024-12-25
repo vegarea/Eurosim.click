@@ -1,6 +1,8 @@
 import { HomeHero } from "@/components/HomeHero";
 import { TrustElements } from "@/components/TrustElements";
 import { SimOptions } from "@/components/SimOptions";
+import { Stats } from "@/components/Stats";
+import { Testimonials } from "@/components/Testimonials";
 
 const Index = () => {
   return (
@@ -8,6 +10,8 @@ const Index = () => {
       <HomeHero />
       <SimOptions />
       <TrustElements />
+      <Stats />
+      <Testimonials />
     </div>
   );
 };
