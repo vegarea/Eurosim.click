@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Wifi } from "lucide-react";
+import { CreditCard, Wifi, Calendar } from "lucide-react";
+import { Tooltip } from "./ui/tooltip";
 
 interface SimCardProps {
   type: "physical" | "esim";
@@ -44,6 +45,20 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
             ${price}
             <span className="text-sm font-normal text-gray-600 ml-1">MXN</span>
           </p>
+        </div>
+
+        <div className="mb-6 p-4 bg-brand-50/30 rounded-lg border border-brand-100">
+          <div className="flex items-start gap-2">
+            <Calendar className="h-5 w-5 text-primary mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-gray-900">
+                ¡Compra con anticipación!
+              </p>
+              <p className="text-sm text-gray-600">
+                Tu SIM se activará automáticamente en tu fecha de llegada a Europa, sin importar cuándo la compres.
+              </p>
+            </div>
+          </div>
         </div>
 
         <ul className="space-y-4 mb-8">
