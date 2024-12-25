@@ -11,6 +11,39 @@ interface SimCardProps {
 }
 
 export function SimCard({ type, title, description, price, features }: SimCardProps) {
+  // Función para determinar el color según el título
+  const getColorScheme = (title: string) => {
+    switch (title) {
+      case "eSIM S":
+        return {
+          iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
+          iconColor: "text-green-600"
+        };
+      case "eSIM M":
+        return {
+          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          iconColor: "text-blue-600"
+        };
+      case "eSIM L":
+        return {
+          iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
+          iconColor: "text-purple-600"
+        };
+      case "eSIM XL":
+        return {
+          iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
+          iconColor: "text-pink-600"
+        };
+      default:
+        return {
+          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          iconColor: "text-blue-600"
+        };
+    }
+  };
+
+  const colorScheme = getColorScheme(title);
+
   return (
     <Card className="w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40">
       {/* Efecto de brillo en hover */}
@@ -20,15 +53,9 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
 
       <CardHeader className="relative">
         <div className="flex items-center gap-3">
-          {title === "Prepago XL" ? (
-            <div className="p-3 bg-gradient-to-br from-[#F2FCE2] to-[#E5F7D3] rounded-xl backdrop-blur-sm">
-              <CreditCard className="h-6 w-6 text-green-600 animate-pulse" />
-            </div>
-          ) : (
-            <div className="p-3 bg-gradient-to-br from-[#D3E4FD] to-[#C4D9F7] rounded-xl backdrop-blur-sm">
-              <CreditCard className="h-6 w-6 text-blue-600 animate-pulse" />
-            </div>
-          )}
+          <div className={`p-3 bg-gradient-to-br ${colorScheme.iconBg} rounded-xl backdrop-blur-sm`}>
+            <CreditCard className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+          </div>
           <div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               {title}
