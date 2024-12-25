@@ -19,7 +19,7 @@ const Index = () => {
         {/* Logo y Hero Section */}
         <div className="text-center mb-16">
           <img 
-            src="/logo.png" 
+            src="logo.png" 
             alt="EuroSim Logo" 
             className="h-24 mx-auto mb-8 animate-float"
           />
