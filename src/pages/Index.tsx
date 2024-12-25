@@ -1,7 +1,6 @@
 import { HomeHero } from "@/components/HomeHero";
 import { TrustElements } from "@/components/TrustElements";
 import { SimOptions } from "@/components/SimOptions";
-import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
 import { PaymentSecurity } from "@/components/PaymentSecurity";
 
@@ -11,7 +10,6 @@ const Index = () => {
       <HomeHero />
       <SimOptions />
       <TrustElements />
-      <Stats />
       <Testimonials />
       <PaymentSecurity />
     </div>
