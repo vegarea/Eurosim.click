@@ -17,12 +17,12 @@ export function PaymentSecurity() {
               className="h-8 object-contain"
             />
             <img 
-              src="https://www.mastercard.com/content/dam/public/mastercardcom/na/global-site/images/logos/mc-logo-52.svg" 
+              src="https://cdn.worldvectorlogo.com/logos/mastercard-2.svg" 
               alt="Mastercard"
               className="h-8 object-contain"
             />
             <img 
-              src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_37x23.jpg" 
+              src="https://cdn.worldvectorlogo.com/logos/paypal-3.svg" 
               alt="PayPal"
               className="h-8 object-contain"
             />
