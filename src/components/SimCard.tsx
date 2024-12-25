@@ -66,7 +66,11 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
       <CardHeader className="relative">
         <div className="flex items-center gap-3">
           <div className={`p-3 bg-gradient-to-br ${colorScheme.iconBg} rounded-xl backdrop-blur-sm`}>
-            <CreditCard className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+            {type === 'physical' ? (
+              <CreditCard className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+            ) : (
+              <Wifi className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+            )}
           </div>
           <div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
