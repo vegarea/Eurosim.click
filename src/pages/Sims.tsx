@@ -3,7 +3,7 @@ import { SimCard } from "@/components/SimCard";
 import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { ArrowRight, Star, WifiIcon, Truck } from "lucide-react";
+import { ArrowRight, WifiIcon, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 
 const Sims = () => {
@@ -80,20 +80,6 @@ const Sims = () => {
                   Recibe tu SIM en la comodidad de tu hogar.
                 </p>
               </div>
-
-              {/* Testimonios */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                  <span className="ml-2 font-medium">4.9/5</span>
-                </div>
-                <span className="mx-2">•</span>
-                <span>+10,000 viajeros satisfechos</span>
-                <span className="mx-2">•</span>
-                <span className="text-primary font-medium">Garantía de servicio</span>
-              </div>
             </div>
 
             {/* Columna de imagen */}
@@ -111,11 +97,6 @@ const Sims = () => {
                     alt="Persona feliz usando su teléfono"
                     className="w-full h-full object-cover rounded-xl"
                   />
-                  
-                  {/* Badge flotante */}
-                  <div className="absolute -bottom-2 -right-2 bg-white px-4 py-2 rounded-lg shadow-lg transform rotate--2">
-                    <p className="text-sm font-medium text-gray-900">¡Más de 10,000 viajeros conectados! 🌍</p>
-                  </div>
                 </div>
               </div>
             </div>
