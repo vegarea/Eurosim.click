@@ -13,6 +13,14 @@ interface SimCardProps {
   isHighlighted?: boolean;
 }
 
+// Función para formatear la descripción con GB en negrita
+const formatDescription = (description: string) => {
+  return description.replace(
+    /(\d+GB)/g,
+    '<span class="font-bold">$1</span>'
+  );
+};
+
 export function SimCard({ type, title, description, price, features, isHighlighted = false }: SimCardProps) {
   // Extraer los GB de la descripción
   const europeGB = parseInt(description.match(/(\d+)GB Europa/)?.[1] || "0");
