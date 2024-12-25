@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wifi } from "lucide-react";
+import { UsageMeter } from "./UsageMeter";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
@@ -9,9 +10,14 @@ interface SimCardProps {
   description: string;
   price: number;
   features: string[];
+  isHighlighted?: boolean;
 }
 
-export function SimCard({ type, title, description, price, features }: SimCardProps) {
+export function SimCard({ type, title, description, price, features, isHighlighted = false }: SimCardProps) {
+  // Extraer los GB de la descripción
+  const europeGB = parseInt(description.match(/(\d+)GB Europa/)?.[1] || "0");
+  const spainGB = parseInt(description.match(/(\d+)GB España/)?.[1] || "0");
+
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
@@ -44,17 +50,6 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
   };
 
   const colorScheme = getColorScheme(title);
-
-  // Function to format description with flags
-  const formatDescription = (desc: string) => {
-    return desc.replace(
-      /(\d+)GB Europa/,
-      `$1GB <span class="fi fi-eu"></span>`
-    ).replace(
-      /(\d+)GB España/,
-      `$1GB <span class="fi fi-es"></span>`
-    );
-  };
 
   return (
     <Card className="w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40">
@@ -92,7 +87,13 @@ export function SimCard({ type, title, description, price, features }: SimCardPr
           </p>
         </div>
 
-        <ul className="space-y-4 mb-8">
+        <UsageMeter 
+          europeGB={europeGB} 
+          spainGB={spainGB}
+          isHighlighted={isHighlighted}
+        />
+
+        <ul className="space-y-4 my-8">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-3 group">
               <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary group-hover:scale-150 transition-transform duration-300" />

@@ -36,7 +36,8 @@ export default function ESims() {
       features: [
         "16GB datos en toda Europa",
         "160GB exclusivo España",
-      ]
+      ],
+      isHighlighted: true
     },
     {
       type: "esim" as const,
