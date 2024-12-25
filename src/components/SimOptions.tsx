@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Smartphone, Globe2, CreditCard, Wifi } from "lucide-react";
+import { ArrowRight, Smartphone, Globe2, CreditCard, Wifi, Truck, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MexicoFlag from "./icons/MexicoFlag";
 
@@ -57,6 +57,10 @@ export function SimOptions() {
                   <ArrowRight className="w-5 h-5 text-primary/60" />
                   <span>Activación sencilla</span>
                 </div>
+                <div className="flex items-center gap-3">
+                  <Truck className="w-5 h-5 text-primary/60" />
+                  <span>Entrega en 72 hrs</span>
+                </div>
               </div>
 
               <Button 
@@ -98,6 +102,10 @@ export function SimOptions() {
                 <div className="flex items-center gap-3">
                   <Smartphone className="w-5 h-5 text-secondary/60" />
                   <span>Para dispositivos compatibles</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-secondary/60" />
+                  <span>Entrega de código QR vía email</span>
                 </div>
               </div>
 
