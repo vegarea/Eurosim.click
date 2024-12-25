@@ -62,8 +62,8 @@ export function Header() {
           </Button>
 
           <Button 
-            variant="default" 
-            className="gap-2 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-lg shadow-primary/20"
+            variant="outline" 
+            className="gap-2 border-brand-200 bg-white/50 text-brand-700 hover:bg-white/80 hover:text-brand-800 transition-all duration-200"
           >
             <User className="h-4 w-4" />
             Iniciar Sesión
@@ -106,7 +106,7 @@ export function Header() {
                   Carrito ({cartItems})
                 </Button>
                 <Button 
-                  className="gap-2 w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                  className="gap-2 w-full border-brand-200 bg-white/50 text-brand-700 hover:bg-white/80 hover:text-brand-800 transition-all duration-200"
                 >
                   <User className="h-4 w-4" />
                   Iniciar Sesión
