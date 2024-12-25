@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { Globe2 } from "lucide-react";
+import { Globe2, Truck } from "lucide-react";
 
 const Sims = () => {
   const simCards = [
@@ -43,49 +43,55 @@ const Sims = () => {
       <Header />
       
       <div className="relative">
-        {/* Fondo decorativo con gradiente y patrón */}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-50/80 to-transparent pointer-events-none h-96" />
-        <div className="absolute inset-0 bg-grid-black pointer-events-none opacity-[0.02]" />
-        
-        <div className="container mx-auto px-4 py-12 relative">
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-8 mb-16">
+        {/* Hero section con imagen de fondo */}
+        <div className="relative h-[500px] overflow-hidden">
+          {/* Imagen de fondo */}
+          <div className="absolute inset-0">
+            <img
+              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+              alt="Viajeros felices en Europa"
+              className="w-full h-full object-cover object-center"
+            />
+            {/* Overlay con gradiente */}
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-500/90 to-secondary/90 mix-blend-multiply" />
+          </div>
+
+          {/* Contenido del hero */}
+          <div className="relative h-full container mx-auto px-4">
+            <div className="flex flex-col h-full justify-center max-w-3xl">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex-1 text-center md:text-left"
+                className="space-y-6"
               >
-                <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-brand-600 bg-clip-text text-transparent">
+                {/* Badge de entrega */}
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 bg-white/90 text-primary px-4 py-2 rounded-full shadow-lg"
+                >
+                  <Truck className="w-5 h-5" />
+                  <span className="font-medium">Entrega a domicilio en todo México</span>
+                </motion.div>
+
+                <h1 className="text-4xl md:text-6xl font-bold text-white">
                   SIM Física para Europa
+                  <span className="block text-brand-50 mt-2">
+                    Simple y Sin Complicaciones
+                  </span>
                 </h1>
-                <p className="text-xl text-gray-600 max-w-2xl">
-                  Mantente conectado en toda la Unión Europea con nuestros planes prepago
+                <p className="text-xl text-white/90 max-w-2xl">
+                  Mantente conectado en toda la Unión Europea con nuestros planes prepago. 
+                  Recibe tu SIM en la comodidad de tu hogar en México.
                 </p>
               </motion.div>
-              
-              {/* Elemento decorativo animado */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative w-48 h-48 flex-shrink-0 hidden md:block"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-2xl animate-pulse" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Globe2 className="w-24 h-24 text-primary animate-float" />
-                </div>
-                <div className="absolute -z-10 inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }} />
-              </motion.div>
             </div>
+          </div>
+        </div>
 
-            {/* Imagen decorativa de fondo */}
-            <div className="absolute top-0 right-0 w-full h-full overflow-hidden -z-10 opacity-10">
-              <img
-                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
-                alt="Background decoration"
-                className="w-full h-full object-cover object-center"
-              />
-            </div>
-
+        <div className="container mx-auto px-4 py-12 relative">
+          <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 mb-16">
               {simCards.map((card, index) => (
                 <motion.div
