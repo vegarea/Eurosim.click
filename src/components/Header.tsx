@@ -7,10 +7,18 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [cartItems] = useState(0);
+  const [currency, setCurrency] = useState("MXN");
 
   const menuItems = [
     { label: "Inicio", href: "/" },
@@ -48,6 +56,18 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Currency Selector */}
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger className="w-[80px] h-9 bg-transparent border-none hover:bg-brand-100/50 transition-colors">
+              <SelectValue placeholder="MXN" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="MXN">MXN</SelectItem>
+              <SelectItem value="USD">USD</SelectItem>
+              <SelectItem value="EUR">EUR</SelectItem>
+            </SelectContent>
+          </Select>
+
           <Button 
             variant="ghost" 
             size="icon" 
@@ -98,6 +118,18 @@ export function Header() {
                 </Link>
               ))}
               <div className="flex flex-col gap-4 mt-4">
+                {/* Mobile Currency Selector */}
+                <Select value={currency} onValueChange={setCurrency}>
+                  <SelectTrigger className="w-full bg-white/80 hover:bg-white transition-colors">
+                    <SelectValue placeholder="MXN" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MXN">MXN</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="EUR">EUR</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 <Button 
                   variant="outline" 
                   className="gap-2 w-full bg-white/80 hover:bg-white transition-colors"
