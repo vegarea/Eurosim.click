@@ -13,13 +13,12 @@ export function HomeHero() {
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       
-      {/* Iconos flotantes de WiFi y señal */}
+      {/* Iconos flotantes de WiFi */}
       <div className="absolute inset-0 pointer-events-none">
-        <WifiIcon className="absolute top-20 right-[20%] text-[#0EA5E9]/30 w-8 h-8 animate-float" />
-        <SignalHigh className="absolute top-40 left-[15%] text-[#0EA5E9]/20 w-6 h-6 animate-float delay-300" />
-        <WifiIcon className="absolute bottom-32 right-[30%] text-[#0EA5E9]/25 w-6 h-6 animate-float delay-700" />
-        <SignalHigh className="absolute top-1/2 left-[25%] text-[#0EA5E9]/30 w-8 h-8 animate-float delay-500" />
-        <WifiIcon className="absolute bottom-20 left-[35%] text-[#0EA5E9]/20 w-7 h-7 animate-float delay-1000" />
+        <WifiIcon className="absolute top-20 right-[20%] text-primary/30 w-8 h-8 animate-float" />
+        <WifiIcon className="absolute bottom-32 right-[30%] text-primary/25 w-6 h-6 animate-float delay-700" />
+        <WifiIcon className="absolute top-1/2 left-[25%] text-primary/30 w-8 h-8 animate-float delay-500" />
+        <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-7 h-7 animate-float delay-1000" />
       </div>
       
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
@@ -28,8 +27,8 @@ export function HomeHero() {
           <div className="flex flex-col justify-center space-y-8">
             <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium bg-white/50 backdrop-blur-sm">
               <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0EA5E9] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0EA5E9]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               ¡Nuevo! eSIM instantánea disponible
             </div>
