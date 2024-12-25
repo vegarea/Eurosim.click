@@ -1,7 +1,9 @@
 import { Header } from "@/components/Header";
+import { SimCard } from "@/components/SimCard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check, Package2, Signal, Globe2 } from "lucide-react";
+import { ArrowLeft, Globe2, Signal, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Sims = () => {
   const navigate = useNavigate();
@@ -11,13 +13,43 @@ const Sims = () => {
     "Entrega a domicilio en todo México",
     "Activación sencilla y rápida",
     "Soporte técnico en español 24/7",
-    "Compatible con todos los dispositivos",
-    "Planes desde 8GB hasta 25GB"
+  ];
+
+  const simCards = [
+    {
+      type: "physical" as const,
+      title: "Prepago XL",
+      description: "15GB para toda la UE",
+      price: 799,
+      features: [
+        "15GB de datos 4G/5G",
+        "30 días de validez",
+        "Llamadas ilimitadas",
+        "SMS ilimitados",
+        "Hotspot incluido",
+        "eSIM disponible"
+      ]
+    },
+    {
+      type: "physical" as const,
+      title: "Prepago XXL",
+      description: "25GB para toda la UE",
+      price: 999,
+      features: [
+        "25GB de datos 4G/5G",
+        "30 días de validez",
+        "Llamadas ilimitadas",
+        "SMS ilimitados",
+        "Hotspot incluido",
+        "eSIM disponible"
+      ]
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-brand-50/50">
+    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50/50">
       <Header />
+      
       <div className="container mx-auto px-4 py-12">
         <Button 
           variant="ghost" 
@@ -27,58 +59,89 @@ const Sims = () => {
           <ArrowLeft className="mr-2 h-4 w-4" /> Volver
         </Button>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
+        <div className="max-w-6xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-16"
+          >
             <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-brand-600 bg-clip-text text-transparent">
               SIM Física para Europa
             </h1>
-            <p className="text-xl text-gray-600">
-              Tu conexión garantizada en toda la Unión Europea
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Mantente conectado en toda la Unión Europea con nuestros planes prepago
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-12 mb-16">
-            <div className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <Package2 className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Entrega a Domicilio</h3>
-                <p className="text-gray-600">
-                  Recibe tu SIM en la comodidad de tu hogar en cualquier parte de México
-                </p>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <Signal className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Conexión Estable</h3>
-                <p className="text-gray-600">
-                  Red 4G/LTE de alta velocidad en toda Europa
-                </p>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <Globe2 className="w-12 h-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Cobertura Total</h3>
-                <p className="text-gray-600">
-                  Navega sin preocupaciones en cualquier país de la UE
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-2xl font-bold mb-6">Características Incluidas</h3>
-              <ul className="space-y-4">
-                {features.map((feature, index) => (
-                  <li key={index} className="flex items-center text-gray-700">
-                    <Check className="w-5 h-5 text-primary mr-3 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Button 
-                className="w-full mt-8 bg-gradient-to-r from-primary to-brand-600"
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {simCards.map((card, index) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.2 }}
               >
-                Ver Planes Disponibles
-              </Button>
-            </div>
+                <SimCard {...card} />
+              </motion.div>
+            ))}
           </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white p-6 rounded-xl shadow-lg"
+            >
+              <Globe2 className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Cobertura Total</h3>
+              <p className="text-gray-600">
+                Navega sin preocupaciones en cualquier país de la UE
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white p-6 rounded-xl shadow-lg"
+            >
+              <Signal className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Red 4G/5G</h3>
+              <p className="text-gray-600">
+                Conexión de alta velocidad en las principales redes europeas
+              </p>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white p-6 rounded-xl shadow-lg"
+            >
+              <Shield className="w-12 h-12 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Garantía de Servicio</h3>
+              <p className="text-gray-600">
+                Soporte 24/7 en español y garantía de devolución
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-br from-primary/5 to-secondary/5 p-8 rounded-2xl backdrop-blur-sm"
+          >
+            <h3 className="text-2xl font-bold mb-6 text-center">¿Por qué elegir nuestra SIM?</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
+                  <span className="text-gray-700">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>
