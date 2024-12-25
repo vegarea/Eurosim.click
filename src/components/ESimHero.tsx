@@ -31,11 +31,8 @@ export function ESimHero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-left">
             <div className="animate-fade-in">
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-                eSIM para tu viaje a Europa
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary bg-300% animate-gradient">
-                  Simple y Sin Complicaciones
-                </span>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+                <span className="text-primary">eSIM</span> para tu viaje a Europa
               </h1>
               <p className="mt-6 text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Conéctate de manera instantánea y disfruta de internet de alta velocidad dondequiera que estés en Europa.
@@ -43,6 +40,7 @@ export function ESimHero() {
               <p className="mt-4 text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Compra, recibe el QR en tu correo, y actívalo al instante. Así de fácil es tener el mejor internet en Europa, sin complicaciones ni sorpresas.
               </p>
+
               <div className="mt-10 flex flex-wrap items-center gap-4">
                 <Dialog>
                   <DialogTrigger asChild>
