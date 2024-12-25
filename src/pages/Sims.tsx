@@ -4,6 +4,7 @@ import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
 import { Truck } from "lucide-react";
+import MexicoFlag from "@/components/icons/MexicoFlag";
 import { motion } from "framer-motion";
 
 const Sims = () => {
@@ -54,6 +55,7 @@ const Sims = () => {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
                 <Truck className="w-4 h-4 mr-2" />
+                <MexicoFlag className="w-6 h-4 mr-2" />
                 Entrega a domicilio en todo México
               </div>
               
