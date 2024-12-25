@@ -3,6 +3,7 @@ import { TrustElements } from "@/components/TrustElements";
 import { SimOptions } from "@/components/SimOptions";
 import { Stats } from "@/components/Stats";
 import { Testimonials } from "@/components/Testimonials";
+import { PaymentSecurity } from "@/components/PaymentSecurity";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <TrustElements />
       <Stats />
       <Testimonials />
+      <PaymentSecurity />
     </div>
   );
 };
