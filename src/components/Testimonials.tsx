@@ -36,21 +36,21 @@ export function Testimonials() {
       location: "Puebla",
       text: "Viajé por Italia y España, la conexión fue estable y rápida en todo momento.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=faces"
+      image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=150&h=150&fit=crop&crop=faces"
     },
     {
       name: "Laura Torres",
       location: "Cancún",
       text: "El proceso de compra fue muy sencillo y la atención al cliente excelente.",
       rating: 4,
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces"
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=150&h=150&fit=crop&crop=faces"
     },
     {
       name: "Diego Ramírez",
       location: "Tijuana",
       text: "Perfecto para mi viaje de negocios por Europa. Conexión confiable y veloz.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces"
+      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=150&h=150&fit=crop&crop=faces"
     }
   ];
 
