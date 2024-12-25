@@ -59,15 +59,42 @@ export function TrustElements() {
     }
   ];
 
+  // Mapa de países con sus códigos ISO correspondientes
   const countries = [
-    "Alemania", "Austria", "Azores", "Bélgica", "Bulgaria", "Channel Islands", 
-    "Chipre", "Croacia", "Dinamarca", "Escocia", "Eslovaquia", "Eslovenia", 
-    "España", "Estonia", "Finlandia", "Francia", "Gales", "Gibraltar", "Grecia",
-    "Guernsey", "Holanda", "Hungría", "Inglaterra", "Irlanda", "Irlanda del Norte",
-    "Islandia", "Islas Aland", "Islas Baleares", "Islas Canarias", "Isla de Man",
-    "Italia", "Jersey", "Letonia", "Liechtenstein", "Lituania", "Luxemburgo",
-    "Madeira", "Malta", "Noruega", "Polonia", "Portugal", "República Checa",
-    "Rumania", "San Marino", "Suecia", "Suiza", "Vaticano"
+    { name: "Alemania", code: "de" },
+    { name: "Austria", code: "at" },
+    { name: "Bélgica", code: "be" },
+    { name: "Bulgaria", code: "bg" },
+    { name: "Chipre", code: "cy" },
+    { name: "Croacia", code: "hr" },
+    { name: "Dinamarca", code: "dk" },
+    { name: "Eslovaquia", code: "sk" },
+    { name: "Eslovenia", code: "si" },
+    { name: "España", code: "es" },
+    { name: "Estonia", code: "ee" },
+    { name: "Finlandia", code: "fi" },
+    { name: "Francia", code: "fr" },
+    { name: "Grecia", code: "gr" },
+    { name: "Holanda", code: "nl" },
+    { name: "Hungría", code: "hu" },
+    { name: "Irlanda", code: "ie" },
+    { name: "Islandia", code: "is" },
+    { name: "Italia", code: "it" },
+    { name: "Letonia", code: "lv" },
+    { name: "Liechtenstein", code: "li" },
+    { name: "Lituania", code: "lt" },
+    { name: "Luxemburgo", code: "lu" },
+    { name: "Malta", code: "mt" },
+    { name: "Noruega", code: "no" },
+    { name: "Polonia", code: "pl" },
+    { name: "Portugal", code: "pt" },
+    { name: "Reino Unido", code: "gb" },
+    { name: "República Checa", code: "cz" },
+    { name: "Rumania", code: "ro" },
+    { name: "San Marino", code: "sm" },
+    { name: "Suecia", code: "se" },
+    { name: "Suiza", code: "ch" },
+    { name: "Vaticano", code: "va" }
   ];
 
   return (
@@ -77,7 +104,7 @@ export function TrustElements() {
           ¿Por qué Elegirnos?
         </h2>
         
-        {/* Features Grid - Características principales */}
+        {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
           {features.map((feature, index) => (
             <div 
@@ -96,7 +123,7 @@ export function TrustElements() {
           ))}
         </div>
 
-        {/* Stats Section - Estadísticas */}
+        {/* Stats Section */}
         <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-2xl p-8 mb-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -141,8 +168,8 @@ export function TrustElements() {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                            <span className={`fi fi-${country.toLowerCase().replace(/\s+/g, '')}`}></span>
-                            <span className="text-sm text-gray-700">{country}</span>
+                            <span className={`fi fi-${country.code}`}></span>
+                            <span className="text-sm text-gray-700">{country.name}</span>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
