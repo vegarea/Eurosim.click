@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { motion } from "framer-motion";
-import { Smartphone, Plane, Globe2, CheckCircle2, Mail, Truck } from "lucide-react";
+import { Smartphone, Plane, Globe2, CheckCircle2, Mail, Truck, AlertCircle } from "lucide-react";
 import { useToast } from "./ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { compatibleDevices, type BrandDevices, type DeviceModel } from "../data/compatibleDevices";
@@ -90,9 +90,14 @@ const SimQuiz = () => {
       setShowResult(true);
       toast({
         title: "Dispositivo no compatible",
-        description: "Te recomendamos usar una SIM física.",
+        description: "Te recomendamos usar una SIM física para garantizar la compatibilidad.",
+        variant: "destructive",
       });
     }
+  };
+
+  const getCurrentBrandModels = () => {
+    return compatibleDevices.find(brand => brand.name === selectedBrand)?.models || [];
   };
 
   const restartQuiz = () => {
@@ -121,10 +126,6 @@ const SimQuiz = () => {
     };
   };
 
-  const getCurrentBrandModels = () => {
-    return compatibleDevices.find(brand => brand.name === selectedBrand)?.models || [];
-  };
-
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
       <Card className="relative overflow-hidden bg-gradient-to-br from-white to-brand-50/50 border-none shadow-lg">
@@ -141,6 +142,9 @@ const SimQuiz = () => {
                   <h3 className="text-2xl font-semibold text-gray-800">
                     Verifica la compatibilidad de tu dispositivo
                   </h3>
+                  <p className="text-gray-600">
+                    Selecciona tu marca y modelo para verificar si es compatible con eSIM
+                  </p>
                 </div>
 
                 <div className="space-y-4">
@@ -178,12 +182,22 @@ const SimQuiz = () => {
                         </SelectTrigger>
                         <SelectContent>
                           {getCurrentBrandModels().map((model) => (
-                            <SelectItem key={model.name} value={model.name}>
+                            <SelectItem 
+                              key={model.name} 
+                              value={model.name}
+                              className={model.compatible ? "" : "text-destructive"}
+                            >
                               {model.name}
+                              {!model.compatible && (
+                                <AlertCircle className="inline-block ml-2 w-4 h-4" />
+                              )}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Si tu modelo no aparece en la lista, selecciona "Mi modelo no está en la lista"
+                      </p>
                     </div>
                   )}
                 </div>

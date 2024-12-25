@@ -25,6 +25,7 @@ export const compatibleDevices: BrandDevices[] = [
       { name: "iPad Air (2019+)", compatible: true },
       { name: "iPad (2019+)", compatible: true },
       { name: "iPad Mini (2019+)", compatible: true },
+      { name: "Mi modelo no está en la lista", compatible: false },
     ]
   },
   {
@@ -39,6 +40,7 @@ export const compatibleDevices: BrandDevices[] = [
       { name: "Galaxy S23 Series", compatible: true },
       { name: "Galaxy S24 Series", compatible: true },
       { name: "Galaxy A54/A55", compatible: true },
+      { name: "Mi modelo no está en la lista", compatible: false },
     ]
   },
   {
@@ -53,6 +55,7 @@ export const compatibleDevices: BrandDevices[] = [
       { name: "Pixel 8/8 Pro/8a", compatible: true },
       { name: "Pixel 9 Pro/9 Pro XL", compatible: true },
       { name: "Pixel Fold", compatible: true },
+      { name: "Mi modelo no está en la lista", compatible: false },
     ]
   },
   {
