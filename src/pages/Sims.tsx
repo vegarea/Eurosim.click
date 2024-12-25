@@ -3,7 +3,7 @@ import { SimCard } from "@/components/SimCard";
 import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { Truck } from "lucide-react";
+import { Truck, Calendar } from "lucide-react";
 import MexicoFlag from "@/components/icons/MexicoFlag";
 import { motion } from "framer-motion";
 
@@ -100,7 +100,7 @@ const Sims = () => {
 
       <div className="container mx-auto px-4 py-12 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
             {simCards.map((card, index) => (
               <motion.div
                 key={card.title}
@@ -112,6 +112,28 @@ const Sims = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Nueva sección informativa */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-16 p-6 rounded-2xl bg-[#D3E4FD]/30 border border-[#D3E4FD] backdrop-blur-sm"
+          >
+            <div className="flex items-start gap-4 max-w-3xl mx-auto">
+              <div className="p-3 bg-[#D3E4FD] rounded-xl">
+                <Calendar className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  ¡Compra tu SIM con anticipación!
+                </h3>
+                <p className="text-gray-600">
+                  No te preocupes por comprar tu SIM con meses de anticipación. Tu SIM se activará automáticamente en tu fecha de llegada a Europa, y a partir de ese momento comenzarán a contar los 30 días de validez. Así puedes asegurar tu conectividad con tiempo.
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           <DeliveryBenefits />
           <SimFeatures />
