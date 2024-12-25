@@ -31,6 +31,8 @@ export default function ESims() {
       features: [
         "8GB datos en toda Europa",
         "80GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Número local gratuito",
         "Velocidad 5G/4G/3G+",
         "Activación inmediata",
         "30 días de validez",
@@ -45,6 +47,8 @@ export default function ESims() {
       features: [
         "12GB datos en toda Europa",
         "120GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Número local gratuito",
         "Velocidad 5G/4G/3G+",
         "Activación inmediata",
         "30 días de validez",
@@ -59,6 +63,8 @@ export default function ESims() {
       features: [
         "16GB datos en toda Europa",
         "160GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Número local gratuito",
         "Velocidad 5G/4G/3G+",
         "Activación inmediata",
         "30 días de validez",
@@ -73,6 +79,8 @@ export default function ESims() {
       features: [
         "22GB datos en toda Europa",
         "190GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Número local gratuito",
         "Velocidad 5G/4G/3G+",
         "Activación inmediata",
         "30 días de validez",
