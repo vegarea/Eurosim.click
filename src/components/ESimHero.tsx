@@ -29,19 +29,19 @@ export function ESimHero() {
 
       <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:px-8 relative">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="text-left">
-            <div className="animate-fade-in">
+          <div className="text-left space-y-8">
+            <div className="animate-fade-in space-y-6">
               <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
                 <span className="text-primary">eSIM</span> para tu viaje a Europa
               </h1>
-              <p className="mt-6 text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
+              <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Conéctate de manera instantánea y disfruta de internet de alta velocidad dondequiera que estés en Europa.
               </p>
-              <p className="mt-4 text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
+              <p className="text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Compra, recibe el QR en tu correo, y actívalo al instante. Así de fácil es tener el mejor internet en Europa, sin complicaciones ni sorpresas.
               </p>
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
