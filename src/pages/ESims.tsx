@@ -9,6 +9,22 @@ export default function ESims() {
   const simCards = [
     {
       type: "esim" as const,
+      title: "Tarifa M",
+      description: "8GB Europa / 100GB España",
+      price: 419,
+      features: [
+        "8GB datos en toda Europa",
+        "100GB exclusivo España",
+        "300 min llamadas internacionales",
+        "Número local gratuito",
+        "Velocidad 5G/4G/3G+",
+        "Activación inmediata",
+        "30 días de validez",
+        "Hotspot incluido"
+      ]
+    },
+    {
+      type: "esim" as const,
       title: "eSIM S",
       description: "8GB Europa / 80GB España",
       price: 690,
