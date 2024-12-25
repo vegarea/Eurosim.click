@@ -79,10 +79,10 @@ const ESims = () => {
                 <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
                   <span className="bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent">eSIM</span> para tu viaje a Europa
                 </h1>
-                <p className="text-lg text-gray-600 max-w-xl">
+                <p className="text-xl font-semibold text-gray-800 max-w-xl">
                   Conéctate de manera instantánea y disfruta de internet de alta velocidad dondequiera que estés en Europa.
                 </p>
-                <p className="text-lg text-gray-600 max-w-xl mt-4">
+                <p className="text-base text-gray-600 max-w-xl mt-4">
                   Compra, recibe el QR en tu correo, y actívalo al instante. Así de fácil es tener el mejor internet en Europa, sin complicaciones ni sorpresas.
                 </p>
               </div>
