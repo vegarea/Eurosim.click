@@ -1,4 +1,4 @@
-import { Star } from "lucide-react";
+import { Star, Check } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -55,19 +55,25 @@ export function Testimonials() {
         </h2>
         
         {/* Overall Rating Display */}
-        <div className="flex items-center justify-center gap-6 mb-12">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-4 mb-12">
+          <div className="flex items-center gap-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <Star 
                   key={i} 
-                  className={`w-6 h-6 ${i < 4 || i === 4 ? 'fill-yellow-400 text-yellow-400' : 'fill-yellow-200 text-yellow-200'}`}
+                  className={`w-4 h-4 ${i < 4 || i === 4 ? 'fill-yellow-400 text-yellow-400' : 'fill-yellow-200 text-yellow-200'}`}
                 />
               ))}
             </div>
-            <span className="text-2xl font-bold text-gray-800">4.7</span>
+            <span className="text-xl font-bold text-gray-800 ml-1">4.7</span>
           </div>
-          <span className="text-gray-500">792 reseñas verificadas</span>
+          <div className="flex items-center gap-1 text-sm text-gray-500">
+            <span>792 reseñas</span>
+            <div className="flex items-center gap-1">
+              <span>verificadas</span>
+              <Check className="w-4 h-4 text-green-500" />
+            </div>
+          </div>
         </div>
 
         <Carousel
