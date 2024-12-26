@@ -5,14 +5,16 @@ import { ShippingForm } from "@/components/checkout/ShippingForm";
 import { ESimForm } from "@/components/checkout/ESimForm";
 import { useCart } from "@/contexts/CartContext";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function Checkout() {
   const { items } = useCart();
   const [step, setStep] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [formData, setFormData] = useState({});
   
   const hasPhysicalSim = items.some(item => item.type === "physical");
   const progress = (step / 3) * 100;
@@ -22,8 +24,61 @@ export default function Checkout() {
   };
 
   const handleFormSubmit = (values: any) => {
-    console.log('Form values:', values);
-    setStep(2);
+    setFormData({ ...formData, ...values });
+    if (step < 3) {
+      setStep(step + 1);
+      setIsFormValid(false); // Reset validation for next step
+    }
+  };
+
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return hasPhysicalSim ? (
+          <ShippingForm 
+            onSubmit={handleFormSubmit}
+            onValidityChange={handleFormValidityChange}
+          />
+        ) : (
+          <ESimForm 
+            onSubmit={handleFormSubmit}
+            onValidityChange={handleFormValidityChange}
+          />
+        );
+      case 2:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
+              Revisa tu información
+            </h2>
+            <div className="bg-gray-50 p-6 rounded-lg">
+              {Object.entries(formData).map(([key, value]) => (
+                <div key={key} className="flex justify-between py-2">
+                  <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
+                  <span className="font-medium">{value as string}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
+              Método de pago
+            </h2>
+            {/* Aquí iría el formulario de pago */}
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -63,29 +118,30 @@ export default function Checkout() {
               transition={{ duration: 0.3 }}
             >
               <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                {step === 1 && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6"
-                  >
-                    <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
-                      {hasPhysicalSim ? 'Información de envío' : 'Información de contacto'}
-                    </h2>
-                    {hasPhysicalSim ? (
-                      <ShippingForm 
-                        onSubmit={handleFormSubmit}
-                        onValidityChange={handleFormValidityChange}
-                      />
-                    ) : (
-                      <ESimForm 
-                        onSubmit={handleFormSubmit}
-                        onValidityChange={handleFormValidityChange}
-                      />
-                    )}
-                  </motion.div>
-                )}
+                {renderStepContent()}
+                
+                <div className="flex justify-between mt-8">
+                  {step > 1 && (
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="flex items-center gap-2"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Volver
+                    </Button>
+                  )}
+                  {step < 3 && (
+                    <Button
+                      className="ml-auto flex items-center gap-2"
+                      onClick={() => isFormValid && handleFormSubmit(formData)}
+                      disabled={!isFormValid}
+                    >
+                      Siguiente
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </motion.div>
 
@@ -98,7 +154,7 @@ export default function Checkout() {
             >
               <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
                 <Cart 
-                  showCheckoutButton={step === 1} 
+                  showCheckoutButton={step === 3} 
                   isButtonEnabled={isFormValid}
                   onCheckout={handleFormSubmit}
                 />
