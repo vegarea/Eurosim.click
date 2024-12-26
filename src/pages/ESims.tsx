@@ -1,5 +1,6 @@
 import { Header } from "@/components/Header";
 import { ESimHero } from "@/components/ESimHero";
+import { HowItWorks } from "@/components/HowItWorks";
 import { CommonFeatures } from "@/components/CommonFeatures";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
@@ -76,6 +77,7 @@ export default function ESims() {
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
       <ESimHero />
+      <HowItWorks />
       
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto">
@@ -84,7 +86,7 @@ export default function ESims() {
           </h2>
 
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-            {/* Panel de selección de planes - Ahora ocupa 65% en desktop */}
+            {/* Panel de selección de planes */}
             <div className="md:w-[65%] order-2 md:order-1">
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {simCards.map((card) => (
@@ -100,7 +102,7 @@ export default function ESims() {
               </div>
             </div>
 
-            {/* Panel de detalles del plan - Ahora ocupa 35% en desktop */}
+            {/* Panel de detalles del plan */}
             <div className="md:w-[35%] order-1 md:order-2">
               <AnimatePresence mode="wait">
                 <PlanDetails
