@@ -1,5 +1,6 @@
 import { Truck, Clock, MapPin, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
+import MexicoFlag from "./icons/MexicoFlag";
 
 export function DeliveryBenefits() {
   const deliveryFeatures = [
@@ -31,8 +32,8 @@ export function DeliveryBenefits() {
       animate={{ opacity: 1, y: 0 }}
       className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-2xl p-8 mb-16"
     >
-      <h3 className="text-2xl font-bold text-center mb-8">
-        Entrega Rápida y Segura en México
+      <h3 className="text-2xl font-bold text-center mb-8 flex items-center justify-center gap-2">
+        Entrega Rápida y Segura en <span className="inline-flex items-center"><MexicoFlag className="w-6 h-4 mr-1" /> México</span>
       </h3>
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {deliveryFeatures.map((feature, index) => (
