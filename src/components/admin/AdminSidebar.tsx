@@ -4,7 +4,9 @@ import {
   Users, 
   Package, 
   Mail,
-  Settings
+  Settings,
+  Truck,
+  QrCode
 } from "lucide-react"
 import {
   Sidebar,
@@ -28,6 +30,16 @@ const menuItems = [
     title: "Pedidos",
     path: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    title: "Envíos Físicos",
+    path: "/admin/physical-shipping",
+    icon: Truck,
+  },
+  {
+    title: "Envíos E-SIM",
+    path: "/admin/esim-delivery",
+    icon: QrCode,
   },
   {
     title: "Clientes",
