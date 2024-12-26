@@ -6,8 +6,11 @@ import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
 import { ProductButton } from "@/components/esim/ProductButton";
 import { PlanDetails } from "@/components/esim/PlanDetails";
+import { FrequentQuestions } from "@/components/FrequentQuestions";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
+
+// ... keep existing code (simCards array and selectedPlan state)
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState({
@@ -117,6 +120,7 @@ export default function ESims() {
             <CommonFeatures />
             <SimFeatures />
             <HowItWorks />
+            <FrequentQuestions />
           </div>
         </div>
       </div>
