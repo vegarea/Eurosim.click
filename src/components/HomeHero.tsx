@@ -78,24 +78,24 @@ export function HomeHero() {
 
           {/* Columna de imagen - Visible en móvil y desktop */}
           <div className="relative order-first lg:order-last">
-            <div className="relative max-w-[400px] mx-auto lg:max-w-none">
+            <div className="relative max-w-[280px] sm:max-w-[400px] mx-auto lg:max-w-none">
               {/* Efectos de blob animados */}
-              <div className="absolute -top-4 -left-4 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-              <div className="absolute -top-4 -right-4 w-72 h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-              <div className="absolute -bottom-8 left-20 w-72 h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+              <div className="absolute -top-3 sm:-top-4 -left-3 sm:-left-4 w-52 sm:w-72 h-52 sm:h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+              <div className="absolute -top-3 sm:-top-4 -right-3 sm:-right-4 w-52 sm:w-72 h-52 sm:h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute -bottom-6 sm:-bottom-8 left-14 sm:left-20 w-52 sm:w-72 h-52 sm:h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
               
               {/* Imagen principal con marco decorativo */}
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[2.5rem] transform rotate-6"></div>
-                <div className="relative bg-white p-3 rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-4 border-white">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[2rem] opacity-50"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[2rem] sm:rounded-[2.5rem] transform rotate-6"></div>
+                <div className="relative bg-white p-2 sm:p-3 rounded-[1.75rem] sm:rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-3 sm:border-4 border-white">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[1.75rem] sm:rounded-[2rem] opacity-50"></div>
                   <img
                     src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop"
                     alt="Persona feliz usando su teléfono"
-                    className="w-full aspect-[4/3] object-cover rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
+                    className="w-full aspect-[4/3] object-cover rounded-[1.5rem] sm:rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
                   />
-                  <div className="absolute -bottom-4 -right-4 bg-white px-4 py-2 rounded-xl shadow-lg transform rotate-3">
-                    <p className="text-sm font-medium text-gray-900">¡Más de 10,000 viajeros conectados! 🌍</p>
+                  <div className="absolute -bottom-3 sm:-bottom-4 -right-3 sm:-right-4 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-lg transform rotate-3">
+                    <p className="text-xs sm:text-sm font-medium text-gray-900">¡Más de 10,000 viajeros conectados! 🌍</p>
                   </div>
                 </div>
               </div>
