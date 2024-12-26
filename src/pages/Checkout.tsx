@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Cart } from "@/components/cart/Cart";
 import { PaymentSecurity } from "@/components/PaymentSecurity";
 import { ShippingForm } from "@/components/checkout/ShippingForm";
+import { DocumentationForm } from "@/components/checkout/DocumentationForm";
 import { ESimForm } from "@/components/checkout/ESimForm";
 import { useCart } from "@/contexts/CartContext";
 import { Progress } from "@/components/ui/progress";
@@ -19,7 +20,7 @@ export default function Checkout() {
   const [formData, setFormData] = useState({});
   
   const hasPhysicalSim = items.some(item => item.type === "physical");
-  const progress = (step / 3) * 100;
+  const progress = (step / 4) * 100; // Actualizado a 4 pasos
 
   const handleFormValidityChange = (isValid: boolean) => {
     setIsFormValid(isValid);
@@ -27,7 +28,7 @@ export default function Checkout() {
 
   const handleFormSubmit = (values: any) => {
     setFormData({ ...formData, ...values });
-    if (step < 3) {
+    if (step < 4) { // Actualizado a 4 pasos
       setStep(step + 1);
       setIsFormValid(false);
     }
@@ -67,6 +68,13 @@ export default function Checkout() {
         );
       case 2:
         return (
+          <DocumentationForm
+            onSubmit={handleFormSubmit}
+            onValidityChange={handleFormValidityChange}
+          />
+        );
+      case 3:
+        return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
               Revisa tu información
@@ -75,13 +83,15 @@ export default function Checkout() {
               {Object.entries(formData).map(([key, value]) => (
                 <div key={key} className="flex justify-between py-2">
                   <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                  <span className="font-medium">{value as string}</span>
+                  <span className="font-medium">
+                    {value instanceof Date ? format(value, "PPP", { locale: es }) : value as string}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         );
-      case 3:
+      case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
@@ -104,7 +114,7 @@ export default function Checkout() {
           {/* Progress Steps */}
           <div className="mb-8 space-y-4 max-w-3xl mx-auto">
             <div className="flex justify-between items-center">
-              {['Información', 'Revisión', 'Pago'].map((stepName, index) => (
+              {['Información', 'Documentación', 'Revisión', 'Pago'].map((stepName, index) => (
                 <motion.div
                   key={stepName}
                   className={`flex items-center ${index + 1 <= step ? 'text-primary' : 'text-gray-400'}`}
@@ -145,7 +155,7 @@ export default function Checkout() {
                       Volver
                     </Button>
                   )}
-                  {step < 3 && (
+                  {step < 4 && (
                     <Button
                       className="ml-auto flex items-center gap-2"
                       onClick={() => isFormValid && handleFormSubmit(formData)}
@@ -168,7 +178,7 @@ export default function Checkout() {
             >
               <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
                 <Cart 
-                  showCheckoutButton={step === 3} 
+                  showCheckoutButton={step === 4} 
                   isButtonEnabled={isFormValid}
                   onCheckout={handleFormSubmit}
                 />
