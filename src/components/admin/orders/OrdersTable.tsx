@@ -15,6 +15,13 @@ interface OrdersTableProps {
   onOrderClick: (order: Order) => void
 }
 
+const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
+  if (type === "physical") {
+    return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]" // Soft blue
+  }
+  return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
+}
+
 export function OrdersTable({ orders, onOrderClick }: OrdersTableProps) {
   return (
     <Table>
@@ -40,7 +47,10 @@ export function OrdersTable({ orders, onOrderClick }: OrdersTableProps) {
             <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
             <TableCell>{order.customer}</TableCell>
             <TableCell>
-              <Badge variant="secondary" className="bg-gray-100">
+              <Badge 
+                variant="secondary" 
+                className={getSimTypeBadgeStyle(order.type)}
+              >
                 {order.type === "physical" ? "SIM Física" : "E-SIM"}
               </Badge>
             </TableCell>
