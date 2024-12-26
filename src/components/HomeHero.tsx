@@ -9,7 +9,7 @@ import SimQuiz from "@/components/SimQuiz";
 
 export function HomeHero() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-brand-50 to-white">
+    <div className="relative min-h-[calc(100vh-4rem)] bg-gradient-to-br from-brand-50 to-white">
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       
@@ -21,10 +21,10 @@ export function HomeHero() {
         <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-3 h-3 md:w-7 md:h-7 animate-float delay-1000" />
       </div>
       
-      <div className="container mx-auto px-4 py-6 md:py-8 h-full">
-        <div className="relative z-10 grid lg:grid-cols-2 gap-8 h-full">
+      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12 h-full">
+        <div className="relative z-10 grid lg:grid-cols-2 gap-8 h-full items-center">
           {/* Columna de contenido */}
-          <div className="flex flex-col justify-start space-y-6 py-8 md:py-12">
+          <div className="flex flex-col justify-center space-y-6">
             <div className="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium bg-white/50 backdrop-blur-sm w-fit">
               <span className="relative flex h-2 w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
@@ -34,22 +34,22 @@ export function HomeHero() {
             </div>
             
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
                 Viaja por Europa con Internet
                 <span className="block mt-2 text-primary flex flex-wrap items-center gap-2">
                   ¡Siempre Conectado!
-                  <WifiIcon className="w-8 h-8 md:w-12 md:h-12 text-primary animate-float" />
+                  <WifiIcon className="w-6 h-6 md:w-12 md:h-12 text-primary animate-float" />
                 </span>
               </h1>
-              <p className="text-lg text-gray-600 max-w-xl">
+              <p className="text-base md:text-lg text-gray-600 max-w-xl">
                 Olvídate del roaming y las complicaciones. Mantente conectado en toda Europa con nuestras SIMs de datos de alta velocidad.
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-fit">
+                  <Button className="w-full md:w-auto animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg">
                     ¿No sabes qué SIM necesitas? Descúbrelo aquí
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -60,12 +60,12 @@ export function HomeHero() {
               </Dialog>
               
               {/* Texto de testimonios */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
                   ))}
-                  <span className="ml-2 font-medium">4.9/5</span>
+                  <span className="ml-1 md:ml-2 font-medium">4.9/5</span>
                 </div>
                 <span className="hidden md:inline">•</span>
                 <span>+10,000 viajeros satisfechos</span>
@@ -102,9 +102,6 @@ export function HomeHero() {
           </div>
         </div>
       </div>
-
-      {/* Línea decorativa inferior */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
     </div>
   );
 }
