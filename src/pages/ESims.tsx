@@ -79,19 +79,25 @@ export default function ESims() {
       
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            Elige tu eSIM ideal
+          </h2>
+
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Panel de selección de planes */}
-            <div className="md:w-1/3 space-y-3">
-              {simCards.map((card) => (
-                <ProductButton
-                  key={card.title}
-                  title={card.title}
-                  price={card.price}
-                  type={card.type}
-                  isSelected={selectedPlan.title === card.title}
-                  onClick={() => setSelectedPlan(card)}
-                />
-              ))}
+            <div className="md:w-1/3">
+              <div className="grid grid-cols-2 gap-3">
+                {simCards.map((card) => (
+                  <ProductButton
+                    key={card.title}
+                    title={card.title}
+                    price={card.price}
+                    type={card.type}
+                    isSelected={selectedPlan.title === card.title}
+                    onClick={() => setSelectedPlan(card)}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Panel de detalles del plan */}
