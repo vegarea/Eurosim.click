@@ -65,7 +65,7 @@ export function SimOptions() {
 
               <Button 
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 group"
-                onClick={() => navigate("/physical-sim")}
+                onClick={() => navigate("/sims")}
               >
                 Conocer más
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -112,7 +112,7 @@ export function SimOptions() {
               <Button 
                 variant="secondary"
                 className="w-full bg-gradient-to-r from-secondary to-primary hover:opacity-90 group"
-                onClick={() => navigate("/esim")}
+                onClick={() => navigate("/e-sims")}
               >
                 Conocer más
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
