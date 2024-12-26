@@ -35,17 +35,14 @@ export function ReviewField({ label, value, onUpdate, type = "text", isActivatio
 
   return (
     <div className={cn(
-      "flex items-center justify-between py-3 border-b transition-all duration-300",
-      isActivationDate && "relative bg-blue-50/50 rounded-lg px-4 animate-float"
+      "flex items-center justify-between py-3 border-b",
+      isActivationDate && "bg-blue-50/30 rounded px-4"
     )}>
-      {isActivationDate && (
-        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-400 rounded-full animate-pulse" />
-      )}
       <div className="flex items-center gap-2">
-        {isActivationDate && <Calendar className="h-4 w-4 text-blue-500" />}
+        {isActivationDate && <Calendar className="h-4 w-4 text-blue-500/70" />}
         <span className={cn(
           "text-gray-600",
-          isActivationDate && "font-medium text-blue-700"
+          isActivationDate && "text-blue-700"
         )}>{label}</span>
       </div>
       {isEditing ? (
