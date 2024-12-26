@@ -1,5 +1,6 @@
 import { ChevronRight, MessageCircle, Globe2, CreditCard, Smartphone, Clock } from "lucide-react";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const questions = [
   {
@@ -35,20 +36,22 @@ const questions = [
 ];
 
 export function FrequentQuestions() {
+  const isMobile = useIsMobile();
+
   return (
-    <section className="py-24 bg-gradient-to-br from-white to-brand-50 relative overflow-hidden">
+    <section className="py-24 md:py-24 bg-gradient-to-br from-white to-brand-50 relative overflow-hidden">
       {/* Elementos decorativos de fondo */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl" />
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-6"
+            className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4 md:mb-6"
           >
             Preguntas <span className="text-primary">frecuentes</span>
           </motion.h2>
@@ -57,14 +60,14 @@ export function FrequentQuestions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
+            className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto"
           >
             Resolvemos tus dudas sobre el servicio de eSIM para que viajes con total tranquilidad
           </motion.p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <div className="space-y-6">
+          <div className="space-y-3 md:space-y-6">
             {questions.map((item, index) => (
               <motion.div
                 key={index}
@@ -74,22 +77,26 @@ export function FrequentQuestions() {
                 transition={{ delay: index * 0.1 }}
                 className="group"
               >
-                <div className={`${item.bgColor} p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-primary/10 backdrop-blur-sm`}>
-                  <div className="flex items-start gap-4">
-                    <div className="relative shrink-0">
-                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
-                      <div className="relative p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl backdrop-blur-sm">
-                        <item.icon className="w-6 h-6 text-primary" />
+                <div className={`${item.bgColor} p-4 md:p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-primary/10 backdrop-blur-sm`}>
+                  <div className="flex items-start gap-3 md:gap-4">
+                    {!isMobile && (
+                      <div className="relative shrink-0">
+                        <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+                        <div className="relative p-3 bg-gradient-to-br from-primary/20 to-primary/5 rounded-xl backdrop-blur-sm">
+                          <item.icon className="w-6 h-6 text-primary" />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <ChevronRight className="w-5 h-5 text-primary transform transition-transform group-hover:translate-x-1" />
-                        <h3 className="text-xl font-semibold text-primary">
+                        {isMobile && (
+                          <item.icon className="w-5 h-5 text-primary shrink-0" />
+                        )}
+                        <h3 className="text-lg md:text-xl font-semibold text-primary">
                           {item.title}
                         </h3>
                       </div>
-                      <p className="text-gray-600 pl-7">
+                      <p className="text-sm md:text-base text-gray-600 md:pl-7">
                         {item.answer}
                       </p>
                     </div>

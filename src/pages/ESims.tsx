@@ -9,10 +9,10 @@ import { PlanDetails } from "@/components/esim/PlanDetails";
 import { FrequentQuestions } from "@/components/FrequentQuestions";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
-
-// ... keep existing code (simCards array and selectedPlan state)
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ESims() {
+  const isMobile = useIsMobile();
   const [selectedPlan, setSelectedPlan] = useState({
     title: "Tarifa XL",
     description: "16GB Europa / 160GB España",
@@ -83,14 +83,14 @@ export default function ESims() {
       
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Elige tu eSIM ideal
           </h2>
 
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+          <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row'} gap-6 md:gap-8`}>
             {/* Panel de selección de planes */}
-            <div className="md:w-[65%] order-2 md:order-1">
-              <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div className={`${isMobile ? 'w-full' : 'md:w-[65%]'} order-2 md:order-1`}>
+              <div className="grid grid-cols-2 gap-2 md:gap-4">
                 {simCards.map((card) => (
                   <ProductButton
                     key={card.title}
@@ -105,7 +105,7 @@ export default function ESims() {
             </div>
 
             {/* Panel de detalles del plan */}
-            <div className="md:w-[35%] order-1 md:order-2">
+            <div className={`${isMobile ? 'w-full' : 'md:w-[35%]'} order-1 md:order-2`}>
               <AnimatePresence mode="wait">
                 <PlanDetails
                   key={selectedPlan.title}
@@ -115,7 +115,7 @@ export default function ESims() {
             </div>
           </div>
 
-          <div className="mt-24">
+          <div className="mt-12 md:mt-24 space-y-12 md:space-y-24">
             <CountryCoverage />
             <CommonFeatures />
             <SimFeatures />
