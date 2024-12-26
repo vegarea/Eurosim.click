@@ -52,7 +52,7 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
           <TooltipTrigger asChild>
             <Info className="h-4 w-4 text-gray-500 cursor-help" />
           </TooltipTrigger>
-          <TooltipContent className="max-w-sm p-4">
+          <TooltipContent className="max-w-sm p-4 bg-white border shadow-md">
             <p className="text-sm">
               Estos datos son aproximados y están basados en un uso moderado que incluye:
               <ul className="list-disc ml-4 mt-2 space-y-1">
