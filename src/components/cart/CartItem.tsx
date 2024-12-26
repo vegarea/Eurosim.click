@@ -1,5 +1,6 @@
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, Mail, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface CartItemProps {
   id: string;
@@ -22,10 +23,34 @@ export function CartItem({
   onUpdateQuantity,
   onRemove,
 }: CartItemProps) {
+  const getDeliveryInfo = (type: "physical" | "esim") => {
+    if (type === "physical") {
+      return {
+        icon: <Truck className="h-3 w-3" />,
+        text: "SIM Física - Entrega a domicilio",
+        variant: "secondary" as const
+      };
+    }
+    return {
+      icon: <Mail className="h-3 w-3" />,
+      text: "eSIM - Entrega por email",
+      variant: "default" as const
+    };
+  };
+
+  const deliveryInfo = getDeliveryInfo(type);
+
   return (
     <div className="flex items-center gap-4 py-4 border-b border-gray-100">
-      <div className="flex-1">
+      <div className="flex-1 space-y-1">
         <h3 className="font-medium text-gray-900">{title}</h3>
+        <Badge 
+          variant={deliveryInfo.variant}
+          className="text-xs flex items-center gap-1 w-fit"
+        >
+          {deliveryInfo.icon}
+          {deliveryInfo.text}
+        </Badge>
         <p className="text-sm text-gray-500">{description}</p>
         <p className="mt-1 text-sm font-medium text-primary">
           ${price.toFixed(2)} MXN
