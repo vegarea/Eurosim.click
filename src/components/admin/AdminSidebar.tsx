@@ -54,14 +54,17 @@ const menuItems = [
 export function AdminSidebar() {
   return (
     <Sidebar>
-      <SidebarContent>
+      <SidebarContent className="bg-gradient-to-b from-brand-500 to-brand-600">
         <SidebarGroup>
-          <SidebarGroupLabel>Panel de Administración</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/90">Panel de Administración</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton 
+                    asChild
+                    className="text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  >
                     <Link to={item.path}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>

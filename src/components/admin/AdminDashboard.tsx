@@ -5,7 +5,12 @@ export function AdminDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Bienvenido al panel de administración
+          </p>
+        </div>
         <div className="flex items-center space-x-4">
           <span className="text-sm text-muted-foreground">
             Última actualización: {new Date().toLocaleString()}
@@ -14,10 +19,10 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50 to-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Ventas Totales</CardTitle>
-            <DollarSign className="h-4 w-4 text-primary" />
+            <DollarSign className="h-4 w-4 text-primary animate-bounce" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$45,231.89</div>
@@ -27,10 +32,10 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50 to-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Nuevos Clientes</CardTitle>
-            <Users className="h-4 w-4 text-primary" />
+            <Users className="h-4 w-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+2350</div>
@@ -40,10 +45,10 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50 to-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pedidos Activos</CardTitle>
-            <Package className="h-4 w-4 text-primary" />
+            <Package className="h-4 w-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+12,234</div>
@@ -53,10 +58,10 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="hover:shadow-lg transition-shadow">
+        <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50 to-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Actividad</CardTitle>
-            <Activity className="h-4 w-4 text-primary" />
+            <Activity className="h-4 w-4 text-primary animate-pulse" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+573</div>
@@ -68,7 +73,7 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 hover:shadow-lg transition-shadow">
+        <Card className="col-span-4 hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50/50 to-white">
           <CardHeader>
             <CardTitle>Resumen de Ventas</CardTitle>
           </CardHeader>
@@ -79,7 +84,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 hover:shadow-lg transition-shadow">
+        <Card className="col-span-3 hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50/50 to-white">
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
           </CardHeader>
