@@ -77,7 +77,6 @@ export default function ESims() {
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
       <ESimHero />
-      <HowItWorks />
       
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-7xl mx-auto">
@@ -117,6 +116,7 @@ export default function ESims() {
             <CommonFeatures />
             <SimFeatures />
             <CountryCoverage />
+            <HowItWorks />
           </div>
         </div>
       </div>
