@@ -121,7 +121,7 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <div className="p-3 space-y-3">
+                      <div className="p-3 space-y-3 bg-white">
                         <div className="grid grid-cols-2 gap-2">
                           <Select
                             value={field.value ? field.value.getFullYear().toString() : ""}
@@ -171,6 +171,7 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
                           }
                           initialFocus
                           captionLayout="buttons"
+                          className="bg-white"
                         />
                       </div>
                     </PopoverContent>
@@ -201,7 +202,6 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
                     <SelectContent>
                       <SelectItem value="M">Masculino</SelectItem>
                       <SelectItem value="F">Femenino</SelectItem>
-                      <SelectItem value="O">Otro</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -282,6 +282,7 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
                         date < new Date()
                       }
                       initialFocus
+                      className="bg-white"
                     />
                   </PopoverContent>
                 </Popover>
