@@ -25,7 +25,7 @@ const App = () => (
             <Route path="/sims" element={<Sims />} />
             <Route path="/e-sims" element={<ESims />} />
             <Route path="/checkout" element={<Checkout />} />
-            <Route path="/paneladmin/*" element={<AdminPanel />} />
+            <Route path="/admin/*" element={<AdminPanel />} />
           </Routes>
         </BrowserRouter>
       </CartProvider>

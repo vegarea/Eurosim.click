@@ -21,32 +21,32 @@ import { Link } from "react-router-dom"
 const menuItems = [
   {
     title: "Dashboard",
-    path: "/paneladmin",
+    path: "/admin",
     icon: LayoutDashboard,
   },
   {
     title: "Pedidos",
-    path: "/paneladmin/orders",
+    path: "/admin/orders",
     icon: ShoppingCart,
   },
   {
     title: "Clientes",
-    path: "/paneladmin/customers",
+    path: "/admin/customers",
     icon: Users,
   },
   {
     title: "Productos",
-    path: "/paneladmin/products",
+    path: "/admin/products",
     icon: Package,
   },
   {
     title: "Emails",
-    path: "/paneladmin/emails",
+    path: "/admin/emails",
     icon: Mail,
   },
   {
     title: "Configuración",
-    path: "/paneladmin/settings",
+    path: "/admin/settings",
     icon: Settings,
   },
 ]
