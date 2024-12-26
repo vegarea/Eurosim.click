@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Wifi, ShoppingCart } from "lucide-react";
+import { CreditCard, Wifi } from "lucide-react";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
@@ -114,22 +114,12 @@ export function SimCard({
           ))}
         </ul>
 
-        <div className="space-y-3">
-          <Button 
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
-            onClick={onSelect}
-          >
-            {isSelected ? 'Plan Seleccionado' : 'Seleccionar Plan'}
-          </Button>
-
-          <Button 
-            variant="outline"
-            className="w-full hover:bg-primary/5 transform transition-all duration-300 hover:scale-105 group"
-          >
-            <ShoppingCart className="mr-2 h-4 w-4 group-hover:text-primary transition-colors" />
-            Comprar
-          </Button>
-        </div>
+        <Button 
+          className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
+          onClick={onSelect}
+        >
+          {isSelected ? 'Plan Seleccionado' : 'Seleccionar Plan'}
+        </Button>
       </CardContent>
 
       {/* Elementos decorativos de fondo */}
