@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
-import { User, Calendar, Passport } from "lucide-react"
+import { User, Calendar, CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -176,7 +176,7 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-2">
-                  <Passport className="w-4 h-4" />
+                  <CreditCard className="w-4 h-4" />
                   Número de pasaporte
                 </FormLabel>
                 <FormControl>

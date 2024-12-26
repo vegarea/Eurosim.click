@@ -12,6 +12,8 @@ import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, ArrowLeft } from "lucide-react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 
 export default function Checkout() {
   const { items } = useCart();
