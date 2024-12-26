@@ -3,6 +3,8 @@ import { UsageMeter } from "@/components/UsageMeter";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 
 interface PlanDetailsProps {
   title: string;
@@ -14,12 +16,24 @@ interface PlanDetailsProps {
 
 export function PlanDetails({ title, description, features, europeGB, spainGB }: PlanDetailsProps) {
   const { toast } = useToast();
+  const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const handlePurchase = () => {
+    addItem({
+      id: `esim-${title}`,
+      type: "esim",
+      title,
+      description,
+      price: 0 // You need to add price to the props and use it here
+    });
+    
     toast({
       title: "Producto añadido al carrito",
       description: `Has seleccionado el plan ${title}`,
     });
+    
+    navigate('/checkout');
   };
 
   return (

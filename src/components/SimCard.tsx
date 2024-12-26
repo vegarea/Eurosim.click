@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wifi } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
@@ -34,6 +35,7 @@ export function SimCard({
   onSelect 
 }: SimCardProps) {
   const { addItem } = useCart();
+  const navigate = useNavigate();
   
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
@@ -74,6 +76,7 @@ export function SimCard({
       description,
       price
     });
+    navigate('/checkout');
   };
 
   const colorScheme = getColorScheme(title);
