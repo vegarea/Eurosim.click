@@ -84,8 +84,8 @@ export default function ESims() {
           </h2>
 
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-            {/* Panel de selección de planes */}
-            <div className="md:w-2/5">
+            {/* Panel de selección de planes - Ahora ocupa 65% en desktop */}
+            <div className="md:w-[65%] order-2 md:order-1">
               <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {simCards.map((card) => (
                   <ProductButton
@@ -100,8 +100,8 @@ export default function ESims() {
               </div>
             </div>
 
-            {/* Panel de detalles del plan */}
-            <div className="md:w-3/5">
+            {/* Panel de detalles del plan - Ahora ocupa 35% en desktop */}
+            <div className="md:w-[35%] order-1 md:order-2">
               <AnimatePresence mode="wait">
                 <PlanDetails
                   key={selectedPlan.title}
