@@ -36,7 +36,10 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange"
-  })
+  });
+
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
+  const months = Array.from({ length: 12 }, (_, i) => i);
 
   useEffect(() => {
     const subscription = form.watch(() => {
@@ -118,15 +121,58 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                      />
+                      <div className="p-3 space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <Select
+                            value={field.value ? field.value.getFullYear().toString() : ""}
+                            onValueChange={(year) => {
+                              const newDate = new Date(field.value || new Date());
+                              newDate.setFullYear(parseInt(year));
+                              field.onChange(newDate);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Año" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {years.map((year) => (
+                                <SelectItem key={year} value={year.toString()}>
+                                  {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select
+                            value={field.value ? field.value.getMonth().toString() : ""}
+                            onValueChange={(month) => {
+                              const newDate = new Date(field.value || new Date());
+                              newDate.setMonth(parseInt(month));
+                              field.onChange(newDate);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Mes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {months.map((month) => (
+                                <SelectItem key={month} value={month.toString()}>
+                                  {new Date(2000, month).toLocaleString('es', { month: 'long' })}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <CalendarComponent
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                          captionLayout="buttons"
+                        />
+                      </div>
                     </PopoverContent>
                   </Popover>
                   <FormMessage />
