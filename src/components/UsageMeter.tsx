@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface UsageMeterProps {
@@ -38,9 +44,29 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
           : 'bg-white/50'
       }`}
     >
-      <h3 className="text-lg font-semibold mb-6 text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-        Días Estimados de Uso
-      </h3>
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <h3 className="text-lg font-semibold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          Días Estimados de Uso
+        </h3>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-4 w-4 text-gray-500 cursor-help" />
+          </TooltipTrigger>
+          <TooltipContent className="max-w-sm p-4">
+            <p className="text-sm">
+              Estos datos son aproximados y están basados en un uso moderado que incluye:
+              <ul className="list-disc ml-4 mt-2 space-y-1">
+                <li>Uso frecuente de Google Maps para navegación</li>
+                <li>Redes sociales con publicación de fotos y videos</li>
+                <li>Videollamadas cortas (10-15 minutos por día)</li>
+                <li>Búsqueda frecuente de restaurantes, atracciones, etc</li>
+                <li>Uso de aplicaciones de streaming para música</li>
+              </ul>
+              <p className="mt-2 text-xs text-gray-500">El consumo real dependerá de tus hábitos de uso.</p>
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
 
       <div className="space-y-6">
         {/* Medidor Europa */}
