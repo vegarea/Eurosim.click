@@ -5,22 +5,25 @@ import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Mail, Check } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Order } from "../orders/types"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
-  // Filtramos solo las órdenes e-sim que estén en estado "processing"
-  const [orders] = useState(mockOrders.filter(order => 
-    order.type === "esim" && order.status === "processing"
-  ))
+  const [orders] = useState(mockOrders.filter(order => order.type === "esim"))
 
-  const handleSendQR = (order: any) => {
+  // Filtrar pedidos por estado
+  const pendingOrders = orders.filter(order => order.status === "processing")
+  const completedOrders = orders.filter(order => order.status === "delivered")
+
+  const handleSendQR = (order: Order) => {
     toast({
       title: "QR enviado",
       description: `El QR del pedido ${order.id} ha sido enviado por email.`
     })
   }
 
-  const handleMarkDelivered = (order: any) => {
+  const handleMarkDelivered = (order: Order) => {
     toast({
       title: "Pedido marcado como entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
@@ -60,13 +63,14 @@ export function AdminESimDelivery() {
       id: "actions",
       cell: ({ row }: any) => {
         const order = row.original
+        const isPending = order.status === "processing"
         return (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handleSendQR(order)}
-              disabled={order.status !== "processing"}
+              disabled={!isPending}
             >
               <Mail className="w-4 h-4 mr-2" />
               Enviar QR
@@ -75,7 +79,7 @@ export function AdminESimDelivery() {
               variant="outline"
               size="sm"
               onClick={() => handleMarkDelivered(order)}
-              disabled={order.status !== "processing"}
+              disabled={!isPending}
             >
               <Check className="w-4 h-4 mr-2" />
               Marcar como entregado
@@ -95,10 +99,46 @@ export function AdminESimDelivery() {
         </p>
       </div>
 
-      <DataTable 
-        columns={columns} 
-        data={orders}
-      />
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="pending" className="relative">
+            Pendientes de Envío
+            {pendingOrders.length > 0 && (
+              <Badge 
+                variant="secondary" 
+                className="ml-2 bg-purple-100 text-purple-800"
+              >
+                {pendingOrders.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="completed">
+            Envíos Completados
+            {completedOrders.length > 0 && (
+              <Badge 
+                variant="secondary" 
+                className="ml-2 bg-green-100 text-green-800"
+              >
+                {completedOrders.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="pending" className="mt-6">
+          <DataTable 
+            columns={columns} 
+            data={pendingOrders}
+          />
+        </TabsContent>
+        
+        <TabsContent value="completed" className="mt-6">
+          <DataTable 
+            columns={columns} 
+            data={completedOrders}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
