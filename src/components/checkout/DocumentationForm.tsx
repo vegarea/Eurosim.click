@@ -30,11 +30,25 @@ const formSchema = z.object({
 interface DocumentationFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
+  initialData?: {
+    fullName: string;
+    birthDate: Date;
+    gender: string;
+    passportNumber: string;
+    activationDate: Date;
+  };
 }
 
-export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationFormProps) {
+export function DocumentationForm({ onSubmit, onValidityChange, initialData }: DocumentationFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      fullName: initialData?.fullName || "",
+      birthDate: initialData?.birthDate || new Date(),
+      gender: initialData?.gender || "",
+      passportNumber: initialData?.passportNumber || "",
+      activationDate: initialData?.activationDate || new Date(),
+    },
     mode: "onChange"
   });
 

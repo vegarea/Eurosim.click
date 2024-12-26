@@ -16,15 +16,20 @@ const formSchema = z.object({
 interface ESimFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
+  initialData?: {
+    fullName: string;
+    email: string;
+    phone: string;
+  };
 }
 
-export function ESimForm({ onSubmit, onValidityChange }: ESimFormProps) {
+export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fullName: "",
-      email: "",
-      phone: "",
+      fullName: initialData?.fullName || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
     },
     mode: "onChange"
   })

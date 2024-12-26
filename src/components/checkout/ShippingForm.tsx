@@ -21,19 +21,28 @@ interface ShippingFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
   email?: string;
+  initialData?: {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
 }
 
-export function ShippingForm({ onSubmit, onValidityChange, email = '' }: ShippingFormProps) {
+export function ShippingForm({ onSubmit, onValidityChange, email = '', initialData }: ShippingFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: email,
-      fullName: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
+      email: email || initialData?.email || "",
+      fullName: initialData?.fullName || "",
+      phone: initialData?.phone || "",
+      address: initialData?.address || "",
+      city: initialData?.city || "",
+      state: initialData?.state || "",
+      zipCode: initialData?.zipCode || "",
     },
     mode: "onChange"
   })
