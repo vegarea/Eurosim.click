@@ -1,54 +1,21 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CartItem } from "./CartItem";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-
-interface CartProduct {
-  id: string;
-  type: "physical" | "esim";
-  title: string;
-  description: string;
-  price: number;
-  quantity: number;
-}
+import { useCart } from "@/contexts/CartContext";
 
 export function Cart() {
   const { toast } = useToast();
-  const [items, setItems] = useState<CartProduct[]>([
-    // Example item - replace with actual cart management
-    {
-      id: "1",
-      type: "esim",
-      title: "Tarifa XL",
-      description: "16GB Europa / 160GB España",
-      price: 817,
-      quantity: 1,
-    },
-  ]);
-
-  const updateQuantity = (id: string, quantity: number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, quantity } : item
-    ));
-  };
-
-  const removeItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
-    toast({
-      title: "Producto eliminado",
-      description: "El producto ha sido eliminado del carrito",
-    });
-  };
-
-  const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const shipping = items.some(item => item.type === "physical") ? 99 : 0;
-  const total = subtotal + shipping;
+  const { items, removeItem, updateQuantity } = useCart();
 
   const handleCheckout = () => {
     // Implement checkout logic
     console.log("Proceeding to checkout");
   };
+
+  const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const shipping = items.some(item => item.type === "physical") ? 99 : 0;
+  const total = subtotal + shipping;
 
   return (
     <div className="max-w-2xl mx-auto p-4 bg-white rounded-xl shadow-sm">
