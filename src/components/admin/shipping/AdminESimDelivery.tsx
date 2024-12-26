@@ -10,20 +10,34 @@ import { Order } from "../orders/types"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
-  const [orders] = useState(mockOrders.filter(order => order.type === "esim"))
+  const [orders, setOrders] = useState(mockOrders.filter(order => order.type === "esim"))
 
   // Filtrar pedidos por estado
   const pendingOrders = orders.filter(order => order.status === "processing")
   const completedOrders = orders.filter(order => order.status === "delivered")
 
   const handleSendQR = (order: Order) => {
+    // Actualizar el estado del pedido a entregado
+    setOrders(orders.map(o => 
+      o.id === order.id 
+        ? { ...o, status: "delivered" }
+        : o
+    ))
+
     toast({
-      title: "QR enviado",
-      description: `El QR del pedido ${order.id} ha sido enviado por email.`
+      title: "QR enviado y pedido actualizado",
+      description: `El QR del pedido ${order.id} ha sido enviado por email y marcado como entregado.`
     })
   }
 
   const handleMarkDelivered = (order: Order) => {
+    // Actualizar el estado del pedido a entregado
+    setOrders(orders.map(o => 
+      o.id === order.id 
+        ? { ...o, status: "delivered" }
+        : o
+    ))
+
     toast({
       title: "Pedido marcado como entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`

@@ -10,13 +10,20 @@ import { Order } from "../orders/types"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
-  const [orders] = useState(mockOrders.filter(order => order.type === "physical"))
+  const [orders, setOrders] = useState(mockOrders.filter(order => order.type === "physical"))
 
   // Filtrar pedidos por estado
   const pendingOrders = orders.filter(order => order.status === "processing")
   const shippedOrders = orders.filter(order => ["shipped", "delivered"].includes(order.status))
 
   const handleShipOrder = (order: Order) => {
+    // Actualizar el estado del pedido a enviado
+    setOrders(orders.map(o => 
+      o.id === order.id 
+        ? { ...o, status: "shipped" }
+        : o
+    ))
+
     toast({
       title: "Pedido marcado como enviado",
       description: `El pedido ${order.id} ha sido marcado como enviado.`
@@ -24,6 +31,13 @@ export function AdminPhysicalShipping() {
   }
 
   const handleDeliverOrder = (order: Order) => {
+    // Actualizar el estado del pedido a entregado
+    setOrders(orders.map(o => 
+      o.id === order.id 
+        ? { ...o, status: "delivered" }
+        : o
+    ))
+
     toast({
       title: "Pedido marcado como entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
