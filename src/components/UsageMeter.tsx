@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
-import { Globe2, MapPin } from 'lucide-react';
+import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface UsageMeterProps {
   europeGB: number;
@@ -52,7 +52,7 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
         >
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
-              <Globe2 className="w-5 h-5 text-primary" />
+              <span className="fi fi-eu w-5 h-5 rounded-sm shadow-sm"></span>
               <span className="font-medium">Europa</span>
             </div>
             <motion.span
@@ -79,7 +79,7 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
         >
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-secondary" />
+              <span className="fi fi-es w-5 h-5 rounded-sm shadow-sm"></span>
               <span className="font-medium">España</span>
             </div>
             <motion.span
