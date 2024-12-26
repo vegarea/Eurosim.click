@@ -15,14 +15,13 @@ export function PlanDetails({ title, description, features, europeGB, spainGB }:
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg"
+      className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
     >
-      <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <h2 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
         {title}
       </h2>
-      <p className="text-gray-600 mb-6">{description}</p>
 
-      <div className="space-y-4 mb-6">
+      <div className="space-y-3 mb-4">
         {features.map((feature, index) => (
           <motion.div
             key={index}
