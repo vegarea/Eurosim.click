@@ -10,31 +10,31 @@ export function PaymentSecurity() {
         
         <div className="max-w-4xl mx-auto">
           {/* Payment Methods */}
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-12">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 mb-12">
             <img 
               src="https://cdn.visa.com/v2/assets/images/logos/visa/blue/logo.png" 
               alt="Visa"
-              className="h-8 object-contain"
+              className="h-5 sm:h-6 md:h-8 object-contain"
             />
             <img 
               src="https://www.mastercard.es/content/dam/public/mastercardcom/eu/es/images/logo/mc-logo-52.svg" 
               alt="Mastercard"
-              className="h-8 object-contain"
+              className="h-5 sm:h-6 md:h-8 object-contain"
             />
             <img 
               src="https://cdn.worldvectorlogo.com/logos/paypal-3.svg" 
               alt="PayPal"
-              className="h-8 object-contain"
+              className="h-5 sm:h-6 md:h-8 object-contain"
             />
             <img 
               src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" 
               alt="Stripe"
-              className="h-8 object-contain"
+              className="h-5 sm:h-6 md:h-8 object-contain"
             />
             <img 
               src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" 
               alt="Google Pay"
-              className="h-8 object-contain grayscale"
+              className="h-5 sm:h-6 md:h-8 object-contain grayscale"
             />
           </div>
 
