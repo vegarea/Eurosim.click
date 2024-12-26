@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Wifi } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 
 interface SimCardProps {
@@ -32,6 +33,8 @@ export function SimCard({
   isSelected = false,
   onSelect 
 }: SimCardProps) {
+  const { addItem } = useCart();
+  
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
@@ -61,6 +64,16 @@ export function SimCard({
           iconColor: "text-blue-600"
         };
     }
+  };
+
+  const handleAddToCart = () => {
+    addItem({
+      id: `${type}-${title}`,
+      type,
+      title,
+      description,
+      price
+    });
   };
 
   const colorScheme = getColorScheme(title);
@@ -116,9 +129,9 @@ export function SimCard({
 
         <Button 
           className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
-          onClick={onSelect}
+          onClick={handleAddToCart}
         >
-          {isSelected ? 'Plan Seleccionado' : 'Seleccionar Plan'}
+          Añadir al Carrito
         </Button>
       </CardContent>
 
