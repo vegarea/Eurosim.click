@@ -25,41 +25,51 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
+      
       <main className="container mx-auto py-8 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8 space-y-4">
-            <h1 className="text-2xl font-bold text-center">
-              {step === 1 ? 'Información de contacto' : 'Resumen y pago'}
-            </h1>
-            <Progress value={progress} className="w-full" />
-            <div className="flex justify-between text-sm text-gray-500">
-              <span className={step >= 1 ? "text-primary font-medium" : ""}>
-                Información
-              </span>
-              <span className={step >= 2 ? "text-primary font-medium" : ""}>
-                Pago
-              </span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Columna izquierda - Formulario */}
+          <div className="lg:col-span-7 xl:col-span-8">
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <div className="mb-8 space-y-4">
+                <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {step === 1 ? 'Información de contacto' : 'Resumen y pago'}
+                </h1>
+                <Progress value={progress} className="w-full" />
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span className={step >= 1 ? "text-primary font-medium" : ""}>
+                    Información
+                  </span>
+                  <span className={step >= 2 ? "text-primary font-medium" : ""}>
+                    Pago
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {step === 1 && (
+                  <div className="animate-fade-in">
+                    {hasPhysicalSim ? (
+                      <ShippingForm onSubmit={handleShippingSubmit} />
+                    ) : (
+                      <ESimForm onSubmit={handleESimSubmit} />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-8 animate-fade-in">
-            {step === 1 ? (
-              <div className="space-y-6">
-                {hasPhysicalSim ? (
-                  <ShippingForm onSubmit={handleShippingSubmit} />
-                ) : (
-                  <ESimForm onSubmit={handleESimSubmit} />
-                )}
-              </div>
-            ) : (
+          {/* Columna derecha - Resumen del carrito */}
+          <div className="lg:col-span-5 xl:col-span-4">
+            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
               <Cart />
-            )}
-          </div>
-          
-          <div className="mt-8">
-            <PaymentSecurity />
+              <div className="mt-6">
+                <PaymentSecurity />
+              </div>
+            </div>
           </div>
         </div>
       </main>
