@@ -16,7 +16,7 @@ export function SimOptions() {
       <div className="absolute -z-10 bottom-1/4 left-0 w-72 h-72 bg-gradient-to-tr from-secondary/5 to-primary/5 rounded-full blur-3xl" />
 
       <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-6 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           Elige tu Solución de Conectividad
         </h2>
         <p className="text-gray-600 text-center mb-16 max-w-2xl mx-auto">
