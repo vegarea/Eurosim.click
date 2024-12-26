@@ -1,16 +1,17 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CartProvider } from "./contexts/CartContext";
-import Index from "./pages/Index";
-import Sims from "./pages/Sims";
-import ESims from "./pages/ESims";
-import Checkout from "./pages/Checkout";
-import "flag-icons/css/flag-icons.min.css";
+import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { CartProvider } from "./contexts/CartContext"
+import Index from "./pages/Index"
+import Sims from "./pages/Sims"
+import ESims from "./pages/ESims"
+import Checkout from "./pages/Checkout"
+import AdminPanel from "./pages/AdminPanel"
+import "flag-icons/css/flag-icons.min.css"
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,11 +25,12 @@ const App = () => (
             <Route path="/sims" element={<Sims />} />
             <Route path="/e-sims" element={<ESims />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/paneladmin/*" element={<AdminPanel />} />
           </Routes>
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>
-);
+)
 
-export default App;
+export default App
