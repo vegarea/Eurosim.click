@@ -50,9 +50,9 @@ export function HomeHero() {
             <div className="flex flex-col gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-full sm:w-fit">
+                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-full sm:w-fit text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-2.5">
                     ¿No sabes qué SIM necesitas? Descúbrelo aquí
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
