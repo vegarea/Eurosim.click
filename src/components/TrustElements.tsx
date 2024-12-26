@@ -40,26 +40,25 @@ export function TrustElements() {
     {
       value: "10,000+",
       label: "Viajeros Conectados",
-      icon: <Users className="w-6 h-6" />
+      icon: <Users className="w-5 h-5 sm:w-6 sm:h-6" />
     },
     {
       value: "34",
       label: "Países y Territorios",
-      icon: <Globe2 className="w-6 h-6" />
+      icon: <Globe2 className="w-5 h-5 sm:w-6 sm:h-6" />
     },
     {
       value: "24/7",
       label: "Soporte Técnico",
-      icon: <Headphones className="w-6 h-6" />
+      icon: <Headphones className="w-5 h-5 sm:w-6 sm:h-6" />
     },
     {
       value: "100%",
       label: "Garantía de Servicio",
-      icon: <CheckCircle className="w-6 h-6" />
+      icon: <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
     }
   ];
 
-  // Mapa de países con sus códigos ISO correspondientes
   const countries = [
     { name: "Alemania", code: "de" },
     { name: "Austria", code: "at" },
@@ -98,46 +97,46 @@ export function TrustElements() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-12 sm:py-16 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-gray-900">
           ¿Por qué Elegirnos?
         </h2>
         
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 mb-12 sm:mb-20">
           {features.map((feature, index) => (
             <div 
               key={index}
               className="relative group hover:scale-105 transition-all duration-300"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl transform -rotate-2 group-hover:rotate-1 transition-transform" />
-              <div className="relative bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all">
-                <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center text-primary bg-primary/10 rounded-full group-hover:scale-110 transition-transform">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl sm:rounded-2xl transform -rotate-2 group-hover:rotate-1 transition-transform" />
+              <div className="relative bg-white p-4 sm:p-6 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center text-primary bg-primary/10 rounded-full group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-2 text-center">{feature.title}</h3>
-                <p className="text-gray-600 text-center text-sm">{feature.description}</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-center">{feature.title}</h3>
+                <p className="text-gray-600 text-sm sm:text-base text-center">{feature.description}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Stats Section */}
-        <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-2xl p-8 mb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-12 sm:mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             {stats.map((stat, index) => (
               <div 
                 key={index}
-                className="flex flex-col items-center text-center space-y-2 group"
+                className="flex flex-col items-center text-center space-y-1 sm:space-y-2 group"
               >
-                <div className="w-12 h-12 flex items-center justify-center text-primary bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-primary bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
                   {stat.icon}
                 </div>
-                <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   {stat.value}
                 </span>
-                <span className="text-gray-600 text-sm">
+                <span className="text-xs sm:text-sm text-gray-600">
                   {stat.label}
                 </span>
               </div>
@@ -146,24 +145,24 @@ export function TrustElements() {
         </div>
 
         {/* Sección de cobertura con acordeón */}
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl p-6 shadow-lg">
+        <div className="max-w-3xl mx-auto bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="coverage">
-              <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold hover:no-underline">
+              <AccordionTrigger className="flex items-center gap-2 text-base sm:text-xl font-semibold hover:no-underline">
                 <div className="flex items-center gap-2">
-                  <span className="fi fi-eu w-6 h-6 rounded-sm shadow-sm"></span>
+                  <span className="fi fi-eu w-5 h-5 sm:w-6 sm:h-6 rounded-sm shadow-sm"></span>
                   <span>Cobertura en Europa</span>
-                  <span className="text-sm font-normal text-gray-500 ml-2">
+                  <span className="text-xs sm:text-sm font-normal text-gray-500 ml-2">
                     ({countries.length} países y territorios)
                   </span>
                 </div>
-                <div className="flex items-center gap-2 ml-auto text-sm font-normal text-primary hover:text-primary/80">
+                <div className="flex items-center gap-2 ml-auto text-xs sm:text-sm font-normal text-primary hover:text-primary/80">
                   <span>Ver cobertura</span>
                   <ChevronDown className="h-4 w-4 shrink-0 text-primary transition-transform duration-200" />
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <p className="text-gray-600 mb-4 text-sm">
+                <p className="text-gray-600 mb-4 text-xs sm:text-sm">
                   Navega sin preocupaciones en cualquiera de estos destinos:
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -171,9 +170,9 @@ export function TrustElements() {
                     <TooltipProvider key={index}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                          <div className="flex items-center gap-2 p-1.5 sm:p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                             <span className={`fi fi-${country.code}`}></span>
-                            <span className="text-sm text-gray-700">{country.name}</span>
+                            <span className="text-xs sm:text-sm text-gray-700">{country.name}</span>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent>
