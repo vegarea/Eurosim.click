@@ -9,39 +9,39 @@ import SimQuiz from "@/components/SimQuiz";
 
 export function HomeHero() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 to-white">
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-gradient-to-br from-brand-50 to-white">
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       
       {/* Iconos flotantes de WiFi */}
       <div className="absolute inset-0 pointer-events-none">
-        <WifiIcon className="absolute top-20 right-[20%] text-primary/30 w-8 h-8 animate-float" />
-        <WifiIcon className="absolute bottom-32 right-[30%] text-primary/25 w-6 h-6 animate-float delay-700" />
-        <WifiIcon className="absolute top-1/2 left-[25%] text-primary/30 w-8 h-8 animate-float delay-500" />
-        <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-7 h-7 animate-float delay-1000" />
+        <WifiIcon className="absolute top-20 right-[20%] text-primary/30 w-6 h-6 md:w-8 md:h-8 animate-float" />
+        <WifiIcon className="absolute bottom-32 right-[30%] text-primary/25 w-4 h-4 md:w-6 md:h-6 animate-float delay-700" />
+        <WifiIcon className="absolute top-1/2 left-[25%] text-primary/30 w-6 h-6 md:w-8 md:h-8 animate-float delay-500" />
+        <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-5 h-5 md:w-7 md:h-7 animate-float delay-1000" />
       </div>
       
-      <div className="mx-auto max-w-7xl px-6 lg:px-8 py-8">
-        <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-4rem)]">
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-4 md:py-8">
+        <div className="relative z-10 grid lg:grid-cols-2 gap-8 md:gap-12 items-center min-h-[calc(100vh-4rem)]">
           {/* Columna de contenido */}
-          <div className="flex flex-col justify-center space-y-8">
-            <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium bg-white/50 backdrop-blur-sm">
-              <span className="relative flex h-2 w-2 mr-2">
+          <div className="flex flex-col justify-center space-y-6 md:space-y-8">
+            <div className="inline-flex items-center rounded-full border px-3 py-1 md:px-4 md:py-1.5 text-xs md:text-sm font-medium bg-white/50 backdrop-blur-sm w-fit">
+              <span className="relative flex h-1.5 md:h-2 w-1.5 md:w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                <span className="relative inline-flex rounded-full h-1.5 md:h-2 w-1.5 md:w-2 bg-green-500"></span>
               </span>
               ¡Nuevo! eSIM instantánea disponible
             </div>
             
             <div>
-              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-6">
+              <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4 md:mb-6">
                 Viaja por Europa con Internet
                 <span className="block mt-2 text-primary flex items-center gap-1">
                   ¡Siempre Conectado!
-                  <WifiIcon className="w-20 h-20 text-primary animate-float -ml-1" />
+                  <WifiIcon className="w-12 h-12 md:w-20 md:h-20 text-primary animate-float -ml-1" />
                 </span>
               </h1>
-              <p className="text-lg text-gray-600 max-w-xl">
+              <p className="text-base md:text-lg text-gray-600 max-w-xl">
                 Olvídate del roaming y las complicaciones. Mantente conectado en toda Europa con nuestras SIMs de datos de alta velocidad.
               </p>
             </div>
@@ -50,9 +50,9 @@ export function HomeHero() {
             <div className="flex flex-col gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-fit">
+                  <Button className="animate-pulse hover:animate-none bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg w-fit text-sm md:text-base">
                     ¿No sabes qué SIM necesitas? Descúbrelo aquí
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 h-3 w-3 md:h-4 md:w-4" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px]">
@@ -60,24 +60,24 @@ export function HomeHero() {
                 </DialogContent>
               </Dialog>
               
-              {/* Nuevo texto de testimonios */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              {/* Texto de testimonios */}
+              <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-gray-600">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                   <span className="ml-2 font-medium">4.9/5</span>
                 </div>
-                <span className="mx-2">•</span>
+                <span className="hidden md:inline mx-2">•</span>
                 <span>+10,000 viajeros satisfechos</span>
-                <span className="mx-2">•</span>
+                <span className="hidden md:inline mx-2">•</span>
                 <span className="text-primary font-medium">Garantía de servicio</span>
               </div>
             </div>
           </div>
 
           {/* Columna de imagen */}
-          <div className="relative lg:block">
+          <div className="relative hidden lg:block">
             <div className="relative">
               {/* Efectos de blob animados */}
               <div className="absolute -top-4 -left-4 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
