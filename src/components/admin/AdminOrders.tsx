@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Check, AlertCircle, ArrowClockwise, X } from "lucide-react"
+import { Check, AlertCircle, RefreshCw, X } from "lucide-react"
 
 // Tipos de datos
 type OrderStatus = "pending" | "processing" | "completed" | "cancelled"
@@ -70,7 +70,7 @@ const statusConfig = {
   processing: {
     label: "Procesando",
     color: "bg-blue-100 text-blue-800",
-    icon: ArrowClockwise,
+    icon: RefreshCw,
   },
   completed: {
     label: "Completado",
