@@ -29,7 +29,7 @@ export function ESimForm({ onSubmit }: ESimFormProps) {
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
     toast({
-      title: "Información guardada",
+      title: "¡Perfecto!",
       description: "Continuando con el proceso de pago...",
     });
   };
@@ -44,7 +44,11 @@ export function ESimForm({ onSubmit }: ESimFormProps) {
             <FormItem>
               <FormLabel>Nombre completo</FormLabel>
               <FormControl>
-                <Input placeholder="Juan Pérez" {...field} />
+                <Input 
+                  placeholder="Juan Pérez" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -58,7 +62,12 @@ export function ESimForm({ onSubmit }: ESimFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="juan@ejemplo.com" {...field} />
+                <Input 
+                  type="email" 
+                  placeholder="juan@ejemplo.com" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,14 +81,23 @@ export function ESimForm({ onSubmit }: ESimFormProps) {
             <FormItem>
               <FormLabel>Teléfono</FormLabel>
               <FormControl>
-                <Input placeholder="55 1234 5678" {...field} />
+                <Input 
+                  placeholder="55 1234 5678" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit" className="w-full">Guardar información</Button>
+        <Button 
+          type="submit" 
+          className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
+        >
+          Continuar
+        </Button>
       </form>
     </Form>
   );

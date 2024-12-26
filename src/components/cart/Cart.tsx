@@ -14,15 +14,14 @@ export function Cart() {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  // Modificamos el cálculo del envío: 160 MXN si hay al menos un producto físico
   const shipping = items.some(item => item.type === "physical") ? 160 : 0;
   const total = subtotal + shipping;
 
   return (
-    <div className="max-w-2xl mx-auto p-4 bg-white rounded-xl shadow-sm">
+    <div className="space-y-6">
       <div className="flex items-center gap-2 mb-6">
         <ShoppingBag className="h-5 w-5 text-primary" />
-        <h2 className="text-xl font-semibold">Tu Carrito</h2>
+        <h2 className="text-xl font-semibold">Resumen de tu pedido</h2>
       </div>
 
       {items.length === 0 ? (
@@ -60,11 +59,11 @@ export function Cart() {
           </div>
 
           <Button 
-            className="w-full mt-8 gap-2"
+            className="w-full mt-8 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
             size="lg"
             onClick={handleCheckout}
           >
-            Continuar al pago
+            Proceder al pago
             <ArrowRight className="h-4 w-4" />
           </Button>
 

@@ -38,7 +38,7 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
     toast({
-      title: "Dirección guardada",
+      title: "¡Perfecto!",
       description: "Continuando con el proceso de pago...",
     });
   };
@@ -53,7 +53,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
             <FormItem>
               <FormLabel>Nombre completo</FormLabel>
               <FormControl>
-                <Input placeholder="Juan Pérez" {...field} />
+                <Input 
+                  placeholder="Juan Pérez" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -68,7 +72,12 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="juan@ejemplo.com" {...field} />
+                  <Input 
+                    type="email" 
+                    placeholder="juan@ejemplo.com" 
+                    {...field} 
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -82,7 +91,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
               <FormItem>
                 <FormLabel>Teléfono</FormLabel>
                 <FormControl>
-                  <Input placeholder="55 1234 5678" {...field} />
+                  <Input 
+                    placeholder="55 1234 5678" 
+                    {...field} 
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -97,7 +110,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
             <FormItem>
               <FormLabel>Dirección</FormLabel>
               <FormControl>
-                <Input placeholder="Calle y número" {...field} />
+                <Input 
+                  placeholder="Calle y número" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01]"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,7 +129,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
               <FormItem>
                 <FormLabel>Ciudad</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ciudad" {...field} />
+                  <Input 
+                    placeholder="Ciudad" 
+                    {...field} 
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,7 +147,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
               <FormItem>
                 <FormLabel>Estado</FormLabel>
                 <FormControl>
-                  <Input placeholder="Estado" {...field} />
+                  <Input 
+                    placeholder="Estado" 
+                    {...field} 
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +165,11 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
               <FormItem>
                 <FormLabel>Código Postal</FormLabel>
                 <FormControl>
-                  <Input placeholder="12345" {...field} />
+                  <Input 
+                    placeholder="12345" 
+                    {...field} 
+                    className="transition-all duration-200 focus:scale-[1.01]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -148,7 +177,12 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
           />
         </div>
 
-        <Button type="submit" className="w-full">Guardar dirección</Button>
+        <Button 
+          type="submit" 
+          className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
+        >
+          Continuar
+        </Button>
       </form>
     </Form>
   );
