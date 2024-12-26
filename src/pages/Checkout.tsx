@@ -1,46 +1,50 @@
-import { Header } from "@/components/Header";
-import { Cart } from "@/components/cart/Cart";
-import { PaymentSecurity } from "@/components/PaymentSecurity";
-import { ShippingForm } from "@/components/checkout/ShippingForm";
-import { DocumentationForm } from "@/components/checkout/DocumentationForm";
-import { ESimForm } from "@/components/checkout/ESimForm";
-import { useCart } from "@/contexts/CartContext";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { InfoIcon } from "lucide-react";
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Check, ArrowRight, ArrowLeft } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { Header } from "@/components/Header"
+import { Cart } from "@/components/cart/Cart"
+import { PaymentSecurity } from "@/components/PaymentSecurity"
+import { ShippingForm } from "@/components/checkout/ShippingForm"
+import { DocumentationForm } from "@/components/checkout/DocumentationForm"
+import { ReviewStep } from "@/components/checkout/ReviewStep"
+import { ESimForm } from "@/components/checkout/ESimForm"
+import { useCart } from "@/contexts/CartContext"
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { InfoIcon } from "lucide-react"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Check, ArrowRight, ArrowLeft } from "lucide-react"
 
 export default function Checkout() {
-  const { items } = useCart();
-  const [step, setStep] = useState(1);
-  const [isFormValid, setIsFormValid] = useState(false);
-  const [formData, setFormData] = useState({});
+  const { items } = useCart()
+  const [step, setStep] = useState(1)
+  const [isFormValid, setIsFormValid] = useState(false)
+  const [formData, setFormData] = useState<Record<string, any>>({})
   
-  const hasPhysicalSim = items.some(item => item.type === "physical");
-  const progress = (step / 4) * 100; // Actualizado a 4 pasos
+  const hasPhysicalSim = items.some(item => item.type === "physical")
+  const progress = (step / 4) * 100
 
   const handleFormValidityChange = (isValid: boolean) => {
-    setIsFormValid(isValid);
-  };
+    setIsFormValid(isValid)
+  }
 
   const handleFormSubmit = (values: any) => {
-    setFormData({ ...formData, ...values });
-    if (step < 4) { // Actualizado a 4 pasos
-      setStep(step + 1);
-      setIsFormValid(false);
+    setFormData({ ...formData, ...values })
+    if (step < 4) {
+      setStep(step + 1)
+      setIsFormValid(false)
     }
-  };
+  }
+
+  const handleUpdateField = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const handleBack = () => {
     if (step > 1) {
-      setStep(step - 1);
+      setStep(step - 1)
+      setIsFormValid(true)
     }
-  };
+  }
 
   const renderStepContent = () => {
     switch (step) {
@@ -67,45 +71,34 @@ export default function Checkout() {
               />
             )}
           </>
-        );
+        )
       case 2:
         return (
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
           />
-        );
+        )
       case 3:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
-              Revisa tu información
-            </h2>
-            <div className="bg-gray-50 p-6 rounded-lg">
-              {Object.entries(formData).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-2">
-                  <span className="text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                  <span className="font-medium">
-                    {value instanceof Date ? format(value, "PPP", { locale: es }) : value as string}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+          <ReviewStep
+            formData={formData}
+            onUpdateField={handleUpdateField}
+          />
+        )
       case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
               Método de pago
             </h2>
-            {/* Aquí iría el formulario de pago */}
+            {/* Payment form will be implemented here */}
           </div>
-        );
+        )
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">

@@ -43,16 +43,23 @@ export function DocumentationForm({ onSubmit, onValidityChange }: DocumentationF
 
   useEffect(() => {
     const subscription = form.watch(() => {
+      const isValid = form.formState.isValid && Object.keys(form.formState.errors).length === 0
       if (onValidityChange) {
-        onValidityChange(form.formState.isValid);
+        onValidityChange(isValid)
       }
     });
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
 
+  const handleSubmit = form.handleSubmit((data) => {
+    if (onSubmit) {
+      onSubmit(data)
+    }
+  });
+
   return (
     <Form {...form}>
-      <form className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <p className="text-blue-700 text-sm">
             Para cumplir con las regulaciones de la Unión Europea y poder asignarte un número local europeo,
