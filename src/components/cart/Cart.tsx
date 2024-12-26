@@ -14,7 +14,8 @@ export function Cart() {
   };
 
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const shipping = items.some(item => item.type === "physical") ? 99 : 0;
+  // Modificamos el cálculo del envío: 160 MXN si hay al menos un producto físico
+  const shipping = items.some(item => item.type === "physical") ? 160 : 0;
   const total = subtotal + shipping;
 
   return (
@@ -48,7 +49,7 @@ export function Cart() {
             </div>
             {shipping > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Envío</span>
+                <span className="text-gray-600">Gastos de envío</span>
                 <span className="font-medium">${shipping.toFixed(2)} MXN</span>
               </div>
             )}
