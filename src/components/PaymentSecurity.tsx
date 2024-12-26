@@ -32,7 +32,7 @@ export function PaymentSecurity() {
               className="h-5 sm:h-6 md:h-8 object-contain"
             />
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/2/25/Google_Pay_Logo.svg" 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/640px-Google_Pay_Logo.svg.png" 
               alt="Google Pay"
               className="h-5 sm:h-6 md:h-8 object-contain grayscale"
             />
