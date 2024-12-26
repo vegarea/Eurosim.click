@@ -22,9 +22,9 @@ export function HomeHero() {
       </div>
       
       <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8 py-4 md:py-8">
-        <div className="relative z-10 grid lg:grid-cols-2 gap-8 md:gap-12 items-center min-h-[calc(100vh-4rem)]">
+        <div className="relative z-10 grid lg:grid-cols-2 gap-8 md:gap-12 items-center min-h-[calc(100vh-4rem)] py-8 md:py-12">
           {/* Columna de contenido */}
-          <div className="flex flex-col justify-center space-y-6 md:space-y-8">
+          <div className="flex flex-col justify-center space-y-4 md:space-y-8">
             <div className="inline-flex items-center rounded-full border px-3 py-1 md:px-4 md:py-1.5 text-xs md:text-sm font-medium bg-white/50 backdrop-blur-sm w-fit">
               <span className="relative flex h-1.5 md:h-2 w-1.5 md:w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
@@ -34,11 +34,11 @@ export function HomeHero() {
             </div>
             
             <div>
-              <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4 md:mb-6">
+              <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-3 md:mb-6">
                 Viaja por Europa con Internet
                 <span className="block mt-2 text-primary flex items-center gap-1">
                   ¡Siempre Conectado!
-                  <WifiIcon className="w-12 h-12 md:w-20 md:h-20 text-primary animate-float -ml-1" />
+                  <WifiIcon className="w-8 h-8 md:w-20 md:h-20 text-primary animate-float -ml-1" />
                 </span>
               </h1>
               <p className="text-base md:text-lg text-gray-600 max-w-xl">
