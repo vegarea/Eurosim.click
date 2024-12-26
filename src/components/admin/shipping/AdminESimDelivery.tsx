@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { mockOrders } from "../orders/mockData"
-import { Order } from "../orders/types"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,16 +8,19 @@ import { Mail, Check } from "lucide-react"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
-  const [orders] = useState(mockOrders.filter(order => order.type === "esim"))
+  // Filtramos solo las órdenes e-sim que estén en estado "processing"
+  const [orders] = useState(mockOrders.filter(order => 
+    order.type === "esim" && order.status === "processing"
+  ))
 
-  const handleSendQR = (order: Order) => {
+  const handleSendQR = (order: any) => {
     toast({
       title: "QR enviado",
       description: `El QR del pedido ${order.id} ha sido enviado por email.`
     })
   }
 
-  const handleMarkDelivered = (order: Order) => {
+  const handleMarkDelivered = (order: any) => {
     toast({
       title: "Pedido marcado como entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
@@ -45,7 +47,10 @@ export function AdminESimDelivery() {
       cell: ({ row }: any) => {
         const status = row.getValue("status")
         return (
-          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+          <Badge 
+            variant="secondary" 
+            className="bg-purple-100 text-purple-800"
+          >
             {status}
           </Badge>
         )

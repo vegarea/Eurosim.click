@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { mockOrders } from "../orders/mockData"
-import { Order } from "../orders/types"
 import { DataTable } from "@/components/ui/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,16 +8,19 @@ import { Truck, PackageCheck } from "lucide-react"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
-  const [orders] = useState(mockOrders.filter(order => order.type === "physical"))
+  // Filtramos solo las órdenes físicas que estén en estado "processing"
+  const [orders] = useState(mockOrders.filter(order => 
+    order.type === "physical" && order.status === "processing"
+  ))
 
-  const handleShipOrder = (order: Order) => {
+  const handleShipOrder = (order: any) => {
     toast({
       title: "Pedido marcado como enviado",
       description: `El pedido ${order.id} ha sido marcado como enviado.`
     })
   }
 
-  const handleDeliverOrder = (order: Order) => {
+  const handleDeliverOrder = (order: any) => {
     toast({
       title: "Pedido marcado como entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
@@ -45,7 +47,10 @@ export function AdminPhysicalShipping() {
       cell: ({ row }: any) => {
         const status = row.getValue("status")
         return (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+          <Badge 
+            variant="secondary" 
+            className="bg-blue-100 text-blue-800"
+          >
             {status}
           </Badge>
         )
