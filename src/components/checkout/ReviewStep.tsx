@@ -24,13 +24,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <p className="text-blue-700 text-sm">
           Por favor, revisa cuidadosamente tu información antes de continuar con el pago.
-          Presta especial atención a la <strong>fecha de activación</strong>, ya que determinará cuándo comenzará tu servicio.
+          La <strong>fecha de activación</strong> es especialmente importante ya que determinará cuándo podrás comenzar a usar tu servicio.
         </p>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm">
         {Object.entries(formData).map(([key, value]) => {
-          // Si el campo es género, transformamos el valor
           const displayValue = key === 'gender' ? genderMap[value as string] || value : value;
           
           return (

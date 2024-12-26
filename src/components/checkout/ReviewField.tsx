@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
-import { Pencil, Check } from "lucide-react"
+import { Pencil, Check, Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ReviewFieldProps {
@@ -36,12 +36,18 @@ export function ReviewField({ label, value, onUpdate, type = "text", isActivatio
   return (
     <div className={cn(
       "flex items-center justify-between py-3 border-b transition-all duration-300",
-      isActivationDate && "bg-primary/5 rounded-lg px-4 animate-pulse-subtle"
+      isActivationDate && "relative bg-blue-50/50 rounded-lg px-4 animate-float"
     )}>
-      <span className={cn(
-        "text-gray-600",
-        isActivationDate && "font-medium text-primary"
-      )}>{label}</span>
+      {isActivationDate && (
+        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-400 rounded-full animate-pulse" />
+      )}
+      <div className="flex items-center gap-2">
+        {isActivationDate && <Calendar className="h-4 w-4 text-blue-500" />}
+        <span className={cn(
+          "text-gray-600",
+          isActivationDate && "font-medium text-blue-700"
+        )}>{label}</span>
+      </div>
       {isEditing ? (
         <div className="flex items-center gap-2">
           <Input
@@ -58,7 +64,7 @@ export function ReviewField({ label, value, onUpdate, type = "text", isActivatio
         <div className="flex items-center gap-2">
           <span className={cn(
             "font-medium",
-            isActivationDate && "text-primary"
+            isActivationDate && "text-blue-700"
           )}>{displayValue}</span>
           <Button size="icon" variant="ghost" onClick={() => setIsEditing(true)}>
             <Pencil className="h-4 w-4" />
