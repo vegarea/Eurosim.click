@@ -52,6 +52,10 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
     mode: "onChange"
   });
 
+  // Define years and months arrays for the date selectors
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
+  const months = Array.from({ length: 12 }, (_, i) => i);
+
   // Watch all form fields for changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
