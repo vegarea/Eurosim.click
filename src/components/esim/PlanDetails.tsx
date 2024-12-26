@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { UsageMeter } from "@/components/UsageMeter";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PlanDetailsProps {
   title: string;
@@ -10,6 +13,15 @@ interface PlanDetailsProps {
 }
 
 export function PlanDetails({ title, description, features, europeGB, spainGB }: PlanDetailsProps) {
+  const { toast } = useToast();
+
+  const handlePurchase = () => {
+    toast({
+      title: "Producto añadido al carrito",
+      description: `Has seleccionado el plan ${title}`,
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,6 +53,21 @@ export function PlanDetails({ title, description, features, europeGB, spainGB }:
         spainGB={spainGB}
         isHighlighted={true}
       />
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mt-6"
+      >
+        <Button 
+          onClick={handlePurchase}
+          className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Comprar
+        </Button>
+      </motion.div>
     </motion.div>
   );
 }
