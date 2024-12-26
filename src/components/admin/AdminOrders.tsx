@@ -1,16 +1,17 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
+import { OrderDetails } from "./orders/OrderDetails"
 import { mockOrders } from "./orders/mockData"
 import { Order, OrderStatus } from "./orders/types"
-import { useToast } from "@/components/ui/use-toast"
 
 export function AdminOrders() {
+  const [orders, setOrders] = useState(mockOrders)
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
-  const { toast } = useToast()
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
-  const filteredOrders = mockOrders.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
       order.customer.toLowerCase().includes(search.toLowerCase())
@@ -19,10 +20,15 @@ export function AdminOrders() {
   })
 
   const handleOrderClick = (order: Order) => {
-    toast({
-      title: `Pedido ${order.id}`,
-      description: "Vista detallada en desarrollo",
-    })
+    setSelectedOrder(order)
+  }
+
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    setOrders(orders.map(order => 
+      order.id === orderId 
+        ? { ...order, status: newStatus }
+        : order
+    ))
   }
 
   return (
@@ -44,6 +50,12 @@ export function AdminOrders() {
           onOrderClick={handleOrderClick}
         />
       </div>
+
+      <OrderDetails
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   )
 }
