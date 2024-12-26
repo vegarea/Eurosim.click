@@ -38,105 +38,107 @@ const timelineItems = [
 
 export function HowItWorks() {
   return (
-    <section className="py-12 bg-gradient-to-br from-white to-brand-50">
+    <section className="py-16 bg-gradient-to-br from-white to-brand-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-2">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-4">
             ¿Cómo funciona?
           </h2>
-          <p className="text-lg text-gray-600">
-            Obtén tu eSIM en 4 sencillos pasos
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Obtener tu eSIM es rápido y sencillo. Sigue estos pasos y estarás conectado en minutos.
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-4">
-            {timelineItems.map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="relative"
-              >
-                {/* Línea conectora */}
-                {index < timelineItems.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-0.5 bg-gradient-to-r from-primary/30 to-secondary/30" />
-                )}
-                
-                <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow relative z-10">
-                  {/* Número del paso */}
-                  <div className="absolute -top-3 -left-3 w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                    {index + 1}
+        <div className="max-w-4xl mx-auto">
+          <div className="relative">
+            {/* Línea vertical del timeline */}
+            <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-primary/30 to-secondary/30" />
+
+            {/* Items del timeline */}
+            <div className="space-y-12">
+              {timelineItems.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                  className={`relative flex items-start ${
+                    index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                  }`}
+                >
+                  {/* Punto del timeline */}
+                  <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-primary/20">
+                    <item.icon className="w-4 h-4 text-primary" />
                   </div>
-                  
-                  <div className="mb-3 flex justify-center">
-                    <div className="p-2 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg">
-                      <item.icon className="w-6 h-6 text-primary" />
+
+                  {/* Contenido */}
+                  <div className={`ml-12 md:ml-0 md:w-1/2 ${
+                    index % 2 === 0 ? "md:pr-12" : "md:pl-12"
+                  }`}>
+                    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                        {item.title}
+                      </h3>
+                      <p className="text-gray-600">
+                        {item.description}
+                      </p>
+                      
+                      {item.highlight && (
+                        <div className="mt-4">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="gap-2">
+                                <Smartphone className="h-4 w-4" />
+                                Verifica la compatibilidad
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>Dispositivos Compatibles</DialogTitle>
+                                <DialogDescription>
+                                  Verifica si tu dispositivo es compatible con eSIM
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="mt-4">
+                                <Accordion type="single" collapsible className="w-full">
+                                  {compatibleDevices.map((brand) => (
+                                    <AccordionItem key={brand.name} value={brand.name}>
+                                      <AccordionTrigger>{brand.name}</AccordionTrigger>
+                                      <AccordionContent>
+                                        <ul className="space-y-2">
+                                          {brand.models.map((model) => (
+                                            <li
+                                              key={model.name}
+                                              className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
+                                            >
+                                              <span>{model.name}</span>
+                                              {model.compatible ? (
+                                                <span className="text-green-500 text-sm font-medium">
+                                                  Compatible
+                                                </span>
+                                              ) : (
+                                                <span className="text-red-500 text-sm font-medium">
+                                                  No compatible
+                                                </span>
+                                              )}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  ))}
+                                </Accordion>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  
-                  <h3 className="text-base font-semibold text-gray-900 mb-1 text-center">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 text-center">
-                    {item.description}
-                  </p>
-                  
-                  {item.highlight && (
-                    <div className="mt-3 flex justify-center">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-xs gap-1">
-                            <Smartphone className="h-3 w-3" />
-                            Verifica compatibilidad
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Dispositivos Compatibles</DialogTitle>
-                            <DialogDescription>
-                              Verifica si tu dispositivo es compatible con eSIM
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="mt-4">
-                            <Accordion type="single" collapsible className="w-full">
-                              {compatibleDevices.map((brand) => (
-                                <AccordionItem key={brand.name} value={brand.name}>
-                                  <AccordionTrigger>{brand.name}</AccordionTrigger>
-                                  <AccordionContent>
-                                    <ul className="space-y-2">
-                                      {brand.models.map((model) => (
-                                        <li
-                                          key={model.name}
-                                          className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
-                                        >
-                                          <span>{model.name}</span>
-                                          {model.compatible ? (
-                                            <span className="text-green-500 text-sm font-medium">
-                                              Compatible
-                                            </span>
-                                          ) : (
-                                            <span className="text-red-500 text-sm font-medium">
-                                              No compatible
-                                            </span>
-                                          )}
-                                        </li>
-                                      ))}
-                                    </ul>
-                                  </AccordionContent>
-                                </AccordionItem>
-                              ))}
-                            </Accordion>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
