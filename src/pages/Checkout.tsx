@@ -13,8 +13,29 @@ import { InfoIcon, Bug } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
-import { testUserData } from "@/utils/checkoutTestData"
 import { useToast } from "@/components/ui/use-toast"
+
+// Test data that matches the expected prop types for each form
+const testData = {
+  shipping: {
+    fullName: "Juan Pérez",
+    email: "juan@ejemplo.com",
+    phone: "5512345678",
+    address: "Calle Principal 123",
+    city: "Ciudad de México",
+    state: "CDMX",
+    zipCode: "11111"
+  },
+  documentation: {
+    fullName: "Juan Pérez",
+    birthDate: new Date(),
+    gender: "M",
+    passportNumber: "AB123456",
+    activationDate: new Date(),
+    email: "juan@ejemplo.com",
+    phone: "5512345678"
+  }
+}
 
 export default function Checkout() {
   const { items } = useCart()
@@ -30,8 +51,8 @@ export default function Checkout() {
   // Función para cargar datos de prueba
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
-      { ...testUserData.shippingData, ...testUserData.documentationData } :
-      testUserData.documentationData;
+      { ...testData.shipping, ...testData.documentation } :
+      testData.documentation;
     
     setFormData(data);
     setIsFormValid(true);
@@ -90,13 +111,17 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? testUserData.shippingData : undefined}
+                initialData={isTestMode ? testData.shipping : undefined}
               />
             ) : (
               <ESimForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? testUserData.documentationData : undefined}
+                initialData={isTestMode ? {
+                  fullName: testData.documentation.fullName,
+                  email: testData.documentation.email,
+                  phone: testData.documentation.phone
+                } : undefined}
               />
             )}
           </>
@@ -106,7 +131,7 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
-            initialData={isTestMode ? testUserData.documentationData : undefined}
+            initialData={isTestMode ? testData.documentation : undefined}
           />
         )
       case 3:
