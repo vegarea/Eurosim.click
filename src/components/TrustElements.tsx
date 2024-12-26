@@ -146,7 +146,7 @@ export function TrustElements() {
         </div>
 
         {/* Sección de cobertura con acordeón */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg">
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl p-6 shadow-lg">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="coverage">
               <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold hover:no-underline">
