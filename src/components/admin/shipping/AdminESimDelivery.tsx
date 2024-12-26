@@ -2,11 +2,11 @@ import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { mockOrders } from "../orders/mockData"
 import { DataTable } from "@/components/ui/data-table"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Mail, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
@@ -17,7 +17,6 @@ export function AdminESimDelivery() {
   const completedOrders = orders.filter(order => order.status === "delivered")
 
   const handleSendQR = (order: Order) => {
-    // Actualizar el estado del pedido a entregado
     setOrders(orders.map(o => 
       o.id === order.id 
         ? { ...o, status: "delivered" }
@@ -25,13 +24,12 @@ export function AdminESimDelivery() {
     ))
 
     toast({
-      title: "QR enviado y pedido actualizado",
+      title: "QR enviado",
       description: `El QR del pedido ${order.id} ha sido enviado por email y marcado como entregado.`
     })
   }
 
   const handleMarkDelivered = (order: Order) => {
-    // Actualizar el estado del pedido a entregado
     setOrders(orders.map(o => 
       o.id === order.id 
         ? { ...o, status: "delivered" }
@@ -39,7 +37,7 @@ export function AdminESimDelivery() {
     ))
 
     toast({
-      title: "Pedido marcado como entregado",
+      title: "Pedido entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
     })
   }
@@ -63,28 +61,21 @@ export function AdminESimDelivery() {
       header: "Estado",
       cell: ({ row }: any) => {
         const status = row.getValue("status")
-        return (
-          <Badge 
-            variant="secondary" 
-            className="bg-purple-100 text-purple-800"
-          >
-            {status}
-          </Badge>
-        )
+        return <OrderStatusBadge status={status} />
       }
     },
     {
       id: "actions",
       cell: ({ row }: any) => {
         const order = row.original
-        const isPending = order.status === "processing"
+        const isProcessing = order.status === "processing"
         return (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => handleSendQR(order)}
-              disabled={!isPending}
+              disabled={!isProcessing}
             >
               <Mail className="w-4 h-4 mr-2" />
               Enviar QR
@@ -93,7 +84,7 @@ export function AdminESimDelivery() {
               variant="outline"
               size="sm"
               onClick={() => handleMarkDelivered(order)}
-              disabled={!isPending}
+              disabled={!isProcessing}
             >
               <Check className="w-4 h-4 mr-2" />
               Marcar como entregado
@@ -116,11 +107,11 @@ export function AdminESimDelivery() {
       <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="pending" className="relative">
-            Pendientes de Envío
+            En Preparación
             {pendingOrders.length > 0 && (
               <Badge 
                 variant="secondary" 
-                className="ml-2 bg-purple-100 text-purple-800"
+                className="ml-2 bg-blue-100 text-blue-800"
               >
                 {pendingOrders.length}
               </Badge>

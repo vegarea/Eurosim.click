@@ -2,11 +2,11 @@ import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { mockOrders } from "../orders/mockData"
 import { DataTable } from "@/components/ui/data-table"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Truck, PackageCheck } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
@@ -17,7 +17,6 @@ export function AdminPhysicalShipping() {
   const shippedOrders = orders.filter(order => ["shipped", "delivered"].includes(order.status))
 
   const handleShipOrder = (order: Order) => {
-    // Actualizar el estado del pedido a enviado
     setOrders(orders.map(o => 
       o.id === order.id 
         ? { ...o, status: "shipped" }
@@ -25,13 +24,12 @@ export function AdminPhysicalShipping() {
     ))
 
     toast({
-      title: "Pedido marcado como enviado",
-      description: `El pedido ${order.id} ha sido marcado como enviado.`
+      title: "Pedido en tránsito",
+      description: `El pedido ${order.id} ha sido marcado como en tránsito.`
     })
   }
 
   const handleDeliverOrder = (order: Order) => {
-    // Actualizar el estado del pedido a entregado
     setOrders(orders.map(o => 
       o.id === order.id 
         ? { ...o, status: "delivered" }
@@ -39,7 +37,7 @@ export function AdminPhysicalShipping() {
     ))
 
     toast({
-      title: "Pedido marcado como entregado",
+      title: "Pedido entregado",
       description: `El pedido ${order.id} ha sido marcado como entregado.`
     })
   }
@@ -63,14 +61,7 @@ export function AdminPhysicalShipping() {
       header: "Estado",
       cell: ({ row }: any) => {
         const status = row.getValue("status")
-        return (
-          <Badge 
-            variant="secondary" 
-            className="bg-blue-100 text-blue-800"
-          >
-            {status}
-          </Badge>
-        )
+        return <OrderStatusBadge status={status} />
       }
     },
     {
@@ -88,7 +79,7 @@ export function AdminPhysicalShipping() {
               disabled={!isProcessing}
             >
               <Truck className="w-4 h-4 mr-2" />
-              Marcar como enviado
+              Marcar en tránsito
             </Button>
             <Button
               variant="outline"
@@ -117,7 +108,7 @@ export function AdminPhysicalShipping() {
       <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="pending" className="relative">
-            Pendientes de Envío
+            En Preparación
             {pendingOrders.length > 0 && (
               <Badge 
                 variant="secondary" 

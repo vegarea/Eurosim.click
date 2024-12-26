@@ -4,7 +4,7 @@ import {
   RefreshCw, 
   Check, 
   CreditCard,
-  Package,
+  Truck,
   Ban
 } from "lucide-react"
 
@@ -20,14 +20,14 @@ export const statusConfig = {
     icon: AlertCircle,
   },
   processing: {
-    label: "Procesando",
+    label: "En Preparación",
     color: "bg-blue-100 text-blue-800",
     icon: RefreshCw,
   },
   shipped: {
-    label: "Enviado",
+    label: "En Tránsito",
     color: "bg-orange-100 text-orange-800",
-    icon: Package,
+    icon: Truck,
   },
   delivered: {
     label: "Entregado",
