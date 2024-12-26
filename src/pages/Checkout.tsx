@@ -9,19 +9,39 @@ import { useCart } from "@/contexts/CartContext"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { InfoIcon } from "lucide-react"
-import { useState } from "react"
+import { InfoIcon, Bug } from "lucide-react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
+import { testUserData } from "@/utils/checkoutTestData"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function Checkout() {
   const { items } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
   const [formData, setFormData] = useState<Record<string, any>>({})
+  const [isTestMode, setIsTestMode] = useState(false)
+  const { toast } = useToast()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
   const progress = (step / 4) * 100
+
+  // Función para cargar datos de prueba
+  const loadTestData = () => {
+    const data = hasPhysicalSim ? 
+      { ...testUserData.shippingData, ...testUserData.documentationData } :
+      testUserData.documentationData;
+    
+    setFormData(data);
+    setIsFormValid(true);
+    setIsTestMode(true);
+    
+    toast({
+      title: "Modo de prueba activado",
+      description: "Se han cargado datos de prueba para facilitar el testing",
+    });
+  };
 
   const handleFormValidityChange = (isValid: boolean) => {
     setIsFormValid(isValid)
@@ -31,7 +51,7 @@ export default function Checkout() {
     setFormData({ ...formData, ...values })
     if (step < 4) {
       setStep(step + 1)
-      setIsFormValid(false)
+      setIsFormValid(step === 3) // Mantenemos la validación activa en el paso de revisión
     }
   }
 
@@ -45,6 +65,13 @@ export default function Checkout() {
       setIsFormValid(true)
     }
   }
+
+  // Validación específica para el paso de revisión
+  useEffect(() => {
+    if (step === 3) {
+      setIsFormValid(true) // Siempre permitimos avanzar desde el paso de revisión
+    }
+  }, [step])
 
   const renderStepContent = () => {
     switch (step) {
@@ -63,11 +90,13 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
+                initialData={isTestMode ? testUserData.shippingData : undefined}
               />
             ) : (
               <ESimForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
+                initialData={isTestMode ? testUserData.documentationData : undefined}
               />
             )}
           </>
@@ -77,6 +106,7 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
+            initialData={isTestMode ? testUserData.documentationData : undefined}
           />
         )
       case 3:
@@ -106,6 +136,19 @@ export default function Checkout() {
       
       <main className="container mx-auto py-8 px-4 max-w-5xl">
         <div className="max-w-5xl mx-auto">
+          {/* Test Mode Button */}
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadTestData}
+              className="flex items-center gap-2"
+            >
+              <Bug className="w-4 h-4" />
+              Cargar datos de prueba
+            </Button>
+          </div>
+
           {/* Progress Steps */}
           <div className="mb-8 space-y-4 max-w-3xl mx-auto">
             <div className="flex justify-between items-center">
