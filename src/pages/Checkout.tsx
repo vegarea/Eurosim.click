@@ -6,6 +6,8 @@ import { ESimForm } from "@/components/checkout/ESimForm";
 import { useCart } from "@/contexts/CartContext";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight, ArrowLeft } from "lucide-react";
@@ -27,7 +29,7 @@ export default function Checkout() {
     setFormData({ ...formData, ...values });
     if (step < 3) {
       setStep(step + 1);
-      setIsFormValid(false); // Reset validation for next step
+      setIsFormValid(false);
     }
   };
 
@@ -40,16 +42,28 @@ export default function Checkout() {
   const renderStepContent = () => {
     switch (step) {
       case 1:
-        return hasPhysicalSim ? (
-          <ShippingForm 
-            onSubmit={handleFormSubmit}
-            onValidityChange={handleFormValidityChange}
-          />
-        ) : (
-          <ESimForm 
-            onSubmit={handleFormSubmit}
-            onValidityChange={handleFormValidityChange}
-          />
+        return (
+          <>
+            {hasPhysicalSim && (
+              <Alert className="mb-6 bg-blue-50 border-blue-200">
+                <InfoIcon className="h-4 w-4 text-blue-500" />
+                <AlertDescription className="text-blue-700">
+                  Tienes un SIM físico en tu carrito. Por favor, proporciona tu información de envío.
+                </AlertDescription>
+              </Alert>
+            )}
+            {hasPhysicalSim ? (
+              <ShippingForm 
+                onSubmit={handleFormSubmit}
+                onValidityChange={handleFormValidityChange}
+              />
+            ) : (
+              <ESimForm 
+                onSubmit={handleFormSubmit}
+                onValidityChange={handleFormValidityChange}
+              />
+            )}
+          </>
         );
       case 2:
         return (
