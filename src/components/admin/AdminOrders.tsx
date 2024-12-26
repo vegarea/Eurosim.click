@@ -16,10 +16,27 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Check, AlertCircle, RefreshCw, X } from "lucide-react"
+import { 
+  AlertCircle, 
+  RefreshCw, 
+  Check, 
+  X, 
+  CreditCard,
+  Package,
+  Mail,
+  Ban
+} from "lucide-react"
 
 // Tipos de datos
-type OrderStatus = "pending" | "processing" | "completed" | "cancelled"
+type OrderStatus = 
+  | "payment_pending"
+  | "payment_failed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+
+type OrderType = "physical" | "esim"
 
 interface Order {
   id: string
@@ -27,6 +44,8 @@ interface Order {
   customer: string
   total: number
   status: OrderStatus
+  type: OrderType
+  paymentMethod?: "stripe" | "paypal"
 }
 
 // Datos de ejemplo
@@ -36,7 +55,8 @@ const mockOrders: Order[] = [
     date: "2024-03-20",
     customer: "Juan Pérez",
     total: 299.99,
-    status: "pending",
+    status: "payment_pending",
+    type: "physical"
   },
   {
     id: "ORD-002",
@@ -44,27 +64,37 @@ const mockOrders: Order[] = [
     customer: "María García",
     total: 159.50,
     status: "processing",
+    type: "esim",
+    paymentMethod: "stripe"
   },
   {
     id: "ORD-003",
     date: "2024-03-18",
     customer: "Carlos López",
     total: 499.99,
-    status: "completed",
+    status: "delivered",
+    type: "physical",
+    paymentMethod: "paypal"
   },
   {
     id: "ORD-004",
     date: "2024-03-17",
     customer: "Ana Martínez",
     total: 89.99,
-    status: "cancelled",
+    status: "payment_failed",
+    type: "esim"
   },
 ]
 
 const statusConfig = {
-  pending: {
-    label: "Pendiente",
+  payment_pending: {
+    label: "Pago Pendiente",
     color: "bg-yellow-100 text-yellow-800",
+    icon: CreditCard,
+  },
+  payment_failed: {
+    label: "Error de Pago",
+    color: "bg-red-100 text-red-800",
     icon: AlertCircle,
   },
   processing: {
@@ -72,15 +102,20 @@ const statusConfig = {
     color: "bg-blue-100 text-blue-800",
     icon: RefreshCw,
   },
-  completed: {
-    label: "Completado",
+  shipped: {
+    label: "Enviado",
+    color: "bg-orange-100 text-orange-800",
+    icon: Package,
+  },
+  delivered: {
+    label: "Entregado",
     color: "bg-green-100 text-green-800",
     icon: Check,
   },
   cancelled: {
     label: "Cancelado",
-    color: "bg-red-100 text-red-800",
-    icon: X,
+    color: "bg-gray-100 text-gray-800",
+    icon: Ban,
   },
 }
 
@@ -136,8 +171,10 @@ export function AdminOrders() {
               <TableHead>ID Pedido</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Tipo</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead>Método de Pago</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -150,6 +187,11 @@ export function AdminOrders() {
                   <TableCell className="font-medium">{order.id}</TableCell>
                   <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                   <TableCell>{order.customer}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className="bg-gray-100">
+                      {order.type === "physical" ? "SIM Física" : "E-SIM"}
+                    </Badge>
+                  </TableCell>
                   <TableCell>${order.total.toFixed(2)}</TableCell>
                   <TableCell>
                     <Badge 
@@ -159,6 +201,13 @@ export function AdminOrders() {
                       <StatusIcon className="w-3 h-3" />
                       {status.label}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {order.paymentMethod ? (
+                      <span className="capitalize">{order.paymentMethod}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </TableCell>
                 </TableRow>
               )
