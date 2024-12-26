@@ -113,9 +113,9 @@ export default function ESims() {
           </div>
 
           <div className="mt-24">
+            <CountryCoverage />
             <CommonFeatures />
             <SimFeatures />
-            <CountryCoverage />
             <HowItWorks />
           </div>
         </div>
