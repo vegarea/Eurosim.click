@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Image, DollarSign, Upload, Building2, ShoppingCart, Search } from "lucide-react"
+import { Image, DollarSign, Upload, Building2, ShoppingCart, Search, Palette, Plug } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 export function AdminSettings() {
@@ -18,6 +18,9 @@ export function AdminSettings() {
   const [taxRate, setTaxRate] = useState("16")
   const [metaTitle, setMetaTitle] = useState("Mi Tienda de SIMs")
   const [metaDescription, setMetaDescription] = useState("Venta de SIMs y eSIMs para viajeros")
+  const [theme, setTheme] = useState("light")
+  const [primaryColor, setPrimaryColor] = useState("#9b87f5")
+  const [zapierWebhook, setZapierWebhook] = useState("")
 
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -39,6 +42,40 @@ export function AdminSettings() {
       title: "Cambios guardados",
       description: `Los cambios en ${section} se han guardado correctamente.`,
     })
+  }
+
+  const handleZapierTest = async () => {
+    if (!zapierWebhook) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa una URL de webhook válida",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      await fetch(zapierWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        mode: "no-cors",
+        body: JSON.stringify({
+          test: true,
+          timestamp: new Date().toISOString(),
+        }),
+      })
+
+      toast({
+        title: "Prueba enviada",
+        description: "Se ha enviado una prueba al webhook de Zapier",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo conectar con Zapier",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -65,6 +102,14 @@ export function AdminSettings() {
           <TabsTrigger value="seo" className="data-[state=active]:bg-white">
             <Search className="mr-2 h-4 w-4" />
             SEO
+          </TabsTrigger>
+          <TabsTrigger value="style" className="data-[state=active]:bg-white">
+            <Palette className="mr-2 h-4 w-4" />
+            Estilo
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="data-[state=active]:bg-white">
+            <Plug className="mr-2 h-4 w-4" />
+            Integraciones
           </TabsTrigger>
         </TabsList>
 
@@ -177,6 +222,89 @@ export function AdminSettings() {
                 />
               </div>
               <Button onClick={() => handleSave('configuración SEO')}>Guardar cambios</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="style" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Estilo de Interfaz
+              </CardTitle>
+              <CardDescription>
+                Personaliza la apariencia de tu aplicación
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="theme">Tema</Label>
+                <Select value={theme} onValueChange={setTheme}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un tema" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Claro</SelectItem>
+                    <SelectItem value="dark">Oscuro</SelectItem>
+                    <SelectItem value="system">Sistema</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="primary-color">Color Principal</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="primary-color"
+                    type="color"
+                    value={primaryColor}
+                    onChange={(e) => setPrimaryColor(e.target.value)}
+                    className="w-20 h-10 p-1"
+                  />
+                  <Input
+                    value={primaryColor}
+                    onChange={(e) => setPrimaryColor(e.target.value)}
+                    placeholder="#000000"
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+              <Button onClick={() => handleSave('estilo de interfaz')}>Guardar cambios</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="integrations" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plug className="h-5 w-5" />
+                Integraciones
+              </CardTitle>
+              <CardDescription>
+                Conecta tu aplicación con servicios externos
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="zapier">Webhook de Zapier</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="zapier"
+                    value={zapierWebhook}
+                    onChange={(e) => setZapierWebhook(e.target.value)}
+                    placeholder="https://hooks.zapier.com/..."
+                    className="flex-1"
+                  />
+                  <Button variant="outline" onClick={handleZapierTest}>
+                    Probar
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Conecta con Zapier para automatizar tareas y sincronizar datos con otras aplicaciones
+                </p>
+              </div>
+              <Button onClick={() => handleSave('integraciones')}>Guardar cambios</Button>
             </CardContent>
           </Card>
         </TabsContent>
