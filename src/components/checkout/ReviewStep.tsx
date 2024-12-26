@@ -24,7 +24,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <p className="text-blue-700 text-sm">
           Por favor, revisa cuidadosamente tu información antes de continuar con el pago.
-          Puedes editar cualquier campo haciendo clic en el ícono de lápiz.
+          Presta especial atención a la <strong>fecha de activación</strong>, ya que determinará cuándo comenzará tu servicio.
         </p>
       </div>
 
@@ -40,6 +40,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
               value={displayValue as string | Date}
               onUpdate={(newValue) => onUpdateField(key, newValue)}
               type={key.includes("Date") ? "date" : "text"}
+              isActivationDate={key === "activationDate"}
             />
           );
         })}
