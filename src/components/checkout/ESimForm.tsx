@@ -79,7 +79,7 @@ export function ESimForm({ onSubmit }: ESimFormProps) {
           )}
         />
 
-        <Button type="submit" className="w-full">Continuar al pago</Button>
+        <Button type="submit" className="w-full">Guardar información</Button>
       </form>
     </Form>
   );

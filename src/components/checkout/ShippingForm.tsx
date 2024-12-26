@@ -148,7 +148,7 @@ export function ShippingForm({ onSubmit, email = '' }: ShippingFormProps) {
           />
         </div>
 
-        <Button type="submit" className="w-full">Continuar al pago</Button>
+        <Button type="submit" className="w-full">Guardar dirección</Button>
       </form>
     </Form>
   );
