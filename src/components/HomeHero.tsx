@@ -21,10 +21,10 @@ export function HomeHero() {
         <WifiIcon className="absolute bottom-20 left-[35%] text-primary/20 w-7 h-7 animate-float delay-1000" />
       </div>
       
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-12 lg:py-16">
         <div className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100svh-4rem)]">
           {/* Columna de contenido */}
-          <div className="flex flex-col justify-center space-y-6 sm:space-y-8">
+          <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
             <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium bg-white/50 backdrop-blur-sm self-start">
               <span className="relative flex h-2 w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
@@ -34,14 +34,14 @@ export function HomeHero() {
             </div>
             
             <div>
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-4 sm:mb-6">
+              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-3 sm:mb-4">
                 Viaja por Europa con Internet
-                <span className="block mt-2 text-primary flex items-center gap-1">
+                <span className="block mt-1 sm:mt-2 text-primary flex items-center gap-1">
                   ¡Siempre Conectado!
-                  <WifiIcon className="w-12 sm:w-20 h-12 sm:h-20 text-primary animate-float -ml-1" />
+                  <WifiIcon className="w-8 sm:w-12 lg:w-20 h-8 sm:h-12 lg:h-20 text-primary animate-float -ml-1" />
                 </span>
               </h1>
-              <p className="text-base sm:text-lg text-gray-600 max-w-xl">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-xl">
                 Olvídate del roaming y las complicaciones. Mantente conectado en toda Europa con nuestras SIMs de datos de alta velocidad.
               </p>
             </div>
@@ -76,9 +76,9 @@ export function HomeHero() {
             </div>
           </div>
 
-          {/* Columna de imagen - Solo visible en desktop */}
-          <div className="relative hidden lg:block">
-            <div className="relative">
+          {/* Columna de imagen - Visible en móvil y desktop */}
+          <div className="relative order-first lg:order-last">
+            <div className="relative max-w-[400px] mx-auto lg:max-w-none">
               {/* Efectos de blob animados */}
               <div className="absolute -top-4 -left-4 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -top-4 -right-4 w-72 h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
