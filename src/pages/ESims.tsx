@@ -85,8 +85,8 @@ export default function ESims() {
 
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             {/* Panel de selección de planes */}
-            <div className="md:w-1/3">
-              <div className="grid grid-cols-2 gap-3">
+            <div className="md:w-2/5">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {simCards.map((card) => (
                   <ProductButton
                     key={card.title}
@@ -101,7 +101,7 @@ export default function ESims() {
             </div>
 
             {/* Panel de detalles del plan */}
-            <div className="md:w-2/3">
+            <div className="md:w-3/5">
               <AnimatePresence mode="wait">
                 <PlanDetails
                   key={selectedPlan.title}

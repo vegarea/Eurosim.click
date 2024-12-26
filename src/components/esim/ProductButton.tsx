@@ -47,7 +47,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
     <button
       onClick={onClick}
       className={cn(
-        "w-full transition-all duration-300 p-3 md:p-4 rounded-xl backdrop-blur-sm",
+        "w-full transition-all duration-300 p-3 md:p-6 rounded-xl backdrop-blur-sm",
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-4",
         isSelected ? 
@@ -56,19 +56,19 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
       )}
     >
       <div className={cn(
-        "p-2 md:p-3 rounded-lg bg-gradient-to-br",
+        "p-2 md:p-4 rounded-lg bg-gradient-to-br",
         colorScheme.iconBg
       )}>
         {type === 'physical' ? (
-          <CreditCard className={cn("h-4 w-4 md:h-5 md:w-5", colorScheme.iconColor)} />
+          <CreditCard className={cn("h-4 w-4 md:h-6 md:w-6", colorScheme.iconColor)} />
         ) : (
-          <Wifi className={cn("h-4 w-4 md:h-5 md:w-5", colorScheme.iconColor)} />
+          <Wifi className={cn("h-4 w-4 md:h-6 md:w-6", colorScheme.iconColor)} />
         )}
       </div>
       
       <div className="flex-1 text-left">
-        <h3 className="text-sm md:text-base font-semibold">{title}</h3>
-        <p className="text-base md:text-lg font-bold text-primary">
+        <h3 className="text-sm md:text-lg font-semibold">{title}</h3>
+        <p className="text-base md:text-xl font-bold text-primary">
           ${price}
           <span className="text-xs md:text-sm font-normal text-gray-600 ml-1">MXN</span>
         </p>
