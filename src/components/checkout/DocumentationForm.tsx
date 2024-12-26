@@ -52,22 +52,44 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
     mode: "onChange"
   });
 
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
-  const months = Array.from({ length: 12 }, (_, i) => i);
-
+  // Watch all form fields for changes
   useEffect(() => {
-    const subscription = form.watch(() => {
-      const isValid = form.formState.isValid && Object.keys(form.formState.errors).length === 0
+    const subscription = form.watch((value, { name, type }) => {
+      // Check if all required fields are filled and valid
+      const isValid = form.formState.isValid;
+      console.log("Form state changed:", { 
+        isValid, 
+        errors: form.formState.errors,
+        values: value 
+      });
+      
       if (onValidityChange) {
-        onValidityChange(isValid)
+        onValidityChange(isValid);
       }
     });
+
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
 
+  // If initialData is provided, update form values
+  useEffect(() => {
+    if (initialData) {
+      Object.entries(initialData).forEach(([key, value]) => {
+        form.setValue(key as keyof typeof initialData, value);
+      });
+      
+      // Trigger validation after setting values
+      form.trigger().then((isValid) => {
+        if (onValidityChange) {
+          onValidityChange(isValid);
+        }
+      });
+    }
+  }, [initialData, form, onValidityChange]);
+
   const handleSubmit = form.handleSubmit((data) => {
     if (onSubmit) {
-      onSubmit(data)
+      onSubmit(data);
     }
   });
 
