@@ -5,6 +5,7 @@ import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { ReviewStep } from "@/components/checkout/ReviewStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
+import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { useCart } from "@/contexts/CartContext"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
@@ -147,7 +148,7 @@ export default function Checkout() {
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
               Método de pago
             </h2>
-            {/* Payment form will be implemented here */}
+            <PaymentStep />
           </div>
         )
       default:
