@@ -12,9 +12,17 @@ interface PlanDetailsProps {
   features: string[];
   europeGB: number;
   spainGB: number;
+  price: number;
 }
 
-export function PlanDetails({ title, description, features, europeGB, spainGB }: PlanDetailsProps) {
+export function PlanDetails({ 
+  title, 
+  description, 
+  features, 
+  europeGB, 
+  spainGB,
+  price 
+}: PlanDetailsProps) {
   const { toast } = useToast();
   const { addItem } = useCart();
   const navigate = useNavigate();
@@ -25,7 +33,7 @@ export function PlanDetails({ title, description, features, europeGB, spainGB }:
       type: "esim",
       title,
       description,
-      price: 0 // You need to add price to the props and use it here
+      price
     });
     
     toast({
@@ -60,6 +68,13 @@ export function PlanDetails({ title, description, features, europeGB, spainGB }:
             <span className="text-gray-700">{feature}</span>
           </motion.div>
         ))}
+      </div>
+
+      <div className="mb-6">
+        <p className="text-3xl font-bold text-primary">
+          ${price}
+          <span className="text-sm font-normal text-gray-600 ml-1">MXN</span>
+        </p>
       </div>
 
       <UsageMeter
