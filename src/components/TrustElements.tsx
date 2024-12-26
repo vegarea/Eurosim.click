@@ -146,10 +146,10 @@ export function TrustElements() {
         </div>
 
         {/* Sección de cobertura con acordeón */}
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl p-6 shadow-lg">
+        <div className="max-w-3xl mx-auto bg-white rounded-2xl p-4 md:p-6 shadow-lg">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="coverage">
-              <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold hover:no-underline">
+              <AccordionTrigger className="flex flex-col md:flex-row items-start md:items-center gap-2 text-lg md:text-xl font-semibold hover:no-underline p-2">
                 <div className="flex items-center gap-2">
                   <span className="fi fi-eu w-6 h-6 rounded-sm shadow-sm"></span>
                   <span>Cobertura en Europa</span>
@@ -157,22 +157,22 @@ export function TrustElements() {
                     ({countries.length} países y territorios)
                   </span>
                 </div>
-                <div className="flex items-center gap-2 ml-auto text-sm font-normal text-primary hover:text-primary/80">
+                <div className="flex items-center gap-2 md:ml-auto text-sm font-normal text-primary hover:text-primary/80">
                   <span>Ver cobertura</span>
                   <ChevronDown className="h-4 w-4 shrink-0 text-primary transition-transform duration-200" />
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <p className="text-gray-600 mb-4 text-sm">
+                <p className="text-gray-600 mb-4 text-sm px-2">
                   Navega sin preocupaciones en cualquiera de estos destinos:
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-2">
                   {countries.map((country, index) => (
                     <TooltipProvider key={index}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                            <span className={`fi fi-${country.code}`}></span>
+                            <span className={`fi fi-${country.code} w-5 h-5`}></span>
                             <span className="text-sm text-gray-700">{country.name}</span>
                           </div>
                         </TooltipTrigger>
