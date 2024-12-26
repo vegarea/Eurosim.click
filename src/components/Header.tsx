@@ -22,8 +22,8 @@ export function Header() {
 
   const menuItems = [
     { label: "Inicio", href: "/" },
-    { label: "Planes eSIM", href: "/esim" },
-    { label: "SIM Física", href: "/physical-sim" },
+    { label: "Planes eSIM", href: "/e-sims" },
+    { label: "SIM Física", href: "/sims" },
     { label: "Cobertura", href: "/coverage" },
     { label: "Soporte", href: "/support" },
   ];
