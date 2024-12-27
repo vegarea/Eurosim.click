@@ -16,7 +16,7 @@ interface TableInfo {
   fields: string[]
   path: string
   content: string
-  isConnected?: boolean
+  isConnected: boolean // Changed from optional to required
 }
 
 export function DatabaseStructure() {
@@ -82,7 +82,7 @@ export function DatabaseStructure() {
                 fields: fields.slice(0, 5),
                 path: file.path,
                 content,
-                isConnected: false // Por ahora todas estarán como no conectadas
+                isConnected: false // Now always providing a value for isConnected
               }
             } catch (error) {
               console.error(`Error processing ${file.path}:`, error)
