@@ -71,7 +71,9 @@ export function DatabaseStructure() {
           })
         )
 
-        setTables(loadedTables)
+        // Ordenar las tablas alfabéticamente por nombre
+        const sortedTables = loadedTables.sort((a, b) => a.name.localeCompare(b.name))
+        setTables(sortedTables)
         setLoading(false)
       } catch (error) {
         console.error('Error loading documentation:', error)
@@ -112,16 +114,16 @@ export function DatabaseStructure() {
               <Card key={table.name} className="hover:shadow-md transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">{table.name}</CardTitle>
-                  <CardDescription>{table.description}</CardDescription>
+                  <CardDescription className="line-clamp-2">{table.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="text-sm font-medium">Campos principales:</div>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {table.fields.map((field) => (
-                        <li key={field} className="flex items-center gap-2">
-                          <ArrowRight className="h-3 w-3" />
-                          {field}
+                      {table.fields.map((field, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <ArrowRight className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{field}</span>
                         </li>
                       ))}
                     </ul>
