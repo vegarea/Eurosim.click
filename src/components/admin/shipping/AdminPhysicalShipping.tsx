@@ -15,7 +15,8 @@ export function AdminPhysicalShipping() {
 
   // Filtrar pedidos por estado
   const pendingOrders = physicalOrders.filter(order => order.status === "processing")
-  const shippedOrders = physicalOrders.filter(order => ["shipped", "delivered"].includes(order.status))
+  const shippedOrders = physicalOrders.filter(order => order.status === "shipped")
+  const deliveredOrders = physicalOrders.filter(order => order.status === "delivered")
 
   const handleShipOrder = (order: Order) => {
     updateOrder(order.id, { status: "shipped" })
@@ -99,7 +100,7 @@ export function AdminPhysicalShipping() {
       </div>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pending" className="relative">
             En Preparación
             {pendingOrders.length > 0 && (
@@ -112,13 +113,24 @@ export function AdminPhysicalShipping() {
             )}
           </TabsTrigger>
           <TabsTrigger value="shipped">
-            En Tránsito y Entregados
+            En Tránsito
             {shippedOrders.length > 0 && (
+              <Badge 
+                variant="secondary" 
+                className="ml-2 bg-orange-100 text-orange-800"
+              >
+                {shippedOrders.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="delivered">
+            Entregados
+            {deliveredOrders.length > 0 && (
               <Badge 
                 variant="secondary" 
                 className="ml-2 bg-green-100 text-green-800"
               >
-                {shippedOrders.length}
+                {deliveredOrders.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -135,6 +147,13 @@ export function AdminPhysicalShipping() {
           <DataTable 
             columns={columns} 
             data={shippedOrders}
+          />
+        </TabsContent>
+
+        <TabsContent value="delivered" className="mt-6">
+          <DataTable 
+            columns={columns} 
+            data={deliveredOrders}
           />
         </TabsContent>
       </Tabs>
