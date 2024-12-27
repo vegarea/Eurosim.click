@@ -1,4 +1,4 @@
-export type WorkflowStatus = 'working' | 'pending' | 'error';
+export type WorkflowStatus = 'working' | 'pending' | 'reviewed';
 
 export interface WorkflowItem {
   id: string;
