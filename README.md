@@ -46,8 +46,9 @@ Tabla para almacenar los pedidos de los clientes.
 | total | decimal | Monto total en centavos | ✅ |
 | payment_method | text | Método de pago utilizado | ✅ |
 | payment_status | enum | Estado del pago ('pending', 'completed', 'failed') | ✅ |
-| created_at | timestamp | Fecha de creación | ✅ |
-| updated_at | timestamp | Fecha de última actualización | ✅ |
+| payment_url | text | URL de confirmación del pago (Stripe/PayPal) | ❌ |
+| created_at | timestamp | Fecha y hora de creación | ✅ |
+| updated_at | timestamp | Fecha y hora de última actualización | ✅ |
 
 #### Información del Cliente
 | Campo | Tipo | Descripción | Requerido |
