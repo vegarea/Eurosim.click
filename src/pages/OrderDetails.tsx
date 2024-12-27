@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useOrders } from "@/contexts/OrdersContext"
 import { OrderStatusBadge, statusConfig } from "@/components/admin/orders/OrderStatusBadge"
@@ -14,7 +13,8 @@ import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
 import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package2 } from "lucide-react"
+import { Package2, Wifi, CreditCard } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 const statusOrder = [
   "payment_pending",
@@ -105,15 +105,40 @@ export default function OrderDetails() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-medium mb-1">Producto</h3>
-                <p>{order.title || "No especificado"}</p>
+                <div className="flex items-center gap-2">
+                  {order.type === 'physical' ? (
+                    <CreditCard className="h-4 w-4 text-primary" />
+                  ) : (
+                    <Wifi className="h-4 w-4 text-primary" />
+                  )}
+                  <span>{order.title || "No especificado"}</span>
+                </div>
               </div>
               <div>
-                <h3 className="font-medium mb-1">Descripción</h3>
-                <p>{order.description || "No especificada"}</p>
+                <h3 className="font-medium mb-1">Tipo de SIM</h3>
+                <Badge variant="secondary" className="capitalize">
+                  {order.type === 'physical' ? 'SIM Física' : 'eSIM'}
+                </Badge>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Datos en Europa</h3>
+                <p className="font-semibold text-primary">
+                  {order.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Datos en España</h3>
+                <p className="font-semibold text-primary">
+                  {order.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
+                </p>
               </div>
               <div>
                 <h3 className="font-medium mb-1">Cantidad</h3>
                 <p>{order.quantity || 1}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Precio</h3>
+                <p className="font-semibold">${order.total?.toFixed(2)} MXN</p>
               </div>
             </div>
           </CardContent>
