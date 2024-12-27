@@ -9,7 +9,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusBadge } from "./OrderStatusBadge"
 import { Order } from "./types"
-import { useEffect, useState } from "react"
 
 interface OrdersTableProps {
   orders: Order[]
@@ -24,26 +23,6 @@ const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
 }
 
 export function OrdersTable({ orders, onOrderClick }: OrdersTableProps) {
-  const [highlightedOrderId, setHighlightedOrderId] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (highlightedOrderId) {
-      // Remove highlight after animation
-      const timer = setTimeout(() => {
-        setHighlightedOrderId(null)
-      }, 2000)
-      return () => clearTimeout(timer)
-    }
-  }, [highlightedOrderId])
-
-  // Update highlight when orders change
-  useEffect(() => {
-    const lastModifiedOrder = orders[0] // Assuming the most recently modified order is at the top
-    if (lastModifiedOrder) {
-      setHighlightedOrderId(lastModifiedOrder.id)
-    }
-  }, [orders])
-
   return (
     <Table>
       <TableHeader>
@@ -61,8 +40,7 @@ export function OrdersTable({ orders, onOrderClick }: OrdersTableProps) {
         {orders.map((order) => (
           <TableRow 
             key={order.id} 
-            className={`cursor-pointer hover:bg-muted/50 transition-colors duration-300
-              ${highlightedOrderId === order.id ? 'animate-highlight bg-yellow-100' : ''}`}
+            className="cursor-pointer hover:bg-muted/50"
             onClick={() => onOrderClick(order)}
           >
             <TableCell className="font-medium">{order.id}</TableCell>
