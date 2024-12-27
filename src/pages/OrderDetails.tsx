@@ -4,7 +4,7 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft, Package2, CreditCard, User2, MapPin, Passport } from "lucide-react"
+import { ChevronLeft, Package2, CreditCard, User2, MapPin, FileText } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -202,7 +202,7 @@ export default function OrderDetails() {
 
                 <div className="space-y-4">
                   <h3 className="font-medium flex items-center gap-2">
-                    <Passport className="h-4 w-4" />
+                    <FileText className="h-4 w-4" />
                     Documentación UE
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
