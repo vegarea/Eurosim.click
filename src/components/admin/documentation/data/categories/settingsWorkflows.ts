@@ -4,61 +4,73 @@ export const settingsWorkflows: WorkflowItem[] = [
   {
     id: "FL-601",
     title: "Configuración de marca",
-    description: "Gestión de logos, colores y elementos de marca",
-    status: "pending",
+    description: "Gestión de identidad visual y datos de empresa",
+    status: "working",
     components: [
-      "BrandSettings.tsx",
+      "CompanySettings.tsx",
       "StyleSettings.tsx"
     ],
     database: [
-      "settings (tabla)",
-      "brand_assets (tabla)"
-    ]
+      "settings (tabla)"
+    ],
+    details: `
+- Gestión de logo de empresa
+- Nombre de empresa
+- Datos de contacto (WhatsApp, redes sociales)
+- Imágenes principales del sitio
+- Colores del tema (primario/secundario)`
   },
   {
     id: "FL-602",
-    title: "Integraciones",
-    description: "Gestión de integraciones con servicios externos",
+    title: "Configuración de E-commerce",
+    description: "Gestión de configuraciones monetarias y fiscales",
     status: "working",
     components: [
-      "IntegrationsManager.tsx",
-      "APIKeys.tsx"
+      "EcommerceSettings.tsx"
     ],
     database: [
-      "integrations (tabla)",
-      "api_keys (tabla)"
-    ]
+      "settings (tabla)"
+    ],
+    details: `
+- Configuración de moneda (MXN)
+- Tasa de impuestos
+- Próximamente: soporte multi-moneda`
   },
   {
     id: "FL-603",
-    title: "Gestión de imágenes de Hero",
-    description: "Sistema de gestión y actualización de imágenes principales",
-    status: "pending",
+    title: "Configuración SEO",
+    description: "Gestión de metadatos para SEO",
+    status: "working",
     components: [
-      "StyleSettings.tsx",
-      "ImageUploader.tsx",
-      "HomeHero.tsx",
-      "ESimHero.tsx"
+      "SeoSettings.tsx"
     ],
     database: [
-      "settings (tabla)",
-      "hero_images (tabla)"
+      "settings (tabla)"
     ],
-    details: "Sistema para gestionar las imágenes principales de las secciones Home, E-SIM y SIM física. Incluye preview, optimización y respaldo de imágenes anteriores."
+    details: `
+- Meta títulos
+- Meta descripciones
+- Configuración general SEO`
   },
   {
     id: "FL-604",
-    title: "Personalización de UI",
-    description: "Sistema de personalización de interfaz de usuario",
-    status: "pending",
+    title: "Integraciones externas",
+    description: "Gestión de integraciones con servicios externos",
+    status: "working",
     components: [
-      "StyleSettings.tsx",
-      "ThemeProvider.tsx"
+      "IntegrationsSettings.tsx",
+      "EmailIntegration.tsx",
+      "ZapierIntegration.tsx",
+      "MakeWebhooks.tsx"
     ],
     database: [
       "settings (tabla)",
-      "ui_themes (tabla)"
+      "webhooks (tabla)"
     ],
-    details: "Gestión de temas, colores, tipografías y otros elementos visuales de la plataforma"
+    details: `
+- Integración con Brevo (email)
+- Webhooks de Make.com
+- Integración con Zapier
+- Gestión de API keys`
   }
 ]
