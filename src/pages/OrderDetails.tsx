@@ -4,7 +4,7 @@ import { useOrders } from "@/contexts/OrdersContext"
 import { OrderStatusBadge, statusConfig } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, Package2, Wifi, CreditCard, ExternalLink } from "lucide-react"
 import { OrderStatus } from "@/components/admin/orders/types"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
@@ -14,7 +14,6 @@ import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
 import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package2, Wifi, CreditCard } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 const statusOrder = [
@@ -30,6 +29,15 @@ export default function OrderDetails() {
   const order = orders.find(o => o.id === orderId)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
+
+  // Mock payment data - In a real app, this would come from your payment provider's API
+  const mockPaymentData = {
+    paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
+    logs: [
+      { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
+      { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
+    ]
+  }
 
   if (!order) {
     return (
@@ -61,7 +69,6 @@ export default function OrderDetails() {
     }
   }
 
-  // Calculate progress percentage based on current status
   const getProgressPercentage = () => {
     const currentIndex = statusOrder.indexOf(order.status as any)
     if (currentIndex === -1) return 0
@@ -140,6 +147,66 @@ export default function OrderDetails() {
               <div>
                 <h3 className="font-medium mb-1">Precio</h3>
                 <p className="font-semibold">${order.total?.toFixed(2)} MXN</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Nueva sección de información de pago */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-gray-500" />
+              Información de Pago
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-medium mb-2">Método de Pago</h3>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="capitalize">
+                    {order.paymentMethod || "No especificado"}
+                  </Badge>
+                </div>
+              </div>
+
+              {mockPaymentData.paymentUrl && (
+                <div>
+                  <h3 className="font-medium mb-2">URL de Pago</h3>
+                  <a 
+                    href={mockPaymentData.paymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline flex items-center gap-1"
+                  >
+                    Ver en {order.paymentMethod} <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              )}
+
+              <div>
+                <h3 className="font-medium mb-2">Registro de Eventos</h3>
+                <div className="space-y-2">
+                  {mockPaymentData.logs.map((log, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{log.event}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(log.date).toLocaleString()}
+                        </p>
+                      </div>
+                      <Badge 
+                        variant={log.status === "completed" ? "success" : "secondary"}
+                      >
+                        {log.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </CardContent>
