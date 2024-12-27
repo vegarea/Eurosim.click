@@ -2,92 +2,69 @@ import { Order } from "./types"
 
 export const mockOrders: Order[] = [
   {
-    id: "ORD-001",
-    date: "2024-03-20",
+    id: "order-001",
+    date: "2024-01-25T10:30:00Z",
     customer: "Juan Pérez",
-    total: 299.99,
+    email: "juan.perez@example.com",
+    phone: "1234567890",
+    total: 100.0,
     status: "payment_pending",
-    type: "physical"
+    type: "physical",
+    paymentMethod: "stripe",
+    notes: [],
+    events: [
+      {
+        id: "evt-001",
+        type: "created",
+        description: "Pedido creado",
+        createdAt: "2024-01-25T10:30:00Z",
+        metadata: {
+          automated: true
+        }
+      },
+      {
+        id: "evt-002",
+        type: "payment_processed",
+        description: "Pago procesado correctamente vía Stripe",
+        createdAt: "2024-01-25T10:31:00Z",
+        metadata: {
+          automated: true,
+          paymentMethod: "stripe"
+        }
+      },
+      {
+        id: "evt-003",
+        type: "status_changed",
+        description: "Estado actualizado a 'processing'",
+        userId: "usr-001",
+        userName: "Admin",
+        createdAt: "2024-01-25T11:00:00Z",
+        metadata: {
+          oldStatus: "payment_pending",
+          newStatus: "processing"
+        }
+      },
+      {
+        id: "evt-004",
+        type: "note_added",
+        description: "Nota añadida al pedido",
+        userId: "usr-001",
+        userName: "Admin",
+        createdAt: "2024-01-25T11:30:00Z"
+      }
+    ]
   },
   {
-    id: "ORD-002",
-    date: "2024-03-19",
-    customer: "María García",
-    total: 159.50,
+    id: "order-002",
+    date: "2024-01-26T12:00:00Z",
+    customer: "María López",
+    email: "maria.lopez@example.com",
+    phone: "0987654321",
+    total: 150.0,
     status: "processing",
     type: "esim",
-    paymentMethod: "stripe"
-  },
-  {
-    id: "ORD-003",
-    date: "2024-03-18",
-    customer: "Carlos López",
-    total: 499.99,
-    status: "delivered",
-    type: "physical",
-    paymentMethod: "paypal"
-  },
-  {
-    id: "ORD-004",
-    date: "2024-03-17",
-    customer: "Ana Martínez",
-    total: 89.99,
-    status: "payment_failed",
-    type: "esim"
-  },
-  // Nuevos pedidos de prueba
-  {
-    id: "ORD-005",
-    date: "2024-03-20",
-    customer: "Roberto Sánchez",
-    total: 299.99,
-    status: "processing",
-    type: "physical",
-    paymentMethod: "stripe"
-  },
-  {
-    id: "ORD-006",
-    date: "2024-03-20",
-    customer: "Laura Torres",
-    total: 159.50,
-    status: "processing",
-    type: "esim",
-    paymentMethod: "paypal"
-  },
-  {
-    id: "ORD-007",
-    date: "2024-03-19",
-    customer: "Miguel Ángel Ruiz",
-    total: 299.99,
-    status: "processing",
-    type: "physical",
-    paymentMethod: "stripe"
-  },
-  {
-    id: "ORD-008",
-    date: "2024-03-19",
-    customer: "Carmen Jiménez",
-    total: 159.50,
-    status: "processing",
-    type: "esim",
-    paymentMethod: "stripe"
-  },
-  {
-    id: "ORD-009",
-    date: "2024-03-18",
-    customer: "Daniel Moreno",
-    total: 299.99,
-    status: "shipped",
-    type: "physical",
-    paymentMethod: "paypal"
-  },
-  {
-    id: "ORD-010",
-    date: "2024-03-18",
-    customer: "Patricia Navarro",
-    total: 159.50,
-    status: "delivered",
-    type: "esim",
-    paymentMethod: "stripe"
+    paymentMethod: "paypal",
+    notes: [],
+    events: []
   }
 ]

@@ -13,6 +13,7 @@ import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation
 import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
 import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
 import { OrderNotes } from "@/components/admin/orders/OrderNotes"
+import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -246,6 +247,9 @@ export default function OrderDetails() {
           onConfirm={confirmStatusChange}
           orderType={order.type}
         />
+
+        {/* Add the OrderHistory component at the bottom */}
+        <OrderHistory events={order.events} />
       </div>
     </AdminLayout>
   )

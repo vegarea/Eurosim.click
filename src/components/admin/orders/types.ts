@@ -16,6 +16,28 @@ export interface OrderNote {
   createdAt: string
 }
 
+export type OrderEventType = 
+  | "created"
+  | "status_changed"
+  | "payment_processed"
+  | "automated_update"
+  | "note_added"
+
+export interface OrderEvent {
+  id: string
+  type: OrderEventType
+  description: string
+  userId?: string
+  userName?: string
+  createdAt: string
+  metadata?: {
+    oldStatus?: OrderStatus
+    newStatus?: OrderStatus
+    paymentMethod?: string
+    automated?: boolean
+  }
+}
+
 export interface Order {
   id: string
   date: string
@@ -27,6 +49,7 @@ export interface Order {
   type: OrderType
   paymentMethod?: "stripe" | "paypal"
   notes?: OrderNote[]
+  events?: OrderEvent[]
   
   // Detalles del producto
   title?: string
