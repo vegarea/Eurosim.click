@@ -8,6 +8,7 @@ import { AdminSettings } from "@/components/admin/AdminSettings"
 import { AdminBlog } from "@/components/admin/AdminBlog"
 import { AdminPhysicalShipping } from "@/components/admin/shipping/AdminPhysicalShipping"
 import { AdminESimDelivery } from "@/components/admin/shipping/AdminESimDelivery"
+import { AdminDocumentation } from "@/components/admin/documentation/AdminDocumentation"
 import { Routes, Route } from "react-router-dom"
 import { OrdersProvider } from "@/contexts/OrdersContext"
 
@@ -24,6 +25,7 @@ export default function AdminPanel() {
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="emails" element={<AdminEmails />} />
+          <Route path="documentation" element={<AdminDocumentation />} />
           <Route path="settings" element={<AdminSettings />} />
         </Routes>
       </AdminLayout>

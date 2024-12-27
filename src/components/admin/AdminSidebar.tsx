@@ -7,7 +7,8 @@ import {
   Settings,
   Truck,
   QrCode,
-  BookOpen
+  BookOpen,
+  FileText
 } from "lucide-react"
 import {
   Sidebar,
@@ -61,6 +62,11 @@ const menuItems = [
     title: "Emails",
     path: "/admin/emails",
     icon: Mail,
+  },
+  {
+    title: "Documentación",
+    path: "/admin/documentation",
+    icon: FileText,
   },
   {
     title: "Configuración",
