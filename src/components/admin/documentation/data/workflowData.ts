@@ -2,90 +2,103 @@ import { WorkflowCategory } from "../types/WorkflowTypes"
 
 export const workflowData: WorkflowCategory[] = [
   {
-    id: "config",
-    title: "Configuración",
+    id: "auth",
+    title: "Autenticación y Usuarios",
     items: [
       {
         id: "FL-001",
-        title: "Subida y actualización de logo",
-        description: "Permite subir y actualizar el logo de la empresa que se muestra en el sitio",
+        title: "Registro de usuario",
+        description: "Proceso de registro de nuevos usuarios en la plataforma",
         status: "pending",
-        details: "El logo debe poder actualizarse en tiempo real sin necesidad de refrescar la página. Se debe validar el tamaño y formato de la imagen.",
         components: [
-          "LogoUploader.tsx",
-          "Header.tsx",
-          "AdminSettings.tsx"
+          "RegisterForm.tsx",
+          "AuthContext.tsx"
         ],
         database: [
-          "settings (tabla)",
-          "files (bucket de Supabase)"
-        ]
+          "users (tabla)",
+          "profiles (tabla)"
+        ],
+        details: "Pendiente implementar validación de email y proceso de verificación"
       },
       {
         id: "FL-002",
-        title: "Configuración de redes sociales",
-        description: "Enlaces a redes sociales y WhatsApp",
-        status: "working",
-        details: "Los enlaces se guardan correctamente en la base de datos",
+        title: "Inicio de sesión",
+        description: "Sistema de autenticación de usuarios",
+        status: "pending",
         components: [
-          "SocialLinks.tsx",
-          "Footer.tsx"
+          "LoginForm.tsx",
+          "AuthContext.tsx"
         ],
         database: [
-          "settings (tabla)"
+          "users (tabla)",
+          "sessions (tabla)"
         ]
       }
     ]
   },
   {
     id: "orders",
-    title: "Pedidos",
+    title: "Gestión de Pedidos",
     items: [
       {
         id: "FL-101",
-        title: "Proceso de pago con Stripe",
-        description: "Flujo completo de pago usando Stripe",
+        title: "Creación de pedido",
+        description: "Proceso de creación y validación de nuevos pedidos",
         status: "working",
-        details: "Integración con Stripe, manejo de webhooks y actualización de estado del pedido",
         components: [
-          "PaymentForm.tsx",
-          "OrderSummary.tsx"
+          "Checkout.tsx",
+          "CartContext.tsx",
+          "OrdersContext.tsx"
         ],
         database: [
           "orders (tabla)",
-          "payments (tabla)"
-        ]
+          "order_items (tabla)"
+        ],
+        details: "El proceso de creación de pedidos está funcionando correctamente"
       },
       {
         id: "FL-102",
-        title: "Envío de confirmación por email",
-        description: "Email automático después de la compra",
-        status: "pending",
-        details: "Pendiente integración con servicio de email",
+        title: "Procesamiento de pago",
+        description: "Integración con pasarelas de pago",
+        status: "working",
         components: [
-          "EmailService.ts",
-          "OrderConfirmationEmail.tsx"
+          "PaymentStep.tsx",
+          "StripeIntegration.tsx"
         ],
         database: [
-          "orders (tabla)",
-          "email_queue (tabla)"
+          "payments (tabla)",
+          "payment_methods (tabla)"
+        ]
+      },
+      {
+        id: "FL-103",
+        title: "Seguimiento de pedido",
+        description: "Sistema de tracking y actualización de estado",
+        status: "pending",
+        components: [
+          "OrderTracking.tsx",
+          "OrderStatus.tsx"
+        ],
+        database: [
+          "order_status (tabla)",
+          "tracking_updates (tabla)"
         ]
       }
     ]
   },
   {
     id: "products",
-    title: "Productos",
+    title: "Gestión de Productos",
     items: [
       {
         id: "FL-201",
-        title: "Gestión de inventario",
-        description: "Control de stock de SIMs físicas",
+        title: "Gestión de SIMs físicas",
+        description: "CRUD de SIMs físicas y control de inventario",
         status: "working",
-        details: "Actualización automática del stock al procesar pedidos",
         components: [
-          "InventoryManager.tsx",
-          "ProductList.tsx"
+          "ProductCard.tsx",
+          "ProductList.tsx",
+          "InventoryManager.tsx"
         ],
         database: [
           "products (tabla)",
@@ -94,17 +107,149 @@ export const workflowData: WorkflowCategory[] = [
       },
       {
         id: "FL-202",
-        title: "Activación de eSIMs",
-        description: "Proceso automático de activación",
+        title: "Gestión de eSIMs",
+        description: "Sistema de activación y entrega de eSIMs",
         status: "pending",
-        details: "Pendiente integración con API del proveedor",
         components: [
-          "ESimActivator.tsx",
-          "ActivationStatus.tsx"
+          "ESimManager.tsx",
+          "ESimActivation.tsx"
         ],
         database: [
           "esims (tabla)",
-          "activation_logs (tabla)"
+          "esim_activations (tabla)"
+        ]
+      }
+    ]
+  },
+  {
+    id: "shipping",
+    title: "Envíos",
+    items: [
+      {
+        id: "FL-301",
+        title: "Envío de SIMs físicas",
+        description: "Gestión de envíos físicos y tracking",
+        status: "working",
+        components: [
+          "ShippingForm.tsx",
+          "TrackingSystem.tsx"
+        ],
+        database: [
+          "shipments (tabla)",
+          "tracking_events (tabla)"
+        ]
+      },
+      {
+        id: "FL-302",
+        title: "Entrega de eSIMs",
+        description: "Sistema de entrega digital de eSIMs",
+        status: "pending",
+        components: [
+          "ESimDelivery.tsx",
+          "QRCodeGenerator.tsx"
+        ],
+        database: [
+          "esim_deliveries (tabla)"
+        ]
+      }
+    ]
+  },
+  {
+    id: "blog",
+    title: "Blog y Contenido",
+    items: [
+      {
+        id: "FL-401",
+        title: "Gestión de artículos",
+        description: "CRUD de artículos del blog",
+        status: "pending",
+        components: [
+          "BlogEditor.tsx",
+          "ArticleList.tsx"
+        ],
+        database: [
+          "blog_posts (tabla)",
+          "blog_categories (tabla)"
+        ]
+      },
+      {
+        id: "FL-402",
+        title: "Generación automática de contenido",
+        description: "Sistema de generación de contenido con IA",
+        status: "pending",
+        components: [
+          "ContentGenerator.tsx",
+          "AIIntegration.tsx"
+        ],
+        database: [
+          "ai_generated_content (tabla)"
+        ]
+      }
+    ]
+  },
+  {
+    id: "emails",
+    title: "Sistema de Emails",
+    items: [
+      {
+        id: "FL-501",
+        title: "Plantillas de email",
+        description: "Gestión de plantillas para diferentes tipos de emails",
+        status: "working",
+        components: [
+          "EmailTemplateEditor.tsx",
+          "EmailPreview.tsx"
+        ],
+        database: [
+          "email_templates (tabla)"
+        ]
+      },
+      {
+        id: "FL-502",
+        title: "Envío automático de emails",
+        description: "Sistema de envío automático basado en eventos",
+        status: "pending",
+        components: [
+          "EmailService.ts",
+          "EmailQueue.tsx"
+        ],
+        database: [
+          "email_queue (tabla)",
+          "email_logs (tabla)"
+        ]
+      }
+    ]
+  },
+  {
+    id: "settings",
+    title: "Configuración del Sistema",
+    items: [
+      {
+        id: "FL-601",
+        title: "Configuración de marca",
+        description: "Gestión de logos, colores y elementos de marca",
+        status: "pending",
+        components: [
+          "BrandSettings.tsx",
+          "StyleSettings.tsx"
+        ],
+        database: [
+          "settings (tabla)",
+          "brand_assets (tabla)"
+        ]
+      },
+      {
+        id: "FL-602",
+        title: "Integraciones",
+        description: "Gestión de integraciones con servicios externos",
+        status: "working",
+        components: [
+          "IntegrationsManager.tsx",
+          "APIKeys.tsx"
+        ],
+        database: [
+          "integrations (tabla)",
+          "api_keys (tabla)"
         ]
       }
     ]
