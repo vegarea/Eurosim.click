@@ -17,6 +17,17 @@ La documentación detallada de cada tabla se encuentra en archivos separados den
 - [Workflow Events](docs/database/workflow_events.md)
 - [Auth Logs](docs/database/auth_logs.md)
 - [Role Permissions](docs/database/role_permissions.md)
+- [Order Items](docs/database/order_items.md)
+- [Order Status History](docs/database/order_status_history.md)
+- [Order Events](docs/database/order_events.md)
+- [Payments](docs/database/payments.md)
+- [Payment Methods](docs/database/payment_methods.md)
+- [Payment Logs](docs/database/payment_logs.md)
+- [Customer Documents](docs/database/customer_documents.md)
+- [Document Validations](docs/database/document_validations.md)
+- [Email Logs](docs/database/email_logs.md)
+- [Order Notes](docs/database/order_notes.md)
+- [Internal Comments](docs/database/internal_comments.md)
 
 ## Convenciones
 
