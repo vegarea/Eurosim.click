@@ -17,6 +17,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useState, useEffect } from "react"
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface EmailTemplate {
   id: string
@@ -26,6 +29,7 @@ interface EmailTemplate {
   description: string
   type: "physical" | "esim" | "both"
   variables: string[]
+  content?: string
 }
 
 interface EmailTemplateDialogProps {
@@ -48,7 +52,8 @@ export function EmailTemplateDialog({
     status: "processing",
     description: "",
     type: "both",
-    variables: []
+    variables: [],
+    content: ""
   })
 
   useEffect(() => {
@@ -62,7 +67,8 @@ export function EmailTemplateDialog({
         status: "processing",
         description: "",
         type: "both",
-        variables: []
+        variables: [],
+        content: ""
       })
     }
   }, [template])
@@ -77,97 +83,144 @@ export function EmailTemplateDialog({
     setFormData({ ...formData, variables: vars })
   }
 
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['link', 'image'],
+      ['clean']
+    ],
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>
               {template ? "Editar Plantilla" : "Nueva Plantilla"}
             </DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nombre de la Plantilla</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="subject">Asunto del Email</Label>
-              <Input
-                id="subject"
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="type">Tipo de Producto</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value: EmailTemplate["type"]) =>
-                  setFormData({ ...formData, type: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona el tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="physical">SIM Física</SelectItem>
-                  <SelectItem value="esim">E-SIM</SelectItem>
-                  <SelectItem value="both">Ambos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="status">Estado Relacionado</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: EmailTemplate["status"]) =>
-                  setFormData({ ...formData, status: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="payment_pending">Pago Pendiente</SelectItem>
-                  <SelectItem value="processing">En Preparación</SelectItem>
-                  <SelectItem value="shipped">En Tránsito</SelectItem>
-                  <SelectItem value="delivered">Entregado</SelectItem>
-                  <SelectItem value="cancelled">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="variables">
-                Variables Disponibles (separadas por comas)
-              </Label>
-              <Textarea
-                id="variables"
-                value={formData.variables.join(', ')}
-                onChange={handleVariablesChange}
-                placeholder="nombre_cliente, numero_pedido, etc..."
-              />
-              <p className="text-sm text-muted-foreground">
-                Estas variables serán reemplazadas con datos reales al enviar el email
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
+
+          <Tabs defaultValue="details" className="mt-4">
+            <TabsList>
+              <TabsTrigger value="details">Detalles</TabsTrigger>
+              <TabsTrigger value="content">Contenido del Email</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="details" className="space-y-4">
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Nombre de la Plantilla</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="subject">Asunto del Email</Label>
+                  <Input
+                    id="subject"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="type">Tipo de Producto</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(value: EmailTemplate["type"]) =>
+                      setFormData({ ...formData, type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona el tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="physical">SIM Física</SelectItem>
+                      <SelectItem value="esim">E-SIM</SelectItem>
+                      <SelectItem value="both">Ambos</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="status">Estado Relacionado</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: EmailTemplate["status"]) =>
+                      setFormData({ ...formData, status: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="payment_pending">Pago Pendiente</SelectItem>
+                      <SelectItem value="processing">En Preparación</SelectItem>
+                      <SelectItem value="shipped">En Tránsito</SelectItem>
+                      <SelectItem value="delivered">Entregado</SelectItem>
+                      <SelectItem value="cancelled">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Descripción</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="variables">
+                    Variables Disponibles (separadas por comas)
+                  </Label>
+                  <Textarea
+                    id="variables"
+                    value={formData.variables.join(', ')}
+                    onChange={handleVariablesChange}
+                    placeholder="nombre_cliente, numero_pedido, etc..."
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Estas variables serán reemplazadas con datos reales al enviar el email
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="content" className="space-y-4">
+              <div className="grid gap-2">
+                <Label>Contenido del Email</Label>
+                <div className="min-h-[400px] border rounded-md">
+                  <ReactQuill 
+                    theme="snow"
+                    value={formData.content || ''}
+                    onChange={(content) => setFormData({ ...formData, content })}
+                    modules={modules}
+                    className="h-[350px]"
+                  />
+                </div>
+                <div className="mt-4 p-4 border rounded-md bg-muted">
+                  <p className="text-sm font-medium mb-2">Variables disponibles:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.variables.map((variable) => (
+                      <code key={variable} className="px-2 py-1 bg-background rounded text-sm">
+                        {`{${variable}}`}
+                      </code>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+
+          <DialogFooter className="mt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
