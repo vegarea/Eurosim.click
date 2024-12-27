@@ -4,25 +4,18 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft, Package2, CreditCard, User2, MapPin, FileText } from "lucide-react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { statusConfig } from "@/components/admin/orders/OrderStatusBadge"
-import { OrderStatus } from "@/components/admin/orders/types"
-import { toast } from "sonner"
+import { ChevronLeft, Package2, User2, MapPin, FileText } from "lucide-react"
+import { PaymentStatusCard } from "@/components/admin/orders/PaymentStatusCard"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { OrderStatus } from "@/components/admin/orders/types"
+import { statusConfig } from "@/components/admin/orders/OrderStatusBadge"
+import { toast } from "sonner"
 
 const statusSteps: OrderStatus[] = [
   "payment_pending",
@@ -83,6 +76,12 @@ export default function OrderDetails() {
           </Link>
         </div>
 
+        {/* Encabezado y estado del pedido */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
+          <OrderStatusBadge status={order.status} />
+        </div>
+
         {/* Barra de progreso */}
         <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
           <div className="flex justify-between mb-4 relative">
@@ -131,176 +130,136 @@ export default function OrderDetails() {
           )}
         </div>
 
-        <div className="grid gap-6">
-          {/* Encabezado del pedido */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
-            <OrderStatusBadge status={order.status} />
-          </div>
+        {/* Estado de pago (Ahora en la parte superior) */}
+        <PaymentStatusCard
+          status={order.status}
+          paymentMethod={order.paymentMethod}
+          orderDate={order.date}
+          onStatusChange={handleStatusChange}
+        />
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Detalles del producto */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package2 className="h-5 w-5 text-gray-500" />
-                  Detalles del Producto
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-medium mb-1">Tipo de SIM</h3>
-                  <Badge 
-                    variant="secondary" 
-                    className={getSimTypeBadgeStyle(order.type)}
-                  >
-                    {order.type === "physical" ? "SIM Física" : "E-SIM"}
-                  </Badge>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Producto</h3>
-                  <p>{order.title || "No especificado"}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Descripción</h3>
-                  <p className="text-gray-600">{order.description || "No especificada"}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Cantidad</h3>
-                  <p>{order.quantity || 1}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Total</h3>
-                  <p className="text-lg font-semibold">${order.total.toFixed(2)} MXN</p>
-                </div>
-              </CardContent>
-            </Card>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Detalles del producto */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Package2 className="h-5 w-5 text-gray-500" />
+                Detalles del Producto
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-medium mb-1">Tipo de SIM</h3>
+                <Badge 
+                  variant="secondary" 
+                  className={getSimTypeBadgeStyle(order.type)}
+                >
+                  {order.type === "physical" ? "SIM Física" : "E-SIM"}
+                </Badge>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Producto</h3>
+                <p>{order.title || "No especificado"}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Descripción</h3>
+                <p className="text-gray-600">{order.description || "No especificada"}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Cantidad</h3>
+                <p>{order.quantity || 1}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Total</h3>
+                <p className="text-lg font-semibold">${order.total.toFixed(2)} MXN</p>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Información del cliente y documentación UE */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User2 className="h-5 w-5 text-gray-500" />
-                  Información del Cliente
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-medium mb-1">Nombre completo</h3>
-                  <p>{order.customer}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Email</h3>
-                  <p>{order.email || "No especificado"}</p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Teléfono</h3>
-                  <p>{order.phone || "No especificado"}</p>
-                </div>
+          {/* Información del cliente y documentación UE */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User2 className="h-5 w-5 text-gray-500" />
+                Información del Cliente
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h3 className="font-medium mb-1">Nombre completo</h3>
+                <p>{order.customer}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Email</h3>
+                <p>{order.email || "No especificado"}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Teléfono</h3>
+                <p>{order.phone || "No especificado"}</p>
+              </div>
 
-                <Separator className="my-4" />
+              <Separator className="my-4" />
 
-                <div className="space-y-4">
-                  <h3 className="font-medium flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Documentación UE
-                  </h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Pasaporte</h4>
-                      <p>{order.passportNumber || "No especificado"}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Fecha de nacimiento</h4>
-                      <p>{order.birthDate || "No especificada"}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Género</h4>
-                      <p>{order.gender === 'M' ? 'Masculino' : order.gender === 'F' ? 'Femenino' : 'No especificado'}</p>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500">Fecha de activación</h4>
-                      <p>{order.activationDate || "No especificada"}</p>
-                    </div>
+              <div className="space-y-4">
+                <h3 className="font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Documentación UE
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Pasaporte</h4>
+                    <p>{order.passportNumber || "No especificado"}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Fecha de nacimiento</h4>
+                    <p>{order.birthDate || "No especificada"}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Género</h4>
+                    <p>{order.gender === 'M' ? 'Masculino' : order.gender === 'F' ? 'Femenino' : 'No especificado'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Fecha de activación</h4>
+                    <p>{order.activationDate || "No especificada"}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Información de envío (solo para SIM física) */}
-            {order.type === "physical" && (
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-gray-500" />
-                    Información de Envío
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-medium mb-1">Dirección de envío</h3>
-                      <p>{order.shippingAddress || "No especificada"}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Ciudad</h3>
-                      <p>{order.city || "No especificada"}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-medium mb-1">Estado</h3>
-                      <p>{order.state || "No especificado"}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Código Postal</h3>
-                      <p>{order.zipCode || "No especificado"}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Información de pago */}
+          {/* Información de envío (solo para SIM física) */}
+          {order.type === "physical" && (
             <Card className="md:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-gray-500" />
-                  Información de Pago
+                  <MapPin className="h-5 w-5 text-gray-500" />
+                  Información de Envío
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-6">
+              <CardContent className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
                   <div>
-                    <h3 className="font-medium mb-1">Método de Pago</h3>
-                    <p className="capitalize">{order.paymentMethod || "No especificado"}</p>
+                    <h3 className="font-medium mb-1">Dirección de envío</h3>
+                    <p>{order.shippingAddress || "No especificada"}</p>
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Estado del Pago</h3>
-                    <Select
-                      value={order.status}
-                      onValueChange={handleStatusChange}
-                    >
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Seleccionar estado" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusConfig).map(([key, { label }]) => (
-                          <SelectItem key={key} value={key}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <h3 className="font-medium mb-1">Ciudad</h3>
+                    <p>{order.city || "No especificada"}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium mb-1">Estado</h3>
+                    <p>{order.state || "No especificado"}</p>
                   </div>
                   <div>
-                    <h3 className="font-medium mb-1">Fecha del Pedido</h3>
-                    <p>{new Date(order.date).toLocaleDateString()}</p>
+                    <h3 className="font-medium mb-1">Código Postal</h3>
+                    <p>{order.zipCode || "No especificado"}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
         </div>
       </div>
     </AdminLayout>
