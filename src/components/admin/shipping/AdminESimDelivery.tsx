@@ -1,6 +1,4 @@
-import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { mockOrders } from "../orders/mockData"
 import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,21 +6,19 @@ import { Mail, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
+import { useOrders } from "@/contexts/OrdersContext"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
-  const [orders, setOrders] = useState(mockOrders.filter(order => order.type === "esim"))
+  const { orders, updateOrder } = useOrders()
+  const eSimOrders = orders.filter(order => order.type === "esim")
 
   // Filtrar pedidos por estado
-  const pendingOrders = orders.filter(order => order.status === "processing")
-  const completedOrders = orders.filter(order => order.status === "delivered")
+  const pendingOrders = eSimOrders.filter(order => order.status === "processing")
+  const completedOrders = eSimOrders.filter(order => order.status === "delivered")
 
   const handleSendQR = (order: Order) => {
-    setOrders(orders.map(o => 
-      o.id === order.id 
-        ? { ...o, status: "delivered" }
-        : o
-    ))
+    updateOrder(order.id, { status: "delivered" })
 
     toast({
       title: "QR enviado",
@@ -31,11 +27,7 @@ export function AdminESimDelivery() {
   }
 
   const handleMarkDelivered = (order: Order) => {
-    setOrders(orders.map(o => 
-      o.id === order.id 
-        ? { ...o, status: "delivered" }
-        : o
-    ))
+    updateOrder(order.id, { status: "delivered" })
 
     toast({
       title: "Pedido entregado",

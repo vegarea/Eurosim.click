@@ -2,11 +2,11 @@ import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
 import { OrderDetails } from "./orders/OrderDetails"
-import { mockOrders } from "./orders/mockData"
 import { Order, OrderStatus } from "./orders/types"
+import { useOrders } from "@/contexts/OrdersContext"
 
 export function AdminOrders() {
-  const [orders, setOrders] = useState(mockOrders)
+  const { orders, updateOrder } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
@@ -24,11 +24,7 @@ export function AdminOrders() {
   }
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    setOrders(orders.map(order => 
-      order.id === orderId 
-        ? { ...order, status: newStatus }
-        : order
-    ))
+    updateOrder(orderId, { status: newStatus })
   }
 
   return (

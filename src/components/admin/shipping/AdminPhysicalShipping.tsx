@@ -1,6 +1,4 @@
-import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { mockOrders } from "../orders/mockData"
 import { DataTable } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,21 +6,19 @@ import { Truck, PackageCheck } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
+import { useOrders } from "@/contexts/OrdersContext"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
-  const [orders, setOrders] = useState(mockOrders.filter(order => order.type === "physical"))
+  const { orders, updateOrder } = useOrders()
+  const physicalOrders = orders.filter(order => order.type === "physical")
 
   // Filtrar pedidos por estado
-  const pendingOrders = orders.filter(order => order.status === "processing")
-  const shippedOrders = orders.filter(order => ["shipped", "delivered"].includes(order.status))
+  const pendingOrders = physicalOrders.filter(order => order.status === "processing")
+  const shippedOrders = physicalOrders.filter(order => ["shipped", "delivered"].includes(order.status))
 
   const handleShipOrder = (order: Order) => {
-    setOrders(orders.map(o => 
-      o.id === order.id 
-        ? { ...o, status: "shipped" }
-        : o
-    ))
+    updateOrder(order.id, { status: "shipped" })
 
     toast({
       title: "Pedido en tránsito",
@@ -31,11 +27,7 @@ export function AdminPhysicalShipping() {
   }
 
   const handleDeliverOrder = (order: Order) => {
-    setOrders(orders.map(o => 
-      o.id === order.id 
-        ? { ...o, status: "delivered" }
-        : o
-    ))
+    updateOrder(order.id, { status: "delivered" })
 
     toast({
       title: "Pedido entregado",
