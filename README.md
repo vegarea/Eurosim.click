@@ -90,5 +90,56 @@ Tabla para almacenar los pedidos de los clientes.
 - Escritura: Solo administradores pueden crear/modificar pedidos
 - Actualización de estado: Solo administradores
 
+### Customers
+
+Tabla para almacenar la información de los clientes.
+
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| id | uuid | Identificador único | ✅ |
+| name | text | Nombre completo | ✅ |
+| email | text | Correo electrónico | ✅ |
+| phone | text | Teléfono | ❌ |
+| status | enum | Estado del cliente ('active', 'inactive') | ✅ |
+
+#### Documentación UE
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| passport_number | text | Número de pasaporte | ❌ |
+| birth_date | date | Fecha de nacimiento | ❌ |
+| gender | enum | Género ('M' o 'F') | ❌ |
+
+#### Dirección de Envío
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| shipping_address | text | Dirección completa | ❌ |
+| city | text | Ciudad | ❌ |
+| state | text | Estado/Provincia | ❌ |
+| zip_code | text | Código postal | ❌ |
+
+#### Metadatos
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| created_at | timestamp | Fecha de creación | ✅ |
+| updated_at | timestamp | Fecha de última actualización | ✅ |
+| last_order_date | timestamp | Fecha del último pedido | ❌ |
+| total_orders | integer | Número total de pedidos | ❌ |
+| total_spent | decimal | Monto total gastado | ❌ |
+| metadata | jsonb | Información adicional en formato JSON | ❌ |
+
+#### Índices
+- `id` (Primary Key)
+- `email` (Unique)
+- `status` (Para filtrado rápido)
+- `created_at` (Para ordenamiento)
+
+#### Políticas de Seguridad (RLS)
+- Lectura: Cliente solo puede ver su propia información
+- Escritura: Cliente solo puede actualizar su propia información
+- Administradores tienen acceso completo
+
+#### Relaciones
+- `orders` - One-to-Many (un cliente puede tener múltiples pedidos)
+
 ---
 *Nota: Este documento se irá actualizando conforme se revisen y añadan más tablas.*
