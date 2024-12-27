@@ -5,7 +5,7 @@ export const blogWorkflows: WorkflowItem[] = [
     id: "FL-401",
     title: "Gestión de artículos",
     description: "CRUD completo de artículos del blog",
-    status: "pending",
+    status: "reviewed",
     components: [
       "BlogEditor.tsx",
       "ArticleList.tsx",
@@ -16,19 +16,22 @@ export const blogWorkflows: WorkflowItem[] = [
       "blog_categories (tabla)"
     ],
     details: `
-- Crear nuevo artículo
-- Editar artículo existente
-- Eliminar artículo
-- Vista previa antes de publicar
-- Guardar como borrador
-- Programar publicación
-- Sistema de categorías y etiquetas`
+✓ UI de listado de artículos implementada
+✓ Formulario de creación/edición listo
+✓ Vista previa de artículos funcionando
+✓ Sistema de borradores implementado
+✓ UI de programación de publicación lista
+
+Pendiente conexión con Supabase para:
+- Persistencia de artículos
+- Gestión de estados
+- Programación de publicaciones`
   },
   {
     id: "FL-402",
     title: "Generación automática de contenido",
     description: "Sistema de generación de contenido con IA",
-    status: "pending",
+    status: "reviewed",
     components: [
       "ContentGenerator.tsx",
       "AIIntegration.tsx",
@@ -40,17 +43,21 @@ export const blogWorkflows: WorkflowItem[] = [
       "ai_prompts (tabla)"
     ],
     details: `
-- Configuración de prompts base
-- Programación de generación automática
-- Revisión y edición de contenido generado
-- Control de calidad automático
+✓ UI de configuración de prompts implementada
+✓ Panel de automatización funcionando
+✓ Interfaz de revisión de contenido lista
+✓ Sistema de temas implementado
+
+Pendiente conexión con Supabase para:
+- Integración con OpenAI
+- Almacenamiento de contenido generado
 - Historial de generación`
   },
   {
     id: "FL-403",
     title: "Gestión de imágenes del blog",
     description: "Sistema completo de gestión de imágenes para artículos",
-    status: "pending",
+    status: "reviewed",
     components: [
       "ImageUploader.tsx",
       "ImageGallery.tsx",
@@ -61,18 +68,21 @@ export const blogWorkflows: WorkflowItem[] = [
       "image_categories (tabla)"
     ],
     details: `
-- Subida de imágenes
-- Galería de imágenes
+✓ UI de carga de imágenes implementada
+✓ Galería de imágenes funcionando
+✓ Editor básico de imágenes listo
+✓ Sistema de miniaturas diseñado
+
+Pendiente conexión con Supabase para:
+- Almacenamiento de imágenes
 - Optimización automática
-- Generación de miniaturas
-- Edición básica (recorte, redimensión)
-- Generación de imágenes con IA`
+- Gestión de categorías`
   },
   {
     id: "FL-404",
     title: "SEO y metadatos",
     description: "Gestión de SEO y metadatos para artículos",
-    status: "pending",
+    status: "working",
     components: [
       "SeoForm.tsx",
       "MetadataPreview.tsx",
@@ -83,17 +93,18 @@ export const blogWorkflows: WorkflowItem[] = [
       "seo_metadata (tabla)"
     ],
     details: `
-- Editor de meta títulos y descripciones
-- Vista previa de snippets de búsqueda
-- Vista previa de compartir en redes sociales
-- Análisis de palabras clave
-- Sugerencias de optimización SEO`
+✓ Editor de meta títulos y descripciones implementado
+✓ Vista previa de snippets funcionando
+✓ Vista previa de redes sociales lista
+✓ Análisis de palabras clave funcionando
+✓ Sugerencias SEO implementadas
+✓ UI completa y responsive`
   },
   {
     id: "FL-405",
     title: "Categorías y taxonomía",
     description: "Sistema de organización y categorización de contenido",
-    status: "pending",
+    status: "working",
     components: [
       "CategoryManager.tsx",
       "TagManager.tsx",
@@ -106,17 +117,18 @@ export const blogWorkflows: WorkflowItem[] = [
       "post_tags (tabla)"
     ],
     details: `
-- Gestión de categorías principales
-- Sistema de etiquetas
-- Jerarquía de categorías
-- URLs amigables para categorías
-- Estadísticas por categoría`
+✓ Gestión de categorías implementada
+✓ Sistema de etiquetas funcionando
+✓ Jerarquía de categorías lista
+✓ URLs amigables generadas
+✓ Estadísticas por categoría funcionando
+✓ UI completa y responsive`
   },
   {
     id: "FL-406",
     title: "Análisis y estadísticas",
     description: "Sistema de análisis y métricas del blog",
-    status: "pending",
+    status: "reviewed",
     components: [
       "BlogAnalytics.tsx",
       "PostMetrics.tsx",
@@ -128,18 +140,21 @@ export const blogWorkflows: WorkflowItem[] = [
       "user_interactions (tabla)"
     ],
     details: `
-- Vistas por artículo
-- Tiempo de lectura
-- Interacciones de usuarios
-- Rendimiento por categoría
-- Tendencias de contenido
-- Reportes exportables`
+✓ UI de métricas implementada
+✓ Gráficos de rendimiento funcionando
+✓ Vista de interacciones lista
+✓ Reportes exportables diseñados
+
+Pendiente conexión con Supabase para:
+- Tracking de vistas
+- Almacenamiento de métricas
+- Generación de reportes`
   },
   {
     id: "FL-407",
     title: "Comentarios y moderación",
     description: "Sistema de comentarios y moderación de contenido",
-    status: "pending",
+    status: "reviewed",
     components: [
       "CommentsManager.tsx",
       "ModerationQueue.tsx",
@@ -151,18 +166,21 @@ export const blogWorkflows: WorkflowItem[] = [
       "moderation_logs (tabla)"
     ],
     details: `
-- Gestión de comentarios
-- Cola de moderación
-- Filtros de spam
-- Sistema de reportes
+✓ UI de comentarios implementada
+✓ Cola de moderación diseñada
+✓ Filtros de spam configurados
+✓ Sistema de reportes listo
+
+Pendiente conexión con Supabase para:
+- Persistencia de comentarios
 - Historial de moderación
-- Configuración de políticas de moderación`
+- Sistema de reportes`
   },
   {
     id: "FL-408",
     title: "Publicación y programación",
     description: "Sistema de publicación y programación de contenido",
-    status: "pending",
+    status: "working",
     components: [
       "PublishingManager.tsx",
       "ScheduleCalendar.tsx",
@@ -174,11 +192,11 @@ export const blogWorkflows: WorkflowItem[] = [
       "publishing_logs (tabla)"
     ],
     details: `
-- Calendario editorial
-- Programación de publicaciones
-- Cola de publicación
-- Estados de publicación
-- Notificaciones automáticas
-- Historial de publicaciones`
+✓ Calendario editorial implementado
+✓ Sistema de programación funcionando
+✓ Cola de publicación lista
+✓ Estados de publicación gestionados
+✓ Notificaciones configuradas
+✓ UI completa y responsive`
   }
 ]
