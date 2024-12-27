@@ -5,7 +5,7 @@ export const settingsWorkflows: WorkflowItem[] = [
     id: "FL-601",
     title: "Configuración de marca",
     description: "Gestión de identidad visual y datos de empresa",
-    status: "working",
+    status: "reviewed",
     components: [
       "CompanySettings.tsx",
       "StyleSettings.tsx"
@@ -19,7 +19,7 @@ export const settingsWorkflows: WorkflowItem[] = [
 - Datos de contacto (WhatsApp, redes sociales)
 - Imágenes principales del sitio
 - Colores del tema (primario/secundario)
-- Interfaz completamente funcional`
+- UI implementada, pendiente conexión con Supabase Storage para imágenes y persistencia de configuración`
   },
   {
     id: "FL-602",
