@@ -3,15 +3,14 @@ import { WorkflowItem } from "../../types/WorkflowTypes"
 export const authWorkflows: WorkflowItem[] = [
   {
     id: "FL-001",
-    title: "Registro de usuario",
-    description: "Proceso de registro de nuevos usuarios en la plataforma con validación de roles",
+    title: "Registro automático de cliente",
+    description: "Proceso de registro automático al completar una compra y sistema de magic links",
     status: "pending",
     components: [
-      "components/auth/RegisterForm.tsx",
-      "components/auth/RoleSelection.tsx",
+      "components/auth/MagicLinkForm.tsx",
+      "components/checkout/CheckoutForm.tsx",
       "contexts/AuthContext.tsx",
-      "hooks/useAuth.tsx",
-      "components/auth/VerificationStep.tsx"
+      "hooks/useAuth.tsx"
     ],
     database: [
       "auth.users (tabla Supabase)",
@@ -19,26 +18,24 @@ export const authWorkflows: WorkflowItem[] = [
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Flujo de registro:
-1. Usuario ingresa email/contraseña
-2. Verificación de email
-3. Completar perfil según rol:
-   - Cliente: Datos personales básicos
-   - Manager: Datos personales + documentación
-   - Admin: Asignación manual por super admin
+Flujo de registro automático:
+1. Usuario completa compra solo con email
+2. Sistema crea cuenta automáticamente
+3. Se envía email con magic link
+4. Usuario puede acceder en cualquier momento vía magic link
 
 Políticas RLS necesarias:
-- Perfiles: lectura pública, escritura solo propietario
+- Perfiles: lectura pública, escritura sistema
 - Role_permissions: lectura autenticada, escritura admin
     `
   },
   {
     id: "FL-002",
-    title: "Inicio de sesión",
-    description: "Sistema de autenticación con manejo de roles y permisos",
+    title: "Acceso con Magic Link",
+    description: "Sistema de autenticación sin contraseña usando magic links",
     status: "pending",
     components: [
-      "components/auth/LoginForm.tsx",
+      "components/auth/MagicLinkForm.tsx",
       "components/auth/RoleBasedLayout.tsx",
       "contexts/AuthContext.tsx",
       "hooks/useAuth.tsx",
@@ -53,18 +50,18 @@ Políticas RLS necesarias:
 Estructura de roles y permisos:
 
 1. Cliente:
-   - Ver/modificar perfil propio
-   - Gestionar pedidos propios
-   - Ver catálogo de productos
-   - Acceso al soporte
+   - Acceso solo por magic link
+   - Ver pedidos propios
+   - Crear tickets de soporte
+   - No requiere contraseña
 
-2. Manager:
+2. Manager (creado por admin en Supabase):
    - Gestión de envíos asignados
    - Ver pedidos en su área (físicos o eSIM)
    - Actualizar estados de envío
    - Acceso a documentación básica
 
-3. Admin:
+3. Admin (creado manualmente en Supabase):
    - Gestión completa de usuarios
    - Asignación de roles
    - Gestión de productos
