@@ -8,10 +8,16 @@ export interface WorkflowItem {
   details?: string;
   components?: string[];
   database?: string[];
+  created_at?: string;
+  updated_at?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface WorkflowCategory {
   id: string;
   title: string;
   items: WorkflowItem[];
+  description?: string;
+  icon?: string;
+  metadata?: Record<string, any>;
 }
