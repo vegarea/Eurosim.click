@@ -8,7 +8,7 @@ interface WorkflowCategoryProps {
 }
 
 export function WorkflowCategory({ category }: WorkflowCategoryProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   
   return (
     <div className="space-y-2">

@@ -6,14 +6,14 @@ export const workflowData: WorkflowCategory[] = [
     title: "Configuración",
     items: [
       {
-        id: "CONF-001",
+        id: "FL-001",
         title: "Subida y actualización de logo",
         description: "Permite subir y actualizar el logo de la empresa que se muestra en el sitio",
         status: "pending",
         details: "Implementar almacenamiento y actualización en tiempo real del logo en el header"
       },
       {
-        id: "CONF-002",
+        id: "FL-002",
         title: "Configuración de redes sociales",
         description: "Enlaces a redes sociales y WhatsApp",
         status: "working",
@@ -26,14 +26,14 @@ export const workflowData: WorkflowCategory[] = [
     title: "Pedidos",
     items: [
       {
-        id: "ORD-001",
+        id: "FL-101",
         title: "Proceso de pago con Stripe",
         description: "Flujo completo de pago usando Stripe",
         status: "working",
         details: "Integración con Stripe, manejo de webhooks y actualización de estado del pedido"
       },
       {
-        id: "ORD-002",
+        id: "FL-102",
         title: "Envío de confirmación por email",
         description: "Email automático después de la compra",
         status: "pending",
@@ -46,14 +46,14 @@ export const workflowData: WorkflowCategory[] = [
     title: "Productos",
     items: [
       {
-        id: "PROD-001",
+        id: "FL-201",
         title: "Gestión de inventario",
         description: "Control de stock de SIMs físicas",
         status: "working",
         details: "Actualización automática del stock al procesar pedidos"
       },
       {
-        id: "PROD-002",
+        id: "FL-202",
         title: "Activación de eSIMs",
         description: "Proceso automático de activación",
         status: "pending",
