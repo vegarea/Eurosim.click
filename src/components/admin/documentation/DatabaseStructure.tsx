@@ -1,4 +1,4 @@
-import { Database, ArrowRight, FileText, Eye } from "lucide-react"
+import { Database, ArrowRight, Eye } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -14,97 +14,84 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import ReactMarkdown from 'react-markdown'
 
-const tables = [
-  {
-    name: "Products",
-    description: "Productos disponibles (SIMs físicas y eSIMs)",
-    fields: ["id", "type", "title", "price", "features", "status"],
-    path: "docs/database/products.md",
-    content: `# Tabla: Products
-
-Esta tabla almacena la información de los productos disponibles en la plataforma, incluyendo tanto SIMs físicas como eSIMs.
-
-## Estructura
-
-| Campo | Tipo | Descripción | Requerido |
-|-------|------|-------------|-----------|
-| id | uuid | Identificador único del producto | ✅ |
-| type | enum | Tipo de producto (physical/esim) | ✅ |
-| title | text | Nombre del producto | ✅ |
-| description | text | Descripción detallada | ✅ |
-| price | integer | Precio en centavos | ✅ |
-| features | text[] | Lista de características | ✅ |
-| europe_gb | integer | GB disponibles en Europa | ❌ |
-| spain_gb | integer | GB disponibles en España | ❌ |
-| created_at | timestamp | Fecha de creación | ✅ |
-| updated_at | timestamp | Fecha de última actualización | ✅ |
-| status | enum | Estado del producto (active/inactive) | ✅ |
-| stock | integer | Cantidad disponible (solo SIMs físicas) | ❌ |
-| metadata | jsonb | Información adicional flexible | ❌ |`
-  },
-  {
-    name: "Orders",
-    description: "Pedidos y transacciones",
-    fields: ["id", "customer_id", "product_id", "status", "total_amount"],
-    path: "docs/database/orders.md",
-    content: "# Tabla: Orders\n\nDocumentación detallada de la tabla Orders..."
-  },
-  {
-    name: "Customers",
-    description: "Información de clientes",
-    fields: ["id", "name", "email", "phone", "documentation"],
-    path: "docs/database/customers.md",
-    content: `# Tabla: Customers
-
-Esta tabla almacena la información de los clientes registrados en la plataforma.
-
-## Estructura
-
-| Campo | Tipo | Descripción | Requerido |
-|-------|------|-------------|-----------|
-| id | uuid | Identificador único del cliente | ✅ |
-| name | text | Nombre completo del cliente | ✅ |
-| email | text | Correo electrónico | ✅ |
-| phone | text | Número de teléfono | ❌ |
-| passport_number | text | Número de pasaporte para documentación UE | ❌ |
-| birth_date | date | Fecha de nacimiento | ❌ |
-| gender | enum | Género (M/F) | ❌ |
-| default_shipping_address | jsonb | Dirección de envío predeterminada | ❌ |
-| billing_address | jsonb | Dirección de facturación | ❌ |
-| preferred_language | text | Idioma preferido para comunicaciones | ❌ |
-| marketing_preferences | jsonb | Preferencias de marketing y comunicación | ❌ |`
-  },
-  {
-    name: "Blog Posts",
-    description: "Artículos del blog (manuales y AI)",
-    fields: ["id", "title", "content", "status", "is_ai_generated"],
-    path: "docs/database/blog-posts.md",
-    content: "# Tabla: Blog Posts\n\nDocumentación detallada de la tabla Blog Posts..."
-  },
-  {
-    name: "Blog Post Images",
-    description: "Imágenes asociadas a los posts",
-    fields: ["id", "post_id", "url", "is_featured"],
-    path: "docs/database/blog-post-images.md",
-    content: "# Tabla: Blog Post Images\n\nDocumentación detallada de la tabla Blog Post Images..."
-  },
-  {
-    name: "Email Templates",
-    description: "Plantillas de correo electrónico",
-    fields: ["id", "name", "subject", "content", "type"],
-    path: "docs/database/email-templates.md",
-    content: "# Tabla: Email Templates\n\nDocumentación detallada de la tabla Email Templates..."
-  }
-]
+// Definición de tipos
+interface TableInfo {
+  name: string
+  description: string
+  fields: string[]
+  path: string
+  content: string
+}
 
 export function DatabaseStructure() {
+  const [tables, setTables] = useState<TableInfo[]>([])
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadTableDocumentation = async () => {
+      try {
+        // Cargar la lista de tablas desde README.md
+        const readmeResponse = await fetch('/docs/database/README.md')
+        const readmeContent = await readmeResponse.text()
+        
+        // Extraer las tablas mencionadas en el README
+        const tableFiles = readmeContent.match(/- `.*\.md`/g) || []
+        
+        // Cargar la documentación de cada tabla
+        const loadedTables = await Promise.all(
+          tableFiles.map(async (file) => {
+            const filePath = file.replace(/- `(.*)`.*/g, '$1')
+            const response = await fetch(`/docs/database/${filePath}`)
+            const content = await response.text()
+            
+            // Extraer información básica del contenido markdown
+            const nameMatch = content.match(/# Tabla: (.*)/i)
+            const descriptionMatch = content.match(/\n\n(.*?)\n\n/i)
+            const fieldsMatch = content.match(/\|\s*([^|]+)\s*\|/g)
+            
+            const fields = fieldsMatch 
+              ? fieldsMatch
+                  .slice(2) // Saltar el encabezado de la tabla
+                  .map(field => field.replace(/\|/g, '').trim())
+                  .filter(field => field !== '----' && field !== '') // Eliminar líneas de separación
+              : []
+
+            return {
+              name: nameMatch ? nameMatch[1].trim() : filePath,
+              description: descriptionMatch ? descriptionMatch[1].trim() : '',
+              fields: fields.slice(0, 5), // Mostrar solo los primeros 5 campos
+              path: filePath,
+              content
+            }
+          })
+        )
+
+        setTables(loadedTables)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading documentation:', error)
+        setLoading(false)
+      }
+    }
+
+    loadTableDocumentation()
+  }, [])
 
   const getTableContent = (tableName: string) => {
     return tables.find(table => table.name === tableName)?.content || ""
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
   }
 
   return (
@@ -157,9 +144,9 @@ export function DatabaseStructure() {
                             </DialogDescription>
                           </DialogHeader>
                           <ScrollArea className="h-[60vh] w-full rounded-md border p-4">
-                            <pre className="whitespace-pre-wrap font-mono text-sm">
-                              {getTableContent(table.name)}
-                            </pre>
+                            <div className="prose prose-sm dark:prose-invert">
+                              <ReactMarkdown>{getTableContent(table.name)}</ReactMarkdown>
+                            </div>
                           </ScrollArea>
                         </DialogContent>
                       </Dialog>
