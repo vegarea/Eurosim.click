@@ -7,22 +7,34 @@ interface CarrierConfig {
 
 export const SHIPPING_CARRIERS: CarrierConfig[] = [
   {
-    id: "dhl",
-    name: "DHL",
-    trackingUrl: "https://www.dhl.com/mx-es/home/tracking.html?tracking-id={{tracking}}",
-    emailTemplate: "Puedes dar seguimiento a tu envío DHL con el número {{tracking}} en el siguiente enlace: https://www.dhl.com/mx-es/home/tracking.html?tracking-id={{tracking}}"
+    id: "redpack",
+    name: "Redpack",
+    trackingUrl: "https://www.redpack.com.mx/rastreo?guia={{tracking}}",
+    emailTemplate: "Puedes dar seguimiento a tu envío Redpack con el número de guía {{tracking}} en el siguiente enlace: https://www.redpack.com.mx/rastreo?guia={{tracking}}"
+  },
+  {
+    id: "estafeta",
+    name: "Estafeta",
+    trackingUrl: "https://www.estafeta.com/Rastreo/{{tracking}}",
+    emailTemplate: "Puedes dar seguimiento a tu envío Estafeta con el número de guía {{tracking}} en el siguiente enlace: https://www.estafeta.com/Rastreo/{{tracking}}"
   },
   {
     id: "fedex",
     name: "FedEx",
     trackingUrl: "https://www.fedex.com/es-mx/tracking.html?tracknumbers={{tracking}}",
-    emailTemplate: "Puedes dar seguimiento a tu envío FedEx con el número {{tracking}} en el siguiente enlace: https://www.fedex.com/es-mx/tracking.html?tracknumbers={{tracking}}"
+    emailTemplate: "Puedes dar seguimiento a tu envío FedEx con el número de guía {{tracking}} en el siguiente enlace: https://www.fedex.com/es-mx/tracking.html?tracknumbers={{tracking}}"
+  },
+  {
+    id: "dhl",
+    name: "DHL",
+    trackingUrl: "https://www.dhl.com/mx-es/home/rastreo.html?tracking-id={{tracking}}",
+    emailTemplate: "Puedes dar seguimiento a tu envío DHL con el número de guía {{tracking}} en el siguiente enlace: https://www.dhl.com/mx-es/home/rastreo.html?tracking-id={{tracking}}"
   },
   {
     id: "ups",
     name: "UPS",
-    trackingUrl: "https://www.ups.com/track?tracknum={{tracking}}&loc=es_MX",
-    emailTemplate: "Puedes dar seguimiento a tu envío UPS con el número {{tracking}} en el siguiente enlace: https://www.ups.com/track?tracknum={{tracking}}&loc=es_MX"
+    trackingUrl: "https://www.ups.com/track?loc=es_MX&tracknum={{tracking}}",
+    emailTemplate: "Puedes dar seguimiento a tu envío UPS con el número de guía {{tracking}} en el siguiente enlace: https://www.ups.com/track?loc=es_MX&tracknum={{tracking}}"
   }
 ]
 
