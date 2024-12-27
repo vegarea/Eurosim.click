@@ -27,7 +27,6 @@ La documentación detallada de cada tabla se encuentra en archivos separados den
 - [Document Validations](docs/database/document_validations.md)
 - [Email Logs](docs/database/email_logs.md)
 - [Order Notes](docs/database/order_notes.md)
-- [Internal Comments](docs/database/internal_comments.md)
 
 ## Convenciones
 

@@ -16,7 +16,7 @@ interface TableInfo {
   fields: string[]
   path: string
   content: string
-  isConnected: boolean // Changed from optional to required
+  isConnected: boolean
 }
 
 export function DatabaseStructure() {
@@ -49,8 +49,7 @@ export function DatabaseStructure() {
           { name: "Customer Documents", path: "/docs/database/customer_documents.md" },
           { name: "Document Validations", path: "/docs/database/document_validations.md" },
           { name: "Email Logs", path: "/docs/database/email_logs.md" },
-          { name: "Order Notes", path: "/docs/database/order_notes.md" },
-          { name: "Internal Comments", path: "/docs/database/internal_comments.md" }
+          { name: "Order Notes", path: "/docs/database/order_notes.md" }
         ]
         
         console.log('Loading table files:', tableFiles)
@@ -82,7 +81,7 @@ export function DatabaseStructure() {
                 fields: fields.slice(0, 5),
                 path: file.path,
                 content,
-                isConnected: false // Now always providing a value for isConnected
+                isConnected: false
               }
             } catch (error) {
               console.error(`Error processing ${file.path}:`, error)
