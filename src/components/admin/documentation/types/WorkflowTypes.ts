@@ -6,6 +6,8 @@ export interface WorkflowItem {
   description: string;
   status: WorkflowStatus;
   details?: string;
+  components?: string[];
+  database?: string[];
 }
 
 export interface WorkflowCategory {
