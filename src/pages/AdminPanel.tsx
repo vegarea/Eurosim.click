@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { AdminDashboard } from "@/components/admin/AdminDashboard"
 import { AdminOrders } from "@/components/admin/AdminOrders"
@@ -11,8 +13,32 @@ import { AdminESimDelivery } from "@/components/admin/shipping/AdminESimDelivery
 import { AdminDocumentation } from "@/components/admin/documentation/AdminDocumentation"
 import { Routes, Route } from "react-router-dom"
 import { OrdersProvider } from "@/contexts/OrdersContext"
+import { supabase } from "@/integrations/supabase/client"
 
 export default function AdminPanel() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Verificar si el usuario está autenticado
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        navigate("/auth")
+      }
+    }
+
+    checkAuth()
+
+    // Escuchar cambios en la autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth")
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [navigate])
+
   return (
     <OrdersProvider>
       <AdminLayout>
