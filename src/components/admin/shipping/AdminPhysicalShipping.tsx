@@ -1,14 +1,16 @@
-import { useToast } from "@/components/ui/use-toast"
-import { DataTable } from "@/components/ui/data-table"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Truck, PackageCheck } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { useOrders } from "@/contexts/OrdersContext"
 import { useState } from "react"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
+import { ShippingTabs } from "./components/ShippingTabs"
+import { 
+  createShippingConfirmationEvent, 
+  createDeliveryConfirmationEvent 
+} from "./utils/shippingEvents"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
@@ -29,22 +31,7 @@ export function AdminPhysicalShipping() {
   const handleConfirmShipping = (trackingNumber: string, carrier: string) => {
     if (!selectedOrderId) return
 
-    const now = new Date().toISOString()
-    const event = {
-      id: crypto.randomUUID(),
-      type: "status_changed" as const,
-      description: `Envío confirmado con ${carrier.toUpperCase()}. Tracking: ${trackingNumber}`,
-      userId: "current-user-id", // Esto debería venir del contexto de autenticación
-      userName: "Manager Name", // Esto debería venir del contexto de autenticación
-      createdAt: now,
-      metadata: {
-        oldStatus: "processing",
-        newStatus: "shipped",
-        trackingNumber,
-        carrier,
-        automated: false
-      }
-    }
+    const event = createShippingConfirmationEvent(trackingNumber, carrier)
 
     updateOrder(selectedOrderId, {
       status: "shipped",
@@ -55,23 +42,12 @@ export function AdminPhysicalShipping() {
       title: "Envío confirmado",
       description: `El pedido ${selectedOrderId} ha sido marcado como enviado.`
     })
+
+    setConfirmDialogOpen(false)
   }
 
   const handleDeliverOrder = (order: Order) => {
-    const now = new Date().toISOString()
-    const event = {
-      id: crypto.randomUUID(),
-      type: "status_changed" as const,
-      description: "Pedido marcado como entregado",
-      userId: "current-user-id", // Esto debería venir del contexto de autenticación
-      userName: "Manager Name", // Esto debería venir del contexto de autenticación
-      createdAt: now,
-      metadata: {
-        oldStatus: "shipped",
-        newStatus: "delivered",
-        automated: false
-      }
-    }
+    const event = createDeliveryConfirmationEvent()
 
     updateOrder(order.id, {
       status: "delivered",
@@ -147,64 +123,12 @@ export function AdminPhysicalShipping() {
         </p>
       </div>
 
-      <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="pending" className="relative">
-            En Preparación
-            {pendingOrders.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-blue-100 text-blue-800"
-              >
-                {pendingOrders.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="shipped">
-            En Tránsito
-            {shippedOrders.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-orange-100 text-orange-800"
-              >
-                {shippedOrders.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="delivered">
-            Entregados
-            {deliveredOrders.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-green-100 text-green-800"
-              >
-                {deliveredOrders.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="pending" className="mt-6">
-          <DataTable 
-            columns={columns} 
-            data={pendingOrders}
-          />
-        </TabsContent>
-        
-        <TabsContent value="shipped" className="mt-6">
-          <DataTable 
-            columns={columns} 
-            data={shippedOrders}
-          />
-        </TabsContent>
-
-        <TabsContent value="delivered" className="mt-6">
-          <DataTable 
-            columns={columns} 
-            data={deliveredOrders}
-          />
-        </TabsContent>
-      </Tabs>
+      <ShippingTabs
+        pendingOrders={pendingOrders}
+        shippedOrders={shippedOrders}
+        deliveredOrders={deliveredOrders}
+        columns={columns}
+      />
 
       <ShippingConfirmDialog
         open={confirmDialogOpen}
