@@ -1,15 +1,14 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { OrderDetails } from "./orders/OrderDetails"
 import { Order, OrderStatus } from "./orders/types"
 import { useOrders } from "@/contexts/OrdersContext"
+import { toast } from "sonner"
 
 export function AdminOrders() {
   const { orders, updateOrder } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
@@ -19,17 +18,9 @@ export function AdminOrders() {
     return matchesSearch && matchesStatus
   })
 
-  const handleOrderClick = (order: Order) => {
-    setSelectedOrder(order)
-  }
-
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrder(orderId, { status: newStatus })
-    // Actualizar el selectedOrder con el pedido actualizado
-    const updatedOrder = orders.find(order => order.id === orderId)
-    if (updatedOrder) {
-      setSelectedOrder(updatedOrder)
-    }
+    toast.success("Estado del pedido actualizado correctamente")
   }
 
   return (
@@ -45,16 +36,8 @@ export function AdminOrders() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <div className="border rounded-lg">
-        <OrdersTable 
-          orders={filteredOrders}
-          onOrderClick={handleOrderClick}
-        />
-      </div>
-
-      <OrderDetails
-        order={selectedOrder}
-        onClose={() => setSelectedOrder(null)}
+      <OrdersTable 
+        orders={filteredOrders}
         onStatusChange={handleStatusChange}
       />
     </div>
