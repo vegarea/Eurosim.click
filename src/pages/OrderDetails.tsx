@@ -77,17 +77,30 @@ export default function OrderDetails() {
 
         {/* Barra de progreso */}
         <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between mb-4 relative">
+            {/* Línea de progreso base */}
+            <div className="absolute top-4 left-0 w-full h-1 bg-gray-200" />
+            
+            {/* Línea de progreso activa */}
+            <div 
+              className="absolute top-4 left-0 h-1 bg-brand-500 transition-all duration-300" 
+              style={{ 
+                width: `${getCurrentStep() >= 0 ? (getCurrentStep() / (statusSteps.length - 1)) * 100 : 0}%` 
+              }} 
+            />
+
+            {/* Pasos */}
             {statusSteps.map((step, index) => {
               const currentStep = getCurrentStep()
               const isActive = index <= currentStep
               const isCurrent = index === currentStep
               
               return (
-                <div key={step} className="flex flex-col items-center flex-1">
+                <div key={step} className="flex flex-col items-center relative z-10" style={{ flex: '1' }}>
                   <div 
                     className={`
                       w-8 h-8 rounded-full flex items-center justify-center mb-2
+                      transition-all duration-300
                       ${isActive 
                         ? 'bg-brand-500 text-white' 
                         : 'bg-gray-200 text-gray-500'}
@@ -99,14 +112,6 @@ export default function OrderDetails() {
                   <div className="text-sm font-medium text-center">
                     {statusConfig[step].label}
                   </div>
-                  {index < statusSteps.length - 1 && (
-                    <div 
-                      className={`
-                        h-1 w-full absolute mt-4
-                        ${isActive ? 'bg-brand-500' : 'bg-gray-200'}
-                      `}
-                    />
-                  )}
                 </div>
               )
             })}
