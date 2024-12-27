@@ -1,4 +1,4 @@
-import { Check, X, ChevronDown, Eye } from "lucide-react"
+import { AlertTriangle, Check, ChevronDown, Eye } from "lucide-react"
 import { useState } from "react"
 import { WorkflowItem as WorkflowItemType } from "../types/WorkflowTypes"
 import {
@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 interface WorkflowItemProps {
   item: WorkflowItemType;
@@ -27,9 +28,15 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
         </div>
         <div className="flex items-center gap-2">
           {item.status === 'working' ? (
-            <Check className="h-5 w-5 text-green-500" />
+            <>
+              <Check className="h-5 w-5 text-green-500" />
+              <Badge variant="success">Funcionando</Badge>
+            </>
           ) : (
-            <X className="h-5 w-5 text-red-500" />
+            <>
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <Badge variant="warning">Pendiente Supabase</Badge>
+            </>
           )}
           <Dialog>
             <DialogTrigger asChild>
@@ -92,8 +99,8 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
                       </>
                     ) : (
                       <>
-                        <X className="h-5 w-5 text-red-500" />
-                        <span className="text-sm text-red-600">Pendiente</span>
+                        <AlertTriangle className="h-5 w-5 text-amber-500" />
+                        <span className="text-sm text-amber-600">Pendiente de conexión con Supabase</span>
                       </>
                     )}
                   </div>
