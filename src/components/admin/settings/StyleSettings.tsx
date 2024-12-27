@@ -28,22 +28,32 @@ export function StyleSettings() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="primary-color">Color primario</Label>
+          <Label htmlFor="primary-color">Color primario (actual)</Label>
           <Input
             id="primary-color"
             type="color"
+            value="#E02653"
             className="h-10 w-20"
+            disabled
           />
+          <p className="text-sm text-muted-foreground">
+            Este es el color principal usado en botones y elementos destacados
+          </p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="secondary-color">Color secundario</Label>
+          <Label htmlFor="secondary-color">Color secundario (actual)</Label>
           <Input
             id="secondary-color"
             type="color"
+            value="#fc2c03"
             className="h-10 w-20"
+            disabled
           />
+          <p className="text-sm text-muted-foreground">
+            Este es el color secundario usado en elementos complementarios
+          </p>
         </div>
-        <Button onClick={handleSave}>Guardar cambios</Button>
+        <Button onClick={handleSave} disabled>Guardar cambios</Button>
       </CardContent>
     </Card>
   )
