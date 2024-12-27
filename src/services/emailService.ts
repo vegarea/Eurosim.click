@@ -1,11 +1,4 @@
-import * as Brevo from '@getbrevo/brevo';
-
-let apiInstance = new Brevo.TransactionalEmailsApi();
-let apiKey = localStorage.getItem('BREVO_API_KEY');
-
-if (apiKey) {
-  apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, apiKey);
-}
+const BREVO_API_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
 
 export const sendEmail = async (
   to: string[],
@@ -13,20 +6,38 @@ export const sendEmail = async (
   htmlContent: string,
   sender = { name: "Tu Empresa", email: "noreply@tuempresa.com" }
 ) => {
+  const apiKey = localStorage.getItem('BREVO_API_KEY');
+  
   if (!apiKey) {
     throw new Error('Brevo API key no configurada');
   }
 
-  const sendSmtpEmail = new Brevo.SendSmtpEmail();
-  sendSmtpEmail.subject = subject;
-  sendSmtpEmail.htmlContent = htmlContent;
-  sendSmtpEmail.sender = sender;
-  sendSmtpEmail.to = to.map(email => ({ email }));
+  const payload = {
+    sender,
+    to: to.map(email => ({ email })),
+    subject,
+    htmlContent
+  };
 
   try {
-    const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('Email enviado:', response);
-    return response;
+    const response = await fetch(BREVO_API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Error al enviar email');
+    }
+
+    const data = await response.json();
+    console.log('Email enviado:', data);
+    return data;
   } catch (error) {
     console.error('Error al enviar email:', error);
     throw error;
@@ -35,6 +46,20 @@ export const sendEmail = async (
 
 export const setBrevoApiKey = (key: string) => {
   localStorage.setItem('BREVO_API_KEY', key);
-  apiKey = key;
-  apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKeys.apiKey, key);
+};
+
+// Función para validar la API key
+export const validateApiKey = async (key: string): Promise<boolean> => {
+  try {
+    const response = await fetch('https://api.brevo.com/v3/account', {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'api-key': key
+      }
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 };

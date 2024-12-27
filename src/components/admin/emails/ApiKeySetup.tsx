@@ -2,27 +2,42 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { setBrevoApiKey } from "@/services/emailService"
+import { setBrevoApiKey, validateApiKey } from "@/services/emailService"
 import { useToast } from "@/components/ui/use-toast"
 
 export function ApiKeySetup() {
   const [apiKey, setApiKey] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
+    
     try {
-      setBrevoApiKey(apiKey)
-      toast({
-        title: "API Key guardada",
-        description: "La API key de Brevo ha sido guardada correctamente"
-      })
+      const isValid = await validateApiKey(apiKey)
+      
+      if (isValid) {
+        setBrevoApiKey(apiKey)
+        toast({
+          title: "API Key guardada",
+          description: "La API key de Brevo ha sido validada y guardada correctamente"
+        })
+      } else {
+        toast({
+          title: "API Key inválida",
+          description: "La API key proporcionada no es válida",
+          variant: "destructive"
+        })
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "No se pudo guardar la API key",
+        description: "No se pudo validar la API key",
         variant: "destructive"
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -36,9 +51,12 @@ export function ApiKeySetup() {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           placeholder="Ingresa tu API key de Brevo"
+          disabled={isLoading}
         />
       </div>
-      <Button type="submit">Guardar API Key</Button>
+      <Button type="submit" disabled={isLoading}>
+        {isLoading ? "Validando..." : "Guardar API Key"}
+      </Button>
     </form>
   )
 }
