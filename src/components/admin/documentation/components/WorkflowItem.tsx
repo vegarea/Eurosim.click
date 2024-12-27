@@ -30,12 +30,12 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
           {item.status === 'working' ? (
             <>
               <Check className="h-5 w-5 text-green-500" />
-              <Badge variant="success">Funcionando</Badge>
+              <Badge variant="default" className="bg-green-500 hover:bg-green-600">Funcionando</Badge>
             </>
           ) : (
             <>
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              <Badge variant="warning">Pendiente Supabase</Badge>
+              <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-200">Pendiente Supabase</Badge>
             </>
           )}
           <Dialog>
