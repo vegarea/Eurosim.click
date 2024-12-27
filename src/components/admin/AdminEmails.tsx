@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmailTemplate } from "./emails/types"
 import { EmailTemplateCard } from "./emails/EmailTemplateCard"
 import { initialTemplates } from "./emails/initialData"
+import { EmailLogs } from "./emails/EmailLogs"
 
 export function AdminEmails() {
   const [templates, setTemplates] = useState<EmailTemplate[]>(initialTemplates)
@@ -41,6 +42,7 @@ export function AdminEmails() {
           <TabsTrigger value="all">Todos los Emails</TabsTrigger>
           <TabsTrigger value="physical">SIM Física</TabsTrigger>
           <TabsTrigger value="esim">E-SIM</TabsTrigger>
+          <TabsTrigger value="logs">Logs de Envío</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
@@ -71,6 +73,10 @@ export function AdminEmails() {
               onEdit={handleEditTemplate}
             />
           ))}
+        </TabsContent>
+
+        <TabsContent value="logs" className="space-y-4">
+          <EmailLogs />
         </TabsContent>
       </Tabs>
 
