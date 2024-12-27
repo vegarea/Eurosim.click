@@ -16,6 +16,7 @@ La documentación detallada de cada tabla se encuentra en archivos separados den
 - [Workflow Categories](docs/database/workflow_categories.md)
 - [Workflow Events](docs/database/workflow_events.md)
 - [Auth Logs](docs/database/auth_logs.md)
+- [Role Permissions](docs/database/role_permissions.md)
 
 ## Convenciones
 

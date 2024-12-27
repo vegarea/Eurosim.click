@@ -22,6 +22,7 @@ Cada archivo markdown corresponde a una tabla específica y contiene:
 - `workflow_categories.md`: Categorías de flujos de trabajo
 - `workflow_events.md`: Eventos y cambios en flujos de trabajo
 - `auth_logs.md`: Registro de eventos de autenticación
+- `role_permissions.md`: Permisos por rol del sistema
 
 ## Notas sobre Automatización
 

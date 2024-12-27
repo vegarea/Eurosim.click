@@ -1,6 +1,6 @@
 # Tabla: Role Permissions
 
-Esta tabla gestiona los permisos específicos para cada rol.
+Esta tabla gestiona los permisos específicos para cada rol en el sistema.
 
 ## Estructura
 
@@ -15,41 +15,32 @@ Esta tabla gestiona los permisos específicos para cada rol.
 | created_at | timestamp | Fecha de creación | ✅ |
 | updated_at | timestamp | Fecha de última actualización | ✅ |
 
-## Permisos por Rol
+## Índices
 
-### Cliente (client)
-- Ver su propio perfil
-- Ver sus pedidos
-- Ver productos disponibles
-- Crear tickets de soporte
-- No puede modificar datos directamente
-
-### Manager
-- Ver pedidos asignados según tipo (physical/esim)
-- Actualizar estado de pedidos
-- Ver perfiles de clientes asignados
-- Acceso a documentación básica
-
-### Admin
-- Acceso total al sistema
-- Crear/modificar managers
-- Gestión de productos
-- Configuración del sistema
-- Ver métricas y reportes
+1. Índice primario en `id`
+2. Índice en `role` para búsquedas rápidas
+3. Índice compuesto en (role, resource) para validación de permisos
+4. Índice en `created_at` para auditoría
 
 ## Políticas de Seguridad (RLS)
 
 ### Lectura
-- Todos los usuarios autenticados pueden leer sus permisos
-- Caché de permisos en el cliente
+- Admin: Puede ver todos los permisos
+- Manager: Solo puede ver sus propios permisos
+- Cliente: Solo puede ver sus propios permisos
+- Sistema: Puede leer todos los permisos para validación
 
 ### Escritura
-- Solo admin puede modificar permisos
-- Se requiere registro de cambios
+- Admin: Puede crear y modificar permisos
+- Otros roles: Sin permisos de escritura
 
-## Notas sobre Implementación
-- Permisos verificados en cada operación
-- Sistema de caché para optimizar rendimiento
-- Registro detallado de cambios para auditoría
-- No se requiere gestión de contraseñas
-- Magic links como único método de autenticación para clientes
+## Triggers
+1. Actualización automática de `updated_at`
+2. Validación de roles permitidos
+3. Registro de cambios en tabla de auditoría
+
+## Notas
+- Los permisos se validan en tiempo real
+- Se mantiene un historial de cambios
+- Las condiciones pueden incluir filtros específicos por usuario o departamento
+- Los permisos son acumulativos (un rol puede tener múltiples permisos)
