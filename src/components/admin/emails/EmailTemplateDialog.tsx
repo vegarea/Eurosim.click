@@ -22,8 +22,10 @@ interface EmailTemplate {
   id: string
   name: string
   subject: string
-  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled"
   description: string
+  type: "physical" | "esim" | "both"
+  variables: string[]
 }
 
 interface EmailTemplateDialogProps {
@@ -43,8 +45,10 @@ export function EmailTemplateDialog({
     id: "",
     name: "",
     subject: "",
-    status: "pending",
+    status: "processing",
     description: "",
+    type: "both",
+    variables: []
   })
 
   useEffect(() => {
@@ -55,8 +59,10 @@ export function EmailTemplateDialog({
         id: crypto.randomUUID(),
         name: "",
         subject: "",
-        status: "pending",
+        status: "processing",
         description: "",
+        type: "both",
+        variables: []
       })
     }
   }, [template])
@@ -64,6 +70,11 @@ export function EmailTemplateDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave(formData)
+  }
+
+  const handleVariablesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const vars = e.target.value.split(',').map(v => v.trim()).filter(v => v)
+    setFormData({ ...formData, variables: vars })
   }
 
   return (
@@ -95,6 +106,24 @@ export function EmailTemplateDialog({
               />
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="type">Tipo de Producto</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value: EmailTemplate["type"]) =>
+                  setFormData({ ...formData, type: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona el tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="physical">SIM Física</SelectItem>
+                  <SelectItem value="esim">E-SIM</SelectItem>
+                  <SelectItem value="both">Ambos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="status">Estado Relacionado</Label>
               <Select
                 value={formData.status}
@@ -106,9 +135,9 @@ export function EmailTemplateDialog({
                   <SelectValue placeholder="Selecciona un estado" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">Pendiente</SelectItem>
-                  <SelectItem value="processing">En Proceso</SelectItem>
-                  <SelectItem value="shipped">Enviado</SelectItem>
+                  <SelectItem value="payment_pending">Pago Pendiente</SelectItem>
+                  <SelectItem value="processing">En Preparación</SelectItem>
+                  <SelectItem value="shipped">En Tránsito</SelectItem>
                   <SelectItem value="delivered">Entregado</SelectItem>
                   <SelectItem value="cancelled">Cancelado</SelectItem>
                 </SelectContent>
@@ -122,6 +151,20 @@ export function EmailTemplateDialog({
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 required
               />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="variables">
+                Variables Disponibles (separadas por comas)
+              </Label>
+              <Textarea
+                id="variables"
+                value={formData.variables.join(', ')}
+                onChange={handleVariablesChange}
+                placeholder="nombre_cliente, numero_pedido, etc..."
+              />
+              <p className="text-sm text-muted-foreground">
+                Estas variables serán reemplazadas con datos reales al enviar el email
+              </p>
             </div>
           </div>
           <DialogFooter>
