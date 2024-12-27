@@ -27,7 +27,8 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsProps) {
-  const [status, setStatus] = useState<OrderStatus | null>(order?.status || null)
+  // Usar el estado actual del pedido como valor inicial
+  const [status, setStatus] = useState<OrderStatus>(order?.status || "payment_pending")
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
 
@@ -39,10 +40,9 @@ export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsPro
   }
 
   const confirmStatusChange = () => {
-    if (pendingStatus) {
+    if (pendingStatus && order) {
       setStatus(pendingStatus)
       onStatusChange(order.id, pendingStatus)
-      toast.success("Estado actualizado correctamente")
       setShowConfirmDialog(false)
     }
   }
@@ -87,7 +87,7 @@ export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsPro
               </div>
               <div>
                 <h3 className="font-medium mb-1">Estado</h3>
-                <OrderStatusBadge status={status || order.status} />
+                <OrderStatusBadge status={status} />
               </div>
             </div>
 
@@ -96,7 +96,7 @@ export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsPro
               <h3 className="font-medium mb-3">Actualizar Estado</h3>
               <div className="flex gap-4">
                 <Select
-                  value={status || order.status}
+                  value={status}
                   onValueChange={(value: OrderStatus) => handleStatusChange(value)}
                 >
                   <SelectTrigger className="w-[200px]">
