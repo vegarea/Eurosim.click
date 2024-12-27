@@ -1,4 +1,4 @@
-import { Database, ArrowRight, Eye } from "lucide-react"
+import { Database, ArrowRight, Eye, Table2 } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -17,8 +17,8 @@ import {
 import { useState, useEffect } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import ReactMarkdown from 'react-markdown'
+import { Input } from "@/components/ui/input"
 
-// Definición de tipos
 interface TableInfo {
   name: string
   description: string
@@ -31,47 +31,45 @@ export function DatabaseStructure() {
   const [tables, setTables] = useState<TableInfo[]>([])
   const [selectedTable, setSelectedTable] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     const loadTableDocumentation = async () => {
       try {
-        // Cargar la lista de tablas desde README.md
         const readmeResponse = await fetch('/docs/database/README.md')
         const readmeContent = await readmeResponse.text()
         
         // Extraer las tablas mencionadas en el README
-        const tableFiles = readmeContent.match(/- `.*\.md`/g) || []
+        const tableFiles = readmeContent.match(/- \[(.*?)\]\((.*?)\)/g) || []
         
         // Cargar la documentación de cada tabla
         const loadedTables = await Promise.all(
           tableFiles.map(async (file) => {
-            const filePath = file.replace(/- `(.*)`.*/g, '$1')
-            const response = await fetch(`/docs/database/${filePath}`)
+            const filePath = file.match(/\((.*?)\)/)?.[1] || ''
+            const response = await fetch(filePath)
             const content = await response.text()
             
-            // Extraer información básica del contenido markdown
             const nameMatch = content.match(/# Tabla: (.*)/i)
             const descriptionMatch = content.match(/\n\n(.*?)\n\n/i)
             const fieldsMatch = content.match(/\|\s*([^|]+)\s*\|/g)
             
             const fields = fieldsMatch 
               ? fieldsMatch
-                  .slice(2) // Saltar el encabezado de la tabla
+                  .slice(2)
                   .map(field => field.replace(/\|/g, '').trim())
-                  .filter(field => field !== '----' && field !== '') // Eliminar líneas de separación
+                  .filter(field => field !== '----' && field !== '')
               : []
 
             return {
-              name: nameMatch ? nameMatch[1].trim() : filePath,
+              name: nameMatch ? nameMatch[1].trim() : filePath.split('/').pop()?.replace('.md', '') || '',
               description: descriptionMatch ? descriptionMatch[1].trim() : '',
-              fields: fields.slice(0, 5), // Mostrar solo los primeros 5 campos
+              fields: fields.slice(0, 5),
               path: filePath,
               content
             }
           })
         )
 
-        // Ordenar las tablas alfabéticamente por nombre
         const sortedTables = loadedTables.sort((a, b) => a.name.localeCompare(b.name))
         setTables(sortedTables)
         setLoading(false)
@@ -87,6 +85,11 @@ export function DatabaseStructure() {
   const getTableContent = (tableName: string) => {
     return tables.find(table => table.name === tableName)?.content || ""
   }
+
+  const filteredTables = tables.filter(table => 
+    table.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    table.description.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   if (loading) {
     return (
@@ -107,13 +110,24 @@ export function DatabaseStructure() {
           <CardDescription>
             Visualización de las tablas y sus relaciones en Supabase
           </CardDescription>
+          <div className="mt-4">
+            <Input
+              placeholder="Buscar tablas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {tables.map((table) => (
+            {filteredTables.map((table) => (
               <Card key={table.name} className="hover:shadow-md transition-shadow">
                 <CardHeader>
-                  <CardTitle className="text-lg">{table.name}</CardTitle>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Table2 className="h-4 w-4 text-primary" />
+                    {table.name}
+                  </CardTitle>
                   <CardDescription className="line-clamp-2">{table.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
