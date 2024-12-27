@@ -11,7 +11,7 @@ import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusC
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
 import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation"
 import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
-import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
+import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
 import { Progress } from "@/components/ui/progress"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -100,7 +100,10 @@ export default function OrderDetails() {
           <Progress value={getProgressPercentage()} />
         </div>
 
-        <OrderBasicInfo order={order} />
+        <OrderCustomerInfo 
+          order={order} 
+          onStatusChange={handleStatusChange}
+        />
 
         <Card>
           <CardHeader>
@@ -152,7 +155,6 @@ export default function OrderDetails() {
           </CardContent>
         </Card>
 
-        {/* Nueva sección de información de pago */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -200,7 +202,8 @@ export default function OrderDetails() {
                         </p>
                       </div>
                       <Badge 
-                        variant={log.status === "completed" ? "success" : "secondary"}
+                        variant="secondary"
+                        className={log.status === "completed" ? "bg-green-100 text-green-800" : ""}
                       >
                         {log.status}
                       </Badge>
@@ -212,11 +215,6 @@ export default function OrderDetails() {
           </CardContent>
         </Card>
 
-        <OrderStatusControl 
-          currentStatus={order.status} 
-          orderType={order.type}
-          onStatusChange={handleStatusChange}
-        />
         <OrderDocumentation order={order} />
         {order.type === "physical" && <OrderShippingInfo order={order} />}
 
