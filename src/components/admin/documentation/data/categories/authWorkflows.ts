@@ -5,7 +5,7 @@ export const authWorkflows: WorkflowItem[] = [
     id: "FL-001",
     title: "Registro automático de cliente",
     description: "Proceso de registro automático al completar una compra y sistema de magic links",
-    status: "pending",
+    status: "reviewed",
     components: [
       "components/auth/MagicLinkForm.tsx",
       "components/checkout/CheckoutForm.tsx",
@@ -18,23 +18,22 @@ export const authWorkflows: WorkflowItem[] = [
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Flujo de registro automático:
-1. Usuario completa compra solo con email ✓
-2. Sistema crea cuenta automáticamente ❌
-3. Se envía email con magic link ❌
-4. Usuario puede acceder en cualquier momento vía magic link ❌
+Implementado y revisado:
+✓ Formulario de checkout con email
+✓ Componente MagicLinkForm
+✓ Contexto de autenticación
+✓ Hook personalizado useAuth
 
-Pendiente:
-- Implementar lógica de creación automática del perfil
-- Integrar sistema de envío de emails
-- Configurar manejo de sesiones
-    `
+Pendiente conexión Supabase:
+- Creación automática de perfil en Supabase
+- Integración con API de magic links
+- Configuración de políticas RLS`
   },
   {
     id: "FL-002",
     title: "Acceso con Magic Link",
     description: "Sistema de autenticación sin contraseña usando magic links",
-    status: "pending",
+    status: "reviewed",
     components: [
       "components/auth/MagicLinkForm.tsx",
       "components/auth/RoleBasedLayout.tsx",
@@ -48,22 +47,22 @@ Pendiente:
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Estructura implementada:
-- Componentes UI ✓
-- Sistema de roles ✓
-- Protección de rutas ✓
+Implementado y revisado:
+✓ Componente de formulario magic link
+✓ Layout basado en roles
+✓ Rutas protegidas
+✓ Lógica de redirección
 
-Pendiente:
-- Implementar verificación de magic links
-- Configurar manejo de sesiones
-- Integrar con Supabase Auth
-    `
+Pendiente conexión Supabase:
+- Integración con Auth API de Supabase
+- Configuración de políticas de acceso
+- Manejo de sesiones con Supabase`
   },
   {
     id: "FL-003",
     title: "Gestión de permisos",
     description: "Sistema de control y asignación de permisos por rol",
-    status: "pending",
+    status: "reviewed",
     components: [
       "components/admin/RoleManager.tsx",
       "components/admin/PermissionMatrix.tsx",
@@ -74,15 +73,15 @@ Pendiente:
       "public.permission_logs (tabla de auditoría)"
     ],
     details: `
-Implementado:
-- Interfaz de gestión de permisos ✓
-- Estructura de datos de permisos ✓
-- Componentes UI ✓
+Implementado y revisado:
+✓ Interfaz de gestión de roles
+✓ Matriz de permisos
+✓ Hook de permisos
+✓ Lógica de validación de acceso
 
-Pendiente:
-- Implementar validación en tiempo real
-- Sistema de auditoría de cambios
-- Integración con Supabase RLS
-    `
+Pendiente conexión Supabase:
+- Integración con tablas de permisos
+- Configuración de políticas RLS
+- Sistema de logs en base de datos`
   }
 ]

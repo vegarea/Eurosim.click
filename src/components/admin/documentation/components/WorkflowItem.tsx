@@ -35,7 +35,7 @@ export function WorkflowItem({ item }: WorkflowItemProps) {
           <>
             <Verified className="h-5 w-5 text-blue-500" />
             <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200">
-              Revisado
+              Revisado - Pendiente Conexión
             </Badge>
           </>
         );
