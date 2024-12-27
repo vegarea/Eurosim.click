@@ -25,6 +25,11 @@ export function AdminOrders() {
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrder(orderId, { status: newStatus })
+    // Actualizar el selectedOrder con el pedido actualizado
+    const updatedOrder = orders.find(order => order.id === orderId)
+    if (updatedOrder) {
+      setSelectedOrder(updatedOrder)
+    }
   }
 
   return (
