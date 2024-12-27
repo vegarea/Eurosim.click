@@ -1,4 +1,5 @@
 import { OrderEvent, OrderStatus } from "../../orders/types"
+import { getTrackingMessage } from "../config/carriers"
 
 export const createShippingConfirmationEvent = (
   trackingNumber: string, 
@@ -6,7 +7,7 @@ export const createShippingConfirmationEvent = (
 ): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
-  description: `Envío confirmado con ${carrier}. Número de tracking: ${trackingNumber}`,
+  description: getTrackingMessage(carrier, trackingNumber),
   userId: "current-user-id", // Esto debería venir del contexto de autenticación
   userName: "Manager Name", // Esto debería venir del contexto de autenticación
   createdAt: new Date().toISOString(),

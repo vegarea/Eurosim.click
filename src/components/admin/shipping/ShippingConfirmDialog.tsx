@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select"
 import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { SHIPPING_CARRIERS, getTrackingMessage } from "./config/carriers"
 
 interface ShippingConfirmDialogProps {
   open: boolean
@@ -24,12 +25,6 @@ interface ShippingConfirmDialogProps {
   orderId: string
   onConfirm: (trackingNumber: string, carrier: string) => void
 }
-
-const SHIPPING_CARRIERS = [
-  { id: "dhl", name: "DHL" },
-  { id: "fedex", name: "FedEx" },
-  { id: "ups", name: "UPS" },
-]
 
 export function ShippingConfirmDialog({
   open,
@@ -96,6 +91,15 @@ export function ShippingConfirmDialog({
               placeholder="Ingresa el número de tracking"
             />
           </div>
+
+          {carrier && trackingNumber && (
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Vista previa del mensaje:</p>
+              <p className="text-sm text-muted-foreground">
+                {getTrackingMessage(carrier, trackingNumber)}
+              </p>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
