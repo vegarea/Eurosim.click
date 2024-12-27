@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmailTemplate } from "./emails/types"
 import { EmailTemplateCard } from "./emails/EmailTemplateCard"
 import { initialTemplates } from "./emails/initialData"
-import { ApiKeySetup } from "./emails/ApiKeySetup"
 
 export function AdminEmails() {
   const [templates, setTemplates] = useState<EmailTemplate[]>(initialTemplates)
@@ -36,8 +35,6 @@ export function AdminEmails() {
           Añadir Plantilla
         </Button>
       </div>
-
-      <ApiKeySetup />
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Image, DollarSign, Upload, Building2, ShoppingCart, Search, Palette, Plug } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { ApiKeySetup } from "./emails/ApiKeySetup"
 
 export function AdminSettings() {
   const { toast } = useToast()
@@ -286,23 +287,33 @@ export function AdminSettings() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="zapier">Webhook de Zapier</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="zapier"
-                    value={zapierWebhook}
-                    onChange={(e) => setZapierWebhook(e.target.value)}
-                    placeholder="https://hooks.zapier.com/..."
-                    className="flex-1"
-                  />
-                  <Button variant="outline" onClick={handleZapierTest}>
-                    Probar
-                  </Button>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Brevo (Email)</h3>
+                  <ApiKeySetup />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Conecta con Zapier para automatizar tareas y sincronizar datos con otras aplicaciones
-                </p>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Zapier</h3>
+                  <Label htmlFor="zapier">Webhook de Zapier</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="zapier"
+                      value={zapierWebhook}
+                      onChange={(e) => setZapierWebhook(e.target.value)}
+                      placeholder="https://hooks.zapier.com/..."
+                      className="flex-1"
+                    />
+                    <Button variant="outline" onClick={handleZapierTest}>
+                      Probar
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Conecta con Zapier para automatizar tareas y sincronizar datos con otras aplicaciones
+                  </p>
+                </div>
               </div>
               <Button onClick={() => handleSave('integraciones')}>Guardar cambios</Button>
             </CardContent>
