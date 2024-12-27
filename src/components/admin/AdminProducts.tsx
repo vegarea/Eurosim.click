@@ -12,6 +12,11 @@ interface Product {
   features: string[]
   europeGB?: number
   spainGB?: number
+  created_at: Date
+  updated_at: Date
+  status: "active" | "inactive"
+  stock?: number // Opcional, solo para SIMs físicas
+  metadata?: Record<string, any> // Para información adicional flexible
 }
 
 const initialProducts: Product[] = [
@@ -28,7 +33,12 @@ const initialProducts: Product[] = [
       "SIM card incluida",
       "30 días de validez",
       "Hotspot incluido"
-    ]
+    ],
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    stock: 100,
+    metadata: {}
   },
   {
     id: "sim-xxl",
@@ -43,7 +53,12 @@ const initialProducts: Product[] = [
       "Velocidad 5G/4G/3G+",
       "SIM card incluida",
       "30 días de validez"
-    ]
+    ],
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    stock: 100,
+    metadata: {}
   },
   {
     id: "esim-s",
@@ -59,7 +74,11 @@ const initialProducts: Product[] = [
       "30 días de validez"
     ],
     europeGB: 8,
-    spainGB: 100
+    spainGB: 100,
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    metadata: {}
   },
   {
     id: "esim-m",
@@ -75,7 +94,11 @@ const initialProducts: Product[] = [
       "30 días de validez"
     ],
     europeGB: 11,
-    spainGB: 140
+    spainGB: 140,
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    metadata: {}
   },
   {
     id: "esim-l",
@@ -92,7 +115,11 @@ const initialProducts: Product[] = [
       "Soporte prioritario"
     ],
     europeGB: 16,
-    spainGB: 160
+    spainGB: 160,
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    metadata: {}
   },
   {
     id: "esim-xl",
@@ -109,7 +136,11 @@ const initialProducts: Product[] = [
       "Soporte prioritario"
     ],
     europeGB: 22,
-    spainGB: 190
+    spainGB: 190,
+    created_at: new Date(),
+    updated_at: new Date(),
+    status: "active",
+    metadata: {}
   }
 ]
 

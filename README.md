@@ -1,69 +1,37 @@
-# Welcome to your Lovable project
+# Estructura de la Base de Datos
 
-## Project info
+Este documento describe la estructura de las tablas en Supabase para el proyecto.
 
-**URL**: https://lovable.dev/projects/bf3664ff-a842-4349-9f96-b8bf19128b04
+## Tablas
 
-## How can I edit this code?
+### Products
 
-There are several ways of editing your application.
+Tabla para almacenar los productos (SIMs físicas y eSIMs).
 
-**Use Lovable**
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| id | uuid | Identificador único | ✅ |
+| type | enum | Tipo de producto ('physical' o 'esim') | ✅ |
+| title | text | Nombre del producto | ✅ |
+| description | text | Descripción del producto | ✅ |
+| price | decimal | Precio en centavos | ✅ |
+| features | json | Array de características | ✅ |
+| europe_gb | integer | GB disponibles en Europa | ❌ |
+| spain_gb | integer | GB disponibles en España | ❌ |
+| created_at | timestamp | Fecha de creación | ✅ |
+| updated_at | timestamp | Fecha de última actualización | ✅ |
+| status | enum | Estado del producto ('active' o 'inactive') | ✅ |
+| stock | integer | Cantidad disponible (solo para SIMs físicas) | ❌ |
+| metadata | jsonb | Información adicional en formato JSON | ❌ |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bf3664ff-a842-4349-9f96-b8bf19128b04) and start prompting.
+#### Índices
+- `id` (Primary Key)
+- `type` (Para filtrado rápido por tipo)
+- `status` (Para filtrado por estado)
 
-Changes made via Lovable will be committed automatically to this repo.
+#### Políticas de Seguridad (RLS)
+- Lectura: Pública para productos activos
+- Escritura: Solo administradores
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/bf3664ff-a842-4349-9f96-b8bf19128b04) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+---
+*Nota: Este documento se irá actualizando conforme se revisen y añadan más tablas.*
