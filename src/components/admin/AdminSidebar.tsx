@@ -6,14 +6,15 @@ import {
   Mail,
   Settings,
   Truck,
-  QrCode
+  QrCode,
+  BookOpen
 } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -25,6 +26,11 @@ const menuItems = [
     title: "Dashboard",
     path: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Blog",
+    path: "/admin/blog",
+    icon: BookOpen,
   },
   {
     title: "Pedidos",
