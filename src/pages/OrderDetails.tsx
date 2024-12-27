@@ -2,10 +2,9 @@ import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useOrders } from "@/contexts/OrdersContext"
 import { OrderStatusBadge, statusConfig } from "@/components/admin/orders/OrderStatusBadge"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft, Package2, User2, MapPin, FileText } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import { OrderStatus } from "@/components/admin/orders/types"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
@@ -13,6 +12,16 @@ import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
 import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation"
 import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
 import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
+import { Progress } from "@/components/ui/progress"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Package2 } from "lucide-react"
+
+const statusOrder = [
+  "payment_pending",
+  "processing",
+  "shipped",
+  "delivered",
+] as const
 
 export default function OrderDetails() {
   const { orderId } = useParams()
@@ -51,6 +60,13 @@ export default function OrderDetails() {
     }
   }
 
+  // Calculate progress percentage based on current status
+  const getProgressPercentage = () => {
+    const currentIndex = statusOrder.indexOf(order.status as any)
+    if (currentIndex === -1) return 0
+    return ((currentIndex + 1) / statusOrder.length) * 100
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -67,7 +83,42 @@ export default function OrderDetails() {
           <OrderStatusBadge status={order.status} />
         </div>
 
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-gray-500">
+            {statusOrder.map((status) => (
+              <span key={status}>{statusConfig[status].label}</span>
+            ))}
+          </div>
+          <Progress value={getProgressPercentage()} />
+        </div>
+
         <OrderBasicInfo order={order} />
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package2 className="h-5 w-5 text-gray-500" />
+              Detalles del Producto
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-medium mb-1">Producto</h3>
+                <p>{order.title || "No especificado"}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Descripción</h3>
+                <p>{order.description || "No especificada"}</p>
+              </div>
+              <div>
+                <h3 className="font-medium mb-1">Cantidad</h3>
+                <p>{order.quantity || 1}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <OrderStatusControl 
           currentStatus={order.status} 
           orderType={order.type}
