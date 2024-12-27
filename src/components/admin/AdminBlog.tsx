@@ -4,11 +4,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, PenTool, Calendar, Image, Settings } from "lucide-react"
+import { BookOpen, PenTool, Calendar, Image, Settings, TrendingUp, Eye } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function AdminBlog() {
   const [autoGenEnabled, setAutoGenEnabled] = useState(false)
+  const [dateFilter, setDateFilter] = useState("all")
+  const [viewsFilter, setViewsFilter] = useState("all")
+
+  const mockArticles = [
+    {
+      id: 1,
+      title: "Los mejores lugares para visitar en Europa #1",
+      publishedAt: "2024-04-10",
+      views: 1250,
+      image: "/placeholder.svg"
+    },
+    {
+      id: 2,
+      title: "Guía completa: Viajando por Italia",
+      publishedAt: "2024-04-08",
+      views: 850,
+      image: "/placeholder.svg"
+    },
+    {
+      id: 3,
+      title: "Top 10 destinos históricos en España",
+      publishedAt: "2024-04-05",
+      views: 2100,
+      image: "/placeholder.svg"
+    }
+  ]
 
   return (
     <div className="space-y-6">
@@ -42,25 +75,64 @@ export function AdminBlog() {
         </TabsList>
 
         <TabsContent value="articles">
-          <div className="grid gap-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardContent className="flex items-center gap-4 p-4">
-                  <div className="relative h-24 w-32 overflow-hidden rounded-lg bg-muted">
-                    <Image className="absolute inset-0 m-auto h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <h3 className="font-semibold">Los mejores lugares para visitar en Europa #{i}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Publicado hace {i} días
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Editar
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filtrar por fecha" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las fechas</SelectItem>
+                  <SelectItem value="today">Hoy</SelectItem>
+                  <SelectItem value="week">Esta semana</SelectItem>
+                  <SelectItem value="month">Este mes</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={viewsFilter} onValueChange={setViewsFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filtrar por vistas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las vistas</SelectItem>
+                  <SelectItem value="high">Más vistas (>1000)</SelectItem>
+                  <SelectItem value="medium">Vistas medias (500-1000)</SelectItem>
+                  <SelectItem value="low">Pocas vistas (<500)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-4">
+              {mockArticles.map((article) => (
+                <Card key={article.id}>
+                  <CardContent className="flex items-center gap-4 p-4">
+                    <div className="relative h-24 w-32 overflow-hidden rounded-lg bg-muted">
+                      <Image className="absolute inset-0 m-auto h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h3 className="font-semibold">{article.title}</h3>
+                      <div className="flex gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {new Date(article.publishedAt).toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          {article.views.toLocaleString()} vistas
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <TrendingUp className="h-4 w-4" />
+                          {article.views > 1000 ? "Tendencia" : "Normal"}
+                        </span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Editar
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </TabsContent>
 
