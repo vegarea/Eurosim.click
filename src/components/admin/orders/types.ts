@@ -35,6 +35,8 @@ export interface OrderEvent {
     newStatus?: OrderStatus
     paymentMethod?: string
     automated?: boolean
+    trackingNumber?: string
+    carrier?: string
   }
 }
 

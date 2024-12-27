@@ -6,7 +6,7 @@ export const createShippingConfirmationEvent = (
 ): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
-  description: `Envío confirmado con ${carrier.toUpperCase()}. Tracking: ${trackingNumber}`,
+  description: `Envío confirmado con ${carrier}. Número de tracking: ${trackingNumber}`,
   userId: "current-user-id", // Esto debería venir del contexto de autenticación
   userName: "Manager Name", // Esto debería venir del contexto de autenticación
   createdAt: new Date().toISOString(),
