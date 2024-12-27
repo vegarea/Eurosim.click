@@ -4,6 +4,7 @@ import { CreditCard, Wifi } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
+import { formatCurrency } from "@/utils/currency";
 
 interface SimCardProps {
   type: "physical" | "esim";
@@ -80,6 +81,7 @@ export function SimCard({
   };
 
   const colorScheme = getColorScheme(title);
+  const formattedPrice = formatCurrency(price);
 
   return (
     <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
@@ -114,8 +116,7 @@ export function SimCard({
       <CardContent className="relative">
         <div className="mb-8 transform transition-all duration-300 hover:scale-105">
           <p className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            ${price}
-            <span className="text-sm font-normal text-gray-600 ml-1">MXN</span>
+            {formattedPrice}
           </p>
         </div>
 
