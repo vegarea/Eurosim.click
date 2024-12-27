@@ -19,14 +19,15 @@ export const authWorkflows: WorkflowItem[] = [
     ],
     details: `
 Flujo de registro automático:
-1. Usuario completa compra solo con email
-2. Sistema crea cuenta automáticamente
-3. Se envía email con magic link
-4. Usuario puede acceder en cualquier momento vía magic link
+1. Usuario completa compra solo con email ✓
+2. Sistema crea cuenta automáticamente ❌
+3. Se envía email con magic link ❌
+4. Usuario puede acceder en cualquier momento vía magic link ❌
 
-Políticas RLS necesarias:
-- Perfiles: lectura pública, escritura sistema
-- Role_permissions: lectura autenticada, escritura admin
+Pendiente:
+- Implementar lógica de creación automática del perfil
+- Integrar sistema de envío de emails
+- Configurar manejo de sesiones
     `
   },
   {
@@ -47,31 +48,15 @@ Políticas RLS necesarias:
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Estructura de roles y permisos:
+Estructura implementada:
+- Componentes UI ✓
+- Sistema de roles ✓
+- Protección de rutas ✓
 
-1. Cliente:
-   - Acceso solo por magic link
-   - Ver pedidos propios
-   - Crear tickets de soporte
-   - No requiere contraseña
-
-2. Manager (creado por admin en Supabase):
-   - Gestión de envíos asignados
-   - Ver pedidos en su área (físicos o eSIM)
-   - Actualizar estados de envío
-   - Acceso a documentación básica
-
-3. Admin (creado manualmente en Supabase):
-   - Gestión completa de usuarios
-   - Asignación de roles
-   - Gestión de productos
-   - Acceso a métricas y reportes
-   - Configuración del sistema
-
-Políticas RLS necesarias:
-- Pedidos: filtrar por rol y propiedad
-- Envíos: filtrar por tipo y asignación
-- Productos: lectura pública, escritura admin
+Pendiente:
+- Implementar verificación de magic links
+- Configurar manejo de sesiones
+- Integrar con Supabase Auth
     `
   },
   {
@@ -89,26 +74,15 @@ Políticas RLS necesarias:
       "public.permission_logs (tabla de auditoría)"
     ],
     details: `
-Estructura de permisos:
+Implementado:
+- Interfaz de gestión de permisos ✓
+- Estructura de datos de permisos ✓
+- Componentes UI ✓
 
-1. Niveles de acceso:
-   - read: solo lectura
-   - write: lectura y escritura
-   - admin: control total
-   - none: sin acceso
-
-2. Áreas de permisos:
-   - orders: pedidos
-   - products: productos
-   - users: usuarios
-   - shipping: envíos
-   - reports: reportes
-   - settings: configuración
-
-Políticas RLS:
-- Solo admin puede modificar permisos
-- Logs de cambios de permisos
-- Verificación en tiempo real de permisos
+Pendiente:
+- Implementar validación en tiempo real
+- Sistema de auditoría de cambios
+- Integración con Supabase RLS
     `
   }
 ]
