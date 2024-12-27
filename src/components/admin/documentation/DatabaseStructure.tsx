@@ -39,38 +39,57 @@ export function DatabaseStructure() {
         const readmeResponse = await fetch('/docs/database/README.md')
         const readmeContent = await readmeResponse.text()
         
-        // Extraer las tablas mencionadas en el README
-        const tableFiles = readmeContent.match(/- \[(.*?)\]\((.*?)\)/g) || []
+        // Extraer las tablas mencionadas en el README usando el nuevo formato de enlaces
+        const tableMatches = readmeContent.matchAll(/- \[(.*?)\]\((.*?)\)/g)
+        const tableFiles = Array.from(tableMatches).map(match => ({
+          name: match[1],
+          path: match[2]
+        }))
+        
+        console.log('Found table files:', tableFiles) // Debug log
         
         // Cargar la documentación de cada tabla
         const loadedTables = await Promise.all(
           tableFiles.map(async (file) => {
-            const filePath = file.match(/\((.*?)\)/)?.[1] || ''
-            const response = await fetch(filePath)
-            const content = await response.text()
-            
-            const nameMatch = content.match(/# Tabla: (.*)/i)
-            const descriptionMatch = content.match(/\n\n(.*?)\n\n/i)
-            const fieldsMatch = content.match(/\|\s*([^|]+)\s*\|/g)
-            
-            const fields = fieldsMatch 
-              ? fieldsMatch
-                  .slice(2)
-                  .map(field => field.replace(/\|/g, '').trim())
-                  .filter(field => field !== '----' && field !== '')
-              : []
+            try {
+              const response = await fetch(file.path)
+              if (!response.ok) {
+                console.error(`Error loading ${file.path}: ${response.statusText}`)
+                return null
+              }
+              const content = await response.text()
+              
+              const nameMatch = content.match(/# Tabla: (.*)/i)
+              const descriptionMatch = content.match(/\n\n(.*?)\n\n/i)
+              const fieldsMatch = content.match(/\|\s*([^|]+)\s*\|/g)
+              
+              const fields = fieldsMatch 
+                ? fieldsMatch
+                    .slice(2)
+                    .map(field => field.replace(/\|/g, '').trim())
+                    .filter(field => field !== '----' && field !== '')
+                : []
 
-            return {
-              name: nameMatch ? nameMatch[1].trim() : filePath.split('/').pop()?.replace('.md', '') || '',
-              description: descriptionMatch ? descriptionMatch[1].trim() : '',
-              fields: fields.slice(0, 5),
-              path: filePath,
-              content
+              return {
+                name: nameMatch ? nameMatch[1].trim() : file.name,
+                description: descriptionMatch ? descriptionMatch[1].trim() : '',
+                fields: fields.slice(0, 5),
+                path: file.path,
+                content
+              }
+            } catch (error) {
+              console.error(`Error processing ${file.path}:`, error)
+              return null
             }
           })
         )
 
-        const sortedTables = loadedTables.sort((a, b) => a.name.localeCompare(b.name))
+        // Filtrar las tablas nulas y ordenarlas
+        const validTables = loadedTables.filter((table): table is TableInfo => table !== null)
+        const sortedTables = validTables.sort((a, b) => a.name.localeCompare(b.name))
+        
+        console.log('Loaded tables:', sortedTables) // Debug log
+        
         setTables(sortedTables)
         setLoading(false)
       } catch (error) {
@@ -121,56 +140,62 @@ export function DatabaseStructure() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredTables.map((table) => (
-              <Card key={table.name} className="hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Table2 className="h-4 w-4 text-primary" />
-                    {table.name}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-2">{table.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="text-sm font-medium">Campos principales:</div>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {table.fields.map((field, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <ArrowRight className="h-3 w-3 flex-shrink-0" />
-                          <span className="truncate">{field}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="pt-4">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button
-                            onClick={() => setSelectedTable(table.name)}
-                            className="inline-flex items-center text-sm text-primary hover:underline"
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Ver documentación completa
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-3xl max-h-[80vh]">
-                          <DialogHeader>
-                            <DialogTitle>Documentación: {table.name}</DialogTitle>
-                            <DialogDescription>
-                              Estructura detallada y relaciones de la tabla
-                            </DialogDescription>
-                          </DialogHeader>
-                          <ScrollArea className="h-[60vh] w-full rounded-md border p-4">
-                            <div className="prose prose-sm dark:prose-invert">
-                              <ReactMarkdown>{getTableContent(table.name)}</ReactMarkdown>
-                            </div>
-                          </ScrollArea>
-                        </DialogContent>
-                      </Dialog>
+            {filteredTables.length > 0 ? (
+              filteredTables.map((table) => (
+                <Card key={table.name} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Table2 className="h-4 w-4 text-primary" />
+                      {table.name}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2">{table.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Campos principales:</div>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {table.fields.map((field, index) => (
+                          <li key={index} className="flex items-center gap-2">
+                            <ArrowRight className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">{field}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="pt-4">
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <button
+                              onClick={() => setSelectedTable(table.name)}
+                              className="inline-flex items-center text-sm text-primary hover:underline"
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver documentación completa
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-3xl max-h-[80vh]">
+                            <DialogHeader>
+                              <DialogTitle>Documentación: {table.name}</DialogTitle>
+                              <DialogDescription>
+                                Estructura detallada y relaciones de la tabla
+                              </DialogDescription>
+                            </DialogHeader>
+                            <ScrollArea className="h-[60vh] w-full rounded-md border p-4">
+                              <div className="prose prose-sm dark:prose-invert">
+                                <ReactMarkdown>{getTableContent(table.name)}</ReactMarkdown>
+                              </div>
+                            </ScrollArea>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-8 text-muted-foreground">
+                No se encontraron tablas que coincidan con la búsqueda
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
