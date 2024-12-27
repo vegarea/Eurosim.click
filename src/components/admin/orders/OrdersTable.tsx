@@ -10,20 +10,16 @@ import { Badge } from "@/components/ui/badge"
 import { OrderStatusBadge } from "./OrderStatusBadge"
 import { Order } from "./types"
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Button } from "@/components/ui/button"
-import { statusConfig } from "./OrderStatusBadge"
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { statusConfig } from "./OrderStatusBadge"
+import { ChevronDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useState } from "react"
 
 interface OrdersTableProps {
   orders: Order[]
@@ -38,6 +34,12 @@ const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
 }
 
 export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
+
+  const toggleOrder = (orderId: string) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId)
+  }
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -54,71 +56,80 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
         </TableHeader>
         <TableBody>
           {orders.map((order) => (
-            <Accordion type="single" collapsible key={order.id}>
-              <AccordionItem value={order.id}>
-                <AccordionTrigger asChild>
-                  <TableRow className="cursor-pointer hover:bg-muted/50">
-                    <TableCell className="font-medium">{order.id}</TableCell>
-                    <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant="secondary" 
-                        className={getSimTypeBadgeStyle(order.type)}
-                      >
-                        {order.type === "physical" ? "SIM Física" : "E-SIM"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>${order.total.toFixed(2)}</TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell>
-                      {order.paymentMethod ? (
-                        <span className="capitalize">{order.paymentMethod}</span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
+            <>
+              <TableRow 
+                key={order.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => toggleOrder(order.id)}
+              >
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    <ChevronDown 
+                      className={cn(
+                        "h-4 w-4 transition-transform", 
+                        expandedOrder === order.id ? "transform rotate-180" : ""
                       )}
-                    </TableCell>
-                  </TableRow>
-                </AccordionTrigger>
+                    />
+                    {order.id}
+                  </div>
+                </TableCell>
+                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                <TableCell>{order.customer}</TableCell>
+                <TableCell>
+                  <Badge 
+                    variant="secondary" 
+                    className={getSimTypeBadgeStyle(order.type)}
+                  >
+                    {order.type === "physical" ? "SIM Física" : "E-SIM"}
+                  </Badge>
+                </TableCell>
+                <TableCell>${order.total.toFixed(2)}</TableCell>
+                <TableCell>
+                  <OrderStatusBadge status={order.status} />
+                </TableCell>
+                <TableCell>
+                  {order.paymentMethod ? (
+                    <span className="capitalize">{order.paymentMethod}</span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
+                  )}
+                </TableCell>
+              </TableRow>
+              {expandedOrder === order.id && (
                 <TableRow>
                   <TableCell colSpan={7} className="p-0">
-                    <AccordionContent>
-                      <div className="p-4 space-y-4 bg-muted/5">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <h3 className="font-medium mb-1">Detalles del Cliente</h3>
-                            <p>{order.customer}</p>
-                          </div>
-                          <div>
-                            <h3 className="font-medium mb-1">Actualizar Estado</h3>
-                            <div className="flex gap-2">
-                              <Select
-                                value={order.status}
-                                onValueChange={(value) => onStatusChange(order.id, value as Order['status'])}
-                              >
-                                <SelectTrigger className="w-[200px]">
-                                  <SelectValue placeholder="Seleccionar estado" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {Object.entries(statusConfig).map(([key, { label }]) => (
-                                    <SelectItem key={key} value={key}>
-                                      {label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
+                    <div className="p-4 space-y-4 bg-muted/5">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="font-medium mb-1">Detalles del Cliente</h3>
+                          <p>{order.customer}</p>
+                        </div>
+                        <div>
+                          <h3 className="font-medium mb-1">Actualizar Estado</h3>
+                          <div className="flex gap-2">
+                            <Select
+                              value={order.status}
+                              onValueChange={(value) => onStatusChange(order.id, value as Order['status'])}
+                            >
+                              <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="Seleccionar estado" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.entries(statusConfig).map(([key, { label }]) => (
+                                  <SelectItem key={key} value={key}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         </div>
-                        {/* Aquí puedes agregar más secciones de información según necesites */}
                       </div>
-                    </AccordionContent>
+                    </div>
                   </TableCell>
                 </TableRow>
-              </AccordionItem>
-            </Accordion>
+              )}
+            </>
           ))}
         </TableBody>
       </Table>
