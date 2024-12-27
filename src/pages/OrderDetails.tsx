@@ -16,6 +16,13 @@ import { statusConfig } from "@/components/admin/orders/OrderStatusBadge"
 import { OrderStatus } from "@/components/admin/orders/types"
 import { toast } from "sonner"
 
+const statusSteps: OrderStatus[] = [
+  "payment_pending",
+  "processing",
+  "shipped",
+  "delivered"
+]
+
 export default function OrderDetails() {
   const { orderId } = useParams()
   const { orders, updateOrder } = useOrders()
@@ -50,6 +57,13 @@ export default function OrderDetails() {
     return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
   }
 
+  const getCurrentStep = () => {
+    if (order.status === "cancelled" || order.status === "payment_failed") {
+      return -1
+    }
+    return statusSteps.indexOf(order.status)
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -59,6 +73,49 @@ export default function OrderDetails() {
               <ChevronLeft className="h-4 w-4" /> Volver a pedidos
             </Button>
           </Link>
+        </div>
+
+        {/* Barra de progreso */}
+        <div className="w-full bg-gray-50 p-6 rounded-lg shadow-sm">
+          <div className="flex justify-between mb-4">
+            {statusSteps.map((step, index) => {
+              const currentStep = getCurrentStep()
+              const isActive = index <= currentStep
+              const isCurrent = index === currentStep
+              
+              return (
+                <div key={step} className="flex flex-col items-center flex-1">
+                  <div 
+                    className={`
+                      w-8 h-8 rounded-full flex items-center justify-center mb-2
+                      ${isActive 
+                        ? 'bg-brand-500 text-white' 
+                        : 'bg-gray-200 text-gray-500'}
+                      ${isCurrent ? 'ring-4 ring-brand-100' : ''}
+                    `}
+                  >
+                    {index + 1}
+                  </div>
+                  <div className="text-sm font-medium text-center">
+                    {statusConfig[step].label}
+                  </div>
+                  {index < statusSteps.length - 1 && (
+                    <div 
+                      className={`
+                        h-1 w-full absolute mt-4
+                        ${isActive ? 'bg-brand-500' : 'bg-gray-200'}
+                      `}
+                    />
+                  )}
+                </div>
+              )
+            })}
+          </div>
+          {(order.status === "cancelled" || order.status === "payment_failed") && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-md text-red-700 text-sm">
+              Este pedido ha sido {order.status === "cancelled" ? "cancelado" : "marcado con error de pago"}
+            </div>
+          )}
         </div>
 
         <div className="grid gap-6">
