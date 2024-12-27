@@ -18,7 +18,7 @@ export function MagicLinkForm() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
@@ -35,7 +35,7 @@ export function MagicLinkForm() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No se pudo enviar el enlace de acceso.",
+        description: "No se pudo enviar el enlace de acceso. Por favor, intenta nuevamente.",
       })
     } finally {
       setIsLoading(false)
