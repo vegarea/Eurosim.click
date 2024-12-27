@@ -7,28 +7,76 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "../orders/types"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { useOrders } from "@/contexts/OrdersContext"
+import { useState } from "react"
+import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
   const { orders, updateOrder } = useOrders()
-  const physicalOrders = orders.filter(order => order.type === "physical")
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
-  // Filtrar pedidos por estado
+  const physicalOrders = orders.filter(order => order.type === "physical")
   const pendingOrders = physicalOrders.filter(order => order.status === "processing")
   const shippedOrders = physicalOrders.filter(order => order.status === "shipped")
   const deliveredOrders = physicalOrders.filter(order => order.status === "delivered")
 
   const handleShipOrder = (order: Order) => {
-    updateOrder(order.id, { status: "shipped" })
+    setSelectedOrderId(order.id)
+    setConfirmDialogOpen(true)
+  }
+
+  const handleConfirmShipping = (trackingNumber: string, carrier: string) => {
+    if (!selectedOrderId) return
+
+    const now = new Date().toISOString()
+    const event = {
+      id: crypto.randomUUID(),
+      type: "status_changed" as const,
+      description: `Envío confirmado con ${carrier.toUpperCase()}. Tracking: ${trackingNumber}`,
+      userId: "current-user-id", // Esto debería venir del contexto de autenticación
+      userName: "Manager Name", // Esto debería venir del contexto de autenticación
+      createdAt: now,
+      metadata: {
+        oldStatus: "processing",
+        newStatus: "shipped",
+        trackingNumber,
+        carrier,
+        automated: false
+      }
+    }
+
+    updateOrder(selectedOrderId, {
+      status: "shipped",
+      events: [...(orders.find(o => o.id === selectedOrderId)?.events || []), event]
+    })
 
     toast({
-      title: "Pedido en tránsito",
-      description: `El pedido ${order.id} ha sido marcado como en tránsito.`
+      title: "Envío confirmado",
+      description: `El pedido ${selectedOrderId} ha sido marcado como enviado.`
     })
   }
 
   const handleDeliverOrder = (order: Order) => {
-    updateOrder(order.id, { status: "delivered" })
+    const now = new Date().toISOString()
+    const event = {
+      id: crypto.randomUUID(),
+      type: "status_changed" as const,
+      description: "Pedido marcado como entregado",
+      userId: "current-user-id", // Esto debería venir del contexto de autenticación
+      userName: "Manager Name", // Esto debería venir del contexto de autenticación
+      createdAt: now,
+      metadata: {
+        oldStatus: "shipped",
+        newStatus: "delivered",
+        automated: false
+      }
+    }
+
+    updateOrder(order.id, {
+      status: "delivered",
+      events: [...(order.events || []), event]
+    })
 
     toast({
       title: "Pedido entregado",
@@ -73,7 +121,7 @@ export function AdminPhysicalShipping() {
               disabled={!isProcessing}
             >
               <Truck className="w-4 h-4 mr-2" />
-              Marcar en tránsito
+              Confirmar Envío
             </Button>
             <Button
               variant="outline"
@@ -157,6 +205,13 @@ export function AdminPhysicalShipping() {
           />
         </TabsContent>
       </Tabs>
+
+      <ShippingConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        orderId={selectedOrderId || ""}
+        onConfirm={handleConfirmShipping}
+      />
     </div>
   )
 }
