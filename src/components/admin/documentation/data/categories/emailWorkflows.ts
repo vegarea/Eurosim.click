@@ -28,7 +28,7 @@ export const emailWorkflows: WorkflowItem[] = [
     id: "FL-502",
     title: "Envío automático de emails",
     description: "Sistema de envío automático basado en eventos del sistema",
-    status: "working",
+    status: "reviewed",
     components: [
       "OrderStatusConfirmDialog.tsx",
       "EmailLogs.tsx"
@@ -42,13 +42,14 @@ export const emailWorkflows: WorkflowItem[] = [
 - Envío automático al cambiar estado de orden
 - Registro de emails enviados
 - Visualización de historial de envíos
-- Reemplazo automático de variables`
+- Reemplazo automático de variables
+- Pendiente conexión con Supabase para persistencia`
   },
   {
     id: "FL-503",
     title: "Configuración del servicio de email",
     description: "Gestión de configuraciones del servicio de email (Brevo)",
-    status: "working",
+    status: "reviewed",
     components: [
       "ApiKeySetup.tsx",
       "EmailIntegration.tsx"
@@ -58,6 +59,7 @@ export const emailWorkflows: WorkflowItem[] = [
 - Configuración de API key de Brevo
 - Validación de credenciales
 - Almacenamiento seguro de API key
-- Interfaz de configuración en settings`
+- Interfaz de configuración en settings
+- Pendiente integración con Supabase Vault para almacenamiento seguro de API keys`
   }
 ]
