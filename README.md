@@ -12,6 +12,9 @@ La documentación detallada de cada tabla se encuentra en archivos separados den
 - [Blog Posts](docs/database/blog-posts.md)
 - [Blog Post Images](docs/database/blog-post-images.md)
 - [Email Templates](docs/database/email-templates.md)
+- [Workflows](docs/database/workflows.md)
+- [Workflow Categories](docs/database/workflow_categories.md)
+- [Workflow Events](docs/database/workflow_events.md)
 
 ## Convenciones
 

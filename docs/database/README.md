@@ -18,6 +18,9 @@ Cada archivo markdown corresponde a una tabla específica y contiene:
 - `blog-posts.md`: Artículos del blog (manuales y generados por IA)
 - `blog-post-images.md`: Imágenes de los artículos
 - `email-templates.md`: Plantillas de correo electrónico
+- `workflows.md`: Flujos de trabajo del sistema
+- `workflow_categories.md`: Categorías de flujos de trabajo
+- `workflow_events.md`: Eventos y cambios en flujos de trabajo
 
 ## Notas sobre Automatización
 
