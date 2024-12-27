@@ -6,8 +6,6 @@ Este documento describe la estructura de las tablas en Supabase para el proyecto
 
 ### Products
 
-Tabla para almacenar los productos (SIMs físicas y eSIMs).
-
 | Campo | Tipo | Descripción | Requerido |
 |-------|------|-------------|-----------|
 | id | uuid | Identificador único | ✅ |
@@ -35,8 +33,6 @@ Tabla para almacenar los productos (SIMs físicas y eSIMs).
 
 ### Orders
 
-Tabla para almacenar los pedidos de los clientes.
-
 | Campo | Tipo | Descripción | Requerido |
 |-------|------|-------------|-----------|
 | id | uuid | Identificador único | ✅ |
@@ -47,6 +43,10 @@ Tabla para almacenar los pedidos de los clientes.
 | payment_method | text | Método de pago utilizado | ✅ |
 | payment_status | enum | Estado del pago ('pending', 'completed', 'failed') | ✅ |
 | payment_url | text | URL de confirmación del pago (Stripe/PayPal) | ❌ |
+| stripe_receipt_url | text | URL del recibo de Stripe | ❌ |
+| paypal_receipt_url | text | URL del recibo de PayPal | ❌ |
+| payment_intent_id | text | ID de la intención de pago (Stripe) | ❌ |
+| paypal_order_id | text | ID de la orden de PayPal | ❌ |
 | created_at | timestamp | Fecha y hora de creación | ✅ |
 | updated_at | timestamp | Fecha y hora de última actualización | ✅ |
 
