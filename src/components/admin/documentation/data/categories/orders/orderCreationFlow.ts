@@ -16,10 +16,12 @@ export const orderCreationFlow: WorkflowItem = {
     "order_items (tabla)"
   ],
   details: `
-- Selección de productos
-- Validación de stock
-- Cálculo de totales
-- Aplicación de descuentos
-- Validación de datos del cliente
-- Integración con pasarelas de pago`
+✓ Selección de productos implementada
+✓ Validación de stock implementada
+✓ Cálculo de totales funcionando
+✓ Aplicación de descuentos implementada
+✓ Validación de datos del cliente
+✓ Integración con contexto de carrito
+✓ Gestión de estado del pedido
+✓ Rutas y navegación configuradas`
 }
