@@ -141,5 +141,132 @@ Tabla para almacenar la información de los clientes.
 #### Relaciones
 - `orders` - One-to-Many (un cliente puede tener múltiples pedidos)
 
----
-*Nota: Este documento se irá actualizando conforme se revisen y añadan más tablas.*
+### Blog Posts
+
+Tabla para almacenar los artículos del blog.
+
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| id | uuid | Identificador único | ✅ |
+| title | text | Título del artículo | ✅ |
+| content | text | Contenido en formato HTML | ✅ |
+| slug | text | URL amigable (unique) | ✅ |
+| status | enum | Estado ('draft', 'published', 'archived') | ✅ |
+| published_at | timestamp | Fecha de publicación | ❌ |
+| author_id | uuid | ID del autor (foreign key) | ✅ |
+| featured_image | text | URL de la imagen destacada | ❌ |
+| meta_description | text | Descripción para SEO | ✅ |
+| views_count | integer | Contador de vistas | ✅ |
+
+#### SEO y Social
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| meta_title | text | Título para SEO | ❌ |
+| meta_keywords | text[] | Keywords para SEO | ❌ |
+| og_image | text | Imagen para compartir en redes | ❌ |
+| og_description | text | Descripción para redes sociales | ❌ |
+
+#### Generación AI
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| ai_prompt | text | Prompt usado para generar | ❌ |
+| ai_model | text | Modelo de AI usado | ❌ |
+| ai_generated | boolean | Si fue generado por AI | ✅ |
+| ai_review_status | enum | Estado de revisión ('pending', 'reviewed', 'approved') | ❌ |
+| ai_metadata | jsonb | Datos adicionales del proceso AI | ❌ |
+
+#### Metadatos
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| created_at | timestamp | Fecha de creación | ✅ |
+| updated_at | timestamp | Fecha de última actualización | ✅ |
+| metadata | jsonb | Información adicional | ❌ |
+
+#### Índices
+- `id` (Primary Key)
+- `slug` (Unique)
+- `status, published_at` (Para listados)
+- `author_id` (Foreign Key)
+
+#### Políticas de Seguridad (RLS)
+- Lectura: Pública para posts publicados
+- Escritura: Solo administradores
+- Borrado: Solo administradores
+
+### Blog Post Images
+
+Tabla para almacenar las imágenes dentro del contenido de los artículos.
+
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| id | uuid | Identificador único | ✅ |
+| post_id | uuid | ID del artículo (foreign key) | ✅ |
+| url | text | URL de la imagen | ✅ |
+| alt_text | text | Texto alternativo | ✅ |
+| caption | text | Pie de foto | ❌ |
+| width | integer | Ancho de la imagen | ✅ |
+| height | integer | Alto de la imagen | ✅ |
+| position | integer | Orden en el artículo | ❌ |
+| created_at | timestamp | Fecha de creación | ✅ |
+| updated_at | timestamp | Fecha de última actualización | ✅ |
+
+#### Índices
+- `id` (Primary Key)
+- `post_id` (Foreign Key)
+- `position` (Para ordenamiento)
+
+#### Políticas de Seguridad (RLS)
+- Lectura: Pública
+- Escritura: Solo administradores
+- Borrado: Solo administradores
+
+### Email Templates
+
+Tabla para almacenar las plantillas de email.
+
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| id | uuid | Identificador único | ✅ |
+| name | text | Nombre de la plantilla | ✅ |
+| subject | text | Asunto del email | ✅ |
+| content | text | Contenido HTML del email | ✅ |
+| description | text | Descripción de uso | ✅ |
+| status | enum | Estado ('active', 'inactive') | ✅ |
+| type | enum | Tipo ('physical', 'esim', 'both') | ✅ |
+
+#### Configuración
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| variables | jsonb | Variables disponibles | ✅ |
+| carrier_specific | boolean | Si es específico para transportista | ✅ |
+| carrier_id | text | ID del transportista si aplica | ❌ |
+| order_status | enum | Estado del pedido relacionado | ✅ |
+| language | text | Idioma de la plantilla | ✅ |
+
+#### Seguimiento
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| last_used | timestamp | Última vez usada | ❌ |
+| usage_count | integer | Veces utilizada | ❌ |
+| success_rate | decimal | Tasa de éxito de envío | ❌ |
+
+#### Metadatos
+| Campo | Tipo | Descripción | Requerido |
+|-------|------|-------------|-----------|
+| created_at | timestamp | Fecha de creación | ✅ |
+| updated_at | timestamp | Fecha de última actualización | ✅ |
+| created_by | uuid | Usuario que la creó | ✅ |
+| updated_by | uuid | Último usuario que la modificó | ✅ |
+| metadata | jsonb | Información adicional | ❌ |
+
+#### Índices
+- `id` (Primary Key)
+- `type, status` (Para filtrado)
+- `carrier_id` (Para filtrado por transportista)
+- `order_status` (Para búsqueda rápida)
+
+#### Políticas de Seguridad (RLS)
+- Lectura: Solo administradores
+- Escritura: Solo administradores
+- Activación/Desactivación: Solo administradores
+
