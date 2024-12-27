@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useOrders } from "@/contexts/OrdersContext"
-import { OrderStatusBadge, statusConfig } from "@/components/admin/orders/OrderStatusBadge"
+import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft, Package2, Wifi, CreditCard, ExternalLink } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 import { OrderStatus } from "@/components/admin/orders/types"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
@@ -15,8 +15,8 @@ import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
 import { OrderNotes } from "@/components/admin/orders/OrderNotes"
 import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
+import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
 
 const statusOrder = [
   "payment_pending",
@@ -25,21 +25,21 @@ const statusOrder = [
   "delivered",
 ] as const
 
+// Mock payment data - In a real app, this would come from your payment provider's API
+const mockPaymentData = {
+  paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
+  logs: [
+    { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
+    { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
+  ]
+}
+
 export default function OrderDetails() {
   const { orderId } = useParams()
   const { orders, updateOrder } = useOrders()
   const order = orders.find(o => o.id === orderId)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
-
-  // Mock payment data - In a real app, this would come from your payment provider's API
-  const mockPaymentData = {
-    paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
-    logs: [
-      { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
-      { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
-    ]
-  }
 
   if (!order) {
     return (
@@ -95,6 +95,7 @@ export default function OrderDetails() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Header y Navegación */}
         <div className="flex items-center justify-between">
           <Link to="/admin/orders">
             <Button variant="ghost" className="gap-2">
@@ -103,142 +104,48 @@ export default function OrderDetails() {
           </Link>
         </div>
 
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
-          <OrderStatusBadge status={order.status} />
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-500">
-            {statusOrder.map((status) => (
-              <span key={status}>{statusConfig[status].label}</span>
-            ))}
+        {/* Estado del Pedido y Progreso */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
+            <OrderStatusBadge status={order.status} />
           </div>
-          <Progress value={getProgressPercentage()} />
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-gray-500">
+              {statusOrder.map((status) => (
+                <span key={status} className="capitalize">
+                  {status.replace('_', ' ')}
+                </span>
+              ))}
+            </div>
+            <Progress value={getProgressPercentage()} className="h-2" />
+          </div>
         </div>
 
+        {/* Control de Estado */}
         <OrderCustomerInfo 
           order={order} 
           onStatusChange={handleStatusChange}
         />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package2 className="h-5 w-5 text-gray-500" />
-              Detalles del Producto
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-medium mb-1">Producto</h3>
-                <div className="flex items-center gap-2">
-                  {order.type === 'physical' ? (
-                    <CreditCard className="h-4 w-4 text-primary" />
-                  ) : (
-                    <Wifi className="h-4 w-4 text-primary" />
-                  )}
-                  <span>{order.title || "No especificado"}</span>
-                </div>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Tipo de SIM</h3>
-                <Badge variant="secondary" className="capitalize">
-                  {order.type === 'physical' ? 'SIM Física' : 'eSIM'}
-                </Badge>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Datos en Europa</h3>
-                <p className="font-semibold text-primary">
-                  {order.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Datos en España</h3>
-                <p className="font-semibold text-primary">
-                  {order.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
-                </p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Cantidad</h3>
-                <p>{order.quantity || 1}</p>
-              </div>
-              <div>
-                <h3 className="font-medium mb-1">Precio</h3>
-                <p className="font-semibold">${order.total?.toFixed(2)} MXN</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Grid de 2 columnas para información principal */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <OrderBasicInfo order={order} />
+            <OrderProductInfo order={order} />
+            {order.type === "physical" && <OrderShippingInfo order={order} />}
+          </div>
+          
+          <div className="space-y-6">
+            <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
+            <OrderDocumentation order={order} />
+            <OrderNotes order={order} onAddNote={handleAddNote} />
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-gray-500" />
-              Información de Pago
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium mb-2">Método de Pago</h3>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="capitalize">
-                    {order.paymentMethod || "No especificado"}
-                  </Badge>
-                </div>
-              </div>
-
-              {mockPaymentData.paymentUrl && (
-                <div>
-                  <h3 className="font-medium mb-2">URL de Pago</h3>
-                  <a 
-                    href={mockPaymentData.paymentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1"
-                  >
-                    Ver en {order.paymentMethod} <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-              )}
-
-              <div>
-                <h3 className="font-medium mb-2">Registro de Eventos</h3>
-                <div className="space-y-2">
-                  {mockPaymentData.logs.map((log, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">{log.event}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(log.date).toLocaleString()}
-                        </p>
-                      </div>
-                      <Badge 
-                        variant="secondary"
-                        className={log.status === "completed" ? "bg-green-100 text-green-800" : ""}
-                      >
-                        {log.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <OrderNotes 
-          order={order}
-          onAddNote={handleAddNote}
-        />
-
-        <OrderDocumentation order={order} />
-        {order.type === "physical" && <OrderShippingInfo order={order} />}
+        {/* Historial completo */}
+        <OrderHistory events={order.events} />
 
         <OrderStatusConfirmDialog
           open={showConfirmDialog}
@@ -247,9 +154,6 @@ export default function OrderDetails() {
           onConfirm={confirmStatusChange}
           orderType={order.type}
         />
-
-        {/* Add the OrderHistory component at the bottom */}
-        <OrderHistory events={order.events} />
       </div>
     </AdminLayout>
   )
