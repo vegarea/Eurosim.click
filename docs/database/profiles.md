@@ -16,11 +16,24 @@ Esta tabla extiende la información de usuarios de Supabase auth.users.
 | created_at | timestamp | Fecha de creación | ✅ |
 | updated_at | timestamp | Fecha de última actualización | ✅ |
 
-## Índices
+## Roles y Permisos
 
-1. Índice primario en `id`
-2. Índice en `role` para filtrado
-3. Índice en `manager_type` para filtrado de managers
+### Cliente (client)
+- Creado automáticamente en checkout
+- Acceso solo por magic link
+- No requiere contraseña
+- Permisos limitados a sus propios datos
+
+### Manager (manager)
+- Creado manualmente por admin
+- Tipos: physical o esim
+- Requiere documentación verificada
+- Acceso a pedidos de su tipo
+
+### Administrador (admin)
+- Creado manualmente en Supabase
+- Acceso total al sistema
+- Puede crear otros managers
 
 ## Políticas de Seguridad (RLS)
 
@@ -30,9 +43,9 @@ Esta tabla extiende la información de usuarios de Supabase auth.users.
 - Admin puede leer todos los perfiles
 
 ### Escritura
-- Usuario puede actualizar su propio perfil (campos limitados)
+- Sistema puede crear perfiles automáticamente
 - Admin puede crear/actualizar cualquier perfil
-- Sistema puede actualizar estados automáticamente
+- Usuario no puede modificar su perfil directamente
 
 ## Triggers
 
@@ -40,7 +53,8 @@ Esta tabla extiende la información de usuarios de Supabase auth.users.
 2. Notificación al admin cuando se registra un nuevo manager
 3. Validación de documentación para managers
 
-## Notas
-- Los managers requieren documentación adicional
-- El campo metadata puede contener información específica del rol
-- Se mantiene historial de cambios importantes
+## Notas sobre Autenticación
+- No se almacenan contraseñas
+- Magic links son el único método de acceso para clientes
+- Managers y admins son creados manualmente
+- Se mantiene registro de todos los accesos

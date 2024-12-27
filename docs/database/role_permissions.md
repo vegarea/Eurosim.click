@@ -15,29 +15,41 @@ Esta tabla gestiona los permisos específicos para cada rol.
 | created_at | timestamp | Fecha de creación | ✅ |
 | updated_at | timestamp | Fecha de última actualización | ✅ |
 
-## Índices
+## Permisos por Rol
 
-1. Índice primario en `id`
-2. Índice compuesto en (role, resource) para búsqueda rápida
-3. Índice en `created_at` para auditoría
+### Cliente (client)
+- Ver su propio perfil
+- Ver sus pedidos
+- Ver productos disponibles
+- Crear tickets de soporte
+- No puede modificar datos directamente
+
+### Manager
+- Ver pedidos asignados según tipo (physical/esim)
+- Actualizar estado de pedidos
+- Ver perfiles de clientes asignados
+- Acceso a documentación básica
+
+### Admin
+- Acceso total al sistema
+- Crear/modificar managers
+- Gestión de productos
+- Configuración del sistema
+- Ver métricas y reportes
 
 ## Políticas de Seguridad (RLS)
 
 ### Lectura
-- Todos los usuarios autenticados pueden leer
+- Todos los usuarios autenticados pueden leer sus permisos
 - Caché de permisos en el cliente
 
 ### Escritura
 - Solo admin puede modificar permisos
 - Se requiere registro de cambios
 
-## Triggers
-
-1. Actualización automática de `updated_at`
-2. Registro en tabla de auditoría al modificar
-3. Validación de consistencia de permisos
-
-## Notas
-- Los permisos se verifican en cada operación
+## Notas sobre Implementación
+- Permisos verificados en cada operación
 - Sistema de caché para optimizar rendimiento
 - Registro detallado de cambios para auditoría
+- No se requiere gestión de contraseñas
+- Magic links como único método de autenticación para clientes

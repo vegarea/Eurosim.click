@@ -35,13 +35,35 @@ Esta tabla almacena la información de los clientes registrados en la plataforma
 
 ### Lectura
 - Cliente: Puede ver solo su propia información
-- Admin: Puede ver todos los clientes
+- Admin/Manager: Puede ver todos los clientes
 - Sistema: Puede leer información para procesamiento
 
 ### Escritura
-- Cliente: Puede actualizar su propia información
+- Cliente: No puede modificar directamente su información
 - Admin: Puede crear y actualizar cualquier cliente
-- Sistema: Puede actualizar metadatos y preferencias
+- Sistema: Puede crear y actualizar registros automáticamente
+
+## Notas sobre Autenticación
+
+1. Creación de cuenta:
+   - Se crea automáticamente al completar una compra
+   - No requiere contraseña inicial
+   - Email es el único identificador requerido
+
+2. Acceso:
+   - Exclusivamente mediante magic links
+   - No se implementa sistema de contraseñas
+   - Links enviados por email tienen validez de 24 horas
+
+3. Proceso de compra:
+   - No requiere registro previo
+   - Email es el único dato de autenticación necesario
+   - Cuenta se crea automáticamente al finalizar la compra
+
+4. Seguridad:
+   - Cada magic link es de un solo uso
+   - Se registra IP y timestamp de accesos
+   - Se notifica por email de accesos desde nuevos dispositivos
 
 ## Relaciones
 
