@@ -8,6 +8,14 @@ export type OrderStatus =
 
 export type OrderType = "physical" | "esim"
 
+export interface OrderNote {
+  id: string
+  text: string
+  userId: string
+  userName: string
+  createdAt: string
+}
+
 export interface Order {
   id: string
   date: string
@@ -18,6 +26,7 @@ export interface Order {
   status: OrderStatus
   type: OrderType
   paymentMethod?: "stripe" | "paypal"
+  notes?: OrderNote[]
   
   // Detalles del producto
   title?: string
