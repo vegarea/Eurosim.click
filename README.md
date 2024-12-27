@@ -269,4 +269,3 @@ Tabla para almacenar las plantillas de email.
 - Lectura: Solo administradores
 - Escritura: Solo administradores
 - Activación/Desactivación: Solo administradores
-
