@@ -18,13 +18,14 @@ export const settingsWorkflows: WorkflowItem[] = [
 - Nombre de empresa
 - Datos de contacto (WhatsApp, redes sociales)
 - Imágenes principales del sitio
-- Colores del tema (primario/secundario)`
+- Colores del tema (primario/secundario)
+- Interfaz completamente funcional`
   },
   {
     id: "FL-602",
     title: "Configuración de E-commerce",
     description: "Gestión de configuraciones monetarias y fiscales",
-    status: "working",
+    status: "reviewed",
     components: [
       "EcommerceSettings.tsx"
     ],
@@ -34,7 +35,8 @@ export const settingsWorkflows: WorkflowItem[] = [
     details: `
 - Configuración de moneda (MXN)
 - Tasa de impuestos
-- Próximamente: soporte multi-moneda`
+- Próximamente: soporte multi-moneda
+- UI implementada, pendiente conexión con Supabase para persistencia`
   },
   {
     id: "FL-603",
@@ -50,13 +52,14 @@ export const settingsWorkflows: WorkflowItem[] = [
     details: `
 - Meta títulos
 - Meta descripciones
-- Configuración general SEO`
+- Configuración general SEO
+- Sistema completamente funcional`
   },
   {
     id: "FL-604",
     title: "Integraciones externas",
     description: "Gestión de integraciones con servicios externos",
-    status: "working",
+    status: "reviewed",
     components: [
       "IntegrationsSettings.tsx",
       "EmailIntegration.tsx",
@@ -71,6 +74,7 @@ export const settingsWorkflows: WorkflowItem[] = [
 - Integración con Brevo (email)
 - Webhooks de Make.com
 - Integración con Zapier
-- Gestión de API keys`
+- Gestión de API keys
+- UI implementada, pendiente conexión con Supabase Vault para almacenamiento seguro de API keys`
   }
 ]
