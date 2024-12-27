@@ -11,7 +11,6 @@ export default function Auth() {
   const { toast } = useToast()
 
   useEffect(() => {
-    // Verificar sesión actual
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession()
       if (error) {
@@ -24,27 +23,53 @@ export default function Auth() {
         return
       }
       
+      // Si hay sesión, verificamos que sea un admin o manager
       if (session) {
-        navigate("/admin")
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profile?.role === 'admin' || profile?.role === 'manager') {
+          navigate("/admin")
+        } else {
+          // Si no es admin/manager, cerramos sesión
+          await supabase.auth.signOut()
+          toast({
+            variant: "destructive",
+            title: "Acceso denegado",
+            description: "Esta área es solo para administradores."
+          })
+        }
       }
     }
 
     checkSession()
 
-    // Suscribirse a cambios en el estado de autenticación
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event)
-      
-      if (event === "SIGNED_IN") {
-        navigate("/admin")
-      } else if (event === "SIGNED_OUT") {
-        navigate("/auth")
+      if (event === "SIGNED_IN" && session) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profile?.role === 'admin' || profile?.role === 'manager') {
+          navigate("/admin")
+        } else {
+          await supabase.auth.signOut()
+          toast({
+            variant: "destructive",
+            title: "Acceso denegado",
+            description: "Esta área es solo para administradores."
+          })
+        }
       }
     })
 
-    // Limpiar suscripción
     return () => subscription.unsubscribe()
   }, [navigate, toast])
 
@@ -52,9 +77,9 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-brand-50 to-white">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Bienvenido</CardTitle>
+          <CardTitle className="text-2xl font-bold">Panel de Administración</CardTitle>
           <CardDescription>
-            Inicia sesión o crea una cuenta para continuar
+            Acceso exclusivo para administradores y managers
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -83,20 +108,6 @@ export default function Auth() {
                   loading_button_label: "Iniciando sesión...",
                   social_provider_text: "Iniciar sesión con {{provider}}",
                   link_text: "¿Ya tienes una cuenta? Inicia sesión"
-                },
-                sign_up: {
-                  email_label: "Correo electrónico",
-                  password_label: "Contraseña",
-                  button_label: "Registrarse",
-                  loading_button_label: "Registrando...",
-                  social_provider_text: "Registrarse con {{provider}}",
-                  link_text: "¿No tienes una cuenta? Regístrate"
-                },
-                magic_link: {
-                  email_input_label: "Correo electrónico",
-                  button_label: "Enviar enlace mágico",
-                  loading_button_label: "Enviando enlace mágico...",
-                  link_text: "Enviar enlace mágico al correo"
                 }
               }
             }}

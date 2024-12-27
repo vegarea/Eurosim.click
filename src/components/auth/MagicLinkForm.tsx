@@ -18,7 +18,7 @@ export function MagicLinkForm() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/checkout`,
         },
       })
 
@@ -28,14 +28,14 @@ export function MagicLinkForm() {
 
       toast({
         title: "¡Enlace enviado!",
-        description: "Revisa tu correo electrónico para iniciar sesión.",
+        description: "Revisa tu correo electrónico para continuar con tu compra.",
       })
     } catch (error) {
       console.error("Error:", error)
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No se pudo enviar el enlace de acceso. Por favor, intenta nuevamente.",
+        description: "No se pudo enviar el enlace. Por favor, intenta nuevamente.",
       })
     } finally {
       setIsLoading(false)
@@ -45,9 +45,9 @@ export function MagicLinkForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Iniciar sesión</CardTitle>
+        <CardTitle>Finalizar compra</CardTitle>
         <CardDescription>
-          Ingresa tu correo electrónico para recibir un enlace de acceso
+          Ingresa tu correo electrónico para continuar con tu compra
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -62,7 +62,7 @@ export function MagicLinkForm() {
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Enviando..." : "Enviar enlace de acceso"}
+            {isLoading ? "Enviando..." : "Continuar con la compra"}
           </Button>
         </form>
       </CardContent>
