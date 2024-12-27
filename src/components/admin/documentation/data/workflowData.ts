@@ -25,7 +25,7 @@ export const workflowData: WorkflowCategory[] = [
   },
   {
     id: "shipping",
-    title: "Envíos",
+    title: "Envíos y Entregas",
     items: shippingWorkflows
   },
   {
