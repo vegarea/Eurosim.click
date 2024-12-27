@@ -1,4 +1,4 @@
-import { WorkflowCategory } from "../../types/WorkflowTypes"
+import { WorkflowItem } from "../../types/WorkflowTypes"
 import { orderCreationFlow } from "./orders/orderCreationFlow"
 import { orderStatusFlow } from "./orders/orderStatusFlow"
 import { orderPaymentFlow } from "./orders/orderPaymentFlow"
