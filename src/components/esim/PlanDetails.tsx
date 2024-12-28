@@ -57,17 +57,19 @@ export function PlanDetails({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white/50 backdrop-blur-sm p-3 rounded-xl shadow-lg"
     >
-      <div className="flex flex-col mb-2">
+      <div className="flex justify-between items-start mb-2">
         <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           {title}
         </h2>
-        <p className="text-2xl font-bold text-primary flex items-baseline gap-1 mt-1">
-          {amount}
-          <span className="text-sm font-normal text-gray-500">{currency}</span>
-        </p>
-        <div className="mt-1 flex items-center gap-2">
-          <span className="text-lg font-semibold text-primary">{europeGB}GB</span>
-          <span className="text-sm text-gray-600">en toda Europa</span>
+        <div className="text-right">
+          <p className="text-2xl font-bold text-primary flex items-baseline gap-1 justify-end">
+            {amount}
+            <span className="text-sm font-normal text-gray-500">{currency}</span>
+          </p>
+          <div className="flex items-center gap-2 justify-end">
+            <span className="text-lg font-semibold text-primary">{europeGB}GB</span>
+            <span className="text-sm text-gray-600">en toda Europa</span>
+          </div>
         </div>
       </div>
 
