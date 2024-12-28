@@ -35,12 +35,17 @@ export const useCheckout = () => {
             }
           })
         })
-        .select()
+        .select('*')
         .single();
 
       if (customerError) {
         console.error('Error creating customer:', customerError);
         throw new Error('Error al crear el cliente');
+      }
+
+      if (!customer) {
+        console.error('No customer data received');
+        throw new Error('Error al crear el cliente: no se recibieron datos');
       }
 
       console.log('Customer created:', customer);
@@ -63,12 +68,17 @@ export const useCheckout = () => {
               activation_date: formData.activationDate
             })
           })
-          .select()
+          .select('*')
           .single();
 
         if (orderError) {
           console.error('Error creating order:', orderError);
           throw new Error('Error al crear la orden');
+        }
+
+        if (!order) {
+          console.error('No order data received');
+          throw new Error('Error al crear la orden: no se recibieron datos');
         }
 
         console.log('Order created:', order);
@@ -93,7 +103,7 @@ export const useCheckout = () => {
 
       // 4. Create Stripe checkout session
       console.log('Creating Stripe checkout session...');
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+      const { data: stripeSession, error: stripeError } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           products: items.map(item => ({
             ...item,
@@ -110,15 +120,19 @@ export const useCheckout = () => {
         }
       });
 
-      if (error) throw error;
+      if (stripeError) {
+        console.error('Error creating Stripe session:', stripeError);
+        throw stripeError;
+      }
+
+      if (!stripeSession?.url) {
+        console.error('No Stripe session URL received');
+        throw new Error('No se recibió la URL de pago de Stripe');
+      }
 
       // 5. Redirect to Stripe checkout
-      if (data?.url) {
-        console.log('Redirecting to Stripe checkout:', data.url);
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL received from Stripe');
-      }
+      console.log('Redirecting to Stripe checkout:', stripeSession.url);
+      window.location.href = stripeSession.url;
 
       return true;
     } catch (error) {
