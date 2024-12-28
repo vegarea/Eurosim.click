@@ -1,4 +1,4 @@
-import { Order } from "@/types"
+import { Order, OrderStatus } from "@/types"
 import { User, ExternalLink, Clock } from "lucide-react"
 import {
   Card,
@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { OrderStatusControl } from "./OrderStatusControl"
-import { OrderStatus } from "@/types"
 
 interface OrderCustomerInfoProps {
   order: Order

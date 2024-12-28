@@ -1,7 +1,8 @@
-import { Order, CreateOrderDTO, ShippingAddress } from "@/types/order/orderTypes";
-import { orderQueries } from "./order/orderQueries";
-import { transformShippingAddressToJson, prepareOrderForCreate } from "@/utils/order/orderTransformers";
-import { validateCreateOrderData, validateOrderStatus, validateOrderNote } from "@/utils/order/orderValidators";
+import { Order, CreateOrderDTO } from "@/types"
+import { orderQueries } from "./order/orderQueries"
+import { transformShippingAddressToJson } from "@/utils/order/orderTransformers"
+import { validateCreateOrderData } from "@/utils/order/orderValidators"
+import { Json } from "@/integrations/supabase/types"
 
 export const orderService = {
   async createOrder(orderData: {
@@ -10,19 +11,26 @@ export const orderService = {
     type: 'physical' | 'esim';
     total_amount: number;
     quantity: number;
-    shipping_address?: ShippingAddress;
+    shipping_address?: any;
     activation_date?: string;
   }): Promise<Order> {
     console.group('📦 Order Service - createOrder');
     console.log('Creating order with data:', orderData);
 
     try {
-      const createOrderDTO: CreateOrderDTO = prepareOrderForCreate({
-        ...orderData,
-        shipping_address: orderData.shipping_address 
-          ? transformShippingAddressToJson(orderData.shipping_address)
-          : undefined
-      });
+      const createOrderDTO: CreateOrderDTO = {
+        customer_id: orderData.customer_id,
+        product_id: orderData.product_id,
+        type: orderData.type,
+        total_amount: orderData.total_amount,
+        quantity: orderData.quantity,
+        shipping_address: orderData.shipping_address ? 
+          transformShippingAddressToJson(orderData.shipping_address) as Json :
+          undefined,
+        activation_date: orderData.activation_date,
+        notes: [],
+        metadata: {}
+      };
 
       // Validar datos antes de crear la orden
       const errors = validateCreateOrderData(createOrderDTO);

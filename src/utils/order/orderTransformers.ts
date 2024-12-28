@@ -1,7 +1,7 @@
-import { Json } from "@/integrations/supabase/types";
-import { ShippingAddress, CreateOrderDTO, Order, CustomerDocumentation } from "@/types/order/orderTypes";
+import { Json } from "@/integrations/supabase/types"
+import { CreateOrderDTO, Order } from "@/types"
 
-export const transformShippingAddressToJson = (address: ShippingAddress): Json => {
+export const transformShippingAddressToJson = (address: any): Json => {
   return {
     street: address.street,
     city: address.city,
@@ -12,10 +12,10 @@ export const transformShippingAddressToJson = (address: ShippingAddress): Json =
   } as Json;
 };
 
-export const transformJsonToShippingAddress = (json: Json | null): ShippingAddress | undefined => {
-  if (!json) return undefined;
+export const transformJsonToShippingAddress = (json: Json | null) => {
+  if (!json || typeof json !== 'object') return undefined;
 
-  const address = json as Record<string, string>;
+  const address = json as Record<string, any>;
   
   if (!address.street || !address.city || !address.state || 
       !address.country || !address.postal_code || !address.phone) {
@@ -33,7 +33,7 @@ export const transformJsonToShippingAddress = (json: Json | null): ShippingAddre
   };
 };
 
-export const transformCustomerDocumentation = (dbCustomer: any): CustomerDocumentation | undefined => {
+export const transformCustomerDocumentation = (dbCustomer: any) => {
   if (!dbCustomer) return undefined;
 
   return {
