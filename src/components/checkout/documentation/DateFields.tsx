@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar as CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
+import { format, addDays } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -41,6 +41,9 @@ export function DateFields({ form }: DateFieldsProps) {
     const newDate = new Date(selectedYear, parseInt(month), 1)
     form.setValue("birthDate", newDate)
   }
+
+  // Calculamos la fecha mínima (3 días después de hoy)
+  const minActivationDate = addDays(new Date(), 3)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,7 +163,7 @@ export function DateFields({ form }: DateFieldsProps) {
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date < new Date()
+                      date < minActivationDate
                     }
                     initialFocus
                     className="bg-white"
