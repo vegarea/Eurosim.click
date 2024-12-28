@@ -190,6 +190,57 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          created_at: string | null
+          data_es_gb: number
+          data_eu_gb: number
+          description: string | null
+          features: Json | null
+          id: string
+          metadata: Json | null
+          price: number
+          status: Database["public"]["Enums"]["product_status"]
+          stock: number | null
+          title: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at: string | null
+          validity_days: number
+        }
+        Insert: {
+          created_at?: string | null
+          data_es_gb: number
+          data_eu_gb: number
+          description?: string | null
+          features?: Json | null
+          id?: string
+          metadata?: Json | null
+          price: number
+          status?: Database["public"]["Enums"]["product_status"]
+          stock?: number | null
+          title: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at?: string | null
+          validity_days: number
+        }
+        Update: {
+          created_at?: string | null
+          data_es_gb?: number
+          data_eu_gb?: number
+          description?: string | null
+          features?: Json | null
+          id?: string
+          metadata?: Json | null
+          price?: number
+          status?: Database["public"]["Enums"]["product_status"]
+          stock?: number | null
+          title?: string
+          type?: Database["public"]["Enums"]["product_type"]
+          updated_at?: string | null
+          validity_days?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -209,6 +260,8 @@ export type Database = {
       order_type: "physical" | "esim"
       payment_method: "stripe" | "paypal"
       payment_status: "pending" | "completed" | "failed" | "refunded"
+      product_status: "active" | "inactive" | "out_of_stock"
+      product_type: "physical" | "esim"
     }
     CompositeTypes: {
       [_ in never]: never
