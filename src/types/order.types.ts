@@ -29,11 +29,25 @@ export interface OrderEvent {
 export interface Order {
   id: string;
   customer: string;
+  email?: string;
+  phone?: string;
   date: string;
   total: number;
   status: OrderStatus;
   type: "physical" | "esim";
   payment_method?: PaymentMethod;
+  title?: string;
+  description?: string;
+  quantity?: number;
+  shippingAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  activationDate?: string;
+  created_at?: string;
   notes?: OrderNote[];
   events?: OrderEvent[];
 }
