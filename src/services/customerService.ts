@@ -37,14 +37,7 @@ export const customerService = {
           passport_number: customerData.passport_number,
           birth_date: customerData.birth_date,
           gender: customerData.gender,
-          default_shipping_address: customerData.shipping_address ? {
-            street: customerData.shipping_address.street,
-            city: customerData.shipping_address.city,
-            state: customerData.shipping_address.state,
-            country: customerData.shipping_address.country,
-            postal_code: customerData.shipping_address.postal_code,
-            phone: customerData.shipping_address.phone
-          } : null
+          default_shipping_address: customerData.shipping_address as Record<string, any>
         })
         .eq('id', existingCustomer.id)
         .select()
@@ -55,10 +48,7 @@ export const customerService = {
         throw updateError;
       }
 
-      return {
-        ...updatedCustomer,
-        default_shipping_address: updatedCustomer.default_shipping_address as ShippingAddress
-      } as Customer;
+      return updatedCustomer as Customer;
     }
 
     // Crear nuevo cliente
@@ -66,14 +56,7 @@ export const customerService = {
       .from('customers')
       .insert({
         ...customerData,
-        default_shipping_address: customerData.shipping_address ? {
-          street: customerData.shipping_address.street,
-          city: customerData.shipping_address.city,
-          state: customerData.shipping_address.state,
-          country: customerData.shipping_address.country,
-          postal_code: customerData.shipping_address.postal_code,
-          phone: customerData.shipping_address.phone
-        } : null
+        default_shipping_address: customerData.shipping_address as Record<string, any>
       })
       .select()
       .single();
@@ -83,9 +66,6 @@ export const customerService = {
       throw createError;
     }
 
-    return {
-      ...newCustomer,
-      default_shipping_address: newCustomer.default_shipping_address as ShippingAddress
-    } as Customer;
+    return newCustomer as Customer;
   }
 };

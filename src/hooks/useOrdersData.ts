@@ -46,7 +46,6 @@ export function useOrdersData() {
         customer: order.customer?.name || 'Unknown',
         email: order.customer?.email,
         phone: order.customer?.phone,
-        date: order.created_at,
         total: order.total_amount / 100,
         total_amount: order.total_amount,
         status: order.status,
@@ -56,17 +55,22 @@ export function useOrdersData() {
         title: order.product?.title,
         description: order.product?.description,
         quantity: order.quantity,
-        shippingAddress: order.shipping_address?.street,
-        city: order.shipping_address?.city,
-        state: order.shipping_address?.state,
-        zipCode: order.shipping_address?.postal_code,
+        shipping_address: order.shipping_address,
+        stripe_payment_intent_id: order.stripe_payment_intent_id,
+        stripe_receipt_url: order.stripe_receipt_url,
+        paypal_order_id: order.paypal_order_id,
+        paypal_receipt_url: order.paypal_receipt_url,
+        tracking_number: order.tracking_number,
+        carrier: order.carrier,
+        activation_date: order.activation_date,
+        metadata: order.metadata,
         created_at: order.created_at,
         updated_at: order.updated_at,
         documentation: {
           passportNumber: order.customer?.passport_number,
           birthDate: order.customer?.birth_date,
           gender: order.customer?.gender,
-          activationDate: order.activation_date // Changed to get from order instead of customer
+          activationDate: order.activation_date
         }
       }));
     },

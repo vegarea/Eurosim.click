@@ -38,7 +38,6 @@ export const orderService = {
       customer: order.customer?.name || 'Unknown',
       customer_id: order.customer_id,
       product_id: order.product_id,
-      date: order.created_at,
       total: order.total_amount / 100,
       total_amount: order.total_amount,
       status: order.status,
@@ -47,6 +46,15 @@ export const orderService = {
       payment_status: order.payment_status,
       title: order.product?.title,
       quantity: order.quantity,
+      shipping_address: order.shipping_address,
+      stripe_payment_intent_id: order.stripe_payment_intent_id,
+      stripe_receipt_url: order.stripe_receipt_url,
+      paypal_order_id: order.paypal_order_id,
+      paypal_receipt_url: order.paypal_receipt_url,
+      tracking_number: order.tracking_number,
+      carrier: order.carrier,
+      activation_date: order.activation_date,
+      metadata: order.metadata,
       created_at: order.created_at,
       updated_at: order.updated_at
     };

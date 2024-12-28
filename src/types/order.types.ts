@@ -33,14 +33,15 @@ export interface CustomerDocumentation {
   activationDate?: string;
 }
 
-// Extendemos DatabaseOrder para la UI
-export interface Order extends DatabaseOrder {
+// Interfaz UI que extiende la orden de base de datos
+export interface Order extends Omit<DatabaseOrder, 'notes'> {
   customer?: string;
   email?: string;
   phone?: string;
   title?: string;
   description?: string;
-  notes?: OrderNote[];
+  total?: number; // Para mostrar el monto en la UI
+  notes?: OrderNote[]; // Override del tipo notes de DatabaseOrder
   events?: OrderEvent[];
   documentation?: CustomerDocumentation;
 }
