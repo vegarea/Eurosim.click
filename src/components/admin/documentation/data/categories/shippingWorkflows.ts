@@ -46,24 +46,26 @@ export const shippingWorkflows: WorkflowItem[] = [
     id: "FL-303",
     title: "Notificaciones de envío",
     description: "Sistema de notificaciones automáticas para envíos",
-    status: "reviewed",
+    status: "working",
     components: [
       "OrderStatusConfirmDialog.tsx",
       "EmailTemplates.tsx"
     ],
     database: [
       "email_templates (tabla)",
-      "orders (tabla) - campos status, tracking_number"
+      "orders (tabla) - campos status, tracking_number",
+      "email_logs (tabla)"
     ],
     details: `
 ✓ UI de plantillas de email implementada
 ✓ Sistema de notificaciones diseñado
-✓ Componentes de confirmación listos
-
-Pendiente conexión con Supabase para:
-- Envío automático de emails
-- Integración con servicio de correo
-- Almacenamiento de historial de notificaciones`
+✓ Componentes de confirmación implementados
+✓ Integración con Supabase completada:
+  - Políticas RLS configuradas
+  - Triggers para cambios de estado
+  - Registro de emails enviados
+  - Plantillas de email persistidas
+✓ Sistema completo y funcional`
   },
   {
     id: "FL-304",

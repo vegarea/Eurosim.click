@@ -1112,6 +1112,15 @@ export type Database = {
           table_name: string
         }[]
       }
+      log_email_sent: {
+        Args: {
+          p_template_id: string
+          p_recipient: string
+          p_subject: string
+          p_metadata?: Json
+        }
+        Returns: string
+      }
     }
     Enums: {
       document_status:
