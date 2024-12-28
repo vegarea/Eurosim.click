@@ -67,9 +67,9 @@ export default function ESims() {
           </h2>
 
           {!isLoading && (
-            <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:gap-4'} gap-6`}>
-              <div className={`${isMobile ? 'w-full' : 'md:w-[60%]'} order-2 md:order-1`}>
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1 max-w-md'} gap-2 md:gap-3`}>
+            <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start'} gap-4`}>
+              <div className={`${isMobile ? 'w-full' : 'md:w-[50%]'} order-2 md:order-1`}>
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3`}>
                   {simCards.map((card) => (
                     <ProductButton
                       key={card.title}
@@ -83,7 +83,7 @@ export default function ESims() {
                 </div>
               </div>
 
-              <div className={`${isMobile ? 'w-full' : 'md:w-[40%] md:sticky md:top-4'} order-1 md:order-2`}>
+              <div className={`${isMobile ? 'w-full' : 'md:w-[50%] md:sticky md:top-4'} order-1 md:order-2`}>
                 <AnimatePresence mode="wait">
                   {selectedPlan && (
                     <PlanDetails
