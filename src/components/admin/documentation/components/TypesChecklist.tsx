@@ -1,12 +1,27 @@
-import { Check, AlertCircle } from "lucide-react"
+import { Check, AlertCircle, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 import { ChecklistItem } from "../types/ChecklistTypes"
 
 interface TypesChecklistProps {
   items: ChecklistItem[]
+  onVerifyTypes?: (categoryId: string) => void
 }
 
-export function TypesChecklist({ items }: TypesChecklistProps) {
+export function TypesChecklist({ items, onVerifyTypes }: TypesChecklistProps) {
+  const { toast } = useToast()
+
+  const handleVerify = async (categoryId: string) => {
+    if (onVerifyTypes) {
+      toast({
+        title: "Verificando tipos",
+        description: "Analizando y documentando tipos del área seleccionada...",
+      })
+      onVerifyTypes(categoryId)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -16,14 +31,25 @@ export function TypesChecklist({ items }: TypesChecklistProps) {
         <div className="space-y-6">
           {items.map((category) => (
             <div key={category.id}>
-              <h3 className="font-medium mb-3">{category.category}</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium">{category.category}</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => handleVerify(category.id)}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Verificar Tipos
+                </Button>
+              </div>
               <div className="space-y-2">
                 {category.items.map((item, index) => (
                   <div 
                     key={index}
                     className="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50"
                   >
-                    {item.status === "completed" ? (
+                    {item.status === "completed" || item.status === "reviewed" ? (
                       <Check className="h-5 w-5 text-green-500 mt-0.5" />
                     ) : (
                       <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
