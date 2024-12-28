@@ -26,8 +26,9 @@ interface Product {
   description: string
   price: number
   features: string[]
-  europeGB?: number
-  spainGB?: number
+  data_eu_gb?: number
+  data_es_gb?: number
+  stock?: number
 }
 
 interface AddProductDialogProps {
@@ -39,6 +40,7 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
     type: "physical",
     features: []
   })
+  const [open, setOpen] = useState(false)
 
   const handleAddProduct = () => {
     if (!newProduct.title || !newProduct.description || !newProduct.price) {
@@ -52,18 +54,18 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
       description: newProduct.description,
       price: Number(newProduct.price),
       features: newProduct.features || [],
-      ...(newProduct.type === "esim" ? {
-        europeGB: Number(newProduct.europeGB),
-        spainGB: Number(newProduct.spainGB)
-      } : {})
+      data_eu_gb: Number(newProduct.data_eu_gb),
+      data_es_gb: Number(newProduct.data_es_gb),
+      stock: newProduct.type === 'physical' ? Number(newProduct.stock) : undefined
     }
 
     onAddProduct(product)
     setNewProduct({ type: "physical", features: [] })
+    setOpen(false)
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="w-4 h-4 mr-2" />
@@ -107,7 +109,7 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="price">Precio (MXN)</Label>
+            <Label htmlFor="price">Precio (MXN en centavos)</Label>
             <Input
               id="price"
               type="number"
@@ -123,27 +125,34 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
               onChange={(e) => setNewProduct({ ...newProduct, features: e.target.value.split("\n").filter(f => f.trim()) })}
             />
           </div>
-          {newProduct.type === "esim" && (
-            <>
-              <div className="grid gap-2">
-                <Label htmlFor="europeGB">GB en Europa</Label>
-                <Input
-                  id="europeGB"
-                  type="number"
-                  value={newProduct.europeGB || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, europeGB: parseFloat(e.target.value) })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="spainGB">GB en España</Label>
-                <Input
-                  id="spainGB"
-                  type="number"
-                  value={newProduct.spainGB || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, spainGB: parseFloat(e.target.value) })}
-                />
-              </div>
-            </>
+          <div className="grid gap-2">
+            <Label htmlFor="data_eu_gb">GB en Europa</Label>
+            <Input
+              id="data_eu_gb"
+              type="number"
+              value={newProduct.data_eu_gb || ""}
+              onChange={(e) => setNewProduct({ ...newProduct, data_eu_gb: parseFloat(e.target.value) })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="data_es_gb">GB en España</Label>
+            <Input
+              id="data_es_gb"
+              type="number"
+              value={newProduct.data_es_gb || ""}
+              onChange={(e) => setNewProduct({ ...newProduct, data_es_gb: parseFloat(e.target.value) })}
+            />
+          </div>
+          {newProduct.type === "physical" && (
+            <div className="grid gap-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input
+                id="stock"
+                type="number"
+                value={newProduct.stock || ""}
+                onChange={(e) => setNewProduct({ ...newProduct, stock: parseFloat(e.target.value) })}
+              />
+            </div>
           )}
           <Button onClick={handleAddProduct}>Añadir Producto</Button>
         </div>

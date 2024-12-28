@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { ProductCard } from "./products/ProductCard"
 import { AddProductDialog } from "./products/AddProductDialog"
+import { supabase } from "@/integrations/supabase/client"
 
 interface Product {
   id: string
@@ -10,158 +11,109 @@ interface Product {
   description: string
   price: number
   features: string[]
-  europeGB?: number
-  spainGB?: number
+  data_eu_gb?: number
+  data_es_gb?: number
   created_at: Date
   updated_at: Date
   status: "active" | "inactive"
-  stock?: number // Opcional, solo para SIMs físicas
-  metadata?: Record<string, any> // Para información adicional flexible
+  stock?: number
+  metadata?: Record<string, any>
 }
 
-const initialProducts: Product[] = [
-  {
-    id: "sim-xl",
-    type: "physical",
-    title: "Prepago XL",
-    description: "16GB Europa / 160GB España",
-    price: 890,
-    features: [
-      "16GB datos en toda Europa",
-      "160GB exclusivo España",
-      "Velocidad 5G/4G/3G+",
-      "SIM card incluida",
-      "30 días de validez",
-      "Hotspot incluido"
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    stock: 100,
-    metadata: {}
-  },
-  {
-    id: "sim-xxl",
-    type: "physical",
-    title: "Prepago XXL",
-    description: "22GB Europa / 190GB España",
-    price: 1090,
-    features: [
-      "22GB datos en toda Europa",
-      "190GB exclusivo España",
-      "300 min llamadas internacionales",
-      "Velocidad 5G/4G/3G+",
-      "SIM card incluida",
-      "30 días de validez"
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    stock: 100,
-    metadata: {}
-  },
-  {
-    id: "esim-s",
-    type: "esim",
-    title: "E-SIM S",
-    description: "8GB Europa / 100GB España",
-    price: 419,
-    features: [
-      "8GB datos en toda Europa",
-      "100GB exclusivo España",
-      "Activación instantánea",
-      "Velocidad 5G/4G/3G+",
-      "30 días de validez"
-    ],
-    europeGB: 8,
-    spainGB: 100,
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    metadata: {}
-  },
-  {
-    id: "esim-m",
-    type: "esim",
-    title: "E-SIM M",
-    description: "11GB Europa / 140GB España",
-    price: 587,
-    features: [
-      "11GB datos en toda Europa",
-      "140GB exclusivo España",
-      "Activación instantánea",
-      "Velocidad 5G/4G/3G+",
-      "30 días de validez"
-    ],
-    europeGB: 11,
-    spainGB: 140,
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    metadata: {}
-  },
-  {
-    id: "esim-l",
-    type: "esim",
-    title: "E-SIM L",
-    description: "16GB Europa / 160GB España",
-    price: 817,
-    features: [
-      "16GB datos en toda Europa",
-      "160GB exclusivo España",
-      "Activación instantánea",
-      "Velocidad 5G/4G/3G+",
-      "30 días de validez",
-      "Soporte prioritario"
-    ],
-    europeGB: 16,
-    spainGB: 160,
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    metadata: {}
-  },
-  {
-    id: "esim-xl",
-    type: "esim",
-    title: "E-SIM XL",
-    description: "22GB Europa / 190GB España",
-    price: 1027,
-    features: [
-      "22GB datos en toda Europa",
-      "190GB exclusivo España",
-      "Activación instantánea",
-      "Velocidad 5G/4G/3G+",
-      "30 días de validez",
-      "Soporte prioritario"
-    ],
-    europeGB: 22,
-    spainGB: 190,
-    created_at: new Date(),
-    updated_at: new Date(),
-    status: "active",
-    metadata: {}
-  }
-]
-
 export function AdminProducts() {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const { toast } = useToast()
 
-  const handleAddProduct = (product: Product) => {
-    setProducts([...products, product])
-    toast({
-      title: "Producto añadido",
-      description: "El producto se ha añadido correctamente"
-    })
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        throw error
+      }
+
+      setProducts(data)
+    } catch (error) {
+      console.error('Error fetching products:', error)
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los productos",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter(p => p.id !== id))
-    toast({
-      title: "Producto eliminado",
-      description: "El producto se ha eliminado correctamente"
-    })
+  const handleAddProduct = async (product: Product) => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .insert([{
+          title: product.title,
+          description: product.description,
+          type: product.type,
+          price: product.price,
+          features: product.features,
+          data_eu_gb: product.data_eu_gb,
+          data_es_gb: product.data_es_gb,
+          status: 'active',
+          stock: product.type === 'physical' ? product.stock : null,
+          validity_days: 30 // Default value
+        }])
+        .select()
+
+      if (error) throw error
+
+      setProducts([...(data || []), ...products])
+      toast({
+        title: "Producto añadido",
+        description: "El producto se ha añadido correctamente"
+      })
+    } catch (error) {
+      console.error('Error adding product:', error)
+      toast({
+        title: "Error",
+        description: "No se pudo añadir el producto",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      setProducts(products.filter(p => p.id !== id))
+      toast({
+        title: "Producto eliminado",
+        description: "El producto se ha eliminado correctamente"
+      })
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el producto",
+        variant: "destructive"
+      })
+    }
+  }
+
+  if (isLoading) {
+    return <div>Cargando productos...</div>
   }
 
   return (
@@ -175,7 +127,11 @@ export function AdminProducts() {
         {products.map((product) => (
           <ProductCard
             key={product.id}
-            product={product}
+            product={{
+              ...product,
+              europeGB: product.data_eu_gb,
+              spainGB: product.data_es_gb
+            }}
             onDelete={handleDeleteProduct}
           />
         ))}
