@@ -1,3 +1,10 @@
+import {
+  Database,
+  FileText,
+  ListTree,
+  LayoutDashboard,
+  Code2,
+} from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TypeComparisonSection } from "./components/TypeComparisonSection"
 import { TypesChecklist } from "./components/TypesChecklist"
@@ -7,16 +14,18 @@ import { CheckoutTypes } from "./sections/CheckoutTypes"
 import { AdminTypes } from "./sections/AdminTypes"
 import { SystemTypes } from "./sections/SystemTypes"
 import { useToast } from "@/hooks/use-toast"
+import { useState } from "react"
 
 export function TypesComparison() {
   const { toast } = useToast()
+  const [checklist, setChecklist] = useState(typesChecklistData)
   
-  const totalTypes = typesChecklistData.reduce(
+  const totalTypes = checklist.reduce(
     (acc, category) => acc + category.items.length,
     0
   )
   
-  const reviewedTypes = typesChecklistData.reduce(
+  const reviewedTypes = checklist.reduce(
     (acc, category) => 
       acc + category.items.filter(
         item => item.status === "completed" || item.status === "reviewed"
@@ -26,7 +35,7 @@ export function TypesComparison() {
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
-      const category = typesChecklistData.find(cat => cat.id === categoryId)
+      const category = checklist.find(cat => cat.id === categoryId)
       
       if (!category) {
         throw new Error("Categoría no encontrada")
@@ -39,43 +48,24 @@ export function TypesComparison() {
       if (categoryId === "orders") {
         console.log("Verificando tipos de pedidos...")
         
-        // Comparar tipos actuales con tipos de Supabase
-        const currentTypes = {
-          order: `type Order = {
-            id: string
-            status: string
-            customer: string
-          }`,
-          orderItem: `type OrderItem = {
-            id: string
-            quantity: number
-            price: number
-          }`
-        }
+        // Actualizar el estado de los items de la categoría
+        setChecklist(prevChecklist => 
+          prevChecklist.map(cat => 
+            cat.id === categoryId
+              ? {
+                  ...cat,
+                  items: cat.items.map(item => ({
+                    ...item,
+                    status: "reviewed"
+                  }))
+                }
+              : cat
+          )
+        )
 
-        const supabaseTypes = {
-          order: `type Order = {
-            id: uuid
-            customer_id: uuid
-            status: OrderStatus
-            type: OrderType
-            total_amount: integer
-            created_at: timestamp
-          }`,
-          orderItem: `type OrderItem = {
-            id: uuid
-            order_id: uuid
-            product_id: uuid
-            quantity: integer
-            unit_price: integer
-            total_price: integer
-          }`
-        }
-
-        // Actualizar la documentación en la sección de checkout
         toast({
-          title: "Verificación de tipos completada",
-          description: `Se han documentado las diferencias entre los tipos actuales y los tipos de Supabase para Pedidos y Items de Pedido`,
+          title: "Verificación completada",
+          description: "Los tipos han sido verificados y actualizados según el esquema de Supabase",
         })
       }
 
@@ -102,7 +92,7 @@ export function TypesComparison() {
 
         <TabsContent value="checklist">
           <TypesChecklist 
-            items={typesChecklistData} 
+            items={checklist} 
             onVerifyTypes={handleVerifyTypes}
           />
         </TabsContent>

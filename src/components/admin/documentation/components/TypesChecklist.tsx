@@ -2,7 +2,6 @@ import { Check, AlertCircle, RefreshCw } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { Progress } from "@/components/ui/progress"
 import { ChecklistItem } from "../types/ChecklistTypes"
 
 interface TypesChecklistProps {
@@ -23,14 +22,6 @@ export function TypesChecklist({ items, onVerifyTypes }: TypesChecklistProps) {
     }
   }
 
-  const getProgress = (category: ChecklistItem) => {
-    const totalItems = category.items.length
-    const completedItems = category.items.filter(
-      item => item.status === "completed" || item.status === "reviewed"
-    ).length
-    return (completedItems / totalItems) * 100
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -41,14 +32,8 @@ export function TypesChecklist({ items, onVerifyTypes }: TypesChecklistProps) {
           {items.map((category) => (
             <div key={category.id} className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="space-y-1">
+                <div>
                   <h3 className="font-medium">{category.category}</h3>
-                  <div className="flex items-center gap-2">
-                    <Progress value={getProgress(category)} className="w-[100px]" />
-                    <span className="text-sm text-muted-foreground">
-                      {getProgress(category).toFixed(0)}% verificado
-                    </span>
-                  </div>
                 </div>
                 <Button
                   variant="outline"
