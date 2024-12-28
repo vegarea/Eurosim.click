@@ -7,6 +7,7 @@ import '/node_modules/flag-icons/css/flag-icons.min.css';
 import { formatCurrency } from "@/utils/currency";
 
 interface SimCardProps {
+  id: string; // Añadido ID del producto
   type: "physical" | "esim";
   title: string;
   description: string;
@@ -26,6 +27,7 @@ const formatDescription = (description: string) => {
 };
 
 export function SimCard({ 
+  id,
   type, 
   title, 
   description, 
@@ -71,7 +73,8 @@ export function SimCard({
 
   const handleAddToCart = () => {
     addItem({
-      id: `${type}-${title}`,
+      id: `${type}-${id}`, // Usando el ID real del producto
+      productId: id, // Guardando el ID real del producto
       type,
       title,
       description,
