@@ -22,24 +22,38 @@ export function TypeComparisonSection({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800 border-green-200"
       case "reviewed":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-blue-100 text-blue-800 border-blue-200"
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "Completado"
+      case "reviewed":
+        return "Verificado"
+      default:
+        return "Pendiente"
     }
   }
 
   return (
-    <Card>
+    <Card className={status === "reviewed" ? "border-green-200" : ""}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {icon}
             <CardTitle className="text-lg">{title}</CardTitle>
           </div>
-          <Badge variant="secondary" className={getStatusColor(status)}>
-            {status}
+          <Badge 
+            variant="outline" 
+            className={`${getStatusColor(status)} px-3 py-1`}
+          >
+            {getStatusText(status)}
           </Badge>
         </div>
       </CardHeader>
