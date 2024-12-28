@@ -13,7 +13,7 @@ import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
 import { ExtendedCustomer } from "@/types/database/customers"
 import { Order } from "@/types/database/orders"
-import { ShippingAddress } from "@/types/database/common"
+import { Json } from "@/types/database/common"
 
 export function AdminCustomers() {
   const { orders } = useOrders()
@@ -47,7 +47,7 @@ export function AdminCustomers() {
           push_notifications: false,
           language_preference: 'es',
           communication_frequency: 'weekly'
-        },
+        } as Json,
         stripe_customer_id: null,
         paypal_customer_id: null,
         metadata: {},
@@ -60,7 +60,7 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].default_shipping_address = order.shipping_address as ShippingAddress
+      acc[customerId].default_shipping_address = order.shipping_address as Json
     }
     
     if (order.metadata) {
