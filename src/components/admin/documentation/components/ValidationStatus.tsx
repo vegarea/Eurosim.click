@@ -24,6 +24,19 @@ export function ValidationStatus({ type, status, message, details }: ValidationS
     workflow: 'Validación de Flujos'
   }
 
+  const getBadgeVariant = (status: 'success' | 'warning' | 'error') => {
+    switch (status) {
+      case 'success':
+        return 'default'
+      case 'warning':
+        return 'destructive'
+      case 'error':
+        return 'destructive'
+      default:
+        return 'default'
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -31,7 +44,7 @@ export function ValidationStatus({ type, status, message, details }: ValidationS
           {icons[status]}
           {titles[type]}
           <Badge 
-            variant={status === 'success' ? 'default' : status === 'warning' ? 'secondary' : 'destructive'}
+            variant={getBadgeVariant(status)}
             className="ml-auto"
           >
             {status === 'success' ? 'Válido' : status === 'warning' ? 'Advertencias' : 'Error'}
@@ -39,7 +52,7 @@ export function ValidationStatus({ type, status, message, details }: ValidationS
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Alert variant={status === 'success' ? 'default' : status === 'warning' ? 'secondary' : 'destructive'}>
+        <Alert variant={status === 'success' ? 'default' : 'destructive'}>
           <AlertDescription>{message}</AlertDescription>
         </Alert>
         {details && details.length > 0 && (

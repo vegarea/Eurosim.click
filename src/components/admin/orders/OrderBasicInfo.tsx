@@ -1,4 +1,4 @@
-import { Order } from "./types"
+import { Order } from "@/types/order.types"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -34,7 +34,7 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
           </div>
           <div>
             <h3 className="font-medium mb-1">Método de Pago</h3>
-            <p className="capitalize">{order.paymentMethod || "No especificado"}</p>
+            <p className="capitalize">{order.payment_method || "No especificado"}</p>
           </div>
         </div>
       </CardContent>

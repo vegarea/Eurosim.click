@@ -15,15 +15,6 @@ import { ValidationResult, TableInfo } from '../types/ValidationTypes'
 import { getTypeScriptType, isValidTypeMapping, getValidationMessage } from '../utils/typeValidation'
 import { TypeValidation } from './TypeValidation'
 
-interface TableInfo {
-  name: string
-  description: string
-  fields: string[]
-  path: string
-  content: string
-  isConnected: boolean
-}
-
 export function DatabaseStructure() {
   const [tables, setTables] = useState<TableInfo[]>([])
   const [loading, setLoading] = useState(true)
@@ -210,4 +201,3 @@ export function DatabaseStructure() {
     </div>
   )
 }
-

@@ -1,6 +1,6 @@
-import { OrderUI } from '@/types/order.types';
+import { Order } from '@/types/order.types';
 
-export const mockOrders: OrderUI[] = [
+export const mockOrders: Order[] = [
   {
     id: "order-001",
     created_at: "2024-01-25T10:30:00Z",
