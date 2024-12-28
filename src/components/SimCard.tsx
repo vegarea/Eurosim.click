@@ -32,25 +32,30 @@ export function SimCard({
   
   const getColorScheme = (title: string) => {
     switch (title) {
-      case "Tarifa M":
+      case "Tarifa S":
         return {
           iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
           iconColor: "text-green-600"
         };
-      case "Tarifa L":
+      case "Tarifa M":
         return {
           iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
           iconColor: "text-blue-600"
         };
-      case "Tarifa XL":
+      case "Tarifa L":
         return {
           iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
           iconColor: "text-purple-600"
         };
-      case "Tarifa XXL":
+      case "Tarifa XL":
         return {
           iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
           iconColor: "text-pink-600"
+        };
+      case "Tarifa XXL":
+        return {
+          iconBg: "from-[#FDE1D3] to-[#FEC6A1]",
+          iconColor: "text-orange-600"
         };
       default:
         return {
