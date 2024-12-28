@@ -12,7 +12,6 @@ import {
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
 import { ExtendedCustomer } from "@/types/database/customers"
-import { Order } from "@/types/database/orders"
 import { Json } from "@/types/database/common"
 
 export function AdminCustomers() {
@@ -60,7 +59,7 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].default_shipping_address = order.shipping_address
+      acc[customerId].default_shipping_address = order.shipping_address as Json
     }
     
     if (order.metadata) {
