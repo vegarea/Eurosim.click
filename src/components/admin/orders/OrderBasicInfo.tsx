@@ -20,11 +20,11 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
           </div>
           <div>
             <h3 className="font-medium mb-1">Fecha</h3>
-            <p>{new Date(order.date).toLocaleDateString()}</p>
+            <p>{new Date(order.created_at).toLocaleDateString()}</p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Total</h3>
-            <p>${order.total.toFixed(2)}</p>
+            <p>${order.total?.toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Tipo</h3>

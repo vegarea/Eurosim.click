@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Order } from "@/types";
+import { transformShippingAddress, prepareShippingAddress } from "@/utils/transformations";
 
 export const orderService = {
   async createOrder(orderData: {
@@ -15,13 +16,18 @@ export const orderService = {
     console.log('Input order data:', orderData);
     
     try {
+      const orderPayload = {
+        ...orderData,
+        ...(orderData.shipping_address && {
+          shipping_address: prepareShippingAddress(orderData.shipping_address)
+        }),
+        status: 'payment_pending',
+        payment_status: 'pending'
+      };
+
       const { data: order, error } = await supabase
         .from('orders')
-        .insert({
-          ...orderData,
-          status: 'payment_pending',
-          payment_status: 'pending'
-        })
+        .insert(orderPayload)
         .select(`
           *,
           customer:customers(name),
@@ -31,20 +37,12 @@ export const orderService = {
 
       if (error) {
         console.error('Error creating order:', error);
-        console.error('Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          query: error.query
-        });
         throw error;
       }
 
       console.log('Order created successfully:', order);
 
-      // Transformar la respuesta al tipo Order
-      const transformedOrder: Order = {
+      return {
         id: order.id,
         customer: order.customer?.name || 'Unknown',
         customer_id: order.customer_id,
@@ -57,7 +55,7 @@ export const orderService = {
         payment_status: order.payment_status,
         title: order.product?.title,
         quantity: order.quantity,
-        shipping_address: order.shipping_address,
+        shipping_address: transformShippingAddress(order.shipping_address),
         stripe_payment_intent_id: order.stripe_payment_intent_id,
         stripe_receipt_url: order.stripe_receipt_url,
         paypal_order_id: order.paypal_order_id,
@@ -69,9 +67,6 @@ export const orderService = {
         created_at: order.created_at,
         updated_at: order.updated_at
       };
-
-      console.log('Transformed order:', transformedOrder);
-      return transformedOrder;
     } finally {
       console.groupEnd();
     }

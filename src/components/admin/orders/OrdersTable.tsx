@@ -1,78 +1,89 @@
-import { useNavigate } from "react-router-dom"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { ColumnDef } from "@tanstack/react-table"
+import { Order } from "@/types/order.types"
 import { OrderStatusBadge } from "./OrderStatusBadge"
-import { Order } from "./types"
+import { Button } from "@/components/ui/button"
+import { Eye } from "lucide-react"
+import { Link } from "react-router-dom"
 
-interface OrdersTableProps {
-  orders: Order[]
-  onStatusChange: (orderId: string, newStatus: Order['status']) => void
-}
-
-const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
-  if (type === "physical") {
-    return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]" // Soft blue
+export const columns: ColumnDef<Order>[] = [
+  {
+    accessorKey: "customer",
+    header: "Cliente",
+    cell: ({ row }) => {
+      const order = row.original
+      return (
+        <div>
+          <div className="font-medium">{order.customer}</div>
+          <div className="text-sm text-gray-500">{order.email}</div>
+        </div>
+      )
+    }
+  },
+  {
+    accessorKey: "title",
+    header: "Producto",
+    cell: ({ row }) => {
+      const order = row.original
+      return (
+        <div>
+          <div className="font-medium">{order.title}</div>
+          <div className="text-sm text-gray-500">Cantidad: {order.quantity}</div>
+        </div>
+      )
+    }
+  },
+  {
+    accessorKey: "total",
+    header: "Total",
+    cell: ({ row }) => {
+      const order = row.original
+      return (
+        <div className="font-medium">
+          ${order.total?.toFixed(2)}
+        </div>
+      )
+    }
+  },
+  {
+    accessorKey: "created_at",
+    header: "Fecha",
+    cell: ({ row }) => {
+      const order = row.original
+      return (
+        <div className="flex items-center">
+          {new Date(order.created_at).toLocaleDateString()}
+        </div>
+      )
+    }
+  },
+  {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      return <OrderStatusBadge status={row.original.status} />
+    }
+  },
+  {
+    accessorKey: "type",
+    header: "Tipo",
+    cell: ({ row }) => {
+      return (
+        <div className="capitalize">
+          {row.original.type === "physical" ? "SIM Física" : "E-SIM"}
+        </div>
+      )
+    }
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return (
+        <Link to={`/admin/orders/${row.original.id}`}>
+          <Button variant="ghost" size="icon">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
+      )
+    }
   }
-  return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
-}
-
-export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
-  const navigate = useNavigate()
-
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID Pedido</TableHead>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Cliente</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Total</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Método de Pago</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {orders.map((order) => (
-            <TableRow 
-              key={order.id}
-              className="cursor-pointer hover:bg-muted/50"
-              onClick={() => navigate(`/admin/orders/${order.id}`)}
-            >
-              <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-              <TableCell>{order.customer}</TableCell>
-              <TableCell>
-                <Badge 
-                  variant="secondary" 
-                  className={getSimTypeBadgeStyle(order.type)}
-                >
-                  {order.type === "physical" ? "SIM Física" : "E-SIM"}
-                </Badge>
-              </TableCell>
-              <TableCell>${order.total.toFixed(2)}</TableCell>
-              <TableCell>
-                <OrderStatusBadge status={order.status} />
-              </TableCell>
-              <TableCell>
-                {order.payment_method ? (
-                  <span className="capitalize">{order.payment_method}</span>
-                ) : (
-                  <span className="text-gray-400">-</span>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
-}
+]

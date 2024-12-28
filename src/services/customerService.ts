@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Customer, ShippingAddress } from "@/types";
+import { transformShippingAddress, prepareShippingAddress } from "@/utils/transformations";
 
 export const customerService = {
   async findOrCreateCustomer(customerData: {
@@ -15,7 +16,6 @@ export const customerService = {
     console.log('Input customer data:', customerData);
 
     try {
-      // Primero buscar cliente existente
       console.log('Searching for existing customer with email:', customerData.email);
       const { data: existingCustomer, error: searchError } = await supabase
         .from('customers')
@@ -25,12 +25,6 @@ export const customerService = {
 
       if (searchError) {
         console.error('Error searching for customer:', searchError);
-        console.error('Error details:', {
-          code: searchError.code,
-          message: searchError.message,
-          details: searchError.details,
-          hint: searchError.hint
-        });
         throw searchError;
       }
 
@@ -43,9 +37,8 @@ export const customerService = {
         passport_number: customerData.passport_number,
         birth_date: customerData.birth_date,
         gender: customerData.gender,
-        // Solo incluir shipping_address si se proporciona
         ...(customerData.shipping_address && {
-          default_shipping_address: customerData.shipping_address
+          default_shipping_address: prepareShippingAddress(customerData.shipping_address)
         })
       };
 
@@ -61,20 +54,15 @@ export const customerService = {
 
         if (updateError) {
           console.error('Error updating customer:', updateError);
-          console.error('Update error details:', {
-            code: updateError.code,
-            message: updateError.message,
-            details: updateError.details,
-            hint: updateError.hint
-          });
           throw updateError;
         }
 
-        console.log('Customer updated successfully:', updatedCustomer);
-        return updatedCustomer as Customer;
+        return {
+          ...updatedCustomer,
+          default_shipping_address: transformShippingAddress(updatedCustomer.default_shipping_address)
+        } as Customer;
       }
 
-      // Crear nuevo cliente
       console.log('Creating new customer with payload:', {
         ...customerPayload,
         email: customerData.email
@@ -91,17 +79,13 @@ export const customerService = {
 
       if (createError) {
         console.error('Error creating customer:', createError);
-        console.error('Creation error details:', {
-          code: createError.code,
-          message: createError.message,
-          details: createError.details,
-          hint: createError.hint
-        });
         throw createError;
       }
 
-      console.log('New customer created successfully:', newCustomer);
-      return newCustomer as Customer;
+      return {
+        ...newCustomer,
+        default_shipping_address: transformShippingAddress(newCustomer.default_shipping_address)
+      } as Customer;
     } finally {
       console.groupEnd();
     }
