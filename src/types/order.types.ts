@@ -8,6 +8,8 @@ export interface OrderEvent {
   user_id?: string;
   metadata?: Record<string, any>;
   created_at: string;
+  // Campo calculado para la UI
+  user_name?: string;
 }
 
 export interface OrderNote {
@@ -20,6 +22,8 @@ export interface OrderNote {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
+  // Campo calculado para la UI
+  user_name?: string;
 }
 
 // Tipo base que coincide exactamente con la estructura de la base de datos
@@ -41,7 +45,7 @@ export interface BaseOrder {
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
-  notes?: OrderNote[];
+  notes?: string[];
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
@@ -50,18 +54,13 @@ export interface BaseOrder {
 // Tipo extendido que incluye campos calculados y transformados para la UI
 export interface Order extends BaseOrder {
   // Campos calculados/transformados para la UI
-  customer_name?: string;
-  customer_email?: string;
-  customer_phone?: string;
-  formatted_date?: string;
-  formatted_total?: string;
-  product_title?: string;
-  product_description?: string;
-  formatted_address?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
+  customer?: Customer;
+  title?: string;
+  description?: string;
+  total?: number;
+  date?: string;
   events?: OrderEvent[];
+  formatted_notes?: OrderNote[];
 }
 
 // Tipo que incluye todas las relaciones completas

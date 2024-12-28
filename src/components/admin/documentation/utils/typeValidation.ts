@@ -1,10 +1,7 @@
 import { ValidationResult } from '../types/ValidationTypes';
 
-type DbType = string;
-type TsType = string;
-
-export function getTypeScriptType(dbType: DbType): TsType {
-  const typeMap: Record<DbType, TsType> = {
+export function getTypeScriptType(dbType: string): string {
+  const typeMap: Record<string, string> = {
     'uuid': 'string',
     'text': 'string',
     'varchar': 'string',
@@ -23,12 +20,12 @@ export function getTypeScriptType(dbType: DbType): TsType {
   return typeMap[dbType.toLowerCase()] || 'any';
 }
 
-export function isValidTypeMapping(dbType: DbType, tsType: TsType): boolean {
+export function isValidTypeMapping(dbType: string, tsType: string): boolean {
   const expectedType = getTypeScriptType(dbType);
   return expectedType === tsType;
 }
 
-export function getValidationMessage(dbType: DbType, tsType: TsType): string {
+export function getValidationMessage(dbType: string, tsType: string): string {
   if (isValidTypeMapping(dbType, tsType)) {
     return 'Tipos coinciden correctamente';
   }

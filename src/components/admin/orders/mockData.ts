@@ -1,32 +1,35 @@
-import { Order } from "./types"
+import { Order, OrderEvent } from "../../../types";
 
 export const mockOrders: Order[] = [
   {
     id: "order-001",
-    date: "2024-01-25T10:30:00Z",
-    customer: "Juan Pérez",
-    email: "juan.perez@example.com",
-    phone: "1234567890",
-    total: 100.0,
+    created_at: "2024-01-25T10:30:00Z",
+    customer_id: "cust-001",
+    product_id: "prod-001",
+    total_amount: 10000,
     status: "payment_pending",
     type: "physical",
-    paymentMethod: "stripe",
+    quantity: 1,
+    payment_method: "stripe",
+    payment_status: "pending",
     notes: [],
     events: [
       {
         id: "evt-001",
+        order_id: "order-001",
         type: "created",
         description: "Pedido creado",
-        createdAt: "2024-01-25T10:30:00Z",
+        created_at: "2024-01-25T10:30:00Z",
         metadata: {
           automated: true
         }
       },
       {
         id: "evt-002",
+        order_id: "order-001",
         type: "payment_processed",
         description: "Pago procesado correctamente vía Stripe",
-        createdAt: "2024-01-25T10:31:00Z",
+        created_at: "2024-01-25T10:31:00Z",
         metadata: {
           automated: true,
           paymentMethod: "stripe"
@@ -36,36 +39,37 @@ export const mockOrders: Order[] = [
   },
   {
     id: "order-002",
-    date: "2024-01-26T12:00:00Z",
-    customer: "María López",
-    email: "maria.lopez@example.com",
-    phone: "0987654321",
-    total: 150.0,
+    created_at: "2024-01-26T12:00:00Z",
+    customer_id: "cust-002",
+    product_id: "prod-002",
+    total_amount: 15000,
     status: "processing",
     type: "physical",
-    paymentMethod: "paypal",
+    quantity: 1,
+    payment_method: "paypal",
+    payment_status: "pending",
     notes: [],
     events: []
   },
   {
     id: "order-003",
-    date: "2024-01-27T15:30:00Z",
-    customer: "Carlos Ruiz",
-    email: "carlos.ruiz@example.com",
-    phone: "5544332211",
-    total: 200.0,
+    created_at: "2024-01-27T15:30:00Z",
+    customer_id: "cust-003",
+    product_id: "prod-003",
+    total_amount: 20000,
     status: "shipped",
     type: "physical",
-    paymentMethod: "stripe",
+    quantity: 1,
+    payment_method: "stripe",
+    payment_status: "completed",
     notes: [],
     events: [
       {
         id: "evt-003",
+        order_id: "order-003",
         type: "status_changed",
         description: "Pedido enviado",
-        userId: "usr-001",
-        userName: "Admin",
-        createdAt: "2024-01-27T15:30:00Z",
+        created_at: "2024-01-27T15:30:00Z",
         metadata: {
           oldStatus: "processing",
           newStatus: "shipped"
@@ -75,23 +79,23 @@ export const mockOrders: Order[] = [
   },
   {
     id: "order-004",
-    date: "2024-01-24T09:15:00Z",
-    customer: "Ana García",
-    email: "ana.garcia@example.com",
-    phone: "6677889900",
-    total: 175.0,
+    created_at: "2024-01-24T09:15:00Z",
+    customer_id: "cust-004",
+    product_id: "prod-004",
+    total_amount: 17500,
     status: "delivered",
     type: "physical",
-    paymentMethod: "stripe",
+    quantity: 1,
+    payment_method: "stripe",
+    payment_status: "completed",
     notes: [],
     events: [
       {
         id: "evt-004",
+        order_id: "order-004",
         type: "status_changed",
         description: "Pedido entregado",
-        userId: "usr-001",
-        userName: "Admin",
-        createdAt: "2024-01-26T14:20:00Z",
+        created_at: "2024-01-26T14:20:00Z",
         metadata: {
           oldStatus: "shipped",
           newStatus: "delivered"
@@ -101,15 +105,16 @@ export const mockOrders: Order[] = [
   },
   {
     id: "order-005",
-    date: "2024-01-28T11:45:00Z",
-    customer: "Roberto Méndez",
-    email: "roberto.mendez@example.com",
-    phone: "3322114455",
-    total: 125.0,
+    created_at: "2024-01-28T11:45:00Z",
+    customer_id: "cust-005",
+    product_id: "prod-005",
+    total_amount: 12500,
     status: "processing",
     type: "physical",
-    paymentMethod: "paypal",
+    quantity: 1,
+    payment_method: "paypal",
+    payment_status: "pending",
     notes: [],
     events: []
   }
-]
+];
