@@ -34,39 +34,33 @@ export function SimCard({
     switch (title) {
       case "Tarifa S":
         return {
-          iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
-          iconColor: "#7FB069",  // Verde pastel más oscuro
-          iconFill: "#E5F7D3"    // Verde pastel claro para el relleno
+          bg: "bg-[#F2FCE2]",
+          iconColor: "text-gray-700"
         };
       case "Tarifa M":
         return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "#6B8EAE",  // Azul pastel más oscuro
-          iconFill: "#D3E4FD"    // Azul pastel claro para el relleno
+          bg: "bg-[#D3E4FD]",
+          iconColor: "text-gray-700"
         };
       case "Tarifa L":
         return {
-          iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
-          iconColor: "#8B7FC4",  // Morado pastel más oscuro
-          iconFill: "#E5DEFF"    // Morado pastel claro para el relleno
+          bg: "bg-[#E5DEFF]",
+          iconColor: "text-gray-700"
         };
       case "Tarifa XL":
         return {
-          iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
-          iconColor: "#D67A87",  // Rosa pastel más oscuro
-          iconFill: "#FFDEE2"    // Rosa pastel claro para el relleno
+          bg: "bg-[#FFDEE2]",
+          iconColor: "text-gray-700"
         };
       case "Tarifa XXL":
         return {
-          iconBg: "from-[#FDE1D3] to-[#FEC6A1]",
-          iconColor: "#E6946C",  // Naranja pastel más oscuro
-          iconFill: "#FDE1D3"    // Naranja pastel claro para el relleno
+          bg: "bg-[#FDE1D3]",
+          iconColor: "text-gray-700"
         };
       default:
         return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "#6B8EAE",
-          iconFill: "#D3E4FD"
+          bg: "bg-[#D3E4FD]",
+          iconColor: "text-gray-700"
         };
     }
   };
@@ -99,19 +93,11 @@ export function SimCard({
 
       <CardHeader className="relative">
         <div className="flex items-center gap-3">
-          <div className={`p-3 bg-gradient-to-br ${colorScheme.iconBg} rounded-xl backdrop-blur-sm`}>
+          <div className={`p-3 ${colorScheme.bg} rounded-xl backdrop-blur-sm`}>
             {type === 'physical' ? (
-              <CreditCard 
-                className={`h-6 w-6`}
-                color={colorScheme.iconColor}
-                fill={colorScheme.iconFill}
-              />
+              <CreditCard className={`h-6 w-6 ${colorScheme.iconColor}`} />
             ) : (
-              <Wifi 
-                className={`h-6 w-6`}
-                color={colorScheme.iconColor}
-                fill={colorScheme.iconFill}
-              />
+              <Wifi className={`h-6 w-6 ${colorScheme.iconColor}`} />
             )}
           </div>
           <div>
