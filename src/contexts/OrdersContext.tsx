@@ -41,28 +41,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      const formattedOrders: Order[] = data.map(order => ({
-        id: order.id,
-        date: order.created_at,
-        customer: order.customers?.name || 'Cliente no encontrado',
-        email: order.customers?.email,
-        phone: order.customers?.phone,
-        total: order.total_amount / 100,
-        status: order.status as OrderStatus,
-        type: order.type as "physical" | "esim",
-        paymentMethod: order.payment_method,
-        title: order.products?.title,
-        description: order.products?.description,
-        quantity: order.quantity,
-        shippingAddress: order.shipping_address ? {
-          street: (order.shipping_address as any).street,
-          city: (order.shipping_address as any).city,
-          state: (order.shipping_address as any).state,
-          zipCode: (order.shipping_address as any).postal_code
-        } : undefined
-      }))
-
-      setOrders(formattedOrders)
+      setOrders(data)
       setIsLoading(false)
     } catch (error) {
       console.error('Error fetching orders:', error)
@@ -77,7 +56,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase
         .from('orders')
         .update({
-          status: updates.status,
+          ...updates,
           updated_at: new Date().toISOString()
         })
         .eq('id', orderId)
