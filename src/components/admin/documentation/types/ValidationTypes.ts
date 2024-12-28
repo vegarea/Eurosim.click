@@ -6,8 +6,11 @@ export interface ValidationResult {
   message?: string;
 }
 
-export interface TableValidation {
-  tableName: string;
-  validations: ValidationResult[];
-  isValid: boolean;
+export interface TableInfo {
+  name: string;
+  description: string;
+  fields: string[];
+  path: string;
+  content: string;
+  isConnected: boolean;
 }

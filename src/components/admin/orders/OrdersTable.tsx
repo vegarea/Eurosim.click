@@ -23,7 +23,7 @@ const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
   return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
   const navigate = useNavigate()
 
   return (
@@ -63,8 +63,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                 <OrderStatusBadge status={order.status} />
               </TableCell>
               <TableCell>
-                {order.paymentMethod ? (
-                  <span className="capitalize">{order.paymentMethod}</span>
+                {order.payment_method ? (
+                  <span className="capitalize">{order.payment_method}</span>
                 ) : (
                   <span className="text-gray-400">-</span>
                 )}

@@ -7,11 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useState, useEffect } from "react"
-import { TableCard } from "./components/TableCard"
-import { TableSearch } from "./components/TableSearch"
+import { TableCard } from "../components/TableCard"
+import { TableSearch } from "../components/TableSearch"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
-import { TypeValidation } from "./TypeValidation"
+import { ValidationResult, TableInfo } from '../types/ValidationTypes'
+import { getTypeScriptType, isValidTypeMapping, getValidationMessage } from '../utils/typeValidation'
+import { TypeValidation } from './TypeValidation'
 
 interface TableInfo {
   name: string
@@ -208,3 +210,4 @@ export function DatabaseStructure() {
     </div>
   )
 }
+

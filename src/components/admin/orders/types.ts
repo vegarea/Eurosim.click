@@ -1,1 +1,1 @@
-export { Order, OrderNote, OrderEvent, OrderStatus } from '@/types/order.types';
+export type { Order, OrderNote, OrderEvent, OrderStatus } from '@/types/order.types';

@@ -1,3 +1,5 @@
+import { ValidationResult } from '../types/ValidationTypes';
+
 export function getTypeScriptType(dbType: string): string {
   const typeMap: Record<string, string> = {
     'uuid': 'string',
@@ -11,7 +13,7 @@ export function getTypeScriptType(dbType: string): string {
     'timestamp': 'string',
     'date': 'string',
     'time': 'string',
-    'USER-DEFINED': 'string', // Para enums
+    'USER-DEFINED': 'string',
     'ARRAY': 'any[]'
   };
 
