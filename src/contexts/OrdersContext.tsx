@@ -1,89 +1,27 @@
-import { createContext, useContext, useState, useEffect } from "react"
-import { Order, OrderStatus, transformOrder, OrderWithDetails } from "@/types/supabase/orders"
-import { supabase } from "@/integrations/supabase/client"
-import { toast } from "sonner"
+import { createContext, useContext } from 'react'
+import { UIOrder, OrderStatus } from '@/types/supabase/base'
+import { useOrders } from '@/hooks/useOrders'
 
 interface OrdersContextType {
-  orders: OrderWithDetails[];
-  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
-  isLoading: boolean;
-  error: Error | null;
+  orders: UIOrder[]
+  updateOrder: (orderId: string, updates: Partial<UIOrder>) => Promise<void>
+  isLoading: boolean
+  error: Error | null
 }
 
-const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
+const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState<OrderWithDetails[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    fetchOrders()
-  }, [])
-
-  const fetchOrders = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          customers (
-            name,
-            email,
-            phone
-          ),
-          products (
-            title,
-            description
-          )
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      const transformedOrders = data.map(order => transformOrder(order))
-      setOrders(transformedOrders)
-      setIsLoading(false)
-    } catch (error) {
-      console.error('Error fetching orders:', error)
-      setError(error as Error)
-      setIsLoading(false)
-      toast.error('Error al cargar los pedidos')
-    }
-  }
-
-  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update(updates)
-        .eq('id', orderId)
-
-      if (error) throw error
-
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order.id === orderId 
-            ? transformOrder({ ...order, ...updates })
-            : order
-        )
-      )
-
-      toast.success('Pedido actualizado correctamente')
-    } catch (error) {
-      console.error('Error updating order:', error)
-      toast.error('Error al actualizar el pedido')
-    }
-  }
+  const ordersHook = useOrders()
 
   return (
-    <OrdersContext.Provider value={{ orders, updateOrder, isLoading, error }}>
+    <OrdersContext.Provider value={ordersHook}>
       {children}
     </OrdersContext.Provider>
   )
 }
 
-export function useOrders() {
+export function useOrdersContext() {
   const context = useContext(OrdersContext)
   if (context === undefined) {
     throw new Error('useOrders must be used within an OrdersProvider')

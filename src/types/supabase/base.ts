@@ -1,90 +1,133 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+import { Database } from "@/integrations/supabase/types"
 
-// Tipos exactos de Supabase (snake_case)
-export interface SupabaseOrder {
-  id: string;
-  customer_id: string;
-  product_id: string;
-  status: string;
-  type: string;
-  total_amount: number;
-  quantity: number;
-  payment_method: string | null;
-  payment_status: string;
-  shipping_address: Json | null;
-  tracking_number: string | null;
-  carrier: string | null;
-  activation_date: string | null;
-  notes: Json[] | null;
-  events: Json[] | null;
-  metadata: Json | null;
-  created_at: string | null;
-  updated_at: string | null;
+// Tipos exactos de Supabase
+export type SupabaseOrder = Database['public']['Tables']['orders']['Row']
+export type SupabaseCustomer = Database['public']['Tables']['customers']['Row']
+export type SupabaseProduct = Database['public']['Tables']['products']['Row']
+export type SupabaseOrderEvent = Database['public']['Tables']['order_events']['Row']
+export type SupabaseOrderNote = Database['public']['Tables']['order_notes']['Row']
+
+// Tipos para la UI
+export interface UIOrder {
+  id: string
+  customerId: string
+  productId: string
+  status: OrderStatus
+  type: OrderType
+  total: number
+  quantity: number
+  paymentMethod: PaymentMethod
+  paymentStatus: PaymentStatus
+  shippingAddress: ShippingAddress | null
+  trackingNumber: string | null
+  carrier: string | null
+  activationDate: string | null
+  notes: OrderNote[] | null
+  events: OrderEvent[] | null
+  metadata: Record<string, any> | null
+  createdAt: string
+  updatedAt: string
+  // Campos calculados/relacionados
+  customer?: {
+    name: string
+    email: string | null
+    phone: string | null
+  }
+  product?: {
+    title: string
+    description: string
+  }
 }
 
-// Tipos para la UI (camelCase)
-export interface UIOrder {
-  id: string;
-  customerId: string;
-  productId: string;
-  status: string;
-  type: string;
-  total: number;
-  quantity: number;
-  paymentMethod: string | null;
-  paymentStatus: string;
-  shippingAddress: any | null;
-  trackingNumber: string | null;
-  carrier: string | null;
-  activationDate: string | null;
-  notes: any[] | null;
-  events: any[] | null;
-  metadata: any | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  // Campos calculados/transformados
-  customerName?: string;
-  formattedDate?: string;
+export type OrderStatus = 
+  | "payment_pending"
+  | "payment_failed" 
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+
+export type OrderType = "physical" | "esim"
+export type PaymentMethod = "stripe" | "paypal"
+export type PaymentStatus = "pending" | "completed" | "failed" | "refunded"
+
+export interface ShippingAddress {
+  street: string
+  city: string
+  state: string
+  country: string
+  postalCode: string
+  phone?: string
+}
+
+export interface OrderEvent {
+  id: string
+  orderId: string
+  type: string
+  description: string
+  userId: string | null
+  metadata: Record<string, any> | null
+  createdAt: string
+}
+
+export interface OrderNote {
+  id: string
+  orderId: string
+  text: string
+  userId: string
+  createdAt: string
 }
 
 // Funciones de transformación
-export function transformToUIOrder(order: SupabaseOrder): UIOrder {
+export function transformToUIOrder(order: SupabaseOrder & {
+  customers?: { name: string; email: string | null; phone: string | null };
+  products?: { title: string; description: string };
+}): UIOrder {
   return {
     id: order.id,
     customerId: order.customer_id,
     productId: order.product_id,
-    status: order.status,
-    type: order.type,
+    status: order.status as OrderStatus,
+    type: order.type as OrderType,
     total: order.total_amount / 100,
     quantity: order.quantity,
-    paymentMethod: order.payment_method,
-    paymentStatus: order.payment_status,
-    shippingAddress: order.shipping_address,
+    paymentMethod: (order.payment_method || 'stripe') as PaymentMethod,
+    paymentStatus: order.payment_status as PaymentStatus,
+    shippingAddress: order.shipping_address as ShippingAddress,
     trackingNumber: order.tracking_number,
     carrier: order.carrier,
     activationDate: order.activation_date,
-    notes: order.notes,
-    events: order.events,
+    notes: order.notes?.map(note => ({
+      id: (note as any).id,
+      orderId: order.id,
+      text: (note as any).text,
+      userId: (note as any).user_id,
+      createdAt: (note as any).created_at
+    })) || [],
+    events: order.events?.map(event => ({
+      id: (event as any).id,
+      orderId: order.id,
+      type: (event as any).type,
+      description: (event as any).description,
+      userId: (event as any).user_id,
+      metadata: (event as any).metadata,
+      createdAt: (event as any).created_at
+    })) || [],
     metadata: order.metadata,
-    createdAt: order.created_at,
-    updatedAt: order.updated_at,
-    formattedDate: order.created_at ? new Date(order.created_at).toLocaleDateString() : '',
-  };
+    createdAt: order.created_at || new Date().toISOString(),
+    updatedAt: order.updated_at || new Date().toISOString(),
+    customer: order.customers,
+    product: order.products
+  }
 }
 
-export function transformToSupabaseOrder(order: UIOrder): Partial<SupabaseOrder> {
+export function transformToSupabaseOrder(order: Partial<UIOrder>): Partial<SupabaseOrder> {
   return {
     customer_id: order.customerId,
     product_id: order.productId,
     status: order.status,
     type: order.type,
-    total_amount: Math.round(order.total * 100),
+    total_amount: order.total ? Math.round(order.total * 100) : undefined,
     quantity: order.quantity,
     payment_method: order.paymentMethod,
     payment_status: order.paymentStatus,
@@ -92,8 +135,20 @@ export function transformToSupabaseOrder(order: UIOrder): Partial<SupabaseOrder>
     tracking_number: order.trackingNumber,
     carrier: order.carrier,
     activation_date: order.activationDate,
-    notes: order.notes,
-    events: order.events,
-    metadata: order.metadata,
-  };
+    notes: order.notes?.map(note => ({
+      id: note.id,
+      text: note.text,
+      user_id: note.userId,
+      created_at: note.createdAt
+    })),
+    events: order.events?.map(event => ({
+      id: event.id,
+      type: event.type,
+      description: event.description,
+      user_id: event.userId,
+      metadata: event.metadata,
+      created_at: event.createdAt
+    })),
+    metadata: order.metadata
+  }
 }

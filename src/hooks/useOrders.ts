@@ -1,16 +1,16 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { SupabaseOrder, UIOrder, transformToUIOrder } from '@/types/supabase/base';
-import { toast } from 'sonner';
+import { useState, useEffect } from 'react'
+import { supabase } from '@/integrations/supabase/client'
+import { UIOrder, SupabaseOrder, transformToUIOrder, transformToSupabaseOrder, OrderStatus } from '@/types/supabase/base'
+import { toast } from 'sonner'
 
 export function useOrders() {
-  const [orders, setOrders] = useState<UIOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [orders, setOrders] = useState<UIOrder[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders()
+  }, [])
 
   const fetchOrders = async () => {
     try {
@@ -28,56 +28,54 @@ export function useOrders() {
             description
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
 
-      if (error) throw error;
+      if (error) throw error
 
-      const uiOrders = data.map(order => {
-        const uiOrder = transformToUIOrder(order as SupabaseOrder);
-        // Añadir datos relacionados
-        uiOrder.customerName = order.customers?.name || 'Unknown';
-        return uiOrder;
-      });
+      const uiOrders = (data as (SupabaseOrder & {
+        customers?: { name: string; email: string | null; phone: string | null };
+        products?: { title: string; description: string };
+      })[]).map(transformToUIOrder)
 
-      setOrders(uiOrders);
+      setOrders(uiOrders)
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      setError(error as Error);
-      toast.error('Error al cargar los pedidos');
+      console.error('Error fetching orders:', error)
+      setError(error as Error)
+      toast.error('Error al cargar los pedidos')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const updateOrder = async (orderId: string, updates: Partial<UIOrder>) => {
     try {
+      const supabaseUpdates = transformToSupabaseOrder(updates)
       const { error } = await supabase
         .from('orders')
-        .update(transformToSupabaseOrder(updates as UIOrder))
-        .eq('id', orderId);
+        .update(supabaseUpdates)
+        .eq('id', orderId)
 
-      if (error) throw error;
+      if (error) throw error
 
-      // Actualizar el estado local
       setOrders(prevOrders =>
         prevOrders.map(order =>
           order.id === orderId
             ? { ...order, ...updates }
             : order
         )
-      );
+      )
 
-      toast.success('Pedido actualizado correctamente');
+      toast.success('Pedido actualizado correctamente')
     } catch (error) {
-      console.error('Error updating order:', error);
-      toast.error('Error al actualizar el pedido');
+      console.error('Error updating order:', error)
+      toast.error('Error al actualizar el pedido')
     }
-  };
+  }
 
   return {
     orders,
     updateOrder,
     isLoading,
     error,
-  };
+  }
 }
