@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
+import { CustomerDocumentation } from "@/types/order.types"
 
 export function AdminCustomers() {
   const { orders } = useOrders()
@@ -28,27 +29,24 @@ export function AdminCustomers() {
         orders: [],
         totalSpent: 0,
         shippingInfo: {},
-        documentation: {}
+        documentation: {
+          passportNumber: order.documentation?.passportNumber,
+          birthDate: order.documentation?.birthDate,
+          gender: order.documentation?.gender,
+          activationDate: order.documentation?.activationDate
+        } as CustomerDocumentation
       }
     }
     acc[order.customer].orders.push(order)
     acc[order.customer].totalSpent += order.total
 
-    // Actualizar información de envío y documentación si está disponible
+    // Actualizar información de envío si está disponible
     if (order.shippingAddress) {
       acc[order.customer].shippingInfo = {
         address: order.shippingAddress,
         city: order.city,
         state: order.state,
         zipCode: order.zipCode
-      }
-    }
-    if (order.passportNumber) {
-      acc[order.customer].documentation = {
-        passportNumber: order.passportNumber,
-        birthDate: order.birthDate,
-        gender: order.gender,
-        activationDate: order.activationDate
       }
     }
     return acc

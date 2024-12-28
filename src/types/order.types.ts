@@ -26,6 +26,13 @@ export interface OrderEvent {
   user_name?: string;
 }
 
+export interface CustomerDocumentation {
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  activationDate?: string;
+}
+
 export interface Order {
   id: string;
   customer: string;
@@ -51,4 +58,5 @@ export interface Order {
   updated_at?: string;
   notes?: OrderNote[];
   events?: OrderEvent[];
+  documentation?: CustomerDocumentation;
 }

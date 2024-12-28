@@ -16,7 +16,11 @@ export function useOrdersData() {
           customer:customers(
             name,
             email,
-            phone
+            phone,
+            passport_number,
+            birth_date,
+            gender,
+            activation_date
           ),
           product:products(
             title,
@@ -58,7 +62,13 @@ export function useOrdersData() {
         state: order.shipping_address?.state,
         zipCode: order.shipping_address?.postal_code,
         created_at: order.created_at,
-        updated_at: order.updated_at
+        updated_at: order.updated_at,
+        documentation: {
+          passportNumber: order.customer?.passport_number,
+          birthDate: order.customer?.birth_date,
+          gender: order.customer?.gender,
+          activationDate: order.customer?.activation_date
+        }
       }));
     },
   });
