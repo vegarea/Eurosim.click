@@ -40,7 +40,13 @@ export function AdminProducts() {
         throw error
       }
 
-      setProducts(data)
+      // Asegurarnos de que el status es del tipo correcto
+      const typedProducts = data.map(product => ({
+        ...product,
+        status: product.status as "active" | "inactive"
+      }))
+
+      setProducts(typedProducts)
     } catch (error) {
       console.error('Error fetching products:', error)
       toast({
@@ -59,7 +65,7 @@ export function AdminProducts() {
         .from('products')
         .insert([{
           ...product,
-          status: 'active' // Establecemos el estado por defecto
+          status: 'active' as const // Asegurarnos de que el tipo es correcto
         }])
         .select()
         .single()
@@ -68,7 +74,13 @@ export function AdminProducts() {
         throw error
       }
 
-      setProducts([data, ...products])
+      // Asegurarnos de que el status es del tipo correcto
+      const typedProduct = {
+        ...data,
+        status: data.status as "active" | "inactive"
+      }
+
+      setProducts([typedProduct, ...products])
       toast({
         title: "Producto añadido",
         description: "El producto se ha añadido correctamente"
