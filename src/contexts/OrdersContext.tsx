@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from "react"
-import type { Order, OrderStatus } from "@/types/database"
+import { createContext, useContext, useState, useEffect } from "react"
+import { Order, OrderUpdate } from "@/types/supabase"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
 interface OrdersContextType {
   orders: Order[]
-  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>
+  updateOrder: (orderId: string, updates: Partial<OrderUpdate>) => Promise<void>
   isLoading: boolean
   error: Error | null
 }
@@ -51,14 +51,11 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
+  const updateOrder = async (orderId: string, updates: Partial<OrderUpdate>) => {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
+        .update(updates)
         .eq('id', orderId)
 
       if (error) throw error

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { OrderStatus } from "./orders/types"
+import { OrderStatus } from "@/types/supabase"
 import { useOrders } from "@/contexts/OrdersContext"
 import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -14,7 +14,7 @@ export function AdminOrders() {
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      order.customer.toLowerCase().includes(search.toLowerCase())
+      order.customer_id.toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })

@@ -11,45 +11,32 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
+import { Customer } from "@/types/supabase"
 
 export function AdminCustomers() {
   const { orders } = useOrders()
   const [search, setSearch] = useState("")
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   // Crear un mapa de clientes únicos basado en los pedidos
   const customers = orders.reduce((acc, order) => {
-    if (!acc[order.customer]) {
-      acc[order.customer] = {
-        name: order.customer,
-        email: order.email || "No especificado",
-        phone: order.phone || "No especificado",
+    const customerInfo = order.customers;
+    if (!acc[order.customer_id] && customerInfo) {
+      acc[order.customer_id] = {
+        id: order.customer_id,
+        name: customerInfo.name,
+        email: customerInfo.email || "No especificado",
+        phone: customerInfo.phone || "No especificado",
         orders: [],
-        totalSpent: 0,
-        shippingInfo: {},
-        documentation: {}
+        total_spent: 0,
+        shipping_address: order.shipping_address,
+        metadata: {}
       }
     }
-    acc[order.customer].orders.push(order)
-    acc[order.customer].totalSpent += order.total
-
-    // Actualizar información de envío y documentación si está disponible
-    if (order.shippingAddress) {
-      acc[order.customer].shippingInfo = {
-        address: order.shippingAddress,
-        city: order.city,
-        state: order.state,
-        zipCode: order.zipCode
-      }
-    }
-    if (order.passportNumber) {
-      acc[order.customer].documentation = {
-        passportNumber: order.passportNumber,
-        birthDate: order.birthDate,
-        gender: order.gender,
-        activationDate: order.activationDate
-      }
+    if (acc[order.customer_id]) {
+      acc[order.customer_id].orders.push(order)
+      acc[order.customer_id].total_spent += order.total_amount
     }
     return acc
   }, {} as Record<string, any>)
