@@ -7,7 +7,7 @@ import { CountryCoverage } from "@/components/CountryCoverage";
 import { ProductButton } from "@/components/esim/ProductButton";
 import { PlanDetails } from "@/components/esim/PlanDetails";
 import { FrequentQuestions } from "@/components/FrequentQuestions";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
@@ -30,23 +30,30 @@ export default function ESims() {
     }
   });
 
-  // Encontrar el producto "E-SIM L" para establecerlo como predeterminado
-  const defaultProduct = products.find(p => p.title === "E-SIM L");
-  
-  const [selectedPlan, setSelectedPlan] = useState(defaultProduct ? {
-    title: defaultProduct.title,
-    description: `${defaultProduct.data_eu_gb}GB Europa / ${defaultProduct.data_es_gb}GB España`,
-    price: defaultProduct.price,
-    features: [
-      `${defaultProduct.data_eu_gb}GB datos en toda Europa`,
-      `${defaultProduct.data_es_gb}GB exclusivo España`,
-      "Velocidad 5G/4G/3G+",
-      "Hotspot incluido",
-      "El más vendido"
-    ],
-    europeGB: defaultProduct.data_eu_gb,
-    spainGB: defaultProduct.data_es_gb
-  } : null);
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+
+  // Efecto para establecer el plan por defecto cuando los productos se cargan
+  useEffect(() => {
+    if (products.length > 0) {
+      const defaultProduct = products.find(p => p.title === "E-SIM L");
+      if (defaultProduct) {
+        setSelectedPlan({
+          title: defaultProduct.title,
+          description: `${defaultProduct.data_eu_gb}GB Europa / ${defaultProduct.data_es_gb}GB España`,
+          price: defaultProduct.price,
+          features: [
+            `${defaultProduct.data_eu_gb}GB datos en toda Europa`,
+            `${defaultProduct.data_es_gb}GB exclusivo España`,
+            "Velocidad 5G/4G/3G+",
+            "Hotspot incluido",
+            "El más vendido"
+          ],
+          europeGB: defaultProduct.data_eu_gb,
+          spainGB: defaultProduct.data_es_gb
+        });
+      }
+    }
+  }, [products]);
 
   const simCards = products.map(product => ({
     type: "esim" as const,
