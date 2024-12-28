@@ -12,6 +12,7 @@ const Sims = () => {
   const isMobile = useIsMobile();
   const simCards = [
     {
+      id: "sim-xl", // Añadido ID
       type: "physical" as const,
       title: "Prepago XL",
       description: "16GB Europa / 160GB España",
@@ -26,6 +27,7 @@ const Sims = () => {
       ]
     },
     {
+      id: "sim-xxl", // Añadido ID
       type: "physical" as const,
       title: "Prepago XXL",
       description: "22GB Europa / 190GB España",

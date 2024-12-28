@@ -7,6 +7,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 
 interface PlanDetailsProps {
+  id: string; // Añadido ID
   title: string;
   description: string;
   features: string[];
@@ -16,6 +17,7 @@ interface PlanDetailsProps {
 }
 
 export function PlanDetails({ 
+  id,
   title, 
   description, 
   features, 
@@ -29,7 +31,8 @@ export function PlanDetails({
 
   const handlePurchase = () => {
     addItem({
-      id: `esim-${title}`,
+      id: `esim-${id}`,
+      productId: id, // Añadido productId
       type: "esim",
       title,
       description,
