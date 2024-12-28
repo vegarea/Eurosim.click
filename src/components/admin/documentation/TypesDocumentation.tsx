@@ -1,4 +1,4 @@
-import { Code2, Check, AlertTriangle, ArrowRight, Database, Components, FileJson } from "lucide-react"
+import { Code2, Check, AlertTriangle, ArrowRight, Database, FileJson } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -190,7 +190,7 @@ export function TypesDocumentation() {
                 Tipos de Base de Datos
               </TabsTrigger>
               <TabsTrigger value="interface" className="flex items-center gap-2">
-                <Components className="h-4 w-4" />
+                <FileJson className="h-4 w-4" />
                 Tipos de Interfaz
               </TabsTrigger>
               <TabsTrigger value="enums" className="flex items-center gap-2">
