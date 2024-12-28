@@ -25,30 +25,36 @@ export function ProductButton({
       case "Tarifa S":
         return {
           bg: "bg-[#F2FCE2]",
-          iconColor: "text-green-600"
+          iconColor: "text-gray-700"
         };
       case "E-SIM M":
       case "Tarifa M":
         return {
           bg: "bg-[#D3E4FD]",
-          iconColor: "text-blue-600"
+          iconColor: "text-gray-700"
         };
       case "E-SIM L":
       case "Tarifa L":
         return {
           bg: "bg-[#E5DEFF]",
-          iconColor: "text-purple-600"
+          iconColor: "text-gray-700"
         };
       case "E-SIM XL":
       case "Tarifa XL":
         return {
           bg: "bg-[#FFDEE2]",
-          iconColor: "text-pink-600"
+          iconColor: "text-gray-700"
+        };
+      case "E-SIM XXL":
+      case "Tarifa XXL":
+        return {
+          bg: "bg-[#FDE1D3]",
+          iconColor: "text-gray-700"
         };
       default:
         return {
           bg: "bg-[#D3E4FD]",
-          iconColor: "text-blue-600"
+          iconColor: "text-gray-700"
         };
     }
   };
