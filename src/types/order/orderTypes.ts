@@ -18,12 +18,44 @@ export interface OrderCustomer {
   name: string;
   email: string;
   phone?: string;
+  documentation?: CustomerDocumentation;
+}
+
+export interface CustomerDocumentation {
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  activationDate?: string;
 }
 
 export interface OrderProduct {
   title: string;
   description: string;
   price: number;
+}
+
+export interface OrderEvent {
+  id: string;
+  order_id: string;
+  type: string;
+  description: string;
+  user_id?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  user_name?: string;
+}
+
+export interface OrderNote {
+  id: string;
+  order_id: string;
+  user_id: string;
+  content: string;
+  type: string;
+  is_internal: boolean;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  user_name?: string;
 }
 
 // Tipo para crear una nueva orden en Supabase
@@ -58,20 +90,9 @@ export interface Order {
   carrier?: string;
   activation_date?: string;
   notes: OrderNote[];
+  events: OrderEvent[];
   product?: OrderProduct;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface OrderNote {
-  id: string;
-  order_id: string;
-  user_id: string;
-  content: string;
-  type: string;
-  is_internal: boolean;
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
-  user_name?: string;
 }

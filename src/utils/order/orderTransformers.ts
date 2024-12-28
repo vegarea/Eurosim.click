@@ -1,5 +1,5 @@
 import { Json } from "@/integrations/supabase/types";
-import { ShippingAddress, CreateOrderDTO, Order } from "@/types/order/orderTypes";
+import { ShippingAddress, CreateOrderDTO, Order, CustomerDocumentation } from "@/types/order/orderTypes";
 
 export const transformShippingAddressToJson = (address: ShippingAddress): Json => {
   return {
@@ -33,6 +33,17 @@ export const transformJsonToShippingAddress = (json: Json | null): ShippingAddre
   };
 };
 
+export const transformCustomerDocumentation = (dbCustomer: any): CustomerDocumentation | undefined => {
+  if (!dbCustomer) return undefined;
+
+  return {
+    passportNumber: dbCustomer.passport_number,
+    birthDate: dbCustomer.birth_date,
+    gender: dbCustomer.gender,
+    activationDate: dbCustomer.activation_date
+  };
+};
+
 export const prepareOrderForCreate = (orderData: Partial<CreateOrderDTO>): CreateOrderDTO => {
   return {
     customer_id: orderData.customer_id!,
@@ -57,7 +68,8 @@ export const transformDatabaseOrderToOrder = (dbOrder: any): Order => {
     customer: dbOrder.customer ? {
       name: dbOrder.customer.name,
       email: dbOrder.customer.email,
-      phone: dbOrder.customer.phone
+      phone: dbOrder.customer.phone,
+      documentation: transformCustomerDocumentation(dbOrder.customer)
     } : undefined,
     status: dbOrder.status,
     type: dbOrder.type,
@@ -70,11 +82,13 @@ export const transformDatabaseOrderToOrder = (dbOrder: any): Order => {
     carrier: dbOrder.carrier,
     activation_date: dbOrder.activation_date,
     notes: dbOrder.notes || [],
+    events: dbOrder.events || [],
     product: dbOrder.product ? {
       title: dbOrder.product.title,
       description: dbOrder.product.description,
       price: dbOrder.product.price
     } : undefined,
+    metadata: dbOrder.metadata,
     created_at: dbOrder.created_at,
     updated_at: dbOrder.updated_at
   };
