@@ -16,27 +16,27 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
     switch (title) {
       case "Tarifa M":
         return {
-          iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
+          bg: "from-[#F2FCE2] to-[#E5F7D3]",
           iconColor: "text-green-600"
         };
       case "Tarifa L":
         return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          bg: "from-[#D3E4FD] to-[#C4D9F7]",
           iconColor: "text-blue-600"
         };
       case "Tarifa XL":
         return {
-          iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
+          bg: "from-[#E5DEFF] to-[#D6CFFF]",
           iconColor: "text-purple-600"
         };
       case "Tarifa XXL":
         return {
-          iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
+          bg: "from-[#FFDEE2] to-[#FFD0D5]",
           iconColor: "text-pink-600"
         };
       default:
         return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          bg: "from-[#D3E4FD] to-[#C4D9F7]",
           iconColor: "text-blue-600"
         };
     }
@@ -53,13 +53,12 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-4",
         isSelected ? 
-          "bg-gradient-to-r from-primary/20 to-secondary/20 shadow-lg" : 
-          "bg-white/50 hover:bg-white"
+          `bg-gradient-to-r ${colorScheme.bg} shadow-lg` : 
+          `bg-gradient-to-r ${colorScheme.bg} opacity-80 hover:opacity-100`
       )}
     >
       <div className={cn(
-        "p-2 md:p-4 rounded-lg bg-gradient-to-br",
-        colorScheme.iconBg
+        "p-2 md:p-4 rounded-lg bg-white/50 backdrop-blur-sm"
       )}>
         {type === 'physical' ? (
           <CreditCard className={cn("h-4 w-4 md:h-6 md:w-6", colorScheme.iconColor)} />
