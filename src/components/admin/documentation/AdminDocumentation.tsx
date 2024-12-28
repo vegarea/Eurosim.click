@@ -3,13 +3,13 @@ import {
   FileText,
   ListTree,
   LayoutDashboard,
-  FolderOpen,
-  ArrowRight,
+  Code2,
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DatabaseStructure } from "./DatabaseStructure"
 import { ProjectWorkflow } from "./ProjectWorkflow"
 import { DocumentationOverview } from "./DocumentationOverview"
+import { TypesDocumentation } from "./TypesDocumentation"
 
 export function AdminDocumentation() {
   return (
@@ -35,6 +35,10 @@ export function AdminDocumentation() {
             <ListTree className="mr-2 h-4 w-4" />
             Flujos de Trabajo
           </TabsTrigger>
+          <TabsTrigger value="types" className="data-[state=active]:bg-white">
+            <Code2 className="mr-2 h-4 w-4" />
+            Tipos
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -47,6 +51,10 @@ export function AdminDocumentation() {
 
         <TabsContent value="workflow">
           <ProjectWorkflow />
+        </TabsContent>
+
+        <TabsContent value="types">
+          <TypesDocumentation />
         </TabsContent>
       </Tabs>
     </div>
