@@ -2,11 +2,28 @@ import { ShoppingCart, Database, User, FileText, Settings, Lock, Server, Mail, P
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TypeComparisonSection } from "./components/TypeComparisonSection"
 import { TypesChecklist } from "./components/TypesChecklist"
+import { TypesCounter } from "./components/TypesCounter"
 import { typesChecklistData } from "./data/typesChecklistData"
 
 export function TypesComparison() {
+  // Calcular el total de tipos y revisados
+  const totalTypes = typesChecklistData.reduce(
+    (acc, category) => acc + category.items.length,
+    0
+  )
+  
+  const reviewedTypes = typesChecklistData.reduce(
+    (acc, category) => 
+      acc + category.items.filter(
+        item => item.status === "completed" || item.status === "reviewed"
+      ).length,
+    0
+  )
+
   return (
     <div className="space-y-6">
+      <TypesCounter totalTypes={totalTypes} reviewedTypes={reviewedTypes} />
+      
       <Tabs defaultValue="checklist" className="space-y-4">
         <TabsList>
           <TabsTrigger value="checklist">Vista General</TabsTrigger>

@@ -1,4 +1,16 @@
-export const typesChecklistData = [
+type ChecklistItemStatus = "pending" | "in_progress" | "completed" | "reviewed"
+
+interface ChecklistItem {
+  id: string
+  category: string
+  items: Array<{
+    name: string
+    status: ChecklistItemStatus
+    description: string
+  }>
+}
+
+export const typesChecklistData: ChecklistItem[] = [
   {
     id: "auth",
     category: "Autenticación y Usuarios",
