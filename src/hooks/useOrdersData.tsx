@@ -27,11 +27,7 @@ export function useOrdersData() {
             description,
             price
           ),
-          order_items(
-            quantity,
-            unit_price,
-            total_price
-          )
+          order_notes(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -66,10 +62,43 @@ export function useOrdersData() {
     },
   });
 
+  const addOrderNote = useMutation({
+    mutationFn: async ({ 
+      orderId, 
+      content, 
+      isInternal = false 
+    }: { 
+      orderId: string; 
+      content: string; 
+      isInternal?: boolean;
+    }) => {
+      const { error } = await supabase
+        .from('order_notes')
+        .insert({
+          order_id: orderId,
+          content,
+          is_internal: isInternal,
+          user_id: 'current-user-id', // En una app real, esto vendría del contexto de auth
+          type: 'user_note'
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Nota añadida correctamente');
+    },
+    onError: (error) => {
+      console.error('Error adding order note:', error);
+      toast.error('Error al añadir la nota');
+    },
+  });
+
   return {
     orders,
     isLoading,
     error,
     updateOrderStatus,
+    addOrderNote,
   };
 }
