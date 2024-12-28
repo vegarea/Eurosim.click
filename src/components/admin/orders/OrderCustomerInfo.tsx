@@ -1,4 +1,4 @@
-import { Order } from "./types"
+import { Order } from "@/types"
 import { User, ExternalLink, Clock } from "lucide-react"
 import {
   Card,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { OrderStatusControl } from "./OrderStatusControl"
-import { OrderStatus } from "./types"
+import { OrderStatus } from "@/types"
 
 interface OrderCustomerInfoProps {
   order: Order
@@ -63,7 +63,7 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
               <h3 className="font-medium mb-1">Fecha y Hora</h3>
               <div className="flex items-center gap-1 text-gray-600">
                 <Clock className="h-4 w-4" />
-                <span>{formatDateTime(order.date)}</span>
+                <span>{formatDateTime(order.created_at)}</span>
               </div>
             </div>
           </div>

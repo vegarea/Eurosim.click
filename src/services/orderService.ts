@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order } from "@/types";
+import { Order, PaymentStatus } from "@/types";
 import { transformShippingAddress, prepareShippingAddress } from "@/utils/transformations";
 
 export const orderService = {
@@ -9,7 +9,7 @@ export const orderService = {
     type: 'physical' | 'esim';
     total_amount: number;
     quantity: number;
-    shipping_address?: any;
+    shipping_address?: Record<string, string>;
     activation_date?: string;
   }): Promise<Order> {
     console.group('📝 Order Service - createOrder');
@@ -22,7 +22,7 @@ export const orderService = {
           shipping_address: prepareShippingAddress(orderData.shipping_address)
         }),
         status: 'payment_pending',
-        payment_status: 'pending'
+        payment_status: 'pending' as PaymentStatus
       };
 
       const { data: order, error } = await supabase
@@ -55,7 +55,7 @@ export const orderService = {
         payment_status: order.payment_status,
         title: order.product?.title,
         quantity: order.quantity,
-        shipping_address: transformShippingAddress(order.shipping_address),
+        shipping_address: order.shipping_address,
         stripe_payment_intent_id: order.stripe_payment_intent_id,
         stripe_receipt_url: order.stripe_receipt_url,
         paypal_order_id: order.paypal_order_id,
