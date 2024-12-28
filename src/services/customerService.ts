@@ -50,11 +50,16 @@ export const customerService = {
           .update(customerPayload)
           .eq('id', existingCustomer.id)
           .select()
-          .single();
+          .maybeSingle();
 
         if (updateError) {
           console.error('Error updating customer:', updateError);
           throw updateError;
+        }
+
+        if (!updatedCustomer) {
+          console.error('No customer was updated');
+          throw new Error('Failed to update customer');
         }
 
         return {
@@ -75,17 +80,25 @@ export const customerService = {
           ...customerPayload
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (createError) {
         console.error('Error creating customer:', createError);
         throw createError;
       }
 
+      if (!newCustomer) {
+        console.error('No customer was created');
+        throw new Error('Failed to create customer');
+      }
+
       return {
         ...newCustomer,
         default_shipping_address: transformShippingAddress(newCustomer.default_shipping_address)
       } as Customer;
+    } catch (error) {
+      console.error('Error in findOrCreateCustomer:', error);
+      throw error;
     } finally {
       console.groupEnd();
     }
