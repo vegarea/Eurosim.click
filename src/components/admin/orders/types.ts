@@ -1,22 +1,6 @@
 import { Order as DatabaseOrder } from "@/types/database/orders"
-
-export interface OrderEvent {
-  id: string;
-  type: string;
-  description: string;
-  user_id?: string;
-  user_name?: string;
-  created_at: string;
-  metadata?: Record<string, any>;
-}
-
-export interface OrderNote {
-  id: string;
-  text: string;
-  user_id: string;
-  user_name: string;
-  created_at: string;
-}
+import { OrderEvent, OrderNote } from "@/types/database/common"
+import { OrderStatus } from "@/types/database/enums"
 
 // Extender el tipo Order de la base de datos para incluir campos adicionales de UI
 export interface Order extends DatabaseOrder {
@@ -25,3 +9,5 @@ export interface Order extends DatabaseOrder {
   customer_phone?: string;
   events?: OrderEvent[];
 }
+
+export type { OrderEvent, OrderNote, OrderStatus }

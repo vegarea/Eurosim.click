@@ -8,31 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-interface CustomerData {
-  customer_id: string;
-  name: string;
-  email: string;
-  phone: string;
-  orders: any[];
-  totalSpent: number;
-  shippingInfo: {
-    address?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-  };
-  documentation: {
-    passportNumber?: string;
-    birthDate?: string;
-    gender?: string;
-    activationDate?: string;
-  };
-}
+import { ExtendedCustomer } from "@/types/database/customers"
 
 interface CustomersTableProps {
-  customers: CustomerData[]
-  onViewDetails: (customer: CustomerData) => void
+  customers: ExtendedCustomer[]
+  onViewDetails: (customer: ExtendedCustomer) => void
 }
 
 export function CustomersTable({ customers, onViewDetails }: CustomersTableProps) {
@@ -50,7 +30,7 @@ export function CustomersTable({ customers, onViewDetails }: CustomersTableProps
         </TableHeader>
         <TableBody>
           {customers.map((customer) => (
-            <TableRow key={customer.customer_id}>
+            <TableRow key={customer.id}>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-500" />

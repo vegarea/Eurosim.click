@@ -22,3 +22,21 @@ export interface MarketingPreferences {
   language_preference?: string;
   communication_frequency?: string;
 }
+
+export interface OrderEvent {
+  id: string;
+  type: string;
+  description: string;
+  user_id?: string;
+  user_name?: string;
+  created_at: string;
+  metadata?: Record<string, any>;
+}
+
+export interface OrderNote {
+  id: string;
+  text: string;
+  user_id: string;
+  user_name: string;
+  created_at: string;
+}

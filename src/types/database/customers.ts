@@ -20,5 +20,10 @@ export interface Customer {
   updated_at: string | null;
 }
 
+export interface ExtendedCustomer extends Customer {
+  orders: Order[];
+  totalSpent: number;
+}
+
 export type CustomerInsert = Omit<Customer, "id" | "created_at" | "updated_at">;
 export type CustomerUpdate = Partial<CustomerInsert>;
