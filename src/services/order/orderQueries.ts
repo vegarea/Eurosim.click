@@ -89,5 +89,32 @@ export const orderQueries = {
     } finally {
       console.groupEnd();
     }
+  },
+
+  async createOrderEvent(orderId: string, type: string, description: string) {
+    console.group('📝 Order Queries - createOrderEvent');
+    console.log('Creating event:', { orderId, type, description });
+
+    try {
+      const { error } = await supabase
+        .from('order_events')
+        .insert({
+          order_id: orderId,
+          type,
+          description
+        });
+
+      if (error) {
+        console.error('Error creating order event:', error);
+        throw error;
+      }
+
+      console.log('Order event created successfully');
+    } catch (error) {
+      console.error('Error in createOrderEvent:', error);
+      throw error;
+    } finally {
+      console.groupEnd();
+    }
   }
 };

@@ -121,7 +121,7 @@ export const useCheckout = () => {
       toast.error(error instanceof Error ? error.message : 'Error al procesar el pedido');
       return false;
     } finally {
-      console.groupEnd(); // Close main checkout process group
+      console.groupEnd();
       setIsProcessing(false);
     }
   };

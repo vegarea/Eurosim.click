@@ -34,5 +34,19 @@ export const orderService = {
 
   async getOrder(orderId: string): Promise<Order> {
     return orderQueries.getOrder(orderId);
+  },
+
+  async createOrderEvent(orderId: string, type: string, description: string) {
+    console.group('📝 Order Service - createOrderEvent');
+    console.log('Creating order event:', { orderId, type, description });
+
+    try {
+      return await orderQueries.createOrderEvent(orderId, type, description);
+    } catch (error) {
+      console.error('Error creating order event:', error);
+      throw error;
+    } finally {
+      console.groupEnd();
+    }
   }
 };
