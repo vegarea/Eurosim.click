@@ -6,6 +6,11 @@ import MexicoFlag from "./icons/MexicoFlag";
 export function SimOptions() {
   const navigate = useNavigate();
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    window.scrollTo({ top: 0 });
+  };
+
   return (
     <section className="py-24 bg-white relative overflow-hidden">
       {/* Fondo con patrón de puntos */}
@@ -36,7 +41,7 @@ export function SimOptions() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">SIM Física</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-1 md:mb-2">SIM Card</h3>
                   <p className="text-sm md:text-base text-gray-600 flex items-center gap-2">
                     Entrega a domicilio a todo México
                     <MexicoFlag className="w-5 h-3 md:w-6 md:h-4" />
@@ -65,7 +70,7 @@ export function SimOptions() {
 
               <Button 
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 group"
-                onClick={() => navigate("/sims")}
+                onClick={() => handleNavigation("/sims")}
               >
                 Conocer más
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -112,7 +117,7 @@ export function SimOptions() {
               <Button 
                 variant="secondary"
                 className="w-full bg-gradient-to-r from-secondary to-primary hover:opacity-90 group"
-                onClick={() => navigate("/e-sims")}
+                onClick={() => handleNavigation("/e-sims")}
               >
                 Conocer más
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
