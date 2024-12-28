@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Order, OrderStatus, OrderStatusHistoryEntry } from '@/types';
+import { Order, OrderStatus, OrderStatusHistoryEntry, Customer } from '@/types';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useOrdersData() {
@@ -16,7 +16,8 @@ export function useOrdersData() {
         .select(`
           *,
           customer:customers(*),
-          events:order_events(*)
+          events:order_events(*),
+          notes:order_notes(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -25,11 +26,27 @@ export function useOrdersData() {
       // Transformar los datos para mantener compatibilidad con la interfaz existente
       return ordersData.map((order: any) => ({
         ...order,
-        total: order.total_amount,
-        date: order.created_at,
         customer: order.customer?.name || 'Unknown',
         email: order.customer?.email,
         phone: order.customer?.phone,
+        date: order.created_at,
+        total: order.total_amount,
+        shippingAddress: order.shipping_address?.street,
+        city: order.shipping_address?.city,
+        state: order.shipping_address?.state,
+        zipCode: order.shipping_address?.postal_code,
+        passportNumber: order.customer?.passport_number,
+        birthDate: order.customer?.birth_date,
+        gender: order.customer?.gender,
+        activationDate: order.activation_date,
+        events: order.events?.map((event: any) => ({
+          ...event,
+          user_name: event.user_id ? 'Admin' : 'System' // Esto debería obtenerse de la tabla de usuarios
+        })),
+        notes: order.notes?.map((note: any) => ({
+          ...note,
+          user_name: note.user_id ? 'Admin' : 'System' // Esto debería obtenerse de la tabla de usuarios
+        }))
       }));
     }
   });

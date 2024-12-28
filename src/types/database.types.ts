@@ -31,3 +31,14 @@ export interface Customer {
   created_at: string;
   updated_at: string;
 }
+
+export interface OrderStatusHistoryEntry {
+  id: string;
+  order_id: string;
+  old_status: OrderStatus;
+  new_status: OrderStatus;
+  changed_by: string;
+  reason?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}
