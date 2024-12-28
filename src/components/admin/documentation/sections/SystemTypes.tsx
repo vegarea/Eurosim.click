@@ -9,7 +9,7 @@ export function SystemTypes() {
         icon={<Database className="h-5 w-5" />}
         currentType={`// Tipos actuales en el sistema`}
         supabaseType={`// Tipos requeridos por Supabase`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "docs/database/schema.ts",
           "src/types/database.ts"
@@ -28,7 +28,7 @@ export function SystemTypes() {
   email: text
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/auth/types.ts",
           "src/contexts/AuthContext.tsx"
@@ -48,7 +48,7 @@ export function SystemTypes() {
   type: text
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/services/storage.ts",
           "src/types/storage.ts"

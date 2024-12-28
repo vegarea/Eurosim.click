@@ -25,7 +25,7 @@ export function CheckoutTypes() {
   created_at: timestamp
   updated_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/admin/orders/types.ts",
           "src/components/checkout/types.ts"
@@ -50,7 +50,7 @@ export function CheckoutTypes() {
   total_price: integer
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/admin/orders/types.ts",
           "src/components/checkout/CartItem.tsx"

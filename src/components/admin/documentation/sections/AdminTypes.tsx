@@ -20,7 +20,7 @@ export function AdminTypes() {
   type: "physical" | "esim"
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/admin/products/types.ts",
           "src/components/admin/products/ProductCard.tsx"
@@ -41,7 +41,7 @@ export function AdminTypes() {
   customer_id: uuid
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/admin/orders/types.ts",
           "src/components/admin/orders/OrdersTable.tsx"
@@ -62,7 +62,7 @@ export function AdminTypes() {
   email: text
   created_at: timestamp
 }`}
-        status="pending"
+        status="reviewed"
         relatedFiles={[
           "src/components/admin/customers/types.ts",
           "src/components/admin/customers/CustomersTable.tsx"
