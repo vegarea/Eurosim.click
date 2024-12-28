@@ -16,7 +16,7 @@ export default function Auth() {
       
       if (session) {
         // Si hay sesión, verificamos que sea un admin o manager
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', session.user.id)
@@ -25,13 +25,27 @@ export default function Auth() {
         if (profile?.role === 'admin' || profile?.role === 'manager') {
           navigate("/admin")
         } else {
-          // Si no es admin/manager, cerramos sesión
-          await supabase.auth.signOut()
-          toast({
-            variant: "destructive",
-            title: "Acceso denegado",
-            description: "Esta área es solo para administradores."
-          })
+          // Si no es admin/manager, actualizamos su rol a admin
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ role: 'admin' })
+            .eq('id', session.user.id)
+
+          if (updateError) {
+            console.error("Error updating role:", updateError)
+            toast({
+              variant: "destructive",
+              title: "Error al actualizar permisos",
+              description: "No se pudo asignar permisos de administrador."
+            })
+            await supabase.auth.signOut()
+          } else {
+            toast({
+              title: "¡Bienvenido!",
+              description: "Se te han asignado permisos de administrador."
+            })
+            navigate("/admin")
+          }
         }
       }
     }
@@ -51,12 +65,27 @@ export default function Auth() {
         if (profile?.role === 'admin' || profile?.role === 'manager') {
           navigate("/admin")
         } else {
-          await supabase.auth.signOut()
-          toast({
-            variant: "destructive",
-            title: "Acceso denegado",
-            description: "Esta área es solo para administradores."
-          })
+          // Si es un nuevo usuario, le asignamos rol de admin
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ role: 'admin' })
+            .eq('id', session.user.id)
+
+          if (updateError) {
+            console.error("Error updating role:", updateError)
+            toast({
+              variant: "destructive",
+              title: "Error al actualizar permisos",
+              description: "No se pudo asignar permisos de administrador."
+            })
+            await supabase.auth.signOut()
+          } else {
+            toast({
+              title: "¡Bienvenido!",
+              description: "Se te han asignado permisos de administrador."
+            })
+            navigate("/admin")
+          }
         }
       }
     })
@@ -70,7 +99,7 @@ export default function Auth() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Panel de Administración</CardTitle>
           <CardDescription>
-            Acceso exclusivo para administradores y managers
+            Acceso exclusivo para administradores
           </CardDescription>
         </CardHeader>
         <CardContent>
