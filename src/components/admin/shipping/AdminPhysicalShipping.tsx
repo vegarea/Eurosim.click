@@ -1,28 +1,62 @@
-import { useToast } from "@/components/ui/use-toast"
-import { DataTable } from "@/components/ui/data-table"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Truck, Package } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Order, OrderStatus } from "@/types/supabase"
+import { Truck, PackageCheck } from "lucide-react"
+import { Order } from "../orders/types"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { useOrders } from "@/contexts/OrdersContext"
+import { useState } from "react"
+import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
+import { ShippingTabs } from "./components/ShippingTabs"
+import { 
+  createShippingConfirmationEvent, 
+  createDeliveryConfirmationEvent 
+} from "./utils/shippingEvents"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
   const { orders, updateOrder } = useOrders()
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+
   const physicalOrders = orders.filter(order => order.type === "physical")
-
-  // Filtrar pedidos por estado
   const pendingOrders = physicalOrders.filter(order => order.status === "processing")
-  const completedOrders = physicalOrders.filter(order => order.status === "shipped")
+  const shippedOrders = physicalOrders.filter(order => order.status === "shipped")
+  const deliveredOrders = physicalOrders.filter(order => order.status === "delivered")
 
-  const handleMarkShipped = (order: Order) => {
-    updateOrder(order.id, { status: "shipped" })
+  const handleShipOrder = (order: Order) => {
+    setSelectedOrderId(order.id)
+    setConfirmDialogOpen(true)
+  }
+
+  const handleConfirmShipping = (trackingNumber: string, carrier: string) => {
+    if (!selectedOrderId) return
+
+    const event = createShippingConfirmationEvent(trackingNumber, carrier)
+
+    updateOrder(selectedOrderId, {
+      status: "shipped",
+      events: [...(orders.find(o => o.id === selectedOrderId)?.events || []), event]
+    })
 
     toast({
-      title: "Pedido marcado como enviado",
-      description: `El pedido ${order.id} ha sido marcado como enviado.`
+      title: "Envío confirmado",
+      description: `El pedido ${selectedOrderId} ha sido marcado como enviado.`
+    })
+
+    setConfirmDialogOpen(false)
+  }
+
+  const handleDeliverOrder = (order: Order) => {
+    const event = createDeliveryConfirmationEvent()
+
+    updateOrder(order.id, {
+      status: "delivered",
+      events: [...(order.events || []), event]
+    })
+
+    toast({
+      title: "Pedido entregado",
+      description: `El pedido ${order.id} ha sido marcado como entregado.`
     })
   }
 
@@ -53,16 +87,26 @@ export function AdminPhysicalShipping() {
       cell: ({ row }: any) => {
         const order = row.original
         const isProcessing = order.status === "processing"
+        const isShipped = order.status === "shipped"
         return (
           <div className="flex gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleMarkShipped(order)}
+              onClick={() => handleShipOrder(order)}
               disabled={!isProcessing}
             >
               <Truck className="w-4 h-4 mr-2" />
-              Marcar como enviado
+              Confirmar Envío
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDeliverOrder(order)}
+              disabled={!isShipped}
+            >
+              <PackageCheck className="w-4 h-4 mr-2" />
+              Marcar como entregado
             </Button>
           </div>
         )
@@ -73,52 +117,25 @@ export function AdminPhysicalShipping() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Gestión de Envíos SIM Física</h1>
+        <h1 className="text-2xl font-bold">Gestión de Envíos Físicos</h1>
         <p className="text-muted-foreground">
-          Gestiona el estado de los envíos de SIM físicas
+          Gestiona los envíos de SIMs físicas y actualiza su estado
         </p>
       </div>
 
-      <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pending" className="relative">
-            En Preparación
-            {pendingOrders.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-blue-100 text-blue-800"
-              >
-                {pendingOrders.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="completed">
-            Envíos Completados
-            {completedOrders.length > 0 && (
-              <Badge 
-                variant="secondary" 
-                className="ml-2 bg-green-100 text-green-800"
-              >
-                {completedOrders.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="pending" className="mt-6">
-          <DataTable 
-            columns={columns} 
-            data={pendingOrders}
-          />
-        </TabsContent>
-        
-        <TabsContent value="completed" className="mt-6">
-          <DataTable 
-            columns={columns} 
-            data={completedOrders}
-          />
-        </TabsContent>
-      </Tabs>
+      <ShippingTabs
+        pendingOrders={pendingOrders}
+        shippedOrders={shippedOrders}
+        deliveredOrders={deliveredOrders}
+        columns={columns}
+      />
+
+      <ShippingConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        orderId={selectedOrderId || ""}
+        onConfirm={handleConfirmShipping}
+      />
     </div>
   )
 }

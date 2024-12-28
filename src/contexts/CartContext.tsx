@@ -3,7 +3,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 export interface CartItem {
   id: string;
-  productId: string; // Añadido para mantener el ID real del producto
   type: "physical" | "esim";
   title: string;
   description: string;
@@ -27,12 +26,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (newItem: Omit<CartItem, "quantity">) => {
     setItems(currentItems => {
-      // Ahora buscamos por productId en lugar de id
-      const existingItem = currentItems.find(item => item.productId === newItem.productId);
+      const existingItem = currentItems.find(item => item.id === newItem.id);
       
       if (existingItem) {
         return currentItems.map(item =>
-          item.productId === newItem.productId
+          item.id === newItem.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -47,19 +45,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const removeItem = (productId: string) => {
-    setItems(currentItems => currentItems.filter(item => item.productId !== productId));
+  const removeItem = (id: string) => {
+    setItems(currentItems => currentItems.filter(item => item.id !== id));
     toast({
       title: "Producto eliminado",
       description: "El producto ha sido eliminado del carrito",
     });
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number) => {
     if (quantity < 1) return;
     setItems(currentItems =>
       currentItems.map(item =>
-        item.productId === productId ? { ...item, quantity } : item
+        item.id === id ? { ...item, quantity } : item
       )
     );
   };

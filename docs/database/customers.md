@@ -37,40 +37,11 @@ Esta tabla almacena la información de los clientes registrados en la plataforma
 - Cliente: Puede ver solo su propia información
 - Admin/Manager: Puede ver todos los clientes
 - Sistema: Puede leer información para procesamiento
-- Público: Sin acceso
 
 ### Escritura
 - Cliente: No puede modificar directamente su información
 - Admin: Puede crear y actualizar cualquier cliente
 - Sistema: Puede crear y actualizar registros automáticamente
-- Webhook de Stripe: Puede crear registros (service_role key)
-
-### Políticas SQL
-
-```sql
--- Permitir creación desde webhook de Stripe (usando service_role)
-CREATE POLICY "Allow Stripe webhook to create customers"
-ON customers FOR INSERT
-TO service_role
-WITH CHECK (true);
-
--- Permitir lectura al propio cliente
-CREATE POLICY "Users can view own profile"
-ON customers FOR SELECT
-USING (auth.uid() = id);
-
--- Permitir lectura a admins
-CREATE POLICY "Admins can view all profiles"
-ON customers FOR SELECT
-TO authenticated
-USING (auth.jwt() ? 'is_admin');
-
--- Permitir actualización a admins
-CREATE POLICY "Admins can update all profiles"
-ON customers FOR UPDATE
-TO authenticated
-USING (auth.jwt() ? 'is_admin');
-```
 
 ## Notas sobre Autenticación
 
@@ -135,4 +106,3 @@ USING (auth.jwt() ? 'is_admin');
 - La documentación UE requiere validación especial del pasaporte y fecha de nacimiento
 - Se mantiene un historial de cambios importantes en una tabla separada
 - Los IDs de proveedores de pago (Stripe/PayPal) se utilizan para facilitar pagos recurrentes
-

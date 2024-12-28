@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 
 interface CartItemProps {
   id: string;
-  productId: string; // Añadido ID del producto
   type: "physical" | "esim";
   title: string;
   description: string;
@@ -16,7 +15,6 @@ interface CartItemProps {
 
 export function CartItem({
   id,
-  productId,
   type,
   title,
   description,
@@ -62,7 +60,7 @@ export function CartItem({
             variant="outline"
             size="icon"
             className="h-8 w-8"
-            onClick={() => onUpdateQuantity(productId, Math.max(0, quantity - 1))}
+            onClick={() => onUpdateQuantity(id, Math.max(0, quantity - 1))}
             disabled={quantity <= 1}
           >
             <Minus className="h-4 w-4" />
@@ -72,7 +70,7 @@ export function CartItem({
             variant="outline"
             size="icon"
             className="h-8 w-8"
-            onClick={() => onUpdateQuantity(productId, quantity + 1)}
+            onClick={() => onUpdateQuantity(id, quantity + 1)}
           >
             <Plus className="h-4 w-4" />
           </Button>
@@ -80,7 +78,7 @@ export function CartItem({
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-gray-400 hover:text-red-500"
-            onClick={() => onRemove(productId)}
+            onClick={() => onRemove(id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

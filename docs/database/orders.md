@@ -1,6 +1,6 @@
 # Tabla: Orders
 
-Esta tabla almacena la información de los pedidos realizados en la plataforma.
+Esta tabla almacena la información de los pedidos realizados en la plataforma, incluyendo detalles de pago y envío.
 
 ## Estructura
 
@@ -9,12 +9,12 @@ Esta tabla almacena la información de los pedidos realizados en la plataforma.
 | id | uuid | Identificador único del pedido | ✅ |
 | customer_id | uuid | ID del cliente que realizó el pedido | ✅ |
 | product_id | uuid | ID del producto ordenado | ✅ |
-| status | enum | Estado del pedido | ✅ |
+| status | enum | Estado del pedido (payment_pending/payment_failed/processing/shipped/delivered/cancelled) | ✅ |
 | type | enum | Tipo de pedido (physical/esim) | ✅ |
 | total_amount | integer | Monto total en centavos | ✅ |
 | quantity | integer | Cantidad de productos | ✅ |
 | payment_method | enum | Método de pago (stripe/paypal) | ✅ |
-| payment_status | enum | Estado del pago | ✅ |
+| payment_status | enum | Estado del pago (pending/completed/failed/refunded) | ✅ |
 | stripe_payment_intent_id | text | ID de la intención de pago en Stripe | ❌ |
 | stripe_receipt_url | text | URL del recibo de Stripe | ❌ |
 | paypal_order_id | text | ID de la orden en PayPal | ❌ |
@@ -27,49 +27,6 @@ Esta tabla almacena la información de los pedidos realizados en la plataforma.
 | metadata | jsonb | Información adicional flexible | ❌ |
 | created_at | timestamp | Fecha de creación | ✅ |
 | updated_at | timestamp | Fecha de última actualización | ✅ |
-
-## Políticas de Seguridad (RLS)
-
-### Lectura
-- Cliente: Puede ver sus propios pedidos
-- Admin/Manager: Puede ver todos los pedidos
-- Sistema: Puede leer para procesamiento
-- Público: Sin acceso
-
-### Escritura
-- Cliente: No puede crear ni modificar pedidos directamente
-- Admin: Puede actualizar pedidos
-- Sistema: Puede crear y actualizar pedidos automáticamente
-- Webhook de Stripe: Puede crear pedidos (service_role key)
-
-### Políticas SQL
-
-```sql
--- Permitir creación desde webhook de Stripe (usando service_role)
-CREATE POLICY "Allow Stripe webhook to create orders"
-ON orders FOR INSERT
-TO service_role
-WITH CHECK (true);
-
--- Permitir lectura al cliente de sus propios pedidos
-CREATE POLICY "Users can view own orders"
-ON orders FOR SELECT
-USING (auth.uid() IN (
-  SELECT id FROM customers WHERE id = customer_id
-));
-
--- Permitir lectura a admins
-CREATE POLICY "Admins can view all orders"
-ON orders FOR SELECT
-TO authenticated
-USING (auth.jwt() ? 'is_admin');
-
--- Permitir actualización a admins
-CREATE POLICY "Admins can update orders"
-ON orders FOR UPDATE
-TO authenticated
-USING (auth.jwt() ? 'is_admin');
-```
 
 ## Índices
 

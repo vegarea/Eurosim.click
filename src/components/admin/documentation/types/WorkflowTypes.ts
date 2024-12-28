@@ -1,15 +1,23 @@
-export * from './orders/OrderTypes';
-export type { OrderNote } from './checkout/CheckoutTypes';
+export type WorkflowStatus = 'working' | 'pending' | 'reviewed';
 
-// Re-export common types that might be needed across the application
-export type { 
-  WorkflowStatus,
-  WorkflowItem,
-  WorkflowCategory,
-  TypeField,
-  TypeDefinition,
-  DocumentValidationForm,
-  ShippingAddressForm,
-  ShippingAddress,
-  Customer
-} from './workflow/WorkflowTypes';
+export interface WorkflowItem {
+  id: string;
+  title: string;
+  description: string;
+  status: WorkflowStatus;
+  details?: string;
+  components?: string[];
+  database?: string[];
+  created_at?: string;
+  updated_at?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface WorkflowCategory {
+  id: string;
+  title: string;
+  items: WorkflowItem[];
+  description?: string;
+  icon?: string;
+  metadata?: Record<string, any>;
+}

@@ -1,21 +1,27 @@
-import { createContext, useContext } from 'react'
-import { UIOrder, OrderStatus } from '@/types/supabase/base'
-import { useOrders as useOrdersHook } from '@/hooks/useOrders'
+import React, { createContext, useContext, useState } from "react"
+import { Order } from "@/components/admin/orders/types"
+import { mockOrders } from "@/components/admin/orders/mockData"
 
 interface OrdersContextType {
-  orders: UIOrder[]
-  updateOrder: (orderId: string, updates: Partial<UIOrder>) => Promise<void>
-  isLoading: boolean
-  error: Error | null
+  orders: Order[]
+  updateOrder: (orderId: string, updates: Partial<Order>) => void
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const ordersHook = useOrdersHook()
+  const [orders, setOrders] = useState(mockOrders)
+
+  const updateOrder = (orderId: string, updates: Partial<Order>) => {
+    setOrders(orders.map(order => 
+      order.id === orderId 
+        ? { ...order, ...updates }
+        : order
+    ))
+  }
 
   return (
-    <OrdersContext.Provider value={ordersHook}>
+    <OrdersContext.Provider value={{ orders, updateOrder }}>
       {children}
     </OrdersContext.Provider>
   )

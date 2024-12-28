@@ -1,10 +1,19 @@
 import { Wifi, CreditCard, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { Tables } from "@/integrations/supabase/types"
-import { formatCurrency } from "@/utils/currency"
+
+interface Product {
+  id: string
+  type: "physical" | "esim"
+  title: string
+  description: string
+  price: number
+  features: string[]
+  europeGB?: number
+  spainGB?: number
+}
 
 interface ProductCardProps {
-  product: Tables<"products">
+  product: Product
   onDelete: (id: string) => void
 }
 
@@ -33,7 +42,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       </div>
       <div className="mb-4">
         <p className="text-2xl font-bold text-primary">
-          {formatCurrency(product.price)}
+          ${product.price}
           <span className="text-sm font-normal text-muted-foreground ml-1">MXN</span>
         </p>
       </div>
@@ -48,14 +57,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       {product.type === "esim" && (
         <div className="mt-4 pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            GB Europa: {product.europe_gb} / España: {product.spain_gb}
-          </p>
-        </div>
-      )}
-      {product.type === "physical" && product.stock !== null && (
-        <div className="mt-4 pt-4 border-t">
-          <p className="text-sm text-muted-foreground">
-            Stock disponible: {product.stock}
+            GB Europa: {product.europeGB} / España: {product.spainGB}
           </p>
         </div>
       )}

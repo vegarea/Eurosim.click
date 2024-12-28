@@ -9,18 +9,22 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusBadge } from "./OrderStatusBadge"
-import { useOrders } from "@/hooks/useOrders"
+import { Order } from "./types"
 
-export function OrdersTable() {
-  const navigate = useNavigate()
-  const { orders } = useOrders()
+interface OrdersTableProps {
+  orders: Order[]
+  onStatusChange: (orderId: string, newStatus: Order['status']) => void
+}
 
-  const getSimTypeBadgeStyle = (type: string) => {
-    if (type === "physical") {
-      return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]"
-    }
-    return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]"
+const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
+  if (type === "physical") {
+    return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]" // Soft blue
   }
+  return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
+}
+
+export function OrdersTable({ orders }: OrdersTableProps) {
+  const navigate = useNavigate()
 
   return (
     <div className="rounded-md border">
@@ -44,8 +48,8 @@ export function OrdersTable() {
               onClick={() => navigate(`/admin/orders/${order.id}`)}
             >
               <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell>{order.formattedDate}</TableCell>
-              <TableCell>{order.customerName}</TableCell>
+              <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+              <TableCell>{order.customer}</TableCell>
               <TableCell>
                 <Badge 
                   variant="secondary" 
