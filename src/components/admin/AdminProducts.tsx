@@ -107,8 +107,11 @@ export function AdminProducts() {
       const priceInCents = typeof updates.price === 'number' ? 
         Math.round(updates.price * 100) : updates.price
 
+      // Preparar datos para actualización, excluyendo campos de fecha
+      const { created_at, updated_at, ...updateFields } = updates
+
       const updateData = {
-        ...updates,
+        ...updateFields,
         price: priceInCents,
         features: Array.isArray(updates.features) ? updates.features : [],
         stock: updates.type === 'physical' ? updates.stock : null,
