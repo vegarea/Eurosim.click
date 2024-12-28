@@ -9,6 +9,7 @@ import Index from "./pages/Index"
 import Sims from "./pages/Sims"
 import ESims from "./pages/ESims"
 import Checkout from "./pages/Checkout"
+import ThankYou from "./pages/ThankYou"
 import AdminPanel from "./pages/AdminPanel"
 import OrderDetails from "./pages/OrderDetails"
 import "flag-icons/css/flag-icons.min.css"
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/sims" element={<Sims />} />
               <Route path="/e-sims" element={<ESims />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/admin/*" element={<AdminPanel />} />
               <Route path="/admin/orders/:orderId" element={<OrderDetails />} />
             </Routes>

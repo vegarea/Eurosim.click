@@ -97,7 +97,7 @@ export function PaymentStep() {
           <div className="mt-6 space-y-4">
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600">
-                Serás redirigido a Stripe para completar tu pago de forma segura.
+                Serás redirigido a Stripe para completar tu pago de forma segura. Después del pago exitoso, serás redirigido a la página de confirmación.
               </p>
             </div>
           </div>
