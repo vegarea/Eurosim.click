@@ -1,6 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Tooltip } from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 import { orderTypes } from "./types/OrderTypes"
 import { formTypes } from "./types/FormTypes"
 import { adminTypes } from "./types/AdminTypes"
@@ -12,7 +14,7 @@ export function TypesList() {
   return (
     <div className="border rounded-lg">
       <ScrollArea className="h-[600px]">
-        <div className="w-full min-w-[1200px]">
+        <div className="w-full min-w-[1400px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -20,6 +22,8 @@ export function TypesList() {
                 <TableHead className="min-w-[300px]">Tipo Actual</TableHead>
                 <TableHead className="min-w-[300px]">Tipo Supabase</TableHead>
                 <TableHead className="min-w-[200px]">Ubicación</TableHead>
+                <TableHead className="min-w-[150px]">Relaciones</TableHead>
+                <TableHead className="w-[120px]">Variables Requeridas</TableHead>
                 <TableHead className="w-[100px]">Categoría</TableHead>
                 <TableHead className="w-[120px]">Estado</TableHead>
               </TableRow>
@@ -28,7 +32,14 @@ export function TypesList() {
               {types.map((type, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium bg-white sticky left-0 border-r">
-                    {type.name}
+                    <div className="flex items-center gap-2">
+                      {type.name}
+                      {type.description && (
+                        <Tooltip content={type.description}>
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Tooltip>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <pre className="text-xs bg-slate-50 p-2 rounded-md overflow-x-auto max-w-[300px]">
@@ -42,11 +53,29 @@ export function TypesList() {
                   </TableCell>
                   <TableCell>
                     <ul className="list-disc list-inside text-sm">
-                      {type.locations.map((location, idx) => (
+                      {type.locations?.map((location, idx) => (
                         <li key={idx} className="text-gray-600 truncate hover:text-clip hover:whitespace-normal">
                           {location}
                         </li>
                       ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell>
+                    <ul className="list-disc list-inside text-sm">
+                      {type.relations?.map((relation, idx) => (
+                        <li key={idx} className="text-gray-600">
+                          {relation.type}: {relation.with}
+                        </li>
+                      )) || <span className="text-gray-400">Sin relaciones</span>}
+                    </ul>
+                  </TableCell>
+                  <TableCell>
+                    <ul className="list-disc list-inside text-sm">
+                      {type.requiredFields?.map((field, idx) => (
+                        <li key={idx} className="text-gray-600">
+                          {field}
+                        </li>
+                      )) || <span className="text-gray-400">No especificado</span>}
                     </ul>
                   </TableCell>
                   <TableCell>
