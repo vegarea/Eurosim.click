@@ -43,7 +43,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
   };
 
   const colorScheme = getColorScheme(title);
-  const formattedPrice = formatCurrency(price);
+  const [amount, currency] = formatCurrency(price).split(' ');
 
   return (
     <button
@@ -70,8 +70,9 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
       
       <div className="flex-1 text-left">
         <h3 className="text-sm md:text-lg font-semibold">{title}</h3>
-        <p className="text-base md:text-xl font-bold text-primary">
-          {formattedPrice}
+        <p className="text-base md:text-xl font-bold text-primary flex items-baseline gap-2">
+          {amount}
+          <span className="text-sm md:text-base font-normal text-gray-500">{currency}</span>
         </p>
       </div>
     </button>
