@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { CreateOrderDTO, Order } from "@/types/order/orderTypes";
+import { CreateOrderDTO, Order } from "@/types";
 import { transformDatabaseOrderToOrder } from "@/utils/order/orderTransformers";
 
 export const orderQueries = {
@@ -10,7 +10,17 @@ export const orderQueries = {
     try {
       const { data: order, error } = await supabase
         .from('orders')
-        .insert(orderData)
+        .insert({
+          customer_id: orderData.customer_id,
+          product_id: orderData.product_id,
+          type: orderData.type,
+          total_amount: orderData.total_amount,
+          quantity: orderData.quantity,
+          shipping_address: orderData.shipping_address,
+          activation_date: orderData.activation_date,
+          notes: orderData.notes,
+          metadata: orderData.metadata
+        })
         .select(`
           *,
           customer:customers(

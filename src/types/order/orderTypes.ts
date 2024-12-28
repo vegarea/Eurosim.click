@@ -1,4 +1,5 @@
 import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from '../database.types';
+import { Json } from '@/integrations/supabase/types';
 
 export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod };
 
@@ -68,7 +69,7 @@ export interface Order {
   payment_status: PaymentStatus;
   title?: string;
   description?: string;
-  shipping_address?: ShippingAddress;
+  shipping_address?: Json;
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
@@ -87,10 +88,8 @@ export interface CreateOrderDTO {
   type: OrderType;
   total_amount: number;
   quantity: number;
-  shipping_address?: ShippingAddress;
+  shipping_address?: Json;
   activation_date?: string;
   notes?: string[];
   metadata?: Record<string, any>;
-  status?: OrderStatus;
-  payment_status?: PaymentStatus;
 }

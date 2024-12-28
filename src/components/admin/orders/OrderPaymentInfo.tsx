@@ -1,4 +1,4 @@
-import { Order } from "@/types/order.types"
+import { Order } from "@/types"
 import { CreditCard, ExternalLink } from "lucide-react"
 import {
   Card,

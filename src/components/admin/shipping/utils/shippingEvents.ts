@@ -1,4 +1,4 @@
-import { OrderEvent } from '@/types/order.types';
+import { OrderEvent } from '@/types';
 import { getTrackingMessage } from "../config/carriers";
 
 export const createShippingConfirmationEvent = (
