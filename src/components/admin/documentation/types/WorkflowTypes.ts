@@ -21,3 +21,17 @@ export interface WorkflowCategory {
   icon?: string;
   metadata?: Record<string, any>;
 }
+
+export interface TypeField {
+  name: string;
+  type: string;
+  description: string;
+  supabaseField?: string;
+}
+
+export interface TypeDefinition {
+  name: string;
+  status: 'verified' | 'warning' | 'pending';
+  description: string;
+  fields: TypeField[];
+}
