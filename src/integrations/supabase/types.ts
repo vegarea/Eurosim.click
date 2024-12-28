@@ -9,6 +9,192 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_post_images: {
+        Row: {
+          ai_prompt: string | null
+          alt_text: string
+          caption: string | null
+          created_at: string
+          height: number
+          id: string
+          is_ai_generated: boolean
+          is_featured: boolean
+          mime_type: string
+          position: number | null
+          post_id: string
+          size_bytes: number
+          storage_path: string
+          thumbnail_url: string | null
+          updated_at: string
+          url: string
+          width: number
+        }
+        Insert: {
+          ai_prompt?: string | null
+          alt_text: string
+          caption?: string | null
+          created_at?: string
+          height: number
+          id?: string
+          is_ai_generated?: boolean
+          is_featured?: boolean
+          mime_type: string
+          position?: number | null
+          post_id: string
+          size_bytes: number
+          storage_path: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          url: string
+          width: number
+        }
+        Update: {
+          ai_prompt?: string | null
+          alt_text?: string
+          caption?: string | null
+          created_at?: string
+          height?: number
+          id?: string
+          is_ai_generated?: boolean
+          is_featured?: boolean
+          mime_type?: string
+          position?: number | null
+          post_id?: string
+          size_bytes?: number
+          storage_path?: string
+          thumbnail_url?: string | null
+          updated_at?: string
+          url?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_images_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          ai_model: string | null
+          ai_prompt: string | null
+          author_id: string
+          content: string
+          created_at: string
+          excerpt: string
+          featured_image_id: string | null
+          id: string
+          is_ai_generated: boolean
+          published_at: string | null
+          scheduled_for: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          ai_model?: string | null
+          ai_prompt?: string | null
+          author_id: string
+          content: string
+          created_at?: string
+          excerpt: string
+          featured_image_id?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          published_at?: string | null
+          scheduled_for?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          ai_model?: string | null
+          ai_prompt?: string | null
+          author_id?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          featured_image_id?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          published_at?: string | null
+          scheduled_for?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_documents: {
+        Row: {
+          country: string
+          created_at: string
+          customer_id: string
+          expiry_date: string
+          id: string
+          metadata: Json | null
+          number: string
+          status: Database["public"]["Enums"]["document_status"]
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          customer_id: string
+          expiry_date: string
+          id?: string
+          metadata?: Json | null
+          number: string
+          status?: Database["public"]["Enums"]["document_status"]
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          customer_id?: string
+          expiry_date?: string
+          id?: string
+          metadata?: Json | null
+          number?: string
+          status?: Database["public"]["Enums"]["document_status"]
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           billing_address: Json | null
@@ -65,6 +251,292 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      document_validations: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          status: string
+          validator_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          status: string
+          validator_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          status?: string
+          validator_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_validations_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "customer_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_validations_validator_id_fkey"
+            columns: ["validator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          metadata: Json | null
+          recipient: string
+          status: string
+          subject: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient: string
+          status: string
+          subject: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient?: string
+          status?: string
+          subject?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          carrier_id: string | null
+          content: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          is_active: boolean
+          name: string
+          status: Database["public"]["Enums"]["order_status"]
+          subject: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          carrier_id?: string | null
+          content: string
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          is_active?: boolean
+          name: string
+          status: Database["public"]["Enums"]["order_status"]
+          subject: string
+          type: Database["public"]["Enums"]["product_type"]
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          carrier_id?: string | null
+          content?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          subject?: string
+          type?: Database["public"]["Enums"]["product_type"]
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_events: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          order_id: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          order_id: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          order_id?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          metadata: Json | null
+          order_id: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          metadata?: Json | null
+          order_id: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          metadata?: Json | null
+          order_id?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_notes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_status_history: {
+        Row: {
+          changed_by: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_status: Database["public"]["Enums"]["order_status"]
+          old_status: Database["public"]["Enums"]["order_status"]
+          order_id: string
+          reason: string | null
+        }
+        Insert: {
+          changed_by: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_status: Database["public"]["Enums"]["order_status"]
+          old_status: Database["public"]["Enums"]["order_status"]
+          order_id: string
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_status?: Database["public"]["Enums"]["order_status"]
+          old_status?: Database["public"]["Enums"]["order_status"]
+          order_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_status_history_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
@@ -152,6 +624,77 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      payment_logs: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          payment_id: string
+          raw_data: Json | null
+          status: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          payment_id: string
+          raw_data?: Json | null
+          status: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          payment_id?: string
+          raw_data?: Json | null
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_logs_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       products: {
         Row: {
