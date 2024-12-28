@@ -10,6 +10,7 @@ import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutLayout } from "@/components/checkout/CheckoutLayout"
 import { useCheckoutFlow } from "@/hooks/useCheckoutFlow"
+import { ShippingFormData, DocumentationFormData } from "@/types/checkout.types"
 
 const CHECKOUT_STEPS = ['Información', 'Documentación', 'Revisión', 'Pago']
 
@@ -46,7 +47,7 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={formData}
+                initialData={formData as Partial<ShippingFormData>}
               />
             ) : (
               <ESimForm 
@@ -66,7 +67,7 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
-            initialData={formData}
+            initialData={formData as Partial<DocumentationFormData>}
           />
         )
       case 3:

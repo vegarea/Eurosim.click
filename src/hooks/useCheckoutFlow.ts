@@ -2,11 +2,12 @@ import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { useCheckout } from "./useCheckout"
 import { useNavigate } from "react-router-dom"
+import { CheckoutFormData } from "@/types/checkout.types"
 
 export function useCheckoutFlow() {
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const [formData, setFormData] = useState<Partial<CheckoutFormData>>({})
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const { processCheckout, isProcessing } = useCheckout()
@@ -54,7 +55,7 @@ export function useCheckoutFlow() {
     setIsFormValid(isValid)
   }
 
-  const handleFormSubmit = async (values: any) => {
+  const handleFormSubmit = async (values: Partial<CheckoutFormData>) => {
     console.log('Form submitted with values:', values)
     
     if (step === 4) {
@@ -64,7 +65,7 @@ export function useCheckoutFlow() {
         navigate('/payment')
       }
     } else {
-      setFormData({ ...formData, ...values })
+      setFormData(prev => ({ ...prev, ...values }))
       setStep(step + 1)
       setIsFormValid(step === 3)
     }
