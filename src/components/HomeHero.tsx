@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, WifiIcon } from "lucide-react";
+import { ArrowRight, WifiIcon, Star } from "lucide-react";
 import {
   Dialog,
   DialogContent,
