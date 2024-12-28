@@ -1,4 +1,4 @@
-import { CreditCard, Wifi } from "lucide-react";
+import { CreditCard, Wifi, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/utils/currency";
 
@@ -8,9 +8,17 @@ interface ProductButtonProps {
   isSelected: boolean;
   onClick: () => void;
   type: "physical" | "esim";
+  isPopular?: boolean;
 }
 
-export function ProductButton({ title, price, isSelected, onClick, type }: ProductButtonProps) {
+export function ProductButton({ 
+  title, 
+  price, 
+  isSelected, 
+  onClick, 
+  type,
+  isPopular = false
+}: ProductButtonProps) {
   const getColorScheme = (title: string) => {
     switch (title) {
       case "E-SIM S":
@@ -52,7 +60,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
     <button
       onClick={onClick}
       className={cn(
-        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm",
+        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm relative",
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-3",
         isSelected ? 
@@ -60,6 +68,13 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
           `${colorScheme.bg} opacity-80 hover:opacity-100`
       )}
     >
+      {isPopular && (
+        <div className="absolute -top-2 -right-2 bg-primary text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+          <Star className="w-3 h-3" />
+          <span>Más vendido</span>
+        </div>
+      )}
+      
       <div className={cn(
         "p-2 rounded-lg bg-white/50 backdrop-blur-sm"
       )}>

@@ -30,16 +30,22 @@ export default function ESims() {
     }
   });
 
-  const [selectedPlan, setSelectedPlan] = useState(products[0] ? {
-    title: products[0].title,
-    description: `${products[0].data_eu_gb}GB Europa / ${products[0].data_es_gb}GB España`,
-    price: products[0].price,
+  // Encontrar el producto "E-SIM L" para establecerlo como predeterminado
+  const defaultProduct = products.find(p => p.title === "E-SIM L");
+  
+  const [selectedPlan, setSelectedPlan] = useState(defaultProduct ? {
+    title: defaultProduct.title,
+    description: `${defaultProduct.data_eu_gb}GB Europa / ${defaultProduct.data_es_gb}GB España`,
+    price: defaultProduct.price,
     features: [
-      `${products[0].data_eu_gb}GB datos en toda Europa`,
-      `${products[0].data_es_gb}GB exclusivo España`,
+      `${defaultProduct.data_eu_gb}GB datos en toda Europa`,
+      `${defaultProduct.data_es_gb}GB exclusivo España`,
+      "Velocidad 5G/4G/3G+",
+      "Hotspot incluido",
+      "El más vendido"
     ],
-    europeGB: products[0].data_eu_gb,
-    spainGB: products[0].data_es_gb
+    europeGB: defaultProduct.data_eu_gb,
+    spainGB: defaultProduct.data_es_gb
   } : null);
 
   const simCards = products.map(product => ({
@@ -50,9 +56,13 @@ export default function ESims() {
     features: [
       `${product.data_eu_gb}GB datos en toda Europa`,
       `${product.data_es_gb}GB exclusivo España`,
+      "Velocidad 5G/4G/3G+",
+      "Hotspot incluido",
+      ...(product.title === "E-SIM L" ? ["El más vendido"] : [])
     ],
     europeGB: product.data_eu_gb,
-    spainGB: product.data_es_gb
+    spainGB: product.data_es_gb,
+    isPopular: product.title === "E-SIM L"
   }));
 
   return (
@@ -69,7 +79,7 @@ export default function ESims() {
           {!isLoading && (
             <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:space-x-6'} gap-4`}>
               <div className={`${isMobile ? 'w-full' : 'md:w-[45%]'} order-2 md:order-1`}>
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3 max-w-lg mx-auto md:mx-0`}>
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3`}>
                   {simCards.map((card) => (
                     <ProductButton
                       key={card.title}
@@ -77,6 +87,7 @@ export default function ESims() {
                       price={card.price}
                       type={card.type}
                       isSelected={selectedPlan?.title === card.title}
+                      isPopular={card.isPopular}
                       onClick={() => setSelectedPlan(card)}
                     />
                   ))}
