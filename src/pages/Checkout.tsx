@@ -11,10 +11,12 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoIcon, Bug } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { useCheckout } from "@/hooks/useCheckout"
+import { useNavigate } from "react-router-dom"
 
 // Test data that matches the expected prop types for each form
 const testData = {
@@ -45,11 +47,12 @@ export default function Checkout() {
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
+  const { processCheckout, isProcessing } = useCheckout()
+  const navigate = useNavigate()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
   const progress = (step / 4) * 100
 
-  // Función para cargar datos de prueba
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
       { ...testData.shipping, ...testData.documentation } :
@@ -69,11 +72,17 @@ export default function Checkout() {
     setIsFormValid(isValid)
   }
 
-  const handleFormSubmit = (values: any) => {
-    setFormData({ ...formData, ...values })
-    if (step < 4) {
+  const handleFormSubmit = async (values: any) => {
+    if (step === 4) {
+      // Process checkout on final step
+      const success = await processCheckout(formData);
+      if (success) {
+        navigate('/payment');
+      }
+    } else {
+      setFormData({ ...formData, ...values })
       setStep(step + 1)
-      setIsFormValid(step === 3) // Mantenemos la validación activa en el paso de revisión
+      setIsFormValid(step === 3)
     }
   }
 
@@ -87,13 +96,6 @@ export default function Checkout() {
       setIsFormValid(true)
     }
   }
-
-  // Validación específica para el paso de revisión
-  useEffect(() => {
-    if (step === 3) {
-      setIsFormValid(true) // Siempre permitimos avanzar desde el paso de revisión
-    }
-  }, [step])
 
   const renderStepContent = () => {
     switch (step) {
@@ -161,7 +163,6 @@ export default function Checkout() {
       <Header />
       
       <main className="container mx-auto py-8 px-4 max-w-5xl">
-        <div className="max-w-5xl mx-auto">
           {/* Test Mode Button */}
           <div className="flex justify-end mb-4">
             <Button
@@ -196,62 +197,60 @@ export default function Checkout() {
             </div>
             <Progress value={progress} className="h-2" />
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Columna izquierda - Formulario */}
-            <motion.div 
-              className="lg:col-span-8"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
-                {renderStepContent()}
-                
-                <div className="flex justify-between mt-8">
-                  {step > 1 && (
-                    <Button
-                      variant="outline"
-                      onClick={handleBack}
-                      className="flex items-center gap-2"
-                    >
-                      <ArrowLeft className="w-4 h-4" />
-                      Volver
-                    </Button>
-                  )}
-                  {step < 4 && (
-                    <Button
-                      className="ml-auto flex items-center gap-2"
-                      onClick={() => isFormValid && handleFormSubmit(formData)}
-                      disabled={!isFormValid}
-                    >
-                      Siguiente
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <motion.div 
+            className="lg:col-span-8"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
+              {renderStepContent()}
+              
+              <div className="flex justify-between mt-8">
+                {step > 1 && (
+                  <Button
+                    variant="outline"
+                    onClick={handleBack}
+                    className="flex items-center gap-2"
+                    disabled={isProcessing}
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Volver
+                  </Button>
+                )}
+                {step < 4 && (
+                  <Button
+                    className="ml-auto flex items-center gap-2"
+                    onClick={() => isFormValid && handleFormSubmit(formData)}
+                    disabled={!isFormValid || isProcessing}
+                  >
+                    Siguiente
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            {/* Columna derecha - Resumen del carrito */}
-            <motion.div 
-              className="lg:col-span-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
-                <Cart 
-                  showCheckoutButton={step === 4} 
-                  isButtonEnabled={isFormValid}
-                  onCheckout={handleFormSubmit}
-                />
-                <div className="mt-4">
-                  <PaymentSecurity />
-                </div>
+          <motion.div 
+            className="lg:col-span-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
+              <Cart 
+                showCheckoutButton={step === 4} 
+                isButtonEnabled={isFormValid && !isProcessing}
+                onCheckout={handleFormSubmit}
+              />
+              <div className="mt-4">
+                <PaymentSecurity />
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </main>
     </div>
