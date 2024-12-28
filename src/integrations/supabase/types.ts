@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      api_configurations: {
+        Row: {
+          api_key: string
+          config: Json | null
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          service: string
+          updated_at: string
+        }
+        Insert: {
+          api_key: string
+          config?: Json | null
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          service: string
+          updated_at?: string
+        }
+        Update: {
+          api_key?: string
+          config?: Json | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          service?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auth_logs: {
         Row: {
           created_at: string
@@ -1106,6 +1147,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_active_api_key: {
+        Args: {
+          service_name: string
+        }
+        Returns: string
+      }
       get_public_tables: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1120,6 +1167,12 @@ export type Database = {
           p_metadata?: Json
         }
         Returns: string
+      }
+      validate_brevo_api_key: {
+        Args: {
+          api_key: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
