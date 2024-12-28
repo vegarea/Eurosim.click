@@ -43,28 +43,6 @@ export const orderService = {
     return orderQueries.getOrder(orderId);
   },
 
-  async updateOrderStatus(orderId: string, newStatus: Order['status']): Promise<Order> {
-    const order = await this.getOrder(orderId);
-    
-    // Validar cambio de estado
-    const errors = validateOrderStatus(order, newStatus);
-    if (errors.length > 0) {
-      throw new Error(`Error al actualizar estado: ${errors.join(", ")}`);
-    }
-
-    return await orderQueries.updateOrderStatus(orderId, newStatus);
-  },
-
-  async addOrderNote(orderId: string, content: string, isInternal: boolean = false): Promise<void> {
-    // Validar contenido de la nota
-    const errors = validateOrderNote(content);
-    if (errors.length > 0) {
-      throw new Error(`Error al añadir nota: ${errors.join(", ")}`);
-    }
-
-    await orderQueries.addOrderNote(orderId, content, isInternal);
-  },
-
   async createOrderEvent(orderId: string, type: string, description: string) {
     console.group('📝 Order Service - createOrderEvent');
     console.log('Creating order event:', { orderId, type, description });

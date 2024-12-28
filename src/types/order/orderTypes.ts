@@ -1,6 +1,15 @@
-import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from '@/types/database.types';
+import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from '../database.types';
 
 export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod };
+
+export interface ShippingAddress {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+  phone: string;
+}
 
 export interface OrderNote {
   id: string;
@@ -57,7 +66,9 @@ export interface Order {
   quantity: number;
   payment_method?: PaymentMethod;
   payment_status: PaymentStatus;
-  shipping_address?: Record<string, any>;
+  title?: string;
+  description?: string;
+  shipping_address?: ShippingAddress;
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
@@ -67,6 +78,7 @@ export interface Order {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
+  total?: number;
 }
 
 export interface CreateOrderDTO {
@@ -75,8 +87,10 @@ export interface CreateOrderDTO {
   type: OrderType;
   total_amount: number;
   quantity: number;
-  shipping_address?: Record<string, any>;
+  shipping_address?: ShippingAddress;
   activation_date?: string;
   notes?: string[];
   metadata?: Record<string, any>;
+  status?: OrderStatus;
+  payment_status?: PaymentStatus;
 }

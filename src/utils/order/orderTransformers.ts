@@ -49,8 +49,6 @@ export const prepareOrderForCreate = (orderData: Partial<CreateOrderDTO>): Creat
     customer_id: orderData.customer_id!,
     product_id: orderData.product_id!,
     type: orderData.type!,
-    status: 'payment_pending',
-    payment_status: 'pending',
     total_amount: orderData.total_amount!,
     quantity: orderData.quantity || 1,
     shipping_address: orderData.shipping_address,
@@ -90,6 +88,9 @@ export const transformDatabaseOrderToOrder = (dbOrder: any): Order => {
     } : undefined,
     metadata: dbOrder.metadata,
     created_at: dbOrder.created_at,
-    updated_at: dbOrder.updated_at
+    updated_at: dbOrder.updated_at,
+    title: dbOrder.product?.title,
+    description: dbOrder.product?.description,
+    total: dbOrder.total_amount
   };
 };
