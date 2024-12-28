@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ReactNode } from "react"
 
 interface TypeComparisonProps {
   title: string
+  icon?: ReactNode
   currentType: string
   supabaseType: string
   status?: "pending" | "reviewed" | "completed"
@@ -11,6 +13,7 @@ interface TypeComparisonProps {
 
 export function TypeComparisonSection({ 
   title, 
+  icon,
   currentType, 
   supabaseType,
   status = "pending",
@@ -31,7 +34,10 @@ export function TypeComparisonSection({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <div className="flex items-center gap-2">
+            {icon}
+            <CardTitle className="text-lg">{title}</CardTitle>
+          </div>
           <Badge variant="secondary" className={getStatusColor(status)}>
             {status}
           </Badge>

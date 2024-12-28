@@ -1,3 +1,4 @@
+import { ShoppingCart, Database, User, FileText, Settings, Lock, Server, Mail, Package, ClipboardList, Users, BookOpen } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TypeComparisonSection } from "./components/TypeComparisonSection"
 import { TypesChecklist } from "./components/TypesChecklist"
@@ -8,42 +9,104 @@ export function TypesComparison() {
     <div className="space-y-6">
       <Tabs defaultValue="checklist" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="checklist">Lista de Verificación</TabsTrigger>
-          <TabsTrigger value="orders">Pedidos</TabsTrigger>
-          <TabsTrigger value="customers">Clientes</TabsTrigger>
-          <TabsTrigger value="products">Productos</TabsTrigger>
+          <TabsTrigger value="checklist">Vista General</TabsTrigger>
+          <TabsTrigger value="checkout">Área de Compra</TabsTrigger>
+          <TabsTrigger value="admin">Panel Admin</TabsTrigger>
+          <TabsTrigger value="system">Sistema</TabsTrigger>
         </TabsList>
 
         <TabsContent value="checklist">
           <TypesChecklist items={typesChecklistData} />
         </TabsContent>
 
-        <TabsContent value="orders">
+        <TabsContent value="checkout">
           <div className="space-y-6">
             <TypeComparisonSection
-              title="Pedidos"
-              currentType={`type Order = {
-  id: string
-  date: string
-  customer: string
-  email?: string
-  phone?: string
-  total: number
-  status: OrderStatus
-  type: OrderType
-  paymentMethod?: string
+              title="Formulario de Checkout"
+              icon={<ShoppingCart className="h-5 w-5" />}
+              currentType={`type CheckoutForm = {
+  customer: CustomerInfo
+  shipping: ShippingInfo
+  payment: PaymentInfo
+  documentation?: DocumentationInfo
 }`}
               supabaseType={`type Order = {
   id: uuid
   customer_id: uuid
-  product_id: uuid
-  status: OrderStatus
-  type: "physical" | "esim"
-  total_amount: integer
-  quantity: integer
+  shipping_address: jsonb
   payment_method: PaymentMethod
+  documentation_status: string
   created_at: timestamp
-  updated_at: timestamp
+}`}
+              status="pending"
+              relatedFiles={[
+                "src/components/checkout/CheckoutForm.tsx",
+                "src/components/checkout/types.ts"
+              ]}
+            />
+
+            <TypeComparisonSection
+              title="Carrito de Compras"
+              icon={<Package className="h-5 w-5" />}
+              currentType={`type CartItem = {
+  id: string
+  quantity: number
+  price: number
+}`}
+              supabaseType={`type CartItem = {
+  id: uuid
+  product_id: uuid
+  quantity: integer
+  price: integer
+  created_at: timestamp
+}`}
+              status="pending"
+              relatedFiles={[
+                "src/components/cart/CartContext.tsx",
+                "src/components/cart/types.ts"
+              ]}
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="admin">
+          <div className="space-y-6">
+            <TypeComparisonSection
+              title="Gestión de Productos"
+              icon={<Package className="h-5 w-5" />}
+              currentType={`type Product = {
+  id: string
+  title: string
+  price: number
+  type: string
+}`}
+              supabaseType={`type Product = {
+  id: uuid
+  title: text
+  price: integer
+  type: "physical" | "esim"
+  created_at: timestamp
+}`}
+              status="pending"
+              relatedFiles={[
+                "src/components/admin/products/types.ts",
+                "src/components/admin/products/ProductCard.tsx"
+              ]}
+            />
+
+            <TypeComparisonSection
+              title="Gestión de Pedidos"
+              icon={<ClipboardList className="h-5 w-5" />}
+              currentType={`type Order = {
+  id: string
+  status: string
+  customer: string
+}`}
+              supabaseType={`type Order = {
+  id: uuid
+  status: OrderStatus
+  customer_id: uuid
+  created_at: timestamp
 }`}
               status="pending"
               relatedFiles={[
@@ -51,29 +114,20 @@ export function TypesComparison() {
                 "src/components/admin/orders/OrdersTable.tsx"
               ]}
             />
-          </div>
-        </TabsContent>
 
-        <TabsContent value="customers">
-          <div className="space-y-6">
             <TypeComparisonSection
-              title="Clientes"
+              title="Gestión de Clientes"
+              icon={<Users className="h-5 w-5" />}
               currentType={`type Customer = {
   id: string
   name: string
   email: string
-  phone?: string
 }`}
               supabaseType={`type Customer = {
   id: uuid
   name: text
   email: text
-  phone: text
-  passport_number: text
-  birth_date: date
-  gender: "M" | "F"
   created_at: timestamp
-  updated_at: timestamp
 }`}
               status="pending"
               relatedFiles={[
@@ -84,35 +138,56 @@ export function TypesComparison() {
           </div>
         </TabsContent>
 
-        <TabsContent value="products">
+        <TabsContent value="system">
           <div className="space-y-6">
             <TypeComparisonSection
-              title="Productos"
-              currentType={`type Product = {
+              title="Base de Datos"
+              icon={<Database className="h-5 w-5" />}
+              currentType={`// Tipos actuales en el sistema`}
+              supabaseType={`// Tipos requeridos por Supabase`}
+              status="pending"
+              relatedFiles={[
+                "docs/database/schema.ts",
+                "src/types/database.ts"
+              ]}
+            />
+
+            <TypeComparisonSection
+              title="Autenticación"
+              icon={<Lock className="h-5 w-5" />}
+              currentType={`type User = {
   id: string
-  title: string
-  description: string
-  price: number
-  type: "physical" | "esim"
+  email: string
 }`}
-              supabaseType={`type Product = {
+              supabaseType={`type User = {
   id: uuid
-  type: "physical" | "esim"
-  title: text
-  description: text
-  price: integer
-  features: string[]
-  europe_gb: integer
-  spain_gb: integer
-  status: "active" | "inactive"
-  stock: integer
+  email: text
   created_at: timestamp
-  updated_at: timestamp
 }`}
               status="pending"
               relatedFiles={[
-                "src/components/admin/products/types.ts",
-                "src/components/admin/products/ProductCard.tsx"
+                "src/components/auth/types.ts",
+                "src/contexts/AuthContext.tsx"
+              ]}
+            />
+
+            <TypeComparisonSection
+              title="Almacenamiento"
+              icon={<Server className="h-5 w-5" />}
+              currentType={`type StorageFile = {
+  path: string
+  type: string
+}`}
+              supabaseType={`type StorageFile = {
+  id: uuid
+  path: text
+  type: text
+  created_at: timestamp
+}`}
+              status="pending"
+              relatedFiles={[
+                "src/services/storage.ts",
+                "src/types/storage.ts"
               ]}
             />
           </div>
