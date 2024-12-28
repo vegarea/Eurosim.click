@@ -24,7 +24,7 @@ export function LogoSite() {
       <img 
         src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className="h-8 w-auto drop-shadow-sm" 
+        className="h-12 w-auto drop-shadow-sm" 
       />
     </Link>
   )

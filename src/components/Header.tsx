@@ -32,9 +32,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full">
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-md border-b border-slate-100/80" />
+      <div className="absolute inset-0 h-20 bg-white/80 backdrop-blur-md border-b border-slate-100/80" />
       
-      <div className="container relative flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container relative flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <LogoSite />
 
