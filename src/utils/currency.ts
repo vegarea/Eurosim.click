@@ -1,8 +1,13 @@
 export const formatCurrency = (amount: number, currency: string = 'MXN') => {
+  // Dividimos por 100 ya que los precios están almacenados en centavos
+  const amountInCurrency = amount / 100;
+  
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency: currency,
-  }).format(amount);
+    minimumFractionDigits: 0, // Esto evita mostrar decimales
+    maximumFractionDigits: 0, // Esto evita mostrar decimales
+  }).format(amountInCurrency);
 };
 
 export const parseCurrency = (value: string): number => {

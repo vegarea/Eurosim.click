@@ -43,7 +43,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
   };
 
   const colorScheme = getColorScheme(title);
-  const formattedPrice = formatCurrency(price / 100);
+  const formattedPrice = formatCurrency(price);
 
   return (
     <button

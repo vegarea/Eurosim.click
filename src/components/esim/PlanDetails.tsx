@@ -45,7 +45,7 @@ export function PlanDetails({
     navigate('/checkout');
   };
 
-  const formattedPrice = formatCurrency(price / 100);
+  const formattedPrice = formatCurrency(price);
 
   return (
     <motion.div

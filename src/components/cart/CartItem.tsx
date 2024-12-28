@@ -29,7 +29,7 @@ export function CartItem({
         <h3 className="font-medium text-gray-900 truncate">{title}</h3>
         <p className="text-sm text-gray-500">{description}</p>
         <p className="mt-1 text-sm font-medium text-primary">
-          {formatCurrency(price / 100)}
+          {formatCurrency(price)}
         </p>
       </div>
       

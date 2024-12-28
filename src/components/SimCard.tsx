@@ -81,7 +81,7 @@ export function SimCard({
   };
 
   const colorScheme = getColorScheme(title);
-  const formattedPrice = formatCurrency(price / 100);
+  const formattedPrice = formatCurrency(price);
 
   return (
     <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
