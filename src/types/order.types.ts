@@ -29,6 +29,7 @@ export interface OrderEvent {
 export interface Order {
   id: string;
   customer: string;
+  customer_id: string;
   email?: string;
   phone?: string;
   date: string;
