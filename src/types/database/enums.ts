@@ -1,6 +1,6 @@
 export type OrderStatus = 
   | "payment_pending"
-  | "payment_failed" 
+  | "payment_failed"
   | "processing"
   | "shipped"
   | "delivered"
@@ -11,3 +11,5 @@ export type OrderType = "physical" | "esim";
 export type PaymentMethod = "stripe" | "paypal";
 
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+
+export type CustomerGender = "M" | "F";

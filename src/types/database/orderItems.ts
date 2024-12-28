@@ -5,7 +5,7 @@ export interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any> | null;
   created_at?: string;
   updated_at?: string;
 }
