@@ -25,26 +25,48 @@ export interface OrderEvent {
   metadata?: {
     oldStatus?: OrderStatus;
     newStatus?: OrderStatus;
-    paymentMethod?: PaymentMethod;
+    paymentMethod?: string;
     automated?: boolean;
     trackingNumber?: string;
     carrier?: string;
-  };
+  }
+}
+
+export interface OrderNote {
+  id: string;
+  text: string;
+  userId: string;
+  userName: string;
+  createdAt: string;
 }
 
 export interface Order {
   id: string;
-  customerId: string;
+  date: string;
+  customer: string;
+  email?: string;
+  phone?: string;
+  total: number;
   status: OrderStatus;
   type: "physical" | "esim";
-  totalAmount: number;
-  paymentMethod: PaymentMethod;
-  paymentStatus: PaymentStatus;
-  shippingAddress?: ShippingAddress;
-  trackingNumber?: string;
-  carrier?: string;
+  paymentMethod?: PaymentMethod;
   notes?: OrderNote[];
   events?: OrderEvent[];
-  createdAt: string;
-  updatedAt: string;
+  
+  // Detalles del producto
+  title?: string;
+  description?: string;
+  quantity?: number;
+
+  // Documentación UE
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: 'M' | 'F';
+  activationDate?: string;
+
+  // Información de envío (solo para SIM física)
+  shippingAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
 }
