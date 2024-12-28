@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { useState } from "react"
 import { Product } from "./types"
+import { formatCurrency } from "@/utils/currency"
 
 interface EditProductDialogProps {
   product: Product
@@ -26,16 +27,38 @@ interface EditProductDialogProps {
 }
 
 export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
-  const [editedProduct, setEditedProduct] = useState<Partial<Product>>(product)
+  const [editedProduct, setEditedProduct] = useState<Partial<Product>>({
+    ...product,
+    price: product.price / 100 // Convertir centavos a pesos para la edición
+  })
   const [open, setOpen] = useState(false)
 
   const handleEdit = () => {
-    if (!editedProduct.title || !editedProduct.description || !editedProduct.price) {
+    if (!editedProduct.title || !editedProduct.description || editedProduct.price === undefined) {
       return
     }
 
-    onEdit(product.id, editedProduct)
+    // Convertir el precio de pesos a centavos antes de guardar
+    const updates = {
+      ...editedProduct,
+      price: Math.round(editedProduct.price * 100)
+    }
+
+    onEdit(product.id, updates)
     setOpen(false)
+  }
+
+  const handlePriceChange = (value: string) => {
+    // Permitir solo números y un punto decimal
+    const cleanValue = value.replace(/[^\d.]/g, '')
+    const parts = cleanValue.split('.')
+    if (parts.length > 2) return // No permitir más de un punto decimal
+    
+    // Limitar a dos decimales
+    if (parts[1] && parts[1].length > 2) return
+    
+    const numericValue = parseFloat(cleanValue) || 0
+    setEditedProduct({ ...editedProduct, price: numericValue })
   }
 
   return (
@@ -82,13 +105,20 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="price">Precio (MXN en centavos)</Label>
-            <Input
-              id="price"
-              type="number"
-              value={editedProduct.price || ""}
-              onChange={(e) => setEditedProduct({ ...editedProduct, price: parseFloat(e.target.value) })}
-            />
+            <Label htmlFor="price">Precio (MXN)</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <Input
+                id="price"
+                type="text"
+                className="pl-7"
+                value={editedProduct.price?.toFixed(2) || "0.00"}
+                onChange={(e) => handlePriceChange(e.target.value)}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {formatCurrency(editedProduct.price || 0)}
+            </p>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="features">Características (una por línea)</Label>
