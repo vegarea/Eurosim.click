@@ -45,7 +45,7 @@ export function PlanDetails({
     navigate('/checkout');
   };
 
-  const formattedPrice = formatCurrency(price);
+  const [amount, currency] = formatCurrency(price).split(' ');
 
   return (
     <motion.div
@@ -74,8 +74,9 @@ export function PlanDetails({
       </div>
 
       <div className="mb-6">
-        <p className="text-3xl font-bold text-primary">
-          {formattedPrice}
+        <p className="text-3xl font-bold text-primary flex items-baseline gap-2">
+          {amount}
+          <span className="text-base font-normal text-gray-500">{currency}</span>
         </p>
       </div>
 

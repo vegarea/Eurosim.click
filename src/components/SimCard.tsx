@@ -81,7 +81,7 @@ export function SimCard({
   };
 
   const colorScheme = getColorScheme(title);
-  const formattedPrice = formatCurrency(price);
+  const [amount, currency] = formatCurrency(price).split(' ');
 
   return (
     <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
@@ -115,8 +115,9 @@ export function SimCard({
 
       <CardContent className="relative">
         <div className="mb-8 transform transition-all duration-300 hover:scale-105">
-          <p className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            {formattedPrice}
+          <p className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-baseline gap-2">
+            {amount}
+            <span className="text-base font-normal text-gray-500">{currency}</span>
           </p>
         </div>
 
