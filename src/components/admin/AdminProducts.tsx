@@ -89,13 +89,16 @@ export function AdminProducts() {
 
   const handleEditProduct = async (id: string, updates: Partial<Product>) => {
     try {
+      console.log('Actualizando producto con ID:', id)
+      console.log('Datos de actualización:', updates)
+
       const { error } = await supabase
         .from('products')
         .update({
           title: updates.title,
           description: updates.description,
           type: updates.type,
-          price: updates.price,
+          price: updates.price, // Este es el precio en centavos
           features: updates.features,
           data_eu_gb: updates.data_eu_gb,
           data_es_gb: updates.data_es_gb,
@@ -105,7 +108,8 @@ export function AdminProducts() {
 
       if (error) throw error
 
-      setProducts(products.map(p => p.id === id ? { ...p, ...updates } : p))
+      // Recargar los productos después de la actualización
+      await fetchProducts()
       
       toast({
         title: "Producto actualizado",

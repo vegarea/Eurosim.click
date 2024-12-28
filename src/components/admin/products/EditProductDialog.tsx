@@ -44,30 +44,17 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
       price: Math.round(editedProduct.price * 100)
     }
 
+    console.log('Enviando actualización con precio en centavos:', updates.price)
     onEdit(product.id, updates)
     setOpen(false)
   }
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+    const value = e.target.value.replace(/[^\d]/g, '')
+    const numericValue = parseInt(value, 10)
+    const priceInPesos = isNaN(numericValue) ? 0 : numericValue
     
-    // Permitir entrada vacía
-    if (value === '') {
-      setEditedProduct({ ...editedProduct, price: 0 })
-      return
-    }
-
-    // Remover cualquier caracter que no sea número
-    const numericValue = value.replace(/[^\d]/g, '')
-    
-    // Convertir a número y dividir por 100 para manejar decimales
-    const price = parseInt(numericValue, 10) / 100
-    
-    setEditedProduct({ ...editedProduct, price })
-  }
-
-  const formatPriceForInput = (price: number) => {
-    return (Math.round(price * 100) / 100).toFixed(2)
+    setEditedProduct({ ...editedProduct, price: priceInPesos })
   }
 
   return (
@@ -115,18 +102,15 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="price">Precio (MXN)</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
-              <Input
-                id="price"
-                type="text"
-                className="pl-7"
-                value={formatPriceForInput(editedProduct.price || 0)}
-                onChange={handlePriceChange}
-              />
-            </div>
+            <Input
+              id="price"
+              type="text"
+              value={editedProduct.price || ""}
+              onChange={handlePriceChange}
+              placeholder="Ingrese el precio en pesos"
+            />
             <p className="text-sm text-muted-foreground">
-              {formatCurrency(editedProduct.price || 0)}
+              Precio actual: {formatCurrency(editedProduct.price || 0)}
             </p>
           </div>
           <div className="grid gap-2">
