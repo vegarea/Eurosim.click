@@ -106,7 +106,7 @@ export function HomeHero() {
         </div>
       </div>
 
-      {/* Línea decorativa inferior */}
+      {/* Línea decorativa inferior con degradado */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
     </div>
   );
