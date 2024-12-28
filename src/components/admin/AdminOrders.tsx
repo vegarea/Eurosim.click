@@ -4,22 +4,35 @@ import { OrdersTable } from "./orders/OrdersTable"
 import { OrderStatus } from "@/types"
 import { useOrdersData } from "@/hooks/useOrdersData"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export function AdminOrders() {
-  const { orders, isLoading, updateOrderStatus } = useOrdersData()
+  const { orders = [], isLoading, error, updateOrderStatus } = useOrdersData()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = orders?.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
       order.customer.toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
-  })
+  }) || []
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrderStatus.mutate({ orderId, newStatus });
+    updateOrderStatus.mutate({ orderId, newStatus })
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Error al cargar los pedidos: {error.message}
+        </AlertDescription>
+      </Alert>
+    )
   }
 
   if (isLoading) {
@@ -51,10 +64,18 @@ export function AdminOrders() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <OrdersTable 
-        orders={filteredOrders}
-        onStatusChange={handleStatusChange}
-      />
+      {orders.length === 0 ? (
+        <Alert>
+          <AlertDescription>
+            No hay pedidos disponibles en este momento.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <OrdersTable 
+          orders={filteredOrders}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </div>
   )
 }
