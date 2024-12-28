@@ -1,27 +1,39 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Order, OrderStatus, OrderStatusHistoryEntry } from '@/components/admin/orders/types';
+import { Order, OrderStatus, OrderStatusHistoryEntry } from '@/types';
 import { useToast } from '@/components/ui/use-toast';
 
 export function useOrdersData() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Obtener todos los pedidos
+  // Obtener todos los pedidos con sus relaciones
   const { data: orders, isLoading, error } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          customer:customers(*),
+          events:order_events(*)
+        `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data as Order[];
+      if (ordersError) throw ordersError;
+
+      // Transformar los datos para mantener compatibilidad con la interfaz existente
+      return ordersData.map((order: any) => ({
+        ...order,
+        total: order.total_amount,
+        date: order.created_at,
+        customer: order.customer?.name || 'Unknown',
+        email: order.customer?.email,
+        phone: order.customer?.phone,
+      }));
     }
   });
 
-  // Actualizar estado de un pedido
   const updateOrderStatus = useMutation({
     mutationFn: async ({ 
       orderId, 
