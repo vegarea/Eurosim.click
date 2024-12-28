@@ -59,7 +59,7 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].default_shipping_address = order.shipping_address as Json
+      acc[customerId].default_shipping_address = order.shipping_address as unknown as Json
     }
     
     if (order.metadata) {
