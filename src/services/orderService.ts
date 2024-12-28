@@ -1,6 +1,28 @@
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Order } from "@/types";
+import { supabase } from "@/integrations/supabase/client"
+import { Order, ShippingAddress } from "@/types"
+import { Json } from "@/integrations/supabase/types"
+
+const transformShippingAddress = (address: Json | null): ShippingAddress | null => {
+  if (!address) return null;
+  
+  // Asegurarnos de que el objeto tiene la estructura correcta
+  const addressObj = address as Record<string, string>;
+  
+  if (!addressObj.street || !addressObj.city || !addressObj.state || 
+      !addressObj.country || !addressObj.postal_code || !addressObj.phone) {
+    console.warn('Dirección incompleta:', addressObj);
+    return null;
+  }
+
+  return {
+    street: addressObj.street,
+    city: addressObj.city,
+    state: addressObj.state,
+    country: addressObj.country,
+    postal_code: addressObj.postal_code,
+    phone: addressObj.phone
+  };
+};
 
 export const orderService = {
   async createOrder(orderData: {
@@ -9,7 +31,7 @@ export const orderService = {
     type: 'physical' | 'esim';
     total_amount: number;
     quantity: number;
-    shipping_address?: any;
+    shipping_address?: ShippingAddress;
     activation_date?: string;
   }) {
     console.group('📦 Order Service - createOrder');
@@ -44,8 +66,14 @@ export const orderService = {
         throw new Error('Failed to create order');
       }
 
-      console.log('Order created successfully:', order);
-      return order as Order;
+      // Transformar la dirección de envío antes de devolver la orden
+      const transformedOrder = {
+        ...order,
+        shipping_address: transformShippingAddress(order.shipping_address)
+      } as Order;
+
+      console.log('Order created successfully:', transformedOrder);
+      return transformedOrder;
     } catch (error) {
       console.error('Error in createOrder:', error);
       throw error;
@@ -114,8 +142,14 @@ export const orderService = {
         throw new Error('Order not found');
       }
 
-      console.log('Order fetched successfully:', order);
-      return order as Order;
+      // Transformar la dirección de envío antes de devolver la orden
+      const transformedOrder = {
+        ...order,
+        shipping_address: transformShippingAddress(order.shipping_address)
+      } as Order;
+
+      console.log('Order fetched successfully:', transformedOrder);
+      return transformedOrder;
     } catch (error) {
       console.error('Error in getOrder:', error);
       throw error;
