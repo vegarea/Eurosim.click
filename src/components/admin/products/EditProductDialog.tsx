@@ -48,17 +48,26 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
     setOpen(false)
   }
 
-  const handlePriceChange = (value: string) => {
-    // Permitir solo números y un punto decimal
-    const cleanValue = value.replace(/[^\d.]/g, '')
-    const parts = cleanValue.split('.')
-    if (parts.length > 2) return // No permitir más de un punto decimal
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
     
-    // Limitar a dos decimales
-    if (parts[1] && parts[1].length > 2) return
+    // Permitir entrada vacía
+    if (value === '') {
+      setEditedProduct({ ...editedProduct, price: 0 })
+      return
+    }
+
+    // Remover cualquier caracter que no sea número
+    const numericValue = value.replace(/[^\d]/g, '')
     
-    const numericValue = parseFloat(cleanValue) || 0
-    setEditedProduct({ ...editedProduct, price: numericValue })
+    // Convertir a número y dividir por 100 para manejar decimales
+    const price = parseInt(numericValue, 10) / 100
+    
+    setEditedProduct({ ...editedProduct, price })
+  }
+
+  const formatPriceForInput = (price: number) => {
+    return (Math.round(price * 100) / 100).toFixed(2)
   }
 
   return (
@@ -112,8 +121,8 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
                 id="price"
                 type="text"
                 className="pl-7"
-                value={editedProduct.price?.toFixed(2) || "0.00"}
-                onChange={(e) => handlePriceChange(e.target.value)}
+                value={formatPriceForInput(editedProduct.price || 0)}
+                onChange={handlePriceChange}
               />
             </div>
             <p className="text-sm text-muted-foreground">
