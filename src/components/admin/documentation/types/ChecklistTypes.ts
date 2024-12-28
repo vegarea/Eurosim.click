@@ -1,4 +1,4 @@
-export type ChecklistItemStatus = "pending" | "reviewed" | "completed"
+export type ChecklistItemStatus = "pending" | "in_progress" | "completed" | "reviewed"
 
 export interface TypeDefinition {
   name: string
@@ -6,20 +6,13 @@ export interface TypeDefinition {
   code: string
 }
 
-export interface TypeDependency {
-  name: string
-  path: string
-}
-
 export interface ChecklistItem {
   name: string
   status: ChecklistItemStatus
   description: string
-  category: "component" | "form" | "context" | "hook"
-  locations: string[]
-  dependencies?: TypeDependency[]
-  currentTypes: TypeDefinition[]
-  supabaseTypes: TypeDefinition[]
+  locations?: string[]
+  currentTypes?: TypeDefinition[]
+  supabaseTypes?: TypeDefinition[]
 }
 
 export interface ChecklistCategory {
