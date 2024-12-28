@@ -16,7 +16,7 @@ export const productTypes: ChecklistCategory = {
       currentTypes: [
         {
           name: "Product",
-          path: "src/components/admin/AdminProducts.tsx",
+          path: "src/components/admin/products/types.ts",
           code: `interface Product {
   id: string
   type: "physical" | "esim"
@@ -37,6 +37,7 @@ export const productTypes: ChecklistCategory = {
       supabaseTypes: [
         {
           name: "Product",
+          path: "src/types/supabase.ts",
           code: `type Product = Database["public"]["Tables"]["products"]["Row"] = {
   id: string
   type: Database["public"]["Enums"]["product_type"]

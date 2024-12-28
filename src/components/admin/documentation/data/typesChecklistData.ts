@@ -1,4 +1,4 @@
-import { ChecklistCategory } from "../types/ChecklistTypes"
+import { ChecklistCategory } from "../../types/ChecklistTypes"
 import { orderTypes } from "./categories/types/orderTypes"
 import { productTypes } from "./categories/types/productTypes"
 import { customerTypes } from "./categories/types/customerTypes"
