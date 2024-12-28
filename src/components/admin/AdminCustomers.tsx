@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
-import { CustomerDocumentation } from "@/types/order.types"
+import { CustomerDocumentation } from "@/types/order/orderTypes"
 
 interface CustomerData {
   name: string;
@@ -50,11 +50,11 @@ export function AdminCustomers() {
           state: order.shipping_address.state,
           zipCode: order.shipping_address.postal_code
         } : {},
-        documentation: {
-          passportNumber: order.documentation?.passportNumber,
-          birthDate: order.documentation?.birthDate,
-          gender: order.documentation?.gender,
-          activationDate: order.documentation?.activationDate
+        documentation: order.customer?.documentation || {
+          passportNumber: undefined,
+          birthDate: undefined,
+          gender: undefined,
+          activationDate: undefined
         }
       }
     }

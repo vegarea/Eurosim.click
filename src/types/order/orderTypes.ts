@@ -58,7 +58,6 @@ export interface OrderNote {
   user_name?: string;
 }
 
-// Tipo para crear una nueva orden en Supabase
 export interface CreateOrderDTO {
   customer_id: string;
   product_id: string;
@@ -73,7 +72,6 @@ export interface CreateOrderDTO {
   metadata?: Json;
 }
 
-// Tipo completo de una orden
 export interface Order {
   id: string;
   customer_id: string;
@@ -95,4 +93,5 @@ export interface Order {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
+  documentation?: CustomerDocumentation;
 }
