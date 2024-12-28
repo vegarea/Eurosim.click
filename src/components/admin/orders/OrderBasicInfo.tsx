@@ -16,7 +16,7 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h3 className="font-medium mb-1">Cliente</h3>
-            <p>{order.customer}</p>
+            <p>{order.customer?.name || 'No especificado'}</p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Fecha</h3>
@@ -24,7 +24,7 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
           </div>
           <div>
             <h3 className="font-medium mb-1">Total</h3>
-            <p>${order.total?.toFixed(2)}</p>
+            <p>${(order.total_amount / 100).toFixed(2)}</p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Tipo</h3>

@@ -40,12 +40,12 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             <div>
               <h3 className="font-medium mb-1">Cliente</h3>
               <p className="flex items-center gap-2">
-                {order.customer}
+                {order.customer?.name || 'No especificado'}
                 <Button 
                   variant="ghost" 
                   size="sm"
                   className="h-6 px-2"
-                  onClick={() => window.open(`/admin/customers/${order.id}`, '_blank')}
+                  onClick={() => window.open(`/admin/customers/${order.customer_id}`, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
@@ -53,11 +53,11 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             </div>
             <div>
               <h3 className="font-medium mb-1">Email</h3>
-              <p>{order.email || "No especificado"}</p>
+              <p>{order.customer?.email || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Teléfono</h3>
-              <p>{order.phone || "No especificado"}</p>
+              <p>{order.customer?.phone || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Fecha y Hora</h3>

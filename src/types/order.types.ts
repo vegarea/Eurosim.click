@@ -33,32 +33,47 @@ export interface CustomerDocumentation {
   activationDate?: string;
 }
 
-// Interfaz para el objeto customer que viene de Supabase
 export interface OrderCustomer {
   name: string;
   email: string;
   phone?: string;
 }
 
-// Interfaz para el objeto product que viene de Supabase
 export interface OrderProduct {
   title: string;
   description: string;
   price: number;
 }
 
-// Interfaz UI que extiende la orden de base de datos
-export interface Order extends Omit<DatabaseOrder, 'notes'> {
+export interface Order {
+  id: string;
+  customer_id: string;
+  product_id: string;
   customer?: OrderCustomer;
   email?: string;
   phone?: string;
+  status: OrderStatus;
+  type: OrderType;
+  total_amount: number;
+  total?: number;
+  quantity: number;
+  payment_method?: PaymentMethod;
+  payment_status: PaymentStatus;
   title?: string;
   description?: string;
-  total?: number;
+  stripe_payment_intent_id?: string;
+  stripe_receipt_url?: string;
+  paypal_order_id?: string;
+  paypal_receipt_url?: string;
+  shipping_address?: ShippingAddress;
+  tracking_number?: string;
+  carrier?: string;
+  activation_date?: string;
   notes?: OrderNote[];
   events?: OrderEvent[];
   documentation?: CustomerDocumentation;
   product?: OrderProduct;
-  // Asegurarnos de que usamos created_at en lugar de date
+  metadata?: Record<string, any>;
   created_at: string;
+  updated_at: string;
 }

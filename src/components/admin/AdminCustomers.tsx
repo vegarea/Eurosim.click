@@ -13,19 +13,35 @@ import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
 import { CustomerDocumentation } from "@/types/order.types"
 
+interface CustomerData {
+  name: string;
+  email: string;
+  phone: string;
+  orders: any[];
+  totalSpent: number;
+  shippingInfo: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  documentation: CustomerDocumentation;
+}
+
 export function AdminCustomers() {
   const { orders } = useOrders()
   const [search, setSearch] = useState("")
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   // Crear un mapa de clientes únicos basado en los pedidos
   const customers = orders.reduce((acc, order) => {
-    if (!acc[order.customer]) {
-      acc[order.customer] = {
-        name: order.customer,
-        email: order.email || "No especificado",
-        phone: order.phone || "No especificado",
+    const customerName = order.customer?.name || 'Unknown';
+    if (!acc[customerName]) {
+      acc[customerName] = {
+        name: customerName,
+        email: order.customer?.email || "No especificado",
+        phone: order.customer?.phone || "No especificado",
         orders: [],
         totalSpent: 0,
         shippingInfo: order.shipping_address ? {
@@ -39,14 +55,14 @@ export function AdminCustomers() {
           birthDate: order.documentation?.birthDate,
           gender: order.documentation?.gender,
           activationDate: order.documentation?.activationDate
-        } as CustomerDocumentation
+        }
       }
     }
-    acc[order.customer].orders.push(order)
-    acc[order.customer].totalSpent += order.total
+    acc[customerName].orders.push(order)
+    acc[customerName].totalSpent += order.total_amount
 
     return acc
-  }, {} as Record<string, any>)
+  }, {} as Record<string, CustomerData>)
 
   // Filtrar clientes basado en la búsqueda
   const filteredCustomers = Object.values(customers).filter(customer => 
