@@ -1,3 +1,5 @@
+import { Json } from "./common";
+
 export interface OrderItem {
   id: string;
   order_id: string;
@@ -5,9 +7,9 @@ export interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
-  metadata?: Record<string, any> | null;
-  created_at?: string;
-  updated_at?: string;
+  metadata: Record<string, any> | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export type OrderItemInsert = Omit<OrderItem, "id" | "created_at" | "updated_at">;
