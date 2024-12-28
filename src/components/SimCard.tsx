@@ -35,32 +35,32 @@ export function SimCard({
       case "Tarifa S":
         return {
           iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
-          iconColor: "text-green-600"
+          iconColor: "text-[#7FB069]"  // Verde pastel más oscuro
         };
       case "Tarifa M":
         return {
           iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "text-blue-600"
+          iconColor: "text-[#6B8EAE]"  // Azul pastel más oscuro
         };
       case "Tarifa L":
         return {
           iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
-          iconColor: "text-purple-600"
+          iconColor: "text-[#8B7FC4]"  // Morado pastel más oscuro
         };
       case "Tarifa XL":
         return {
           iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
-          iconColor: "text-pink-600"
+          iconColor: "text-[#D67A87]"  // Rosa pastel más oscuro
         };
       case "Tarifa XXL":
         return {
           iconBg: "from-[#FDE1D3] to-[#FEC6A1]",
-          iconColor: "text-orange-600"
+          iconColor: "text-[#E6946C]"  // Naranja pastel más oscuro
         };
       default:
         return {
           iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "text-blue-600"
+          iconColor: "text-[#6B8EAE]"
         };
     }
   };
@@ -95,9 +95,9 @@ export function SimCard({
         <div className="flex items-center gap-3">
           <div className={`p-3 bg-gradient-to-br ${colorScheme.iconBg} rounded-xl backdrop-blur-sm`}>
             {type === 'physical' ? (
-              <CreditCard className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+              <CreditCard className={`h-6 w-6 ${colorScheme.iconColor}`} />
             ) : (
-              <Wifi className={`h-6 w-6 ${colorScheme.iconColor} animate-pulse`} />
+              <Wifi className={`h-6 w-6 ${colorScheme.iconColor}`} />
             )}
           </div>
           <div>
