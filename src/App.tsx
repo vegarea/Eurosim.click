@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { CartProvider } from "./contexts/CartContext"
 import { OrdersProvider } from "./contexts/OrdersContext"
+import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute"
 import Index from "./pages/Index"
 import Sims from "./pages/Sims"
 import ESims from "./pages/ESims"
 import Checkout from "./pages/Checkout"
 import AdminPanel from "./pages/AdminPanel"
 import OrderDetails from "./pages/OrderDetails"
+import Login from "./pages/Login"
 import "flag-icons/css/flag-icons.min.css"
 
 const queryClient = new QueryClient()
@@ -28,8 +30,23 @@ const App = () => (
               <Route path="/sims" element={<Sims />} />
               <Route path="/e-sims" element={<ESims />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/admin/*" element={<AdminPanel />} />
-              <Route path="/admin/orders/:orderId" element={<OrderDetails />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminPanel />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/orders/:orderId"
+                element={
+                  <ProtectedAdminRoute>
+                    <OrderDetails />
+                  </ProtectedAdminRoute>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </OrdersProvider>
