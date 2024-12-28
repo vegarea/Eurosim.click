@@ -4,6 +4,7 @@ import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/utils/currency";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -57,17 +58,17 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
           <div className="mt-6 space-y-4">
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Subtotal</span>
-              <span className="font-medium">${subtotal.toFixed(2)} MXN</span>
+              <span className="font-medium">{formatCurrency(subtotal / 100)}</span>
             </div>
             {shipping > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Gastos de envío</span>
-                <span className="font-medium">${shipping.toFixed(2)} MXN</span>
+                <span className="font-medium">{formatCurrency(shipping / 100)}</span>
               </div>
             )}
             <div className="flex justify-between text-base font-medium pt-4 border-t">
               <span>Total</span>
-              <span className="text-primary">${total.toFixed(2)} MXN</span>
+              <span className="text-primary">{formatCurrency(total / 100)}</span>
             </div>
           </div>
 
