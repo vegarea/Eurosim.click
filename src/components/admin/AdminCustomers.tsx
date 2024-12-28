@@ -28,7 +28,12 @@ export function AdminCustomers() {
         phone: order.phone || "No especificado",
         orders: [],
         totalSpent: 0,
-        shippingInfo: {},
+        shippingInfo: order.shipping_address ? {
+          address: order.shipping_address.street,
+          city: order.shipping_address.city,
+          state: order.shipping_address.state,
+          zipCode: order.shipping_address.postal_code
+        } : {},
         documentation: {
           passportNumber: order.documentation?.passportNumber,
           birthDate: order.documentation?.birthDate,
@@ -40,15 +45,6 @@ export function AdminCustomers() {
     acc[order.customer].orders.push(order)
     acc[order.customer].totalSpent += order.total
 
-    // Actualizar información de envío si está disponible
-    if (order.shippingAddress) {
-      acc[order.customer].shippingInfo = {
-        address: order.shippingAddress,
-        city: order.city,
-        state: order.state,
-        zipCode: order.zipCode
-      }
-    }
     return acc
   }, {} as Record<string, any>)
 

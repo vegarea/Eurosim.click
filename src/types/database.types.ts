@@ -5,12 +5,13 @@ export type PaymentMethod = 'stripe' | 'paypal';
 export type UserRole = 'client' | 'manager' | 'admin';
 export type DocumentStatus = 'pending' | 'validating' | 'approved' | 'rejected' | 'expired';
 
+// Alineado con la estructura jsonb de la base de datos
 export interface ShippingAddress {
   street: string;
   city: string;
   state: string;
   country: string;
-  postal_code: string;
+  postal_code: string; // Cambiado de zipCode a postal_code
   phone: string;
 }
 
@@ -22,7 +23,7 @@ export interface Customer {
   passport_number?: string;
   birth_date?: string;
   gender?: string;
-  default_shipping_address?: ShippingAddress | null;
+  default_shipping_address?: ShippingAddress | null; // Cambiado a snake_case
   billing_address?: Record<string, any> | null;
   preferred_language?: string;
   marketing_preferences?: Record<string, any> | null;
@@ -47,12 +48,12 @@ export interface DatabaseOrder {
   stripe_receipt_url?: string;
   paypal_order_id?: string;
   paypal_receipt_url?: string;
-  shipping_address?: ShippingAddress;
+  shipping_address?: ShippingAddress; // Cambiado a snake_case
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
   notes?: string[];
   metadata?: Record<string, any>;
-  created_at: string;
+  created_at: string; // Usado en lugar de date
   updated_at: string;
 }

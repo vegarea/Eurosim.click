@@ -40,8 +40,10 @@ export interface Order extends Omit<DatabaseOrder, 'notes'> {
   phone?: string;
   title?: string;
   description?: string;
-  total?: number; // Para mostrar el monto en la UI
-  notes?: OrderNote[]; // Override del tipo notes de DatabaseOrder
+  total?: number;
+  notes?: OrderNote[];
   events?: OrderEvent[];
   documentation?: CustomerDocumentation;
+  // Asegurarnos de que usamos created_at en lugar de date
+  created_at: string;
 }
