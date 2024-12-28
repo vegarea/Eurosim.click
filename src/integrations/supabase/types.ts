@@ -11,75 +11,75 @@ export type Database = {
     Tables: {
       orders: {
         Row: {
-          id: string
-          customer_id: string | null
+          activation_date: string | null
+          carrier: string | null
+          created_at: string
           customer_email: string
+          customer_id: string | null
           customer_name: string
-          status: string
-          type: string
-          total_amount: number
-          quantity: number
+          id: string
+          metadata: Json | null
+          notes: string[] | null
           payment_method: string | null
           payment_status: string | null
-          stripe_payment_intent_id: string | null
-          stripe_receipt_url: string | null
           paypal_order_id: string | null
           paypal_receipt_url: string | null
+          quantity: number
           shipping_address: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_receipt_url: string | null
+          total_amount: number
           tracking_number: string | null
-          carrier: string | null
-          activation_date: string | null
-          notes: string[] | null
-          metadata: Json | null
-          created_at: string
+          type: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          customer_id?: string | null
+          activation_date?: string | null
+          carrier?: string | null
+          created_at?: string
           customer_email: string
+          customer_id?: string | null
           customer_name: string
-          status?: string
-          type: string
-          total_amount: number
-          quantity?: number
+          id?: string
+          metadata?: Json | null
+          notes?: string[] | null
           payment_method?: string | null
           payment_status?: string | null
-          stripe_payment_intent_id?: string | null
-          stripe_receipt_url?: string | null
           paypal_order_id?: string | null
           paypal_receipt_url?: string | null
+          quantity?: number
           shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_receipt_url?: string | null
+          total_amount: number
           tracking_number?: string | null
-          carrier?: string | null
-          activation_date?: string | null
-          notes?: string[] | null
-          metadata?: Json | null
-          created_at?: string
+          type: string
           updated_at?: string
         }
         Update: {
-          id?: string
-          customer_id?: string | null
+          activation_date?: string | null
+          carrier?: string | null
+          created_at?: string
           customer_email?: string
+          customer_id?: string | null
           customer_name?: string
-          status?: string
-          type?: string
-          total_amount?: number
-          quantity?: number
+          id?: string
+          metadata?: Json | null
+          notes?: string[] | null
           payment_method?: string | null
           payment_status?: string | null
-          stripe_payment_intent_id?: string | null
-          stripe_receipt_url?: string | null
           paypal_order_id?: string | null
           paypal_receipt_url?: string | null
+          quantity?: number
           shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_receipt_url?: string | null
+          total_amount?: number
           tracking_number?: string | null
-          carrier?: string | null
-          activation_date?: string | null
-          notes?: string[] | null
-          metadata?: Json | null
-          created_at?: string
+          type?: string
           updated_at?: string
         }
         Relationships: [
@@ -89,7 +89,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {

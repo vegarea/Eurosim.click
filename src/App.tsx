@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/sims" element={<Sims />} />
-        <Route path="/esims" element={<ESims />} />
+        <Route path="/e-sims" element={<ESims />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order/:id" element={<OrderDetails />} />
         <Route path="/auth" element={<Auth />} />
