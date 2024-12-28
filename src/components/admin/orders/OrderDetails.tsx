@@ -5,7 +5,7 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/components/admin/orders/types"
+import { OrderStatus } from "@/types/order/orderTypes"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -17,7 +17,7 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
-import { OrderNote } from "@/types/order.types"
+import { OrderNote } from "@/types/order/orderTypes"
 
 const statusOrder = [
   "payment_pending",

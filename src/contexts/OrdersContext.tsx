@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { Order } from '@/types';
+import { Order } from '@/types/order/orderTypes';
 import { useOrdersData } from '@/hooks/useOrdersData';
 
 interface OrdersContextType {
