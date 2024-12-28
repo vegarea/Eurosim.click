@@ -7,6 +7,7 @@ export const formatCurrency = (amount: number, currency: string = 'MXN') => {
     currency: currency,
     minimumFractionDigits: 0, // Esto evita mostrar decimales
     maximumFractionDigits: 0, // Esto evita mostrar decimales
+    currencyDisplay: 'narrowSymbol' // Esto asegura que se muestre el símbolo de moneda
   }).format(amountInCurrency);
 };
 
