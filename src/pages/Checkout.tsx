@@ -11,89 +11,90 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoIcon, Bug } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-
-// Test data that matches the expected prop types for each form
-const testData = {
-  shipping: {
-    fullName: "Juan Pérez",
-    email: "juan@ejemplo.com",
-    phone: "5512345678",
-    address: "Calle Principal 123",
-    city: "Ciudad de México",
-    state: "CDMX",
-    zipCode: "11111"
-  },
-  documentation: {
-    fullName: "Juan Pérez",
-    birthDate: new Date(),
-    gender: "M",
-    passportNumber: "AB123456",
-    activationDate: new Date(),
-    email: "juan@ejemplo.com",
-    phone: "5512345678"
-  }
-}
+import { supabase } from "@/integrations/supabase/client"
 
 export default function Checkout() {
-  const { items } = useCart()
+  const { items, clearCart } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
   const [formData, setFormData] = useState<Record<string, any>>({})
-  const [isTestMode, setIsTestMode] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   const { toast } = useToast()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
   const progress = (step / 4) * 100
 
-  // Función para cargar datos de prueba
-  const loadTestData = () => {
-    const data = hasPhysicalSim ? 
-      { ...testData.shipping, ...testData.documentation } :
-      testData.documentation;
-    
-    setFormData(data);
-    setIsFormValid(true);
-    setIsTestMode(true);
-    
-    toast({
-      title: "Modo de prueba activado",
-      description: "Se han cargado datos de prueba para facilitar el testing",
-    });
-  };
-
   const handleFormValidityChange = (isValid: boolean) => {
     setIsFormValid(isValid)
   }
 
-  const handleFormSubmit = (values: any) => {
-    setFormData({ ...formData, ...values })
+  const handleFormSubmit = async (values: any) => {
     if (step < 4) {
+      setFormData({ ...formData, ...values })
       setStep(step + 1)
-      setIsFormValid(step === 3) // Mantenemos la validación activa en el paso de revisión
+      setIsFormValid(step === 3)
+      return
+    }
+
+    // Procesamiento final del pago
+    setIsProcessing(true)
+    try {
+      // Aquí iría la lógica de procesamiento del pago con Stripe
+
+      // Crear el pedido en la base de datos
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([
+          {
+            customer_email: formData.email,
+            customer_name: formData.fullName,
+            // ... otros campos del pedido
+          }
+        ])
+        .select()
+        .single()
+
+      if (orderError) throw orderError
+
+      // Enviar email de confirmación con magic link
+      const response = await fetch('/api/send-order-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          orderId: order.id,
+          customerName: formData.fullName,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el email de confirmación')
+      }
+
+      // Limpiar carrito y redireccionar
+      clearCart()
+      toast({
+        title: "¡Pedido completado!",
+        description: "Te hemos enviado un email con los detalles de tu compra.",
+      })
+      
+      // Redireccionar a página de confirmación
+      window.location.href = `/order-confirmation/${order.id}`
+    } catch (error: any) {
+      console.error('Error en el checkout:', error)
+      toast({
+        title: "Error al procesar el pedido",
+        description: "Por favor, intenta nuevamente.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsProcessing(false)
     }
   }
-
-  const handleUpdateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1)
-      setIsFormValid(true)
-    }
-  }
-
-  // Validación específica para el paso de revisión
-  useEffect(() => {
-    if (step === 3) {
-      setIsFormValid(true) // Siempre permitimos avanzar desde el paso de revisión
-    }
-  }, [step])
 
   const renderStepContent = () => {
     switch (step) {
@@ -112,17 +113,11 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? testData.shipping : undefined}
               />
             ) : (
               <ESimForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? {
-                  fullName: testData.documentation.fullName,
-                  email: testData.documentation.email,
-                  phone: testData.documentation.phone
-                } : undefined}
               />
             )}
           </>
@@ -132,14 +127,13 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
-            initialData={isTestMode ? testData.documentation : undefined}
           />
         )
       case 3:
         return (
           <ReviewStep
             formData={formData}
-            onUpdateField={handleUpdateField}
+            onUpdateField={(field, value) => setFormData(prev => ({ ...prev, [field]: value }))}
           />
         )
       case 4:
@@ -167,7 +161,17 @@ export default function Checkout() {
             <Button
               variant="outline"
               size="sm"
-              onClick={loadTestData}
+              onClick={() => {
+                const data = hasPhysicalSim ? 
+                  { fullName: "Juan Pérez", email: "juan@ejemplo.com", phone: "5512345678", address: "Calle Principal 123", city: "Ciudad de México", state: "CDMX", zipCode: "11111" } :
+                  { fullName: "Juan Pérez", email: "juan@ejemplo.com", phone: "5512345678" };
+                setFormData(data);
+                setIsFormValid(true);
+                toast({
+                  title: "Modo de prueba activado",
+                  description: "Se han cargado datos de prueba para facilitar el testing",
+                });
+              }}
               className="flex items-center gap-2"
             >
               <Bug className="w-4 h-4" />
@@ -212,7 +216,12 @@ export default function Checkout() {
                   {step > 1 && (
                     <Button
                       variant="outline"
-                      onClick={handleBack}
+                      onClick={() => {
+                        if (step > 1) {
+                          setStep(step - 1);
+                          setIsFormValid(true);
+                        }
+                      }}
                       className="flex items-center gap-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
