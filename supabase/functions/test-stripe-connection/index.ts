@@ -13,19 +13,29 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+    if (!stripeKey) {
+      console.error('STRIPE_SECRET_KEY no está configurada')
+      throw new Error('Stripe key no configurada')
+    }
+
+    console.log('Iniciando prueba de conexión con Stripe...')
+    
+    const stripe = new Stripe(stripeKey, {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Intentando conectar con Stripe...')
+    console.log('Cliente Stripe inicializado, intentando listar productos...')
     
-    // Intentar listar productos (operación simple)
     const products = await stripe.products.list({
       limit: 1,
     })
 
     console.log('Conexión exitosa con Stripe')
-    console.log('Primer producto encontrado:', products.data[0]?.id || 'No hay productos')
+    console.log('Productos encontrados:', products.data.length)
+    if (products.data[0]) {
+      console.log('ID del primer producto:', products.data[0].id)
+    }
 
     return new Response(
       JSON.stringify({ 
@@ -39,12 +49,22 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error conectando con Stripe:', error)
+    console.error('Error detallado:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      cause: error.cause
+    })
+
     return new Response(
       JSON.stringify({ 
         success: false, 
         error: error.message,
-        details: error
+        details: {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        }
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

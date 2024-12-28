@@ -9,21 +9,27 @@ export function StripeConnectionTest() {
   const testConnection = async () => {
     setIsLoading(true)
     try {
+      console.log('Iniciando prueba de conexión...')
       const { data, error } = await supabase.functions.invoke('test-stripe-connection')
       
-      if (error) throw error
+      if (error) {
+        console.error('Error de Supabase:', error)
+        throw error
+      }
       
-      if (data.success) {
+      console.log('Respuesta recibida:', data)
+      
+      if (data?.success) {
         toast.success('Conexión con Stripe exitosa', {
           description: `Se encontraron ${data.productCount} productos`
         })
       } else {
-        throw new Error(data.message || 'Error desconocido')
+        throw new Error(data?.message || 'Error desconocido')
       }
     } catch (error) {
-      console.error('Error testing Stripe connection:', error)
+      console.error('Error completo:', error)
       toast.error('Error al probar la conexión con Stripe', {
-        description: error.message
+        description: error instanceof Error ? error.message : 'Error de conexión'
       })
     } finally {
       setIsLoading(false)
@@ -35,6 +41,7 @@ export function StripeConnectionTest() {
       <Button 
         onClick={testConnection}
         disabled={isLoading}
+        variant="outline"
       >
         {isLoading ? 'Probando conexión...' : 'Probar conexión con Stripe'}
       </Button>
