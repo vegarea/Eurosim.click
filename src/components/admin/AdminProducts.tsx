@@ -13,8 +13,8 @@ interface Product {
   features: string[]
   europe_gb?: number
   spain_gb?: number
-  created_at: Date
-  updated_at: Date
+  created_at: string
+  updated_at: string
   status: "active" | "inactive"
   stock?: number
   metadata?: Record<string, any>
@@ -57,7 +57,10 @@ export function AdminProducts() {
     try {
       const { data, error } = await supabase
         .from('products')
-        .insert([product])
+        .insert([{
+          ...product,
+          status: 'active' // Establecemos el estado por defecto
+        }])
         .select()
         .single()
 
