@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface CartItem {
   id: string;
@@ -12,7 +13,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity">) => void;
+  addItem: (item: Omit<CartItem, "quantity">) => Promise<void>;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -24,25 +25,67 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
-  const addItem = (newItem: Omit<CartItem, "quantity">) => {
-    setItems(currentItems => {
-      const existingItem = currentItems.find(item => item.id === newItem.id);
-      
-      if (existingItem) {
-        return currentItems.map(item =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+  const addItem = async (newItem: Omit<CartItem, "quantity">) => {
+    try {
+      // Validar que el producto existe y está activo
+      const { data: product, error } = await supabase
+        .from('products')
+        .select('id, status, title, stock')
+        .eq('id', newItem.id)
+        .single();
+
+      if (error) {
+        throw new Error('Error al verificar el producto');
       }
 
-      return [...currentItems, { ...newItem, quantity: 1 }];
-    });
+      if (!product) {
+        throw new Error('Producto no encontrado');
+      }
 
-    toast({
-      title: "Producto añadido al carrito",
-      description: `Has añadido ${newItem.title} a tu carrito`,
-    });
+      if (product.status !== 'active') {
+        throw new Error('Este producto no está disponible actualmente');
+      }
+
+      // Validar stock para SIMs físicas
+      if (newItem.type === 'physical' && product.stock <= 0) {
+        throw new Error('Este producto está agotado');
+      }
+
+      setItems(currentItems => {
+        const existingItem = currentItems.find(item => item.id === newItem.id);
+        
+        if (existingItem) {
+          // Validar stock antes de incrementar
+          if (newItem.type === 'physical' && existingItem.quantity >= product.stock) {
+            toast({
+              title: "No hay suficiente stock disponible",
+              description: `Solo quedan ${product.stock} unidades disponibles`,
+            });
+            return currentItems;
+          }
+          
+          return currentItems.map(item =>
+            item.id === newItem.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        }
+
+        return [...currentItems, { ...newItem, quantity: 1 }];
+      });
+
+      toast({
+        title: "Producto añadido al carrito",
+        description: `Has añadido ${newItem.title} a tu carrito`,
+      });
+    } catch (error) {
+      console.error('Error adding item to cart:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Error al añadir el producto",
+        variant: "destructive"
+      });
+    }
   };
 
   const removeItem = (id: string) => {
@@ -53,13 +96,47 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = async (id: string, quantity: number) => {
     if (quantity < 1) return;
-    setItems(currentItems =>
-      currentItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
-      )
-    );
+
+    try {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      if (item.type === 'physical') {
+        // Verificar stock disponible
+        const { data: product, error } = await supabase
+          .from('products')
+          .select('stock')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (!product) throw new Error('Producto no encontrado');
+
+        if (quantity > product.stock) {
+          toast({
+            title: "Stock insuficiente",
+            description: `Solo hay ${product.stock} unidades disponibles`,
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      setItems(currentItems =>
+        currentItems.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      );
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la cantidad",
+        variant: "destructive"
+      });
+    }
   };
 
   const clearCart = () => {

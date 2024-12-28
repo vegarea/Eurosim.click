@@ -13,99 +13,151 @@ export const useCheckout = () => {
     setIsProcessing(true);
     
     try {
-      // 1. Validate products exist and are active
-      console.log('Validating products...');
+      // 1. Revalidar productos y stock
+      console.log('Validating products and stock...');
       for (const item of items) {
-        console.log('Checking product:', item.title);
-        
-        // Primero intentamos encontrar el producto sin filtrar por status
         const { data: product, error: productError } = await supabase
           .from('products')
-          .select('id, status, title')
-          .ilike('title', item.title)
-          .maybeSingle();
+          .select('id, status, stock, title')
+          .eq('id', item.id)
+          .single();
 
         if (productError) {
           console.error('Error validating product:', productError);
           throw new Error('Error al validar el producto');
         }
 
-        console.log('Product query result:', product);
-
         if (!product) {
-          console.error('Product not found:', item.title);
+          console.error('Product not found:', item.id);
           throw new Error(`El producto "${item.title}" no existe`);
         }
 
         if (product.status !== 'active') {
-          console.error('Product is inactive:', item.title);
+          console.error('Product is inactive:', item.id);
           throw new Error(`El producto "${item.title}" no está disponible actualmente`);
         }
 
-        // Log the found product for debugging
-        console.log('Found active product:', product);
+        if (item.type === 'physical' && (product.stock || 0) < item.quantity) {
+          console.error('Insufficient stock:', item.id);
+          throw new Error(`Stock insuficiente para "${item.title}"`);
+        }
       }
 
-      // 2. Create customer
-      console.log('Creating customer...');
-      const { data: customer, error: customerError } = await supabase
+      // 2. Buscar o crear cliente
+      console.log('Creating or updating customer...');
+      let customer;
+      const { data: existingCustomer, error: customerSearchError } = await supabase
         .from('customers')
-        .insert({
-          name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          passport_number: formData.passportNumber,
-          birth_date: formData.birthDate,
-          gender: formData.gender,
-        })
         .select('*')
-        .single();
+        .eq('email', formData.email)
+        .maybeSingle();
 
-      if (customerError) {
-        console.error('Error creating customer:', customerError);
-        throw new Error('Error al crear el cliente');
+      if (customerSearchError) {
+        console.error('Error searching for customer:', customerSearchError);
+        throw new Error('Error al buscar cliente');
       }
 
-      console.log('Customer created:', customer);
+      if (existingCustomer) {
+        // Actualizar cliente existente
+        const { data: updatedCustomer, error: updateError } = await supabase
+          .from('customers')
+          .update({
+            name: formData.fullName,
+            phone: formData.phone,
+            passport_number: formData.passportNumber,
+            birth_date: formData.birthDate,
+            gender: formData.gender,
+            default_shipping_address: items.some(item => item.type === 'physical') ? {
+              street: formData.address,
+              city: formData.city,
+              state: formData.state,
+              postal_code: formData.zipCode,
+              country: 'ES',
+              phone: formData.phone
+            } : null
+          })
+          .eq('id', existingCustomer.id)
+          .select()
+          .single();
 
-      // 3. Create orders
+        if (updateError) {
+          console.error('Error updating customer:', updateError);
+          throw new Error('Error al actualizar cliente');
+        }
+
+        customer = updatedCustomer;
+      } else {
+        // Crear nuevo cliente
+        const { data: newCustomer, error: createError } = await supabase
+          .from('customers')
+          .insert({
+            name: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            passport_number: formData.passportNumber,
+            birth_date: formData.birthDate,
+            gender: formData.gender,
+            default_shipping_address: items.some(item => item.type === 'physical') ? {
+              street: formData.address,
+              city: formData.city,
+              state: formData.state,
+              postal_code: formData.zipCode,
+              country: 'ES',
+              phone: formData.phone
+            } : null
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating customer:', createError);
+          throw new Error('Error al crear cliente');
+        }
+
+        customer = newCustomer;
+      }
+
+      console.log('Customer created/updated:', customer);
+
+      // 3. Crear órdenes
       console.log('Creating orders...');
       const orders = [];
       for (const item of items) {
-        // Get product again to ensure it's still active
+        // Verificar producto una última vez
         const { data: product, error: productError } = await supabase
           .from('products')
-          .select('id, status, title')
-          .ilike('title', item.title)
-          .maybeSingle();
+          .select('id, status, stock')
+          .eq('id', item.id)
+          .single();
 
         if (productError || !product) {
           console.error('Error getting product:', productError);
-          throw new Error(`El producto "${item.title}" ya no está disponible`);
+          throw new Error(`El producto ya no está disponible`);
         }
 
         if (product.status !== 'active') {
-          throw new Error(`El producto "${item.title}" ya no está activo`);
+          throw new Error(`El producto ya no está activo`);
+        }
+
+        if (item.type === 'physical' && (product.stock || 0) < item.quantity) {
+          throw new Error(`Stock insuficiente`);
         }
 
         console.log('Creating order for product:', product);
 
-        // Create order
+        // Crear orden
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
             customer_id: customer.id,
-            product_id: product.id,
+            product_id: item.id,
             type: item.type,
-            total_amount: item.price * item.quantity,
+            total_amount: item.price * item.quantity * 100, // Convertir a centavos
             quantity: item.quantity,
-            ...(item.type === 'physical' ? {
-              shipping_address: customer.default_shipping_address
-            } : {
-              activation_date: formData.activationDate
-            })
+            shipping_address: item.type === 'physical' ? customer.default_shipping_address : null,
+            activation_date: item.type === 'esim' ? formData.activationDate : null
           })
-          .select('*')
+          .select()
           .single();
 
         if (orderError) {
@@ -116,7 +168,7 @@ export const useCheckout = () => {
         console.log('Order created:', order);
         orders.push(order);
 
-        // Create order event
+        // Crear evento de orden
         const { error: eventError } = await supabase
           .from('order_events')
           .insert({
@@ -127,19 +179,22 @@ export const useCheckout = () => {
 
         if (eventError) {
           console.error('Error creating order event:', eventError);
-          // No lanzamos error aquí ya que no es crítico
         }
 
         console.log('Order event created for order:', order.id);
       }
 
-      // 4. Create Stripe checkout session
+      // 4. Crear sesión de Stripe
       console.log('Creating Stripe checkout session...');
       const { data: stripeSession, error: stripeError } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           products: items.map(item => ({
-            ...item,
-            price: item.price * 100 // Convert to cents for Stripe
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            price: item.price * 100, // Convertir a centavos para Stripe
+            quantity: item.quantity,
+            type: item.type
           })),
           customerData: {
             name: customer.name,
@@ -147,7 +202,8 @@ export const useCheckout = () => {
             phone: customer.phone
           },
           metadata: {
-            orderId: orders[0].id // We'll use the first order ID for tracking
+            orderId: orders[0].id,
+            customerId: customer.id
           }
         }
       });
@@ -162,7 +218,7 @@ export const useCheckout = () => {
         throw new Error('No se recibió la URL de pago de Stripe');
       }
 
-      // 5. Redirect to Stripe checkout
+      // 5. Redireccionar a Stripe
       console.log('Redirecting to Stripe checkout:', stripeSession.url);
       window.location.href = stripeSession.url;
 
