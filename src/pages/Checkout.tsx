@@ -9,12 +9,14 @@ import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutLayout } from "@/components/checkout/CheckoutLayout"
 import { useCheckoutFlow } from "@/hooks/useCheckoutFlow"
-import { ShippingFormData, DocumentationFormData } from "@/types/checkout.types"
+import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 
 const CHECKOUT_STEPS = ['Información', 'Documentación', 'Pago']
 
 export default function Checkout() {
   const { items } = useCart()
+  const navigate = useNavigate()
   const {
     step,
     isFormValid,
@@ -23,31 +25,42 @@ export default function Checkout() {
     loadTestData,
     handleFormValidityChange,
     handleFormSubmit,
-    handleUpdateField,
     handleBack
   } = useCheckoutFlow()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
+
+  // Redirigir si el carrito está vacío
+  useEffect(() => {
+    if (items.length === 0) {
+      navigate('/')
+    }
+  }, [items, navigate])
+
+  // No renderizar nada si el carrito está vacío
+  if (items.length === 0) {
+    return null
+  }
 
   const renderStepContent = () => {
     switch (step) {
       case 1:
         return (
           <>
-            {hasPhysicalSim && (
-              <Alert className="mb-6 bg-blue-50 border-blue-200">
-                <InfoIcon className="h-4 w-4 text-blue-500" />
-                <AlertDescription className="text-blue-700">
-                  Tienes un SIM físico en tu carrito. Por favor, proporciona tu información de envío.
-                </AlertDescription>
-              </Alert>
-            )}
             {hasPhysicalSim ? (
-              <ShippingForm 
-                onSubmit={handleFormSubmit}
-                onValidityChange={handleFormValidityChange}
-                initialData={formData}
-              />
+              <>
+                <Alert className="mb-6 bg-blue-50 border-blue-200">
+                  <InfoIcon className="h-4 w-4 text-blue-500" />
+                  <AlertDescription className="text-blue-700">
+                    Tienes un SIM físico en tu carrito. Por favor, proporciona tu información de envío.
+                  </AlertDescription>
+                </Alert>
+                <ShippingForm 
+                  onSubmit={handleFormSubmit}
+                  onValidityChange={handleFormValidityChange}
+                  initialData={formData}
+                />
+              </>
             ) : (
               <ESimForm 
                 onSubmit={handleFormSubmit}
@@ -92,7 +105,6 @@ export default function Checkout() {
       isProcessing={isProcessing}
     >
       <CheckoutProgress step={step} steps={CHECKOUT_STEPS} />
-      
       {renderStepContent()}
       
       <div className="flex justify-between mt-8">

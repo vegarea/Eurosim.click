@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -21,13 +21,24 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = "shopping_cart";
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    // Inicializar desde localStorage
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  
   const { toast } = useToast();
+
+  // Persistir cambios en localStorage
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
 
   const addItem = async (newItem: Omit<CartItem, "quantity">) => {
     try {
-      // Validar que el producto existe y está activo
       const { data: product, error } = await supabase
         .from('products')
         .select('id, status, title, stock')
@@ -46,7 +57,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Este producto no está disponible actualmente');
       }
 
-      // Validar stock para SIMs físicas
       if (newItem.type === 'physical' && product.stock <= 0) {
         throw new Error('Este producto está agotado');
       }
@@ -55,7 +65,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const existingItem = currentItems.find(item => item.id === newItem.id);
         
         if (existingItem) {
-          // Validar stock antes de incrementar
           if (newItem.type === 'physical' && existingItem.quantity >= product.stock) {
             toast({
               title: "No hay suficiente stock disponible",
