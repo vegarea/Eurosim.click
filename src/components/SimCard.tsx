@@ -17,14 +17,6 @@ interface SimCardProps {
   onSelect?: () => void;
 }
 
-// Función para formatear la descripción con GB en negrita
-const formatDescription = (description: string) => {
-  return description.replace(
-    /(\d+GB)/g,
-    '<span class="font-bold">$1</span>'
-  );
-};
-
 export function SimCard({ 
   type, 
   title, 
@@ -38,7 +30,6 @@ export function SimCard({
   const { addItem } = useCart();
   const navigate = useNavigate();
   
-  // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
       case "Tarifa M":
@@ -82,6 +73,9 @@ export function SimCard({
 
   const colorScheme = getColorScheme(title);
   const [amount, currency] = formatCurrency(price).split(' ');
+  
+  // Extraer los GB de la descripción
+  const [euGB, esGB] = description.match(/\d+/g)?.map(Number) || [0, 0];
 
   return (
     <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
@@ -105,10 +99,20 @@ export function SimCard({
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               {title}
             </CardTitle>
-            <CardDescription 
-              className="text-base mt-1"
-              dangerouslySetInnerHTML={{ __html: formatDescription(description) }}
-            />
+          </div>
+        </div>
+        
+        {/* Destacar GB Europa */}
+        <div className="mt-4 p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="fi fi-eu w-6 h-4 rounded shadow-sm" />
+              <span className="text-2xl font-bold text-primary">{euGB}GB</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="fi fi-es w-5 h-3 rounded shadow-sm" />
+              <span>{esGB}GB España</span>
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -122,14 +126,16 @@ export function SimCard({
         </div>
 
         <ul className="space-y-4 my-8">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-3 group">
-              <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary group-hover:scale-150 transition-transform duration-300" />
-              <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
-                {feature}
-              </span>
-            </li>
-          ))}
+          {features
+            .filter(feature => !feature.includes('GB datos en toda Europa') && !feature.includes('GB exclusivo España'))
+            .map((feature, index) => (
+              <li key={index} className="flex items-center gap-3 group">
+                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary group-hover:scale-150 transition-transform duration-300" />
+                <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
+                  {feature}
+                </span>
+              </li>
+            ))}
         </ul>
 
         <Button 
