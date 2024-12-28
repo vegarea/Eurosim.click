@@ -5,6 +5,7 @@ import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
+// Declare global Google Maps types
 declare global {
   interface Window {
     google: typeof google;
@@ -13,9 +14,9 @@ declare global {
 }
 
 interface AddressAutocompleteProps {
-  value: string
-  onChange: (value: string) => void
-  onAddressSelect: (address: google.maps.places.PlaceResult) => void
+  value: string;
+  onChange: (value: string) => void;
+  onAddressSelect: (address: google.maps.places.PlaceResult) => void;
 }
 
 export function AddressAutocomplete({ value, onChange, onAddressSelect }: AddressAutocompleteProps) {
@@ -65,10 +66,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
               variant: "destructive",
             })
           }
-
-          await new Promise<void>((resolve) => {
-            script.onload = () => resolve()
-          })
         }
 
         // Initialize autocomplete after script is loaded
@@ -96,10 +93,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     loadGoogleMapsScript()
-
-    return () => {
-      // Cleanup if needed
-    }
   }, [onAddressSelect, toast])
 
   return (
