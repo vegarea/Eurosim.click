@@ -1,6 +1,7 @@
 import { Wifi, CreditCard, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Tables } from "@/integrations/supabase/types"
+import { formatCurrency } from "@/utils/currency"
 
 interface ProductCardProps {
   product: Tables<"products">
@@ -32,7 +33,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       </div>
       <div className="mb-4">
         <p className="text-2xl font-bold text-primary">
-          ${(product.price / 100).toFixed(2)}
+          {formatCurrency(product.price)}
           <span className="text-sm font-normal text-muted-foreground ml-1">MXN</span>
         </p>
       </div>

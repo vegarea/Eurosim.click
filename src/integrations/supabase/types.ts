@@ -142,9 +142,10 @@ export type Database = {
           carrier: string | null
           created_at: string | null
           customer_id: string
+          events: Json[] | null
           id: string
           metadata: Json | null
-          notes: string[] | null
+          notes: Json[] | null
           payment_method: string | null
           payment_status: string
           paypal_order_id: string | null
@@ -165,9 +166,10 @@ export type Database = {
           carrier?: string | null
           created_at?: string | null
           customer_id: string
+          events?: Json[] | null
           id?: string
           metadata?: Json | null
-          notes?: string[] | null
+          notes?: Json[] | null
           payment_method?: string | null
           payment_status: string
           paypal_order_id?: string | null
@@ -188,9 +190,10 @@ export type Database = {
           carrier?: string | null
           created_at?: string | null
           customer_id?: string
+          events?: Json[] | null
           id?: string
           metadata?: Json | null
-          notes?: string[] | null
+          notes?: Json[] | null
           payment_method?: string | null
           payment_status?: string
           paypal_order_id?: string | null
