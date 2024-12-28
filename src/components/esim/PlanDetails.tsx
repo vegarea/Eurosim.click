@@ -47,6 +47,9 @@ export function PlanDetails({
 
   const [amount, currency] = formatCurrency(price).split(' ');
 
+  // Filtrar los GB de Europa de las características
+  const filteredFeatures = features.filter(feature => !feature.includes('GB datos en toda Europa'));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -54,18 +57,22 @@ export function PlanDetails({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white/50 backdrop-blur-sm p-3 rounded-xl shadow-lg"
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col mb-2">
         <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           {title}
         </h2>
-        <p className="text-xl font-bold text-primary flex items-baseline gap-1">
+        <p className="text-2xl font-bold text-primary flex items-baseline gap-1 mt-1">
           {amount}
           <span className="text-sm font-normal text-gray-500">{currency}</span>
         </p>
+        <div className="mt-1 flex items-center gap-2">
+          <span className="text-lg font-semibold text-primary">{europeGB}GB</span>
+          <span className="text-sm text-gray-600">en toda Europa</span>
+        </div>
       </div>
 
       <div className="space-y-1.5 mb-3">
-        {features.map((feature, index) => (
+        {filteredFeatures.map((feature, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, x: -20 }}
