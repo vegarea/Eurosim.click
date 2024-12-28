@@ -1,7 +1,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tooltip } from "@/components/ui/tooltip"
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Info } from "lucide-react"
 import { orderTypes } from "./types/OrderTypes"
 import { formTypes } from "./types/FormTypes"
@@ -35,9 +40,16 @@ export function TypesList() {
                     <div className="flex items-center gap-2">
                       {type.name}
                       {type.description && (
-                        <Tooltip content={type.description}>
-                          <Info className="h-4 w-4 text-muted-foreground" />
-                        </Tooltip>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Info className="h-4 w-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{type.description}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       )}
                     </div>
                   </TableCell>

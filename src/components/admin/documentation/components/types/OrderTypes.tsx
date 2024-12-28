@@ -1,6 +1,7 @@
 export const orderTypes = [
   {
     name: "CartItem",
+    description: "Tipo para los items del carrito de compras",
     currentType: `interface CartItem {
   id: string
   type: "physical" | "esim"
@@ -22,23 +23,31 @@ export const orderTypes = [
       "src/components/cart/Cart.tsx",
       "src/components/cart/CartItem.tsx"
     ],
+    relations: [
+      {
+        type: "many_to_one",
+        with: "Product",
+        description: "Cada item del carrito pertenece a un producto"
+      }
+    ],
+    requiredFields: [
+      "product_id",
+      "quantity"
+    ],
     category: "component",
     status: "pending"
   },
   {
     name: "Order",
+    description: "Tipo para los pedidos realizados",
     currentType: `interface Order {
   id: string
-  date: string
-  customer: string
-  email?: string
-  phone?: string
-  total: number
   status: OrderStatus
-  type: OrderType
-  paymentMethod?: "stripe" | "paypal"
-  notes?: OrderNote[]
-  events?: OrderEvent[]
+  customer: string
+  total: number
+  type: "physical" | "esim"
+  paymentMethod?: string
+  date: string
   title?: string
   description?: string
   quantity?: number
@@ -46,35 +55,39 @@ export const orderTypes = [
   birthDate?: string
   gender?: 'M' | 'F'
   activationDate?: string
-  shippingAddress?: string
-  city?: string
-  state?: string
-  zipCode?: string
+  notes?: OrderNote[]
+  events?: OrderEvent[]
 }`,
     supabaseType: `type Order = Database["public"]["Tables"]["orders"]["Row"] = {
   id: string
   customer_id: string
-  product_id: string
   status: Database["public"]["Enums"]["order_status"]
   type: Database["public"]["Enums"]["order_type"]
   total_amount: number
-  quantity: number
   payment_method: Database["public"]["Enums"]["payment_method"]
-  payment_status: Database["public"]["Enums"]["payment_status"]
-  shipping_address: Json | null
-  tracking_number: string | null
-  carrier: string | null
-  activation_date: string | null
-  notes: string[] | null
-  metadata: Json | null
   created_at: string
   updated_at: string | null
+  shipping_address_id: string | null
+  metadata: Json | null
 }`,
     locations: [
-      "src/contexts/OrdersContext.tsx",
       "src/components/admin/orders/types.ts",
       "src/components/checkout/types.ts",
+      "src/contexts/OrdersContext.tsx",
       "src/pages/OrderDetails.tsx"
+    ],
+    relations: [
+      {
+        type: "one_to_many",
+        with: "CartItem",
+        description: "Un pedido puede tener múltiples items del carrito"
+      }
+    ],
+    requiredFields: [
+      "customer_id",
+      "total_amount",
+      "status",
+      "type"
     ],
     category: "context",
     status: "pending"
