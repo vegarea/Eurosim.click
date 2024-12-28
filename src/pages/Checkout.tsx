@@ -10,12 +10,13 @@ import { useCart } from "@/contexts/CartContext"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { InfoIcon, Bug } from "lucide-react"
+import { InfoIcon, Bug, ShoppingBag } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { Json } from "@/types/database/common"
+import { useNavigate } from "react-router-dom"
 
 // Test data that matches the expected prop types for each form
 const testData = {
@@ -46,11 +47,28 @@ export default function Checkout() {
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
+  const navigate = useNavigate()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
   const progress = (step / 4) * 100
 
-  // Función para cargar datos de prueba
+  // Verificar si el carrito está vacío y redirigir
+  useEffect(() => {
+    if (items.length === 0) {
+      toast({
+        title: "Carrito vacío",
+        description: "Agrega productos a tu carrito para continuar con la compra",
+        variant: "destructive",
+      })
+      navigate('/')
+    }
+  }, [items, navigate, toast])
+
+  // Si el carrito está vacío, no renderizar el contenido
+  if (items.length === 0) {
+    return null;
+  }
+
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
       { ...testData.shipping, ...testData.documentation } :
