@@ -2,13 +2,22 @@ export const formatCurrency = (amount: number, currency: string = 'MXN') => {
   // Dividimos por 100 ya que los precios están almacenados en centavos
   const amountInCurrency = amount / 100;
   
-  return new Intl.NumberFormat('es-MX', {
+  const formatted = new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: 0, // Esto evita mostrar decimales
-    maximumFractionDigits: 0, // Esto evita mostrar decimales
-    currencyDisplay: 'narrowSymbol' // Esto asegura que se muestre el símbolo de moneda
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    currencyDisplay: 'code' // Cambiamos a 'code' para forzar la visualización del código de moneda
   }).format(amountInCurrency);
+
+  console.log('Formatting currency:', {
+    originalAmount: amount,
+    amountInCurrency,
+    formatted,
+    currency
+  });
+
+  return formatted;
 };
 
 export const parseCurrency = (value: string): number => {
