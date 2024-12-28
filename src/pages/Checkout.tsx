@@ -1,101 +1,33 @@
-import { Header } from "@/components/Header"
-import { Cart } from "@/components/cart/Cart"
-import { PaymentSecurity } from "@/components/PaymentSecurity"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { InfoIcon, ArrowRight, ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useCart } from "@/contexts/CartContext"
 import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { ReviewStep } from "@/components/checkout/ReviewStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
-import { useCart } from "@/contexts/CartContext"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { InfoIcon, Bug } from "lucide-react"
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Check, ArrowRight, ArrowLeft } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useCheckout } from "@/hooks/useCheckout"
-import { useNavigate } from "react-router-dom"
+import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
+import { CheckoutLayout } from "@/components/checkout/CheckoutLayout"
+import { useCheckoutFlow } from "@/hooks/useCheckoutFlow"
 
-// Test data that matches the expected prop types for each form
-const testData = {
-  shipping: {
-    fullName: "Juan Pérez",
-    email: "juan@ejemplo.com",
-    phone: "5512345678",
-    address: "Calle Principal 123",
-    city: "Ciudad de México",
-    state: "CDMX",
-    zipCode: "11111"
-  },
-  documentation: {
-    fullName: "Juan Pérez",
-    birthDate: new Date(),
-    gender: "M",
-    passportNumber: "AB123456",
-    activationDate: new Date(),
-    email: "juan@ejemplo.com",
-    phone: "5512345678"
-  }
-}
+const CHECKOUT_STEPS = ['Información', 'Documentación', 'Revisión', 'Pago']
 
 export default function Checkout() {
   const { items } = useCart()
-  const [step, setStep] = useState(1)
-  const [isFormValid, setIsFormValid] = useState(false)
-  const [formData, setFormData] = useState<Record<string, any>>({})
-  const [isTestMode, setIsTestMode] = useState(false)
-  const { toast } = useToast()
-  const { processCheckout, isProcessing } = useCheckout()
-  const navigate = useNavigate()
+  const {
+    step,
+    isFormValid,
+    formData,
+    isProcessing,
+    loadTestData,
+    handleFormValidityChange,
+    handleFormSubmit,
+    handleUpdateField,
+    handleBack
+  } = useCheckoutFlow()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
-  const progress = (step / 4) * 100
-
-  const loadTestData = () => {
-    const data = hasPhysicalSim ? 
-      { ...testData.shipping, ...testData.documentation } :
-      testData.documentation;
-    
-    setFormData(data);
-    setIsFormValid(true);
-    setIsTestMode(true);
-    
-    toast({
-      title: "Modo de prueba activado",
-      description: "Se han cargado datos de prueba para facilitar el testing",
-    });
-  };
-
-  const handleFormValidityChange = (isValid: boolean) => {
-    setIsFormValid(isValid)
-  }
-
-  const handleFormSubmit = async (values: any) => {
-    if (step === 4) {
-      // Process checkout on final step
-      const success = await processCheckout(formData);
-      if (success) {
-        navigate('/payment');
-      }
-    } else {
-      setFormData({ ...formData, ...values })
-      setStep(step + 1)
-      setIsFormValid(step === 3)
-    }
-  }
-
-  const handleUpdateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1)
-      setIsFormValid(true)
-    }
-  }
 
   const renderStepContent = () => {
     switch (step) {
@@ -114,17 +46,17 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? testData.shipping : undefined}
+                initialData={formData}
               />
             ) : (
               <ESimForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={isTestMode ? {
-                  fullName: testData.documentation.fullName,
-                  email: testData.documentation.email,
-                  phone: testData.documentation.phone
-                } : undefined}
+                initialData={{
+                  fullName: formData.fullName,
+                  email: formData.email,
+                  phone: formData.phone
+                }}
               />
             )}
           </>
@@ -134,7 +66,7 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
-            initialData={isTestMode ? testData.documentation : undefined}
+            initialData={formData}
           />
         )
       case 3:
@@ -159,100 +91,40 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
-      <Header />
+    <CheckoutLayout 
+      onLoadTestData={() => loadTestData(hasPhysicalSim)}
+      showCheckoutButton={step === 4}
+      isButtonEnabled={isFormValid && !isProcessing}
+      onCheckout={() => handleFormSubmit(formData)}
+      isProcessing={isProcessing}
+    >
+      <CheckoutProgress step={step} steps={CHECKOUT_STEPS} />
       
-      <main className="container mx-auto py-8 px-4 max-w-5xl">
-          {/* Test Mode Button */}
-          <div className="flex justify-end mb-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadTestData}
-              className="flex items-center gap-2"
-            >
-              <Bug className="w-4 h-4" />
-              Cargar datos de prueba
-            </Button>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="mb-8 space-y-4 max-w-3xl mx-auto">
-            <div className="flex justify-between items-center">
-              {['Información', 'Documentación', 'Revisión', 'Pago'].map((stepName, index) => (
-                <motion.div
-                  key={stepName}
-                  className={`flex items-center ${index + 1 <= step ? 'text-primary' : 'text-gray-400'}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 
-                    ${index + 1 <= step ? 'border-primary bg-primary text-white' : 'border-gray-300'}`}>
-                    {index + 1 <= step ? <Check className="w-4 h-4" /> : index + 1}
-                  </div>
-                  <span className="ml-2 font-medium hidden sm:inline">{stepName}</span>
-                </motion.div>
-              ))}
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <motion.div 
-            className="lg:col-span-8"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
+      {renderStepContent()}
+      
+      <div className="flex justify-between mt-8">
+        {step > 1 && (
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            className="flex items-center gap-2"
+            disabled={isProcessing}
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
-              {renderStepContent()}
-              
-              <div className="flex justify-between mt-8">
-                {step > 1 && (
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                    className="flex items-center gap-2"
-                    disabled={isProcessing}
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Volver
-                  </Button>
-                )}
-                {step < 4 && (
-                  <Button
-                    className="ml-auto flex items-center gap-2"
-                    onClick={() => isFormValid && handleFormSubmit(formData)}
-                    disabled={!isFormValid || isProcessing}
-                  >
-                    Siguiente
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            className="lg:col-span-4"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
+            <ArrowLeft className="w-4 h-4" />
+            Volver
+          </Button>
+        )}
+        {step < 4 && (
+          <Button
+            className="ml-auto flex items-center gap-2"
+            onClick={() => isFormValid && handleFormSubmit(formData)}
+            disabled={!isFormValid || isProcessing}
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
-              <Cart 
-                showCheckoutButton={step === 4} 
-                isButtonEnabled={isFormValid && !isProcessing}
-                onCheckout={handleFormSubmit}
-              />
-              <div className="mt-4">
-                <PaymentSecurity />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </main>
-    </div>
-  );
+            Siguiente
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+    </CheckoutLayout>
+  )
 }

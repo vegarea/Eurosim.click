@@ -9,9 +9,12 @@ export const useCheckout = () => {
   const { items, clearCart } = useCart();
 
   const processCheckout = async (formData: any) => {
+    console.log('Starting checkout process with data:', formData);
     setIsProcessing(true);
+    
     try {
       // 1. Create customer
+      console.log('Creating customer...');
       const customerData = {
         name: formData.fullName,
         email: formData.email,
@@ -32,8 +35,10 @@ export const useCheckout = () => {
       };
 
       const customer = await checkoutService.createCustomer(customerData);
+      console.log('Customer created:', customer);
 
       // 2. Create order for each item
+      console.log('Creating orders...');
       const orders = [];
       for (const item of items) {
         const orderData = {
@@ -50,6 +55,7 @@ export const useCheckout = () => {
         };
 
         const order = await checkoutService.createOrder(orderData);
+        console.log('Order created:', order);
         orders.push(order);
 
         // 3. Create initial order event
@@ -58,9 +64,11 @@ export const useCheckout = () => {
           'created',
           'Orden creada exitosamente'
         );
+        console.log('Order event created for order:', order.id);
       }
 
       // 4. Create Stripe checkout session
+      console.log('Creating Stripe checkout session...');
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           products: items.map(item => ({
@@ -78,6 +86,7 @@ export const useCheckout = () => {
 
       // 5. Redirect to Stripe checkout
       if (data?.url) {
+        console.log('Redirecting to Stripe checkout:', data.url);
         window.location.href = data.url;
       } else {
         throw new Error('No checkout URL received from Stripe');
