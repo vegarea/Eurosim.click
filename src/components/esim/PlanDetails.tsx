@@ -46,8 +46,6 @@ export function PlanDetails({
   };
 
   const [amount, currency] = formatCurrency(price).split(' ');
-
-  // Filtrar los GB de Europa de las características
   const filteredFeatures = features.filter(feature => !feature.includes('GB datos en toda Europa'));
 
   return (
@@ -57,11 +55,13 @@ export function PlanDetails({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
     >
-      {/* Header con título y precio */}
-      <div className="flex justify-between items-start">
-        <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-          {title}
-        </h2>
+      <div className="flex justify-between items-start border-b border-gray-100 pb-3">
+        <div className="flex flex-col">
+          <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            {title}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">{description}</p>
+        </div>
         <div className="text-right">
           <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
             {amount}
@@ -74,15 +74,14 @@ export function PlanDetails({
         </div>
       </div>
 
-      {/* Lista de características */}
-      <div className="mt-4 space-y-2">
+      <div className="py-3 border-b border-gray-100">
         {filteredFeatures.map((feature, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 mb-2 last:mb-0"
           >
             <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
             <span className="text-sm text-gray-700">{feature}</span>
@@ -90,8 +89,7 @@ export function PlanDetails({
         ))}
       </div>
 
-      {/* Medidor de uso */}
-      <div className="mt-4">
+      <div className="py-3 border-b border-gray-100">
         <UsageMeter
           europeGB={europeGB}
           spainGB={spainGB}
@@ -99,12 +97,11 @@ export function PlanDetails({
         />
       </div>
 
-      {/* Botón de compra */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-4"
+        className="pt-3"
       >
         <Button 
           onClick={handlePurchase}
