@@ -9,14 +9,14 @@ import SimQuiz from "@/components/SimQuiz";
 
 export function HomeHero() {
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-gradient-to-br from-brand-50 to-white">
+    <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-gradient-to-br from-brand-50 to-white">
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
       
       {/* Se eliminaron los iconos flotantes de WiFi del fondo */}
       
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-12 lg:py-16">
-        <div className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100svh-4rem)]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8">
+        <div className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100svh-8rem)]">
           {/* Columna de contenido */}
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
             <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium bg-white/50 backdrop-blur-sm self-start">
