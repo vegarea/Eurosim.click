@@ -10,56 +10,64 @@ const types = [...orderTypes, ...formTypes, ...adminTypes]
 
 export function TypesList() {
   return (
-    <ScrollArea className="h-[600px] w-full rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[200px]">Nombre del Tipo</TableHead>
-            <TableHead className="w-[300px]">Tipo Actual</TableHead>
-            <TableHead className="w-[300px]">Tipo Supabase</TableHead>
-            <TableHead>Ubicación</TableHead>
-            <TableHead>Categoría</TableHead>
-            <TableHead>Estado</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {types.map((type, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">{type.name}</TableCell>
-              <TableCell>
-                <pre className="text-xs bg-slate-50 p-2 rounded-md overflow-x-auto">
-                  {type.currentType}
-                </pre>
-              </TableCell>
-              <TableCell>
-                <pre className="text-xs bg-slate-50 p-2 rounded-md overflow-x-auto">
-                  {type.supabaseType}
-                </pre>
-              </TableCell>
-              <TableCell>
-                <ul className="list-disc list-inside text-sm">
-                  {type.locations.map((location, idx) => (
-                    <li key={idx} className="text-gray-600">{location}</li>
-                  ))}
-                </ul>
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className="capitalize">
-                  {type.category}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <Badge 
-                  variant={type.status === "updated" ? "default" : "secondary"}
-                  className={type.status === "updated" ? "bg-green-500" : ""}
-                >
-                  {type.status === "updated" ? "Actualizado a Supabase" : "Sin actualizar"}
-                </Badge>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </ScrollArea>
+    <div className="border rounded-lg">
+      <ScrollArea className="h-[600px]">
+        <div className="w-full min-w-[1200px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[150px] bg-white sticky left-0">Nombre del Tipo</TableHead>
+                <TableHead className="min-w-[300px]">Tipo Actual</TableHead>
+                <TableHead className="min-w-[300px]">Tipo Supabase</TableHead>
+                <TableHead className="min-w-[200px]">Ubicación</TableHead>
+                <TableHead className="w-[100px]">Categoría</TableHead>
+                <TableHead className="w-[120px]">Estado</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {types.map((type, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium bg-white sticky left-0 border-r">
+                    {type.name}
+                  </TableCell>
+                  <TableCell>
+                    <pre className="text-xs bg-slate-50 p-2 rounded-md overflow-x-auto max-w-[300px]">
+                      {type.currentType}
+                    </pre>
+                  </TableCell>
+                  <TableCell>
+                    <pre className="text-xs bg-slate-50 p-2 rounded-md overflow-x-auto max-w-[300px]">
+                      {type.supabaseType}
+                    </pre>
+                  </TableCell>
+                  <TableCell>
+                    <ul className="list-disc list-inside text-sm">
+                      {type.locations.map((location, idx) => (
+                        <li key={idx} className="text-gray-600 truncate hover:text-clip hover:whitespace-normal">
+                          {location}
+                        </li>
+                      ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="capitalize">
+                      {type.category}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={type.status === "updated" ? "default" : "secondary"}
+                      className={type.status === "updated" ? "bg-green-500" : ""}
+                    >
+                      {type.status === "updated" ? "Actualizado" : "Pendiente"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </ScrollArea>
+    </div>
   )
 }
