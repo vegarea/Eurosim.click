@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input"
 import { User } from "lucide-react"
 import { motion } from "framer-motion"
 import { UseFormReturn } from "react-hook-form"
-import { DocumentValidationForm } from "@/components/admin/documentation/types/WorkflowTypes"
+import { DocumentValidationForm } from "@/components/admin/documentation/types/workflow/WorkflowTypes"
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<DocumentValidationForm>;

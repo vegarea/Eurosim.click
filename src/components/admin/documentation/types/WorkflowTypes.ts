@@ -7,5 +7,9 @@ export type {
   WorkflowItem,
   WorkflowCategory,
   TypeField,
-  TypeDefinition
+  TypeDefinition,
+  DocumentValidationForm,
+  ShippingAddressForm,
+  ShippingAddress,
+  Customer
 } from './workflow/WorkflowTypes';

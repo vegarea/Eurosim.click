@@ -8,7 +8,7 @@ import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { UseFormReturn } from "react-hook-form"
-import { DocumentValidationForm } from "@/components/admin/documentation/types/WorkflowTypes"
+import { DocumentValidationForm } from "@/components/admin/documentation/types/workflow/WorkflowTypes"
 
 interface DateFieldsProps {
   form: UseFormReturn<DocumentValidationForm>;
