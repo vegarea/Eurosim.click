@@ -1,9 +1,10 @@
 import { ReviewField } from "./ReviewField"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { DocumentationFormData, ShippingFormData } from "@/types/checkout.types"
 
 interface ReviewStepProps {
-  formData: any
+  formData: Partial<DocumentationFormData & ShippingFormData>
   onUpdateField: (field: string, value: any) => void
 }
 
@@ -27,13 +28,20 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
     F: "Femenino"
   }
 
-  const formatValue = (key: string, value: any): string => {
+  const formatValue = (key: string, value: any): string | Date => {
     if (!value) return "No especificado";
 
+    // Para fechas, asegurarnos de que sean objetos Date
     if (key.includes("Date")) {
-      // Verifica si value es un objeto Date o un string de fecha
-      const date = value instanceof Date ? value : new Date(value);
-      return format(date, "PPP", { locale: es });
+      if (value instanceof Date) {
+        return value;
+      }
+      // Si es un objeto con _type: "Date", extraer el valor
+      if (value._type === "Date" && value.value?.iso) {
+        return new Date(value.value.iso);
+      }
+      // Si es un string de fecha
+      return new Date(value);
     }
     
     if (key === "gender") {
@@ -42,6 +50,30 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
 
     return String(value);
   }
+
+  // Ordenar los campos para mostrarlos en un orden lógico
+  const fieldOrder = [
+    'fullName',
+    'email',
+    'phone',
+    'address',
+    'city',
+    'state',
+    'zipCode',
+    'birthDate',
+    'gender',
+    'passportNumber',
+    'activationDate'
+  ];
+
+  const sortedFields = Object.entries(formData)
+    .sort(([keyA], [keyB]) => {
+      const indexA = fieldOrder.indexOf(keyA);
+      const indexB = fieldOrder.indexOf(keyB);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
 
   return (
     <div className="space-y-6">
@@ -53,14 +85,17 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        {Object.entries(formData).map(([key, value]) => {
+        {sortedFields.map(([key, value]) => {
           if (value === undefined || value === null) return null;
           
+          const formattedValue = formatValue(key, value);
+          if (!formattedValue) return null;
+
           return (
             <ReviewField
               key={key}
               label={fieldLabels[key] || key}
-              value={formatValue(key, value)}
+              value={formattedValue}
               onUpdate={(newValue) => onUpdateField(key, newValue)}
               type={key.includes("Date") ? "date" : "text"}
               isActivationDate={key === "activationDate"}
