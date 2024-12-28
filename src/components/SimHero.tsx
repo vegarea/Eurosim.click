@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import EUFlag from "@/components/icons/EUFlag";
+import MexicoFlag from "@/components/icons/MexicoFlag";
+import { Truck } from "lucide-react";
 
 export function SimHero() {
   return (
@@ -15,14 +18,20 @@ export function SimHero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-left space-y-8">
             <div className="animate-fade-in space-y-6">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                <span className="text-primary">SIM Física</span> para tu viaje a Europa
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl flex items-center gap-4">
+                <span className="text-primary">SIM Card</span> para
+                <EUFlag className="h-12 w-16 inline-block" />
+                Europa
               </h1>
-              <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
-                Recibe tu SIM física en la comodidad de tu hogar y disfruta de internet de alta velocidad en toda Europa.
+              <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl flex items-center gap-3">
+                <Truck className="h-6 w-6 text-primary flex-shrink-0" />
+                <span>
+                  Entrega a domicilio en toda la República Mexicana
+                  <MexicoFlag className="h-5 w-8 inline-block ml-2" />
+                </span>
               </p>
               <p className="text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
-                Envío a todo México, activación sencilla y soporte en español 24/7. La manera más confiable de mantenerte conectado en Europa.
+                Mantente conectado en toda Europa con internet de alta velocidad. Activación sencilla y soporte en español 24/7.
               </p>
             </div>
           </div>
