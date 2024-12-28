@@ -1,15 +1,6 @@
 import { Check, AlertCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-interface ChecklistItem {
-  id: string
-  category: string
-  items: Array<{
-    name: string
-    status: "pending" | "in_progress" | "completed"
-    description: string
-  }>
-}
+import { ChecklistItem } from "../types/ChecklistTypes"
 
 interface TypesChecklistProps {
   items: ChecklistItem[]

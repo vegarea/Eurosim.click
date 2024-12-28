@@ -1,14 +1,4 @@
-type ChecklistItemStatus = "pending" | "in_progress" | "completed" | "reviewed"
-
-interface ChecklistItem {
-  id: string
-  category: string
-  items: Array<{
-    name: string
-    status: ChecklistItemStatus
-    description: string
-  }>
-}
+import { ChecklistItem } from "../types/ChecklistTypes"
 
 export const typesChecklistData: ChecklistItem[] = [
   {
