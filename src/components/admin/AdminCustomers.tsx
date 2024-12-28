@@ -21,13 +21,12 @@ export function AdminCustomers() {
 
   // Crear un mapa de clientes únicos basado en los pedidos
   const customers = orders.reduce((acc, order) => {
-    const customerInfo = order.customers;
-    if (!acc[order.customer_id] && customerInfo) {
+    if (!acc[order.customer_id] && order.customers) {
       acc[order.customer_id] = {
         id: order.customer_id,
-        name: customerInfo.name,
-        email: customerInfo.email || "No especificado",
-        phone: customerInfo.phone || "No especificado",
+        name: order.customers.name,
+        email: order.customers.email || "No especificado",
+        phone: order.customers.phone || "No especificado",
         orders: [],
         total_spent: 0,
         shipping_address: order.shipping_address,

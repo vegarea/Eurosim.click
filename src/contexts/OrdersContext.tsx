@@ -1,16 +1,16 @@
 import { createContext, useContext, useState, useEffect } from "react"
-import { Order, OrderUpdate } from "@/types/supabase"
+import { Order, OrderStatus } from "@/types/supabase/orders"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
 interface OrdersContextType {
-  orders: Order[]
-  updateOrder: (orderId: string, updates: Partial<OrderUpdate>) => Promise<void>
-  isLoading: boolean
-  error: Error | null
+  orders: Order[];
+  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
+const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([])
@@ -41,7 +41,14 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      setOrders(data)
+      const ordersWithDetails = data.map(order => ({
+        ...order,
+        customer: order.customers?.name || 'Unknown',
+        date: order.created_at,
+        total: order.total_amount / 100, // Convertir de centavos a unidades
+      }))
+
+      setOrders(ordersWithDetails)
       setIsLoading(false)
     } catch (error) {
       console.error('Error fetching orders:', error)
@@ -51,7 +58,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const updateOrder = async (orderId: string, updates: Partial<OrderUpdate>) => {
+  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
     try {
       const { error } = await supabase
         .from('orders')

@@ -1,7 +1,10 @@
-export { 
+export type {
   Order,
   OrderStatus,
   OrderType,
   PaymentMethod,
-  PaymentStatus
-} from '@/types/supabase';
+  PaymentStatus,
+  OrderEvent,
+  OrderNote,
+  OrderWithDetails
+} from '@/types/supabase/orders';
