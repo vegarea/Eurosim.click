@@ -43,18 +43,24 @@ export default function Checkout() {
     // Procesamiento final del pago
     setIsProcessing(true)
     try {
-      // Aquí iría la lógica de procesamiento del pago con Stripe
-
       // Crear el pedido en la base de datos
       const { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert([
-          {
-            customer_email: formData.email,
-            customer_name: formData.fullName,
-            // ... otros campos del pedido
-          }
-        ])
+        .insert({
+          customer_email: formData.email,
+          customer_name: formData.fullName,
+          type: items[0].type, // Assuming all items are of the same type
+          total_amount: items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+          quantity: items.reduce((acc, item) => acc + item.quantity, 0),
+          shipping_address: hasPhysicalSim ? {
+            street: formData.address,
+            city: formData.city,
+            state: formData.state,
+            zipCode: formData.zipCode,
+            phone: formData.phone
+          } : null,
+          activation_date: formData.activationDate
+        })
         .select()
         .single()
 

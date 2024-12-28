@@ -9,6 +9,89 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      orders: {
+        Row: {
+          id: string
+          customer_id: string | null
+          customer_email: string
+          customer_name: string
+          status: string
+          type: string
+          total_amount: number
+          quantity: number
+          payment_method: string | null
+          payment_status: string | null
+          stripe_payment_intent_id: string | null
+          stripe_receipt_url: string | null
+          paypal_order_id: string | null
+          paypal_receipt_url: string | null
+          shipping_address: Json | null
+          tracking_number: string | null
+          carrier: string | null
+          activation_date: string | null
+          notes: string[] | null
+          metadata: Json | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          customer_id?: string | null
+          customer_email: string
+          customer_name: string
+          status?: string
+          type: string
+          total_amount: number
+          quantity?: number
+          payment_method?: string | null
+          payment_status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_receipt_url?: string | null
+          paypal_order_id?: string | null
+          paypal_receipt_url?: string | null
+          shipping_address?: Json | null
+          tracking_number?: string | null
+          carrier?: string | null
+          activation_date?: string | null
+          notes?: string[] | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          customer_id?: string | null
+          customer_email?: string
+          customer_name?: string
+          status?: string
+          type?: string
+          total_amount?: number
+          quantity?: number
+          payment_method?: string | null
+          payment_status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_receipt_url?: string | null
+          paypal_order_id?: string | null
+          paypal_receipt_url?: string | null
+          shipping_address?: Json | null
+          tracking_number?: string | null
+          carrier?: string | null
+          activation_date?: string | null
+          notes?: string[] | null
+          metadata?: Json | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
