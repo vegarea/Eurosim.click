@@ -10,7 +10,7 @@ interface OrdersContextType {
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const { orders, updateOrderStatus } = useOrdersData();
+  const { orders = [], updateOrderStatus } = useOrdersData();
 
   const updateOrder = (orderId: string, updates: Partial<Order>) => {
     if (updates.status) {
