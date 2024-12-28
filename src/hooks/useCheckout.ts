@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { checkoutService } from '@/services/checkoutService';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useCheckout = () => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -33,6 +34,7 @@ export const useCheckout = () => {
       const customer = await checkoutService.createCustomer(customerData);
 
       // 2. Create order for each item
+      const orders = [];
       for (const item of items) {
         const orderData = {
           customer_id: customer.id,
@@ -48,6 +50,7 @@ export const useCheckout = () => {
         };
 
         const order = await checkoutService.createOrder(orderData);
+        orders.push(order);
 
         // 3. Create initial order event
         await checkoutService.createOrderEvent(
@@ -57,11 +60,29 @@ export const useCheckout = () => {
         );
       }
 
-      // 4. Clear cart and show success message
-      clearCart();
-      toast.success('¡Pedido creado exitosamente!');
-      
-      // TODO: Redirect to payment page
+      // 4. Create Stripe checkout session
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          products: items.map(item => ({
+            ...item,
+            price: item.price * 100 // Convert to cents for Stripe
+          })),
+          customerData,
+          metadata: {
+            orderId: orders[0].id // We'll use the first order ID for tracking
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // 5. Redirect to Stripe checkout
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received from Stripe');
+      }
+
       return true;
     } catch (error) {
       console.error('Error in checkout process:', error);
