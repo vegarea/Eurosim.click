@@ -39,6 +39,7 @@ export interface Order {
   status: OrderStatus;
   type: "physical" | "esim";
   payment_method?: PaymentMethod;
+  payment_status: PaymentStatus;
   title?: string;
   description?: string;
   quantity?: number;
