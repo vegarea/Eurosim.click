@@ -47,24 +47,21 @@ const enumTypes: TypeDefinition[] = [
     ]
   },
   {
-    name: "ShippingCarrier",
+    name: "ProductStatus",
     status: "verified",
-    description: "Empresas de envío soportadas",
+    description: "Estados posibles de un producto",
     fields: [
-      { name: "REDPACK", type: "enum", description: "Redpack" },
-      { name: "ESTAFETA", type: "enum", description: "Estafeta" },
-      { name: "FEDEX", type: "enum", description: "FedEx" },
-      { name: "DHL", type: "enum", description: "DHL" },
-      { name: "UPS", type: "enum", description: "UPS" }
+      { name: "ACTIVE", type: "enum", description: "Activo" },
+      { name: "INACTIVE", type: "enum", description: "Inactivo" }
     ]
   },
   {
-    name: "DocumentType",
+    name: "Gender",
     status: "verified",
-    description: "Tipos de documentos soportados",
+    description: "Géneros soportados",
     fields: [
-      { name: "PASSPORT", type: "enum", description: "Pasaporte" },
-      { name: "ID_CARD", type: "enum", description: "Documento de identidad" }
+      { name: "M", type: "enum", description: "Masculino" },
+      { name: "F", type: "enum", description: "Femenino" }
     ]
   }
 ];
