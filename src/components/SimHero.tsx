@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import EUFlag from "@/components/icons/EUFlag";
 import MexicoFlag from "@/components/icons/MexicoFlag";
-import { Truck } from "lucide-react";
+import { Truck, ArrowDown } from "lucide-react";
 
 export function SimHero() {
+  const scrollToProducts = () => {
+    const productsSection = document.querySelector('#products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white to-brand-50 min-h-[90vh]">
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
@@ -33,6 +40,14 @@ export function SimHero() {
               <p className="text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Mantente conectado en toda Europa con internet de alta velocidad. Activación sencilla y soporte en español 24/7.
               </p>
+
+              <Button 
+                onClick={scrollToProducts}
+                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 group"
+              >
+                Ver Tarifas
+                <ArrowDown className="ml-2 h-4 w-4 group-hover:animate-bounce" />
+              </Button>
             </div>
           </div>
 

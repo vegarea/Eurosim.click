@@ -46,7 +46,7 @@ const Sims = () => {
       <Header />
       <SimHero />
       
-      <div className="container mx-auto px-4 py-8 lg:py-12 relative">
+      <div id="products-section" className="container mx-auto px-4 py-8 lg:py-12 relative scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-4 lg:gap-8 mb-8">
             {!isLoading && simCards.map((card, index) => (
