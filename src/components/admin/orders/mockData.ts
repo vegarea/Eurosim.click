@@ -11,13 +11,19 @@ export const mockOrders: Order[] = [
     quantity: 1,
     payment_method: "stripe",
     payment_status: "pending",
-    created_at: "2024-01-25T10:30:00Z",
-    updated_at: "2024-01-25T10:30:00Z",
-    customer_name: "Juan Pérez",
-    customer_email: "juan@example.com",
-    customer_phone: "+1234567890",
+    stripe_payment_intent_id: null,
+    stripe_receipt_url: null,
+    paypal_order_id: null,
+    paypal_receipt_url: null,
+    shipping_address: null,
+    tracking_number: null,
+    carrier: null,
+    activation_date: null,
     notes: [],
     metadata: {
+      customer_name: "Juan Pérez",
+      customer_email: "juan@example.com",
+      customer_phone: "+1234567890",
       events: [
         {
           id: "evt-001",
@@ -29,7 +35,12 @@ export const mockOrders: Order[] = [
           }
         }
       ]
-    }
+    },
+    created_at: "2024-01-25T10:30:00Z",
+    updated_at: "2024-01-25T10:30:00Z",
+    customer_name: "Juan Pérez",
+    customer_email: "juan@example.com",
+    customer_phone: "+1234567890",
   },
   {
     id: "order-002",

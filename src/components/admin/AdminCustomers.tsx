@@ -13,8 +13,9 @@ import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
 import { Order } from "@/types/database/orders"
 import { Customer } from "@/types/database/customers"
+import { ShippingAddress } from "@/types/database/common"
 
-interface CustomerData extends Customer {
+interface ExtendedCustomer extends Customer {
   orders: Order[];
   totalSpent: number;
 }
@@ -22,7 +23,7 @@ interface CustomerData extends Customer {
 export function AdminCustomers() {
   const { orders } = useOrders()
   const [search, setSearch] = useState("")
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<ExtendedCustomer | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   // Crear un mapa de clientes únicos basado en los pedidos
@@ -36,10 +37,10 @@ export function AdminCustomers() {
         id: customerId,
         name: metadata?.customer_name || "No especificado",
         email: metadata?.customer_email || "No especificado",
-        phone: metadata?.customer_phone || "No especificado",
+        phone: metadata?.customer_phone || null,
         orders: [],
         totalSpent: 0,
-        // Inicializar campos opcionales
+        // Inicializar campos requeridos según el tipo Customer
         passport_number: null,
         birth_date: null,
         gender: null,
@@ -49,7 +50,9 @@ export function AdminCustomers() {
         marketing_preferences: {
           email_marketing: false,
           sms_marketing: false,
-          push_notifications: false
+          push_notifications: false,
+          language_preference: 'es',
+          communication_frequency: 'weekly'
         },
         stripe_customer_id: null,
         paypal_customer_id: null,
@@ -63,23 +66,23 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].default_shipping_address = order.shipping_address as any
+      acc[customerId].default_shipping_address = order.shipping_address as ShippingAddress
     }
     
     if (order.metadata) {
       const metadata = order.metadata as Record<string, any>
-      acc[customerId].passport_number = metadata.passport_number || null
-      acc[customerId].birth_date = metadata.birth_date || null
-      acc[customerId].gender = metadata.gender || null
+      if (metadata.passport_number) acc[customerId].passport_number = metadata.passport_number
+      if (metadata.birth_date) acc[customerId].birth_date = metadata.birth_date
+      if (metadata.gender) acc[customerId].gender = metadata.gender
     }
     return acc
-  }, {} as Record<string, CustomerData>)
+  }, {} as Record<string, ExtendedCustomer>)
 
   // Filtrar clientes basado en la búsqueda
   const filteredCustomers = Object.values(customers).filter(customer => 
     customer.name.toLowerCase().includes(search.toLowerCase()) ||
     customer.email.toLowerCase().includes(search.toLowerCase()) ||
-    customer.phone.toLowerCase().includes(search.toLowerCase())
+    (customer.phone && customer.phone.toLowerCase().includes(search.toLowerCase()))
   )
 
   return (

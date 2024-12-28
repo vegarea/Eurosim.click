@@ -1,7 +1,4 @@
-import { Database } from "@/integrations/supabase/types";
-import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
-
-export type { OrderStatus, OrderType, PaymentMethod, PaymentStatus };
+import { Order as DatabaseOrder } from "@/types/database/orders"
 
 export interface OrderEvent {
   id: string;
@@ -21,10 +18,10 @@ export interface OrderNote {
   created_at: string;
 }
 
-export type Order = Database["public"]["Tables"]["orders"]["Row"] & {
+// Extender el tipo Order de la base de datos para incluir campos adicionales de UI
+export interface Order extends DatabaseOrder {
   customer_name?: string;
   customer_email?: string;
   customer_phone?: string;
   events?: OrderEvent[];
-  notes?: OrderNote[];
-};
+}
