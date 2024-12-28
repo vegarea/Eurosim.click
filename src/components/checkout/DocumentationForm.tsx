@@ -42,11 +42,7 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
       }
     });
     
-    return () => {
-      if (subscription && typeof subscription === 'function') {
-        subscription();
-      }
-    };
+    return () => subscription();
   }, [form, onValidityChange]);
 
   return (
