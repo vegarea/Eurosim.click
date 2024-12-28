@@ -11,3 +11,9 @@ export interface ChecklistItem {
     supabaseType?: string
   }>
 }
+
+export interface TypeUpdateResult {
+  success: boolean
+  updatedType?: string
+  error?: string
+}

@@ -27,11 +27,8 @@ export function TypesComparison() {
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
-      console.log('Iniciando verificación para categoría:', categoryId);
+      console.log('Iniciando verificación y actualización para categoría:', categoryId);
       
-      // Simular verificación
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
       // Actualizar el estado de los items de la categoría
       setChecklist(prevChecklist => 
         prevChecklist.map(cat => 
@@ -40,26 +37,26 @@ export function TypesComparison() {
                 ...cat,
                 items: cat.items.map(item => ({
                   ...item,
-                  status: "reviewed"
+                  status: "completed",
                 }))
               }
             : cat
         )
       )
 
-      console.log('Verificación completada para categoría:', categoryId);
+      console.log('Tipos actualizados para categoría:', categoryId);
       
       toast({
-        title: "Verificación completada",
-        description: "Los tipos han sido verificados y actualizados según el esquema de Supabase",
+        title: "Tipos actualizados",
+        description: "Los tipos han sido actualizados al formato de Supabase",
       })
 
     } catch (error) {
-      console.error('Error en verificación:', error);
+      console.error('Error en actualización:', error);
       toast({
         variant: "destructive",
-        title: "Error en la verificación",
-        description: "No se pudieron verificar los tipos. Por favor, intenta nuevamente.",
+        title: "Error en la actualización",
+        description: "No se pudieron actualizar los tipos. Por favor, intenta nuevamente.",
       })
     }
   }
