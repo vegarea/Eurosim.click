@@ -1,11 +1,11 @@
 import React, { createContext, useContext } from 'react';
-import { Order, OrderStatus, OrderNote } from '@/types/order/orderTypes';
+import { Order, OrderStatus } from '@/types/order/orderTypes';
 import { useOrdersData } from '@/hooks/useOrdersData';
 import { toast } from 'sonner';
 
 interface OrdersContextType {
   orders: Order[];
-  updateOrder: (orderId: string, updates: Partial<Order>) => void;
+  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
@@ -24,7 +24,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Si hay una nueva nota, usar la mutación específica
-      if (updates.notes) {
+      if (updates.notes?.length) {
         const newNote = updates.notes[0];
         if (newNote) {
           await addOrderNote.mutateAsync({
