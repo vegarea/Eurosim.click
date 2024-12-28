@@ -5,17 +5,17 @@ export const typesChecklistData = [
     items: [
       {
         name: "Perfiles de Usuario",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar tipos en profiles.md y componentes de autenticación"
       },
       {
         name: "Roles y Permisos",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar role_permissions.md y políticas RLS"
       },
       {
         name: "Logs de Autenticación",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar auth_logs.md y eventos de autenticación"
       }
     ]
@@ -26,27 +26,27 @@ export const typesChecklistData = [
     items: [
       {
         name: "Pedidos",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar orders.md y componentes de pedidos"
       },
       {
         name: "Items de Pedido",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar order_items.md y relaciones"
       },
       {
         name: "Historial de Estados",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar order_status_history.md"
       },
       {
         name: "Eventos de Pedido",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar order_events.md y triggers"
       },
       {
         name: "Notas de Pedido",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar order_notes.md y componentes"
       }
     ]
@@ -57,12 +57,12 @@ export const typesChecklistData = [
     items: [
       {
         name: "Productos",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar products.md y componentes de productos"
       },
       {
         name: "Categorías",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar categorización y filtros"
       }
     ]
@@ -73,17 +73,17 @@ export const typesChecklistData = [
     items: [
       {
         name: "Clientes",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar customers.md y gestión de clientes"
       },
       {
         name: "Documentos",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar customer_documents.md"
       },
       {
         name: "Validaciones",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar document_validations.md"
       }
     ]
@@ -94,17 +94,17 @@ export const typesChecklistData = [
     items: [
       {
         name: "Pagos",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar payments.md y procesamiento"
       },
       {
         name: "Métodos de Pago",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar payment_methods.md"
       },
       {
         name: "Logs de Pago",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar payment_logs.md"
       }
     ]
@@ -115,12 +115,12 @@ export const typesChecklistData = [
     items: [
       {
         name: "Posts",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar blog-posts.md y componentes"
       },
       {
         name: "Imágenes",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar blog-post-images.md"
       }
     ]
@@ -131,12 +131,12 @@ export const typesChecklistData = [
     items: [
       {
         name: "Plantillas de Email",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar email-templates.md"
       },
       {
         name: "Logs de Email",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar email_logs.md"
       }
     ]
@@ -147,17 +147,17 @@ export const typesChecklistData = [
     items: [
       {
         name: "Workflows",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar workflows.md y automatizaciones"
       },
       {
         name: "Categorías",
-        status: "pending",
+        status: "pending" as const,
         description: "Verificar workflow_categories.md"
       },
       {
         name: "Eventos",
-        status: "pending",
+        status: "pending" as const,
         description: "Revisar workflow_events.md"
       }
     ]
