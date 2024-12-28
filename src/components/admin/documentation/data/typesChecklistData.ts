@@ -2,10 +2,11 @@ import { ChecklistCategory } from "../types/ChecklistTypes"
 import { orderTypes } from "./categories/types/orderTypes"
 import { productTypes } from "./categories/types/productTypes"
 import { customerTypes } from "./categories/types/customerTypes"
-import { blogTypes } from "./categories/types/blogTypes"
+import { blogTypes } from "../components/types/BlogTypes"
 import { emailTypes } from "./categories/types/emailTypes"
 import { workflowTypes } from "./categories/types/workflowTypes"
 import { authTypes } from "./categories/types/authTypes"
+import { settingsTypes } from "../components/types/SettingsTypes"
 
 export const typesChecklistData: ChecklistCategory[] = [
   orderTypes,
@@ -14,5 +15,6 @@ export const typesChecklistData: ChecklistCategory[] = [
   blogTypes,
   emailTypes,
   workflowTypes,
-  authTypes
+  authTypes,
+  settingsTypes
 ]
