@@ -1,33 +1,26 @@
 import { 
-  ShippingAddress, 
-  OrderType, 
+  ShippingAddress,
+  ShippingAddressForm,
   DocumentValidation,
-  Customer,
-  Order,
-  Payment
+  DocumentValidationForm,
+  Customer
 } from "@/components/admin/documentation/types/WorkflowTypes"
 
-export interface CheckoutFormData extends Partial<Customer & DocumentValidation> {
+export interface CheckoutFormData extends Partial<Customer> {
   shippingAddress?: ShippingAddress;
-}
-
-export interface CheckoutContextData {
-  formData: CheckoutFormData;
-  step: number;
-  isFormValid: boolean;
-  orderType: OrderType;
+  documentValidation?: DocumentValidation;
 }
 
 export interface DocumentationFormProps {
-  onSubmit: (values: Partial<DocumentValidation>) => void;
+  onSubmit: (values: DocumentValidationForm) => void;
   onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<DocumentValidation>;
+  initialData?: Partial<DocumentValidationForm>;
 }
 
 export interface ShippingFormProps {
-  onSubmit: (values: ShippingAddress) => void;
+  onSubmit: (values: ShippingAddressForm) => void;
   onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<ShippingAddress>;
+  initialData?: Partial<ShippingAddressForm>;
 }
 
 export interface ESimFormProps {

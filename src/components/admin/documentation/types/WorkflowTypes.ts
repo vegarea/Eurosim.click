@@ -190,3 +190,24 @@ export interface DocumentValidation {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface DocumentValidationForm {
+  fullName: string;
+  birthDate: Date;
+  gender: 'M' | 'F';
+  passportNumber: string;
+  activationDate: Date;
+  email?: string;
+  phone?: string;
+}
+
+export interface ShippingAddressForm {
+  fullName: string;
+  email: string;
+  phone: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}

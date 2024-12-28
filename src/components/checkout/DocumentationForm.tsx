@@ -6,13 +6,16 @@ import { useEffect } from "react"
 import { DocumentationFormProps } from "./types/checkoutTypes"
 import { PersonalInfoFields } from "./documentation/PersonalInfoFields"
 import { DateFields } from "./documentation/DateFields"
+import { DocumentValidationForm } from "@/components/admin/documentation/types/WorkflowTypes"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   birthDate: z.date({
     required_error: "La fecha de nacimiento es requerida",
   }),
-  gender: z.string().min(1, "El género es requerido"),
+  gender: z.enum(['M', 'F'], {
+    required_error: "El género es requerido",
+  }),
   passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
   activationDate: z.date({
     required_error: "La fecha de activación es requerida",
@@ -20,12 +23,12 @@ const formSchema = z.object({
 })
 
 export function DocumentationForm({ onSubmit, onValidityChange, initialData }: DocumentationFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<DocumentValidationForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
       birthDate: initialData?.birthDate || new Date(),
-      gender: initialData?.gender || "",
+      gender: initialData?.gender || 'M',
       passportNumber: initialData?.passportNumber || "",
       activationDate: initialData?.activationDate || new Date(),
     },

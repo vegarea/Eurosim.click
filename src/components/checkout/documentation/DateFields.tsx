@@ -2,23 +2,19 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 import { UseFormReturn } from "react-hook-form"
-import { DocumentValidation } from "@/components/admin/documentation/types/WorkflowTypes"
+import { DocumentValidationForm } from "@/components/admin/documentation/types/WorkflowTypes"
 
 interface DateFieldsProps {
-  form: UseFormReturn<Partial<DocumentValidation>>;
+  form: UseFormReturn<DocumentValidationForm>;
 }
 
 export function DateFields({ form }: DateFieldsProps) {
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i)
-  const months = Array.from({ length: 12 }, (_, i) => i)
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <motion.div
