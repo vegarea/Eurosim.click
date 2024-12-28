@@ -74,7 +74,15 @@ export function SimCard({
     }
   };
 
-  const colorScheme = getColorScheme(title);
+  const colorScheme = {
+    iconBg: type === 'physical' 
+      ? "from-[#D3E4FD] to-[#C4D9F7]"
+      : "from-[#E5DEFF] to-[#D6CFFF]",
+    iconColor: type === 'physical' 
+      ? "text-blue-600"
+      : "text-purple-600"
+  };
+
   const formattedPrice = formatCurrency(price);
 
   return (
