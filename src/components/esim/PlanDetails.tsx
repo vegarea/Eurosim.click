@@ -52,13 +52,19 @@ export function PlanDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
+      className="bg-white/50 backdrop-blur-sm p-3 rounded-xl shadow-lg"
     >
-      <h2 className="text-lg md:text-xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-        {title}
-      </h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          {title}
+        </h2>
+        <p className="text-xl font-bold text-primary flex items-baseline gap-1">
+          {amount}
+          <span className="text-sm font-normal text-gray-500">{currency}</span>
+        </p>
+      </div>
 
-      <div className="space-y-2 mb-4">
+      <div className="space-y-1.5 mb-3">
         {features.map((feature, index) => (
           <motion.div
             key={index}
@@ -73,13 +79,6 @@ export function PlanDetails({
         ))}
       </div>
 
-      <div className="mb-4">
-        <p className="text-2xl font-bold text-primary flex items-baseline gap-2">
-          {amount}
-          <span className="text-base font-normal text-gray-500">{currency}</span>
-        </p>
-      </div>
-
       <UsageMeter
         europeGB={europeGB}
         spainGB={spainGB}
@@ -90,7 +89,7 @@ export function PlanDetails({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-4"
+        className="mt-3"
       >
         <Button 
           onClick={handlePurchase}
