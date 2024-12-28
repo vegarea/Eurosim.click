@@ -1,91 +1,65 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Customer, ShippingAddress } from "@/types";
+import { Customer, ShippingAddress } from "@/types/database.types";
+
+interface CreateCustomerData {
+  name: string;
+  email: string;
+  phone?: string;
+  passport_number?: string;
+  birth_date?: string;
+  gender?: string;
+  shipping_address?: ShippingAddress;
+}
 
 export const customerService = {
-  async findOrCreateCustomer(customerData: {
-    name: string;
-    email: string;
-    phone?: string;
-    passport_number?: string;
-    birth_date?: string;
-    gender?: string;
-    shipping_address?: ShippingAddress;
-  }): Promise<Customer> {
-    console.log('Finding or creating customer with data:', customerData);
+  async findOrCreateCustomer(data: CreateCustomerData): Promise<Customer> {
+    console.log('Finding or creating customer:', data);
 
-    // Primero buscar cliente existente
-    const { data: existingCustomer, error: searchError } = await supabase
+    // Buscar cliente existente
+    const { data: existing } = await supabase
       .from('customers')
-      .select('*')
-      .eq('email', customerData.email)
+      .select()
+      .eq('email', data.email)
       .maybeSingle();
 
-    if (searchError) {
-      console.error('Error searching for customer:', searchError);
-      throw searchError;
-    }
-
-    if (existingCustomer) {
-      console.log('Found existing customer:', existingCustomer);
+    if (existing) {
+      console.log('Found existing customer:', existing);
       
-      // Actualizar cliente existente
-      const { data: updatedCustomer, error: updateError } = await supabase
+      // Actualizar cliente
+      const { data: updated, error: updateError } = await supabase
         .from('customers')
         .update({
-          name: customerData.name,
-          phone: customerData.phone,
-          passport_number: customerData.passport_number,
-          birth_date: customerData.birth_date,
-          gender: customerData.gender,
-          default_shipping_address: customerData.shipping_address ? {
-            street: customerData.shipping_address.street,
-            city: customerData.shipping_address.city,
-            state: customerData.shipping_address.state,
-            country: customerData.shipping_address.country,
-            postal_code: customerData.shipping_address.postal_code,
-            phone: customerData.shipping_address.phone
-          } : null
+          name: data.name,
+          phone: data.phone,
+          passport_number: data.passport_number,
+          birth_date: data.birth_date,
+          gender: data.gender,
+          default_shipping_address: data.shipping_address || null
         })
-        .eq('id', existingCustomer.id)
+        .eq('id', existing.id)
         .select()
         .single();
 
-      if (updateError) {
-        console.error('Error updating customer:', updateError);
-        throw updateError;
-      }
-
-      return {
-        ...updatedCustomer,
-        default_shipping_address: updatedCustomer.default_shipping_address as ShippingAddress
-      } as Customer;
+      if (updateError) throw updateError;
+      return updated as Customer;
     }
 
     // Crear nuevo cliente
-    const { data: newCustomer, error: createError } = await supabase
+    const { data: created, error: createError } = await supabase
       .from('customers')
       .insert({
-        ...customerData,
-        default_shipping_address: customerData.shipping_address ? {
-          street: customerData.shipping_address.street,
-          city: customerData.shipping_address.city,
-          state: customerData.shipping_address.state,
-          country: customerData.shipping_address.country,
-          postal_code: customerData.shipping_address.postal_code,
-          phone: customerData.shipping_address.phone
-        } : null
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        passport_number: data.passport_number,
+        birth_date: data.birth_date,
+        gender: data.gender,
+        default_shipping_address: data.shipping_address || null
       })
       .select()
       .single();
 
-    if (createError) {
-      console.error('Error creating customer:', createError);
-      throw createError;
-    }
-
-    return {
-      ...newCustomer,
-      default_shipping_address: newCustomer.default_shipping_address as ShippingAddress
-    } as Customer;
+    if (createError) throw createError;
+    return created as Customer;
   }
 };

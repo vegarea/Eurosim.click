@@ -2,8 +2,6 @@ export type OrderStatus = 'payment_pending' | 'payment_failed' | 'processing' | 
 export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 export type OrderType = 'physical' | 'esim';
 export type PaymentMethod = 'stripe' | 'paypal';
-export type UserRole = 'client' | 'manager' | 'admin';
-export type DocumentStatus = 'pending' | 'validating' | 'approved' | 'rejected' | 'expired';
 
 export interface ShippingAddress {
   street: string;
@@ -23,23 +21,22 @@ export interface Customer {
   birth_date?: string;
   gender?: string;
   default_shipping_address?: ShippingAddress | null;
-  billing_address?: Record<string, any> | null;
-  preferred_language?: string;
-  marketing_preferences?: Record<string, any> | null;
-  stripe_customer_id?: string;
-  paypal_customer_id?: string;
-  metadata?: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }
 
-export interface OrderStatusHistoryEntry {
+export interface Order {
   id: string;
-  order_id: string;
-  old_status: OrderStatus;
-  new_status: OrderStatus;
-  changed_by: string;
-  reason?: string;
-  metadata?: Record<string, any>;
+  customer_id: string;
+  product_id: string;
+  status: OrderStatus;
+  type: OrderType;
+  total_amount: number;
+  quantity: number;
+  payment_method?: PaymentMethod;
+  payment_status: PaymentStatus;
+  shipping_address?: ShippingAddress | null;
+  activation_date?: string | null;
   created_at: string;
+  updated_at: string;
 }
