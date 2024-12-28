@@ -4,7 +4,7 @@ export const orderEmailFlow: WorkflowItem = {
   id: "FL-105",
   title: "Sistema de emails de pedidos",
   description: "Gestión de notificaciones y comunicaciones por email",
-  status: "reviewed",
+  status: "working",
   components: [
     "EmailTemplates.tsx",
     "OrderEmailPreview.tsx",
@@ -15,15 +15,15 @@ export const orderEmailFlow: WorkflowItem = {
     "email_logs (tabla)"
   ],
   details: `
-Implementado y revisado:
+✓ Tablas creadas y conectadas
+✓ Políticas RLS configuradas
+✓ Triggers configurados
 ✓ Plantillas de email diseñadas
-✓ Sistema de preview de emails
-✓ Componentes de estado de envío
-✓ Personalización de contenido
+✓ Sistema de preview implementado
+✓ Componentes de estado implementados
 
-Pendiente conexión Supabase:
-- Integración con Brevo
-- Registro de envíos en BD
+Pendiente integración:
+- Conexión con Brevo
 - Sistema de retry automático
 - Logs de delivery status`
 }

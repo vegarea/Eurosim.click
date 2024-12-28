@@ -2,25 +2,27 @@ import { WorkflowItem } from "../../../types/WorkflowTypes"
 
 export const orderDocumentationFlow: WorkflowItem = {
   id: "FL-104",
-  title: "Gestión de documentación UE",
-  description: "Sistema de gestión de documentación requerida por la UE",
+  title: "Documentación UE",
+  description: "Sistema de validación de documentación para regulación UE",
   status: "working",
   components: [
     "DocumentationForm.tsx",
-    "PassportValidator.tsx",
-    "DocumentViewer.tsx",
-    "DocumentationStep.tsx"
+    "DocumentPreview.tsx",
+    "ValidationStatus.tsx"
   ],
   database: [
     "customer_documents (tabla)",
     "document_validations (tabla)"
   ],
   details: `
-✓ Formulario de documentación implementado
-✓ Validación de pasaporte funcionando
-✓ Verificación de datos personales
-✓ Almacenamiento temporal de documentos
-✓ Cumplimiento GDPR implementado
-✓ Historial de validaciones
-✓ Sistema de exportación de documentos`
+✓ Tablas creadas y conectadas
+✓ Políticas RLS configuradas
+✓ Triggers configurados
+✓ Formularios implementados
+✓ Sistema de validación diseñado
+
+Pendiente integración:
+- Sistema de validación automática
+- Notificaciones de estado
+- Almacenamiento de documentos`
 }

@@ -5,7 +5,7 @@ export const authWorkflows: WorkflowItem[] = [
     id: "FL-001",
     title: "Registro automático de cliente",
     description: "Proceso de registro automático al completar una compra y sistema de magic links",
-    status: "reviewed",
+    status: "working",
     components: [
       "components/auth/MagicLinkForm.tsx",
       "components/checkout/CheckoutForm.tsx",
@@ -18,22 +18,20 @@ export const authWorkflows: WorkflowItem[] = [
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Implementado y revisado:
-✓ Formulario de checkout con email
-✓ Componente MagicLinkForm
-✓ Contexto de autenticación
-✓ Hook personalizado useAuth
+✓ Tablas creadas y conectadas
+✓ Políticas RLS configuradas
+✓ Triggers configurados
+✓ Componentes UI implementados
 
-Pendiente conexión Supabase:
-- Creación automática de perfil en Supabase
-- Integración con API de magic links
-- Configuración de políticas RLS`
+Pendiente implementación:
+- Integración con magic links
+- Flujo de registro en checkout`
   },
   {
     id: "FL-002",
     title: "Acceso con Magic Link",
     description: "Sistema de autenticación sin contraseña usando magic links",
-    status: "reviewed",
+    status: "working",
     components: [
       "components/auth/MagicLinkForm.tsx",
       "components/auth/RoleBasedLayout.tsx",
@@ -47,22 +45,20 @@ Pendiente conexión Supabase:
       "public.role_permissions (tabla personalizada)"
     ],
     details: `
-Implementado y revisado:
-✓ Componente de formulario magic link
-✓ Layout basado en roles
-✓ Rutas protegidas
-✓ Lógica de redirección
+✓ Tablas creadas y conectadas
+✓ Políticas RLS configuradas
+✓ Triggers configurados
+✓ Componentes UI implementados
 
-Pendiente conexión Supabase:
-- Integración con Auth API de Supabase
-- Configuración de políticas de acceso
-- Manejo de sesiones con Supabase`
+Pendiente implementación:
+- Integración con Supabase Auth
+- Flujo de magic links`
   },
   {
     id: "FL-003",
     title: "Gestión de permisos",
     description: "Sistema de control y asignación de permisos por rol",
-    status: "reviewed",
+    status: "working",
     components: [
       "components/admin/RoleManager.tsx",
       "components/admin/PermissionMatrix.tsx",
@@ -73,15 +69,13 @@ Pendiente conexión Supabase:
       "public.permission_logs (tabla de auditoría)"
     ],
     details: `
-Implementado y revisado:
-✓ Interfaz de gestión de roles
-✓ Matriz de permisos
-✓ Hook de permisos
-✓ Lógica de validación de acceso
+✓ Tablas creadas y conectadas
+✓ Políticas RLS configuradas
+✓ Triggers configurados
+✓ Componentes UI implementados
 
-Pendiente conexión Supabase:
-- Integración con tablas de permisos
-- Configuración de políticas RLS
-- Sistema de logs en base de datos`
+Pendiente implementación:
+- Integración con Supabase Auth
+- Sistema de roles y permisos`
   }
 ]
