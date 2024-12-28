@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
-import { Json, ShippingAddress, OrderEvent, OrderNote } from "./common";
+import { Json, OrderEvent, OrderNote } from "./common";
 
 export interface Order {
   id: string;
@@ -15,7 +15,7 @@ export interface Order {
   stripe_receipt_url: string | null;
   paypal_order_id: string | null;
   paypal_receipt_url: string | null;
-  shipping_address: ShippingAddress | null;
+  shipping_address: Json | null;
   tracking_number: string | null;
   carrier: string | null;
   activation_date: string | null;

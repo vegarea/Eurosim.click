@@ -12,6 +12,7 @@ import {
   Card,
   CardContent,
 } from "@/components/ui/card"
+import { Json } from "@/types/database/common"
 
 interface CustomerDetailsModalProps {
   customer: any
@@ -21,6 +22,8 @@ interface CustomerDetailsModalProps {
 
 export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: CustomerDetailsModalProps) {
   if (!customer) return null
+
+  const shippingAddress = customer.default_shipping_address as unknown as Json;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -90,7 +93,7 @@ export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: Custome
                         <span className="font-medium">#{order.id}</span>
                         <Badge variant="outline">{order.status}</Badge>
                       </div>
-                      <span>${order.total.toFixed(2)}</span>
+                      <span>${order.total_amount.toFixed(2)}</span>
                     </Link>
                   ))}
                 </div>
@@ -99,24 +102,24 @@ export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: Custome
           </TabsContent>
 
           <TabsContent value="shipping" className="space-y-4">
-            {customer.shippingInfo.address ? (
+            {shippingAddress ? (
               <div className="grid gap-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-gray-500" />
-                  <span>{customer.shippingInfo.address}</span>
+                  <span>{(shippingAddress as any).street}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="text-sm text-gray-500">Ciudad</label>
-                    <p>{customer.shippingInfo.city || "No especificada"}</p>
+                    <p>{(shippingAddress as any).city || "No especificada"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Estado</label>
-                    <p>{customer.shippingInfo.state || "No especificado"}</p>
+                    <p>{(shippingAddress as any).state || "No especificado"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Código Postal</label>
-                    <p>{customer.shippingInfo.zipCode || "No especificado"}</p>
+                    <p>{(shippingAddress as any).postal_code || "No especificado"}</p>
                   </div>
                 </div>
               </div>
@@ -128,24 +131,24 @@ export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: Custome
           </TabsContent>
 
           <TabsContent value="documentation" className="space-y-4">
-            {customer.documentation.passportNumber ? (
+            {customer.passport_number ? (
               <div className="grid gap-4">
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-gray-500" />
-                  <span>Pasaporte: {customer.documentation.passportNumber}</span>
+                  <span>Pasaporte: {customer.passport_number}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="text-sm text-gray-500">Fecha de Nacimiento</label>
-                    <p>{customer.documentation.birthDate || "No especificada"}</p>
+                    <p>{customer.birth_date || "No especificada"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Género</label>
-                    <p>{customer.documentation.gender === 'M' ? 'Masculino' : 'Femenino'}</p>
+                    <p>{customer.gender === 'M' ? 'Masculino' : 'Femenino'}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Fecha de Activación</label>
-                    <p>{customer.documentation.activationDate || "No especificada"}</p>
+                    <p>{customer.activation_date || "No especificada"}</p>
                   </div>
                 </div>
               </div>
