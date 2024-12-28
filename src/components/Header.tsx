@@ -8,6 +8,12 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { CountryCoverage } from "./CountryCoverage";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,10 +66,21 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
-            <EUFlag className="w-4 h-4" />
-            <span>Cobertura en toda Europa</span>
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+              >
+                <EUFlag className="w-4 h-4" />
+                <span>Cobertura en toda Europa</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <CountryCoverage />
+            </DialogContent>
+          </Dialog>
 
           <Button 
             variant="ghost" 
@@ -117,10 +134,20 @@ export function Header() {
               ))}
               
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                  <EUFlag className="w-4 h-4" />
-                  <span>Cobertura en toda Europa</span>
-                </div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="ghost"
+                      className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                    >
+                      <EUFlag className="w-4 h-4 mr-2" />
+                      Cobertura en toda Europa
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-3xl">
+                    <CountryCoverage />
+                  </DialogContent>
+                </Dialog>
                 
                 <Button 
                   variant="ghost"
