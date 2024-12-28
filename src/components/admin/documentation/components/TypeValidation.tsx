@@ -21,9 +21,9 @@ export function TypeValidation({ tableName, validations }: TypeValidationProps) 
   };
 
   const getStatus = () => {
-    if (allValid) return 'success';
-    if (hasWarnings) return 'warning';
-    return 'error';
+    if (allValid) return 'default';
+    if (hasWarnings) return 'secondary';
+    return 'destructive';
   };
 
   return (
@@ -44,7 +44,7 @@ export function TypeValidation({ tableName, validations }: TypeValidationProps) 
         {validations.map((validation, index) => (
           <Alert 
             key={index}
-            variant={validation.isValid ? 'default' : 'warning'}
+            variant={validation.isValid ? 'default' : 'destructive'}
             className="mb-2"
           >
             <AlertDescription>

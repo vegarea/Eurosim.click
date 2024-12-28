@@ -1,5 +1,3 @@
-import { ValidationResult } from '../types/ValidationTypes';
-
 export function getTypeScriptType(dbType: string): string {
   const typeMap: Record<string, string> = {
     'uuid': 'string',
@@ -30,19 +28,4 @@ export function getValidationMessage(dbType: string, tsType: string): string {
     return 'Tipos coinciden correctamente';
   }
   return `El tipo de BD "${dbType}" debería mapearse a "${getTypeScriptType(dbType)}" en TypeScript`;
-}
-
-export function validateTableTypes(tableFields: string[]): ValidationResult[] {
-  return tableFields.map(field => {
-    const [name, type] = field.split('|').map(s => s.trim());
-    const tsType = getTypeScriptType(type);
-    
-    return {
-      field: name,
-      dbType: type,
-      tsType,
-      isValid: isValidTypeMapping(type, tsType),
-      message: getValidationMessage(type, tsType)
-    };
-  });
 }
