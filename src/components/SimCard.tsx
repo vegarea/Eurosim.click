@@ -41,59 +41,30 @@ export function SimCard({
   const { addItem } = useCart();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Función para determinar el color según el título
-  const getColorScheme = (title: string) => {
-    switch (title) {
-      case "Tarifa M":
-        return {
-          iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
-          iconColor: "text-green-600"
-        };
-      case "Tarifa L":
-        return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "text-blue-600"
-        };
-      case "Tarifa XL":
-        return {
-          iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
-          iconColor: "text-purple-600"
-        };
-      case "Tarifa XXL":
-        return {
-          iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
-          iconColor: "text-pink-600"
-        };
-      default:
-        return {
-          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
-          iconColor: "text-blue-600"
-        };
-    }
-  };
 
+  // Map of product titles to their IDs
+  const PRODUCT_IDS: Record<string, string> = {
+    "Prepago XL": "bcdcf122-bd8b-484b-aff8-f97e23d56d2c",
+    "Prepago XXL": "9f0819db-c004-49d1-ab56-60a47b058703"
+  };
+  
   const handleAddToCart = async () => {
     setIsLoading(true);
     try {
-      // Obtener el ID del producto basado en el título
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('id')
-        .eq('title', title)
-        .eq('type', 'physical')
-        .single();
-
-      if (error) throw error;
-      if (!product) throw new Error('Producto no encontrado');
+      const productId = PRODUCT_IDS[title];
+      
+      if (!productId) {
+        throw new Error('Producto no encontrado');
+      }
 
       await addItem({
-        id: product.id,
+        id: productId,
         type,
         title,
         description,
         price
       });
+      
       navigate('/checkout');
     } catch (error) {
       console.error('Error adding to cart:', error);

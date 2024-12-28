@@ -5,7 +5,6 @@ import { ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 
 interface PlanDetailsProps {
   title: string;
@@ -27,22 +26,27 @@ export function PlanDetails({
   const { toast } = useToast();
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Map of eSIM titles to their IDs
+  const PRODUCT_IDS: Record<string, string> = {
+    "E-SIM S": "ccdbdc7f-674a-4cf5-baae-b9105b821105",
+    "E-SIM M": "2c6d8a85-0211-472b-b6d6-4a207a4f9f8d",
+    "E-SIM L": "5304a466-dc0f-4f85-abe6-19564dd10f1b",
+    "E-SIM XL": "77993e6d-057a-4d99-8154-32c00fab068a"
+  };
 
   const handlePurchase = async () => {
+    setIsLoading(true);
     try {
-      // Obtener el ID del producto basado en el título
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('id')
-        .eq('title', title)
-        .eq('type', 'esim')
-        .single();
-
-      if (error) throw error;
-      if (!product) throw new Error('Producto no encontrado');
+      const productId = PRODUCT_IDS[title];
+      
+      if (!productId) {
+        throw new Error('Producto no encontrado');
+      }
 
       await addItem({
-        id: product.id,
+        id: productId,
         type: "esim",
         title,
         description,
@@ -52,11 +56,9 @@ export function PlanDetails({
       navigate('/checkout');
     } catch (error) {
       console.error('Error al añadir al carrito:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo añadir el producto al carrito. Por favor, intenta de nuevo.",
-        variant: "destructive"
-      });
+      toast.error(error instanceof Error ? error.message : 'Error al añadir al carrito');
+    } finally {
+      setIsLoading(false);
     }
   };
 
