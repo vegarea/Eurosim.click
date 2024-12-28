@@ -32,10 +32,16 @@ export function AdminPhysicalShipping() {
     if (!selectedOrderId) return
 
     const event = createShippingConfirmationEvent(trackingNumber, carrier)
-
+    const currentOrder = orders.find(o => o.id === selectedOrderId)
+    
     updateOrder(selectedOrderId, {
       status: "shipped",
-      events: [...(orders.find(o => o.id === selectedOrderId)?.events || []), event]
+      tracking_number: trackingNumber,
+      carrier: carrier,
+      metadata: {
+        ...currentOrder?.metadata,
+        events: [...((currentOrder?.metadata?.events as OrderEvent[]) || []), event]
+      }
     })
 
     toast({
@@ -48,10 +54,13 @@ export function AdminPhysicalShipping() {
 
   const handleDeliverOrder = (order: Order) => {
     const event = createDeliveryConfirmationEvent()
-
+    
     updateOrder(order.id, {
       status: "delivered",
-      events: [...(order.events || []), event]
+      metadata: {
+        ...order.metadata,
+        events: [...((order.metadata?.events as OrderEvent[]) || []), event]
+      }
     })
 
     toast({

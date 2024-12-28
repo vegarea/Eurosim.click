@@ -40,7 +40,7 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
     })
   }
 
-  const notes = (order.notes || []) as OrderNote[];
+  const notes = ((order.metadata?.notes || []) as OrderNote[]);
 
   return (
     <Card>

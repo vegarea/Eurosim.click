@@ -1,13 +1,9 @@
 import { Database } from "@/integrations/supabase/types";
+import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 
-export type Order = Database["public"]["Tables"]["orders"]["Row"] & {
-  // Campos adicionales para UI que no están en la base de datos
-  customer_name?: string;
-  product_title?: string;
-  product_description?: string;
-};
+export type { OrderStatus, OrderType, PaymentMethod, PaymentStatus };
 
-export type OrderEvent = {
+export interface OrderEvent {
   id: string;
   type: string;
   description: string;
@@ -15,12 +11,20 @@ export type OrderEvent = {
   user_name?: string;
   created_at: string;
   metadata?: Record<string, any>;
-};
+}
 
-export type OrderNote = {
+export interface OrderNote {
   id: string;
   text: string;
   user_id: string;
   user_name: string;
   created_at: string;
+}
+
+export type Order = Database["public"]["Tables"]["orders"]["Row"] & {
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  events?: OrderEvent[];
+  notes?: OrderNote[];
 };

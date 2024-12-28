@@ -31,7 +31,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
               ) : (
                 <Wifi className="h-4 w-4 text-primary" />
               )}
-              <span>{order.title || "No especificado"}</span>
+              <span>{order.metadata?.title || "No especificado"}</span>
             </div>
           </div>
           <div>
@@ -43,13 +43,13 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           <div>
             <h3 className="font-medium mb-1">Datos en Europa</h3>
             <p className="font-semibold text-primary">
-              {order.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
+              {order.metadata?.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Datos en España</h3>
             <p className="font-semibold text-primary">
-              {order.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
+              {order.metadata?.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
             </p>
           </div>
           <div>
@@ -58,7 +58,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           </div>
           <div>
             <h3 className="font-medium mb-1">Precio</h3>
-            <p className="font-semibold">${order.total?.toFixed(2)} MXN</p>
+            <p className="font-semibold">${(order.total_amount / 100).toFixed(2)} MXN</p>
           </div>
         </div>
       </CardContent>

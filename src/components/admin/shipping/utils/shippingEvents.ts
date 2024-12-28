@@ -1,4 +1,5 @@
-import { OrderEvent, OrderStatus } from "../../orders/types";
+import { OrderEvent } from "../../orders/types";
+import { OrderStatus } from "@/types/database/enums";
 
 export const createShippingConfirmationEvent = (
   trackingNumber: string, 
