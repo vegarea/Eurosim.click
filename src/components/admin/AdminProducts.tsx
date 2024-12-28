@@ -3,7 +3,9 @@ import { useToast } from "@/components/ui/use-toast"
 import { ProductCard } from "./products/ProductCard"
 import { AddProductDialog } from "./products/AddProductDialog"
 import { supabase } from "@/integrations/supabase/client"
-import type { Product } from "@/types/database"
+import type { Tables } from "@/integrations/supabase/types"
+
+type Product = Tables<"products">
 
 export function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([])
@@ -38,15 +40,11 @@ export function AdminProducts() {
     }
   }
 
-  const handleAddProduct = async (productData: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'metadata'>) => {
+  const handleAddProduct = async (productData: Omit<Product, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const { error } = await supabase
         .from('products')
-        .insert({
-          ...productData,
-          status: 'active',
-          metadata: null
-        })
+        .insert(productData)
 
       if (error) throw error
 

@@ -1,16 +1,8 @@
 import { Wifi, CreditCard, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import type { Tables } from "@/integrations/supabase/types"
 
-interface Product {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  features: string[]
-  europeGB?: number
-  spainGB?: number
-}
+type Product = Tables<"products">
 
 interface ProductCardProps {
   product: Product
@@ -42,7 +34,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       </div>
       <div className="mb-4">
         <p className="text-2xl font-bold text-primary">
-          ${product.price}
+          ${product.price / 100}
           <span className="text-sm font-normal text-muted-foreground ml-1">MXN</span>
         </p>
       </div>
@@ -57,7 +49,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       {product.type === "esim" && (
         <div className="mt-4 pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            GB Europa: {product.europeGB} / España: {product.spainGB}
+            GB Europa: {product.europe_gb} / España: {product.spain_gb}
           </p>
         </div>
       )}

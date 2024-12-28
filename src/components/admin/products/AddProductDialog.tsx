@@ -18,26 +18,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useState } from "react"
+import type { Tables } from "@/integrations/supabase/types"
 
-interface Product {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  features: string[]
-  europeGB?: number
-  spainGB?: number
-}
+type Product = Tables<"products">
 
 interface AddProductDialogProps {
-  onAddProduct: (product: Product) => void
+  onAddProduct: (product: Omit<Product, 'id' | 'created_at' | 'updated_at'>) => void
 }
 
 export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     type: "physical",
-    features: []
+    features: [],
+    status: "active"
   })
 
   const handleAddProduct = () => {
@@ -45,21 +38,20 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
       return
     }
 
-    const product: Product = {
-      id: `${newProduct.type}-${newProduct.title?.toLowerCase().replace(/\s+/g, '-')}`,
-      type: newProduct.type as "physical" | "esim",
+    onAddProduct({
+      type: newProduct.type || "physical",
       title: newProduct.title,
       description: newProduct.description,
       price: Number(newProduct.price),
       features: newProduct.features || [],
-      ...(newProduct.type === "esim" ? {
-        europeGB: Number(newProduct.europeGB),
-        spainGB: Number(newProduct.spainGB)
-      } : {})
-    }
+      status: "active",
+      europe_gb: newProduct.type === "esim" ? Number(newProduct.europe_gb) : null,
+      spain_gb: newProduct.type === "esim" ? Number(newProduct.spain_gb) : null,
+      stock: newProduct.type === "physical" ? Number(newProduct.stock) : null,
+      metadata: null
+    })
 
-    onAddProduct(product)
-    setNewProduct({ type: "physical", features: [] })
+    setNewProduct({ type: "physical", features: [], status: "active" })
   }
 
   return (
@@ -107,12 +99,12 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="price">Precio (MXN)</Label>
+            <Label htmlFor="price">Precio (centavos MXN)</Label>
             <Input
               id="price"
               type="number"
               value={newProduct.price || ""}
-              onChange={(e) => setNewProduct({ ...newProduct, price: parseFloat(e.target.value) })}
+              onChange={(e) => setNewProduct({ ...newProduct, price: parseInt(e.target.value) })}
             />
           </div>
           <div className="grid gap-2">
@@ -130,8 +122,8 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
                 <Input
                   id="europeGB"
                   type="number"
-                  value={newProduct.europeGB || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, europeGB: parseFloat(e.target.value) })}
+                  value={newProduct.europe_gb || ""}
+                  onChange={(e) => setNewProduct({ ...newProduct, europe_gb: parseInt(e.target.value) })}
                 />
               </div>
               <div className="grid gap-2">
@@ -139,11 +131,22 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
                 <Input
                   id="spainGB"
                   type="number"
-                  value={newProduct.spainGB || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, spainGB: parseFloat(e.target.value) })}
+                  value={newProduct.spain_gb || ""}
+                  onChange={(e) => setNewProduct({ ...newProduct, spain_gb: parseInt(e.target.value) })}
                 />
               </div>
             </>
+          )}
+          {newProduct.type === "physical" && (
+            <div className="grid gap-2">
+              <Label htmlFor="stock">Stock Disponible</Label>
+              <Input
+                id="stock"
+                type="number"
+                value={newProduct.stock || ""}
+                onChange={(e) => setNewProduct({ ...newProduct, stock: parseInt(e.target.value) })}
+              />
+            </div>
           )}
           <Button onClick={handleAddProduct}>Añadir Producto</Button>
         </div>
