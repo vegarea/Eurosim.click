@@ -24,29 +24,25 @@ interface Workflow {
   updated_at: string
 }
 
-interface WorkflowCategory {
-  id: string
-  title: string
-  description: string
-  slug: string
-  icon?: string
-  metadata?: Record<string, any>
-  created_at: string
-  updated_at: string
-}
-
-// Simulamos la obtención de datos de la base de datos
-// Esto se reemplazará con llamadas reales a Supabase cuando se integre
-const fetchWorkflowData = async () => {
-  // Por ahora usamos los datos estáticos
-  const { workflowData } = await import("../components/admin/documentation/data/workflowData")
-  return workflowData
-}
+// Mock data directamente en el archivo en lugar de importarlo
+const mockWorkflowData = {
+  workflows: [
+    {
+      id: "1",
+      category_id: "cat1",
+      title: "Sample Workflow",
+      description: "A sample workflow",
+      status: "working",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }
+  ]
+};
 
 export function useWorkflows() {
   return useQuery({
     queryKey: ['workflows'],
-    queryFn: fetchWorkflowData,
+    queryFn: async () => mockWorkflowData,
     refetchInterval: 30000, // Refresca cada 30 segundos
   })
 }

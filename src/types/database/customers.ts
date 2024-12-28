@@ -1,5 +1,6 @@
 import { CustomerGender } from "./enums";
 import { Json, MarketingPreferences, ShippingAddress } from "./common";
+import { Order } from "./orders";
 
 export interface Customer {
   id: string;
