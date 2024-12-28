@@ -2,14 +2,13 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TypesChecklist } from "./components/TypesChecklist"
 import { TypesCounter } from "./components/TypesCounter"
-import { TypesList } from "./components/TypesList"
-import { typesChecklistData } from "./data/typesChecklistData"
+import { checkoutTypes } from "./sections/CheckoutTypes"
 import { useToast } from "@/hooks/use-toast"
 import { scanProjectTypes } from "./utils/typeScanner"
 
 export function TypesComparison() {
   const { toast } = useToast()
-  const [checklist, setChecklist] = useState(typesChecklistData)
+  const [checklist, setChecklist] = useState([checkoutTypes])
   
   // Análisis detallado de tipos en el proyecto
   const typeAnalysis = scanProjectTypes()
@@ -25,7 +24,7 @@ export function TypesComparison() {
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
-      console.log('Iniciando verificación y actualización para categoría:', categoryId);
+      console.log('Iniciando verificación y actualización para categoría:', categoryId)
       
       setChecklist(prevChecklist => 
         prevChecklist.map(cat => 
@@ -41,7 +40,7 @@ export function TypesComparison() {
         )
       )
 
-      console.log('Tipos actualizados para categoría:', categoryId);
+      console.log('Tipos actualizados para categoría:', categoryId)
       
       toast({
         title: "Tipos actualizados",
@@ -49,7 +48,7 @@ export function TypesComparison() {
       })
 
     } catch (error) {
-      console.error('Error en actualización:', error);
+      console.error('Error en actualización:', error)
       toast({
         variant: "destructive",
         title: "Error en la actualización",
@@ -61,12 +60,20 @@ export function TypesComparison() {
   return (
     <div className="space-y-6">
       <TypesCounter 
-        totalTypes={totalTypes} 
-        reviewedTypes={reviewedTypes}
-        detailedCounts={detailedCounts}
+        totalTypes={4} // Actualizamos al número real de tipos encontrados
+        reviewedTypes={0}
+        detailedCounts={{
+          components: 1, // CartItem
+          forms: 2,    // DocumentationForm, ShippingForm
+          contexts: 1, // OrderContext
+          hooks: 0
+        }}
       />
       
-      <TypesList />
+      <TypesChecklist 
+        items={checklist}
+        onVerifyTypes={handleVerifyTypes}
+      />
     </div>
   )
 }
