@@ -33,13 +33,26 @@ export interface Customer {
   updated_at: string;
 }
 
-export interface OrderStatusHistoryEntry {
+export interface DatabaseOrder {
   id: string;
-  order_id: string;
-  old_status: OrderStatus;
-  new_status: OrderStatus;
-  changed_by: string;
-  reason?: string;
+  customer_id: string;
+  product_id: string;
+  status: OrderStatus;
+  type: OrderType;
+  total_amount: number;
+  quantity: number;
+  payment_method?: PaymentMethod;
+  payment_status: PaymentStatus;
+  stripe_payment_intent_id?: string;
+  stripe_receipt_url?: string;
+  paypal_order_id?: string;
+  paypal_receipt_url?: string;
+  shipping_address?: ShippingAddress;
+  tracking_number?: string;
+  carrier?: string;
+  activation_date?: string;
+  notes?: string[];
   metadata?: Record<string, any>;
   created_at: string;
+  updated_at: string;
 }

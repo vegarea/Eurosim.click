@@ -1,6 +1,6 @@
-import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from './database.types';
+import { OrderStatus, PaymentStatus, OrderType, PaymentMethod, DatabaseOrder, ShippingAddress } from './database.types';
 
-export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod };
+export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod, ShippingAddress };
 
 export interface OrderNote {
   id: string;
@@ -33,29 +33,13 @@ export interface CustomerDocumentation {
   activationDate?: string;
 }
 
-export interface Order {
-  id: string;
-  customer: string;
-  customer_id: string;
-  product_id: string;
+// Extendemos DatabaseOrder para la UI
+export interface Order extends DatabaseOrder {
+  customer?: string;
   email?: string;
   phone?: string;
-  date: string;
-  total: number;
-  total_amount: number;
-  status: OrderStatus;
-  type: OrderType;
-  payment_method?: PaymentMethod;
-  payment_status: PaymentStatus;
   title?: string;
   description?: string;
-  quantity?: number;
-  shippingAddress?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  created_at?: string;
-  updated_at?: string;
   notes?: OrderNote[];
   events?: OrderEvent[];
   documentation?: CustomerDocumentation;
