@@ -12,7 +12,6 @@ export function OrdersTable({ orders, onStatusChange }: OrdersTableProps) {
     <DataTable 
       columns={columns} 
       data={orders}
-      onStatusChange={onStatusChange}
     />
   )
 }

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order, PaymentStatus } from "@/types";
+import { Order, PaymentStatus, OrderStatus, ShippingAddress } from "@/types";
 import { transformShippingAddress, prepareShippingAddress } from "@/utils/transformations";
 
 export const orderService = {
@@ -9,7 +9,7 @@ export const orderService = {
     type: 'physical' | 'esim';
     total_amount: number;
     quantity: number;
-    shipping_address?: Record<string, string>;
+    shipping_address?: ShippingAddress;
     activation_date?: string;
   }): Promise<Order> {
     console.group('📝 Order Service - createOrder');
@@ -18,11 +18,11 @@ export const orderService = {
     try {
       const orderPayload = {
         ...orderData,
+        status: 'payment_pending' as OrderStatus,
+        payment_status: 'pending' as PaymentStatus,
         ...(orderData.shipping_address && {
           shipping_address: prepareShippingAddress(orderData.shipping_address)
-        }),
-        status: 'payment_pending',
-        payment_status: 'pending' as PaymentStatus
+        })
       };
 
       const { data: order, error } = await supabase
@@ -42,7 +42,7 @@ export const orderService = {
 
       console.log('Order created successfully:', order);
 
-      return {
+      const transformedOrder: Order = {
         id: order.id,
         customer: order.customer?.name || 'Unknown',
         customer_id: order.customer_id,
@@ -55,7 +55,7 @@ export const orderService = {
         payment_status: order.payment_status,
         title: order.product?.title,
         quantity: order.quantity,
-        shipping_address: order.shipping_address,
+        shipping_address: order.shipping_address ? transformShippingAddress(order.shipping_address) : undefined,
         stripe_payment_intent_id: order.stripe_payment_intent_id,
         stripe_receipt_url: order.stripe_receipt_url,
         paypal_order_id: order.paypal_order_id,
@@ -63,40 +63,12 @@ export const orderService = {
         tracking_number: order.tracking_number,
         carrier: order.carrier,
         activation_date: order.activation_date,
-        metadata: order.metadata,
+        metadata: order.metadata as Record<string, any>,
         created_at: order.created_at,
         updated_at: order.updated_at
       };
-    } finally {
-      console.groupEnd();
-    }
-  },
 
-  async createOrderEvent(orderId: string, type: string, description: string) {
-    console.group('📋 Order Service - createOrderEvent');
-    console.log('Creating order event:', { orderId, type, description });
-    
-    try {
-      const { error } = await supabase
-        .from('order_events')
-        .insert({
-          order_id: orderId,
-          type,
-          description
-        });
-
-      if (error) {
-        console.error('Error creating order event:', error);
-        console.error('Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        throw error;
-      }
-
-      console.log('Order event created successfully');
+      return transformedOrder;
     } finally {
       console.groupEnd();
     }
