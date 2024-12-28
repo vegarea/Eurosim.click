@@ -10,6 +10,7 @@ interface Product {
   features: string[]
   europeGB?: number
   spainGB?: number
+  status: "active" | "inactive" | "out_of_stock"
 }
 
 interface ProductCardProps {

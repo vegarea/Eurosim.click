@@ -29,6 +29,7 @@ interface Product {
   data_eu_gb?: number
   data_es_gb?: number
   stock?: number
+  status: "active" | "inactive" | "out_of_stock"
 }
 
 interface AddProductDialogProps {
@@ -56,7 +57,8 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
       features: newProduct.features || [],
       data_eu_gb: Number(newProduct.data_eu_gb),
       data_es_gb: Number(newProduct.data_es_gb),
-      stock: newProduct.type === 'physical' ? Number(newProduct.stock) : undefined
+      stock: newProduct.type === 'physical' ? Number(newProduct.stock) : undefined,
+      status: 'active' // Default value
     }
 
     onAddProduct(product)

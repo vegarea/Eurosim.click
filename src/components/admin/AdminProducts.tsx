@@ -15,7 +15,7 @@ interface Product {
   data_es_gb?: number
   created_at: Date
   updated_at: Date
-  status: "active" | "inactive"
+  status: "active" | "inactive" | "out_of_stock"
   stock?: number
   metadata?: Record<string, any>
 }
