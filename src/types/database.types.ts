@@ -1,8 +1,10 @@
-// Tipos base de la base de datos
+// Enums de la base de datos
 export type OrderStatus = 'payment_pending' | 'payment_failed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 export type OrderType = 'physical' | 'esim';
 export type PaymentMethod = 'stripe' | 'paypal';
+export type UserRole = 'client' | 'manager' | 'admin';
+export type DocumentStatus = 'pending' | 'validating' | 'approved' | 'rejected' | 'expired';
 
 export interface ShippingAddress {
   street: string;
@@ -22,12 +24,12 @@ export interface Customer {
   birth_date?: string;
   gender?: string;
   default_shipping_address?: ShippingAddress;
-  billing_address?: any;
+  billing_address?: Record<string, any>;
   preferred_language?: string;
-  marketing_preferences?: any;
+  marketing_preferences?: Record<string, any>;
   stripe_customer_id?: string;
   paypal_customer_id?: string;
-  metadata?: any;
+  metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
 }
