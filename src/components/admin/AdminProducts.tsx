@@ -3,6 +3,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { ProductCard } from "./products/ProductCard"
 import { AddProductDialog } from "./products/AddProductDialog"
 import { supabase } from "@/integrations/supabase/client"
+import { Json } from "@/integrations/supabase/types"
 
 interface Product {
   id: string
@@ -17,7 +18,7 @@ interface Product {
   updated_at: string
   status: "active" | "inactive"
   stock?: number
-  metadata?: Record<string, any>
+  metadata?: Json | null
 }
 
 export function AdminProducts() {
@@ -44,7 +45,7 @@ export function AdminProducts() {
       const typedProducts = data.map(product => ({
         ...product,
         status: product.status as "active" | "inactive"
-      }))
+      })) as Product[]
 
       setProducts(typedProducts)
     } catch (error) {
@@ -65,7 +66,7 @@ export function AdminProducts() {
         .from('products')
         .insert([{
           ...product,
-          status: 'active' as const // Asegurarnos de que el tipo es correcto
+          status: 'active' as const
         }])
         .select()
         .single()
@@ -78,7 +79,7 @@ export function AdminProducts() {
       const typedProduct = {
         ...data,
         status: data.status as "active" | "inactive"
-      }
+      } as Product
 
       setProducts([typedProduct, ...products])
       toast({
