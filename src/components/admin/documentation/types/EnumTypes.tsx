@@ -38,6 +38,15 @@ const enumTypes: TypeDefinition[] = [
     ]
   },
   {
+    name: "PaymentMethod",
+    status: "verified",
+    description: "Métodos de pago soportados",
+    fields: [
+      { name: "STRIPE", type: "enum", description: "Stripe" },
+      { name: "PAYPAL", type: "enum", description: "PayPal" }
+    ]
+  },
+  {
     name: "ShippingCarrier",
     status: "verified",
     description: "Empresas de envío soportadas",
@@ -47,6 +56,15 @@ const enumTypes: TypeDefinition[] = [
       { name: "FEDEX", type: "enum", description: "FedEx" },
       { name: "DHL", type: "enum", description: "DHL" },
       { name: "UPS", type: "enum", description: "UPS" }
+    ]
+  },
+  {
+    name: "DocumentType",
+    status: "verified",
+    description: "Tipos de documentos soportados",
+    fields: [
+      { name: "PASSPORT", type: "enum", description: "Pasaporte" },
+      { name: "ID_CARD", type: "enum", description: "Documento de identidad" }
     ]
   }
 ];
