@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, WifiIcon, SignalHigh } from "lucide-react";
+import { ArrowRight, WifiIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +9,12 @@ import SimQuiz from "@/components/SimQuiz";
 
 export function HomeHero() {
   return (
-    <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden bg-gradient-to-br from-brand-50 to-white">
+    <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden">
+      {/* Fondo animado con gradiente */}
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-50 to-white animate-gradient bg-[length:400%_400%]" />
+      
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
-      
-      {/* Se eliminaron los iconos flotantes de WiFi del fondo */}
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8">
         <div className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100svh-8rem)]">
@@ -98,7 +99,7 @@ export function HomeHero() {
         </div>
       </div>
 
-      {/* Elementos decorativos flotantes */}
+      {/* Línea decorativa inferior */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
     </div>
   );
