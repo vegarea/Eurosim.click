@@ -2,25 +2,28 @@ import { ChecklistCategory } from "../../../types/ChecklistTypes";
 
 export const emailTypes: ChecklistCategory = {
   id: "emails",
-  category: "Emails",
+  category: "Emails y Notificaciones",
   items: [
     {
-      name: "Plantilla de Email",
+      name: "EmailTemplate",
       status: "pending",
-      description: "Tipos encontrados en email-templates.md y componentes relacionados",
+      description: "Plantillas de email con variables dinámicas y tipos de contenido",
       locations: [
-        "src/components/admin/emails/types.ts"
+        "src/components/admin/emails/types.ts",
+        "src/components/admin/emails/EmailTemplateDialog.tsx"
       ],
       currentTypes: [
         {
           name: "EmailTemplate",
           path: "src/components/admin/emails/types.ts",
-          code: `type EmailTemplate = {
+          code: `interface EmailTemplate {
   id: string
   name: string
   subject: string
   content: string
   variables: string[]
+  type: "physical" | "esim" | "both"
+  status: "active" | "inactive"
 }`
         }
       ],

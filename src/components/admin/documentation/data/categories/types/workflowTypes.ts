@@ -7,7 +7,7 @@ export const workflowTypes: ChecklistCategory = {
     {
       name: "Workflow",
       status: "pending",
-      description: "Tipos encontrados en workflows.md y componentes relacionados",
+      description: "Definición de flujos de trabajo y sus categorías",
       locations: [
         "src/components/admin/documentation/types/WorkflowTypes.ts"
       ],

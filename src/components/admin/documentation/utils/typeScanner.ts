@@ -4,6 +4,9 @@ import { settingsTypes } from "../components/types/SettingsTypes"
 import { orderTypes } from "../components/types/OrderTypes"
 import { formTypes } from "../components/types/FormTypes"
 import { adminTypes } from "../components/types/AdminTypes"
+import { emailTypes } from "../data/categories/types/emailTypes"
+import { customerTypes } from "../data/categories/types/customerTypes"
+import { workflowTypes } from "../data/categories/types/workflowTypes"
 
 interface TypeAnalysis {
   total: number
@@ -29,7 +32,10 @@ export function scanProjectTypes(): TypeAnalysis {
     ...formTypes,
     ...adminTypes,
     ...blogTypes.items,
-    ...settingsTypes.items
+    ...settingsTypes.items,
+    ...emailTypes.items,
+    ...customerTypes.items,
+    ...workflowTypes.items
   ];
 
   // Count types by their categories
@@ -65,7 +71,10 @@ export function findTypeLocations(typeName: string): string[] {
     ...formTypes,
     ...adminTypes,
     ...blogTypes.items,
-    ...settingsTypes.items
+    ...settingsTypes.items,
+    ...emailTypes.items,
+    ...customerTypes.items,
+    ...workflowTypes.items
   ];
 
   const typeDefinition = allTypes.find(type => type.name === typeName);
