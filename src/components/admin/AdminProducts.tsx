@@ -20,6 +20,22 @@ interface Product {
   metadata?: Record<string, any>
 }
 
+interface SupabaseProduct {
+  id: string
+  type: "physical" | "esim"
+  title: string
+  description: string
+  price: number
+  features: unknown
+  data_eu_gb: number
+  data_es_gb: number
+  created_at: string
+  updated_at: string
+  status: "active" | "inactive" | "out_of_stock"
+  stock: number | null
+  metadata: Record<string, any> | null
+}
+
 export function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -28,6 +44,17 @@ export function AdminProducts() {
   useEffect(() => {
     fetchProducts()
   }, [])
+
+  const transformSupabaseProduct = (product: SupabaseProduct): Product => {
+    return {
+      ...product,
+      features: Array.isArray(product.features) ? product.features : [],
+      created_at: new Date(product.created_at),
+      updated_at: new Date(product.updated_at),
+      metadata: product.metadata || undefined,
+      stock: product.stock || undefined
+    }
+  }
 
   const fetchProducts = async () => {
     try {
@@ -40,7 +67,8 @@ export function AdminProducts() {
         throw error
       }
 
-      setProducts(data)
+      const transformedProducts = (data as SupabaseProduct[]).map(transformSupabaseProduct)
+      setProducts(transformedProducts)
     } catch (error) {
       console.error('Error fetching products:', error)
       toast({
@@ -73,7 +101,9 @@ export function AdminProducts() {
 
       if (error) throw error
 
-      setProducts([...(data || []), ...products])
+      const transformedNewProducts = (data as SupabaseProduct[]).map(transformSupabaseProduct)
+      setProducts([...transformedNewProducts, ...products])
+      
       toast({
         title: "Producto añadido",
         description: "El producto se ha añadido correctamente"
