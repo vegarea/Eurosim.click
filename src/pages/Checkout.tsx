@@ -41,6 +41,7 @@ const testData = {
 }
 
 export default function Checkout() {
+  // Mover todos los hooks al inicio del componente
   const { items } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
@@ -64,11 +65,6 @@ export default function Checkout() {
     }
   }, [items, navigate, toast])
 
-  // Si el carrito está vacío, no renderizar el contenido
-  if (items.length === 0) {
-    return null;
-  }
-
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
       { ...testData.shipping, ...testData.documentation } :
@@ -89,7 +85,6 @@ export default function Checkout() {
   }
 
   const handleFormSubmit = (values: any) => {
-    // Asegurarse de que la dirección de envío se guarde como Json
     const formDataWithShippingAddress = {
       ...values,
       shipping_address: values.shippingAddress as unknown as Json
@@ -116,7 +111,7 @@ export default function Checkout() {
   // Validación específica para el paso de revisión
   useEffect(() => {
     if (step === 3) {
-      setIsFormValid(true) // Siempre permitimos avanzar desde el paso de revisión
+      setIsFormValid(true)
     }
   }, [step])
 
@@ -179,6 +174,11 @@ export default function Checkout() {
       default:
         return null
     }
+  }
+
+  // Mover la verificación del carrito vacío después de todos los hooks y definiciones de funciones
+  if (items.length === 0) {
+    return null;
   }
 
   return (
