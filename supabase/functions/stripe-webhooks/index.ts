@@ -86,6 +86,27 @@ serve(async (req) => {
           throw eventError
         }
 
+        // Registrar el pago
+        const { error: paymentError } = await supabase
+          .from('payments')
+          .insert({
+            order_id: session.metadata.orderId,
+            amount: session.amount_total,
+            currency: session.currency,
+            status: 'completed',
+            payment_method_id: session.payment_method_types[0],
+            provider_payment_id: session.payment_intent,
+            provider_receipt_url: session.receipt_url,
+            metadata: {
+              stripe_session_id: session.id
+            }
+          })
+
+        if (paymentError) {
+          console.error('Error creating payment record:', paymentError)
+          throw paymentError
+        }
+
         break
       }
 
@@ -109,6 +130,23 @@ serve(async (req) => {
         if (orderError) {
           console.error('Error updating order:', orderError)
           throw orderError
+        }
+
+        // Crear evento de orden
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert({
+            order_id: session.metadata.orderId,
+            type: 'payment_expired',
+            description: 'La sesión de pago ha expirado',
+            metadata: {
+              stripe_session_id: session.id
+            }
+          })
+
+        if (eventError) {
+          console.error('Error creating order event:', eventError)
+          throw eventError
         }
 
         break
@@ -135,6 +173,24 @@ serve(async (req) => {
           throw orderError
         }
 
+        // Crear evento de orden
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert({
+            order_id: session.metadata.orderId,
+            type: 'payment_failed',
+            description: 'El pago ha fallado',
+            metadata: {
+              payment_intent_id: paymentIntent.id,
+              failure_reason: paymentIntent.last_payment_error?.message || 'Unknown error'
+            }
+          })
+
+        if (eventError) {
+          console.error('Error creating order event:', eventError)
+          throw eventError
+        }
+
         break
       }
     }
@@ -145,9 +201,12 @@ serve(async (req) => {
     })
   } catch (error) {
     console.error('Error processing webhook:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    )
   }
 })
