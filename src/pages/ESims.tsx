@@ -61,15 +61,15 @@ export default function ESims() {
       <ESimHero />
       
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Elige tu eSIM ideal
           </h2>
 
           {!isLoading && (
-            <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start'} gap-4`}>
-              <div className={`${isMobile ? 'w-full' : 'md:w-[50%]'} order-2 md:order-1`}>
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3`}>
+            <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:space-x-6'} gap-4`}>
+              <div className={`${isMobile ? 'w-full' : 'md:w-[45%]'} order-2 md:order-1`}>
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3 max-w-lg mx-auto md:mx-0`}>
                   {simCards.map((card) => (
                     <ProductButton
                       key={card.title}
@@ -83,15 +83,17 @@ export default function ESims() {
                 </div>
               </div>
 
-              <div className={`${isMobile ? 'w-full' : 'md:w-[50%] md:sticky md:top-4'} order-1 md:order-2`}>
-                <AnimatePresence mode="wait">
-                  {selectedPlan && (
-                    <PlanDetails
-                      key={selectedPlan.title}
-                      {...selectedPlan}
-                    />
-                  )}
-                </AnimatePresence>
+              <div className={`${isMobile ? 'w-full' : 'md:w-[55%] md:sticky md:top-4'} order-1 md:order-2`}>
+                <div className="max-w-lg mx-auto">
+                  <AnimatePresence mode="wait">
+                    {selectedPlan && (
+                      <PlanDetails
+                        key={selectedPlan.title}
+                        {...selectedPlan}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           )}

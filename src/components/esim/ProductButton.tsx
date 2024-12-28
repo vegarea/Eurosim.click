@@ -11,7 +11,6 @@ interface ProductButtonProps {
 }
 
 export function ProductButton({ title, price, isSelected, onClick, type }: ProductButtonProps) {
-  // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
       case "E-SIM S":
@@ -53,29 +52,29 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
     <button
       onClick={onClick}
       className={cn(
-        "w-full transition-all duration-300 p-3 md:p-6 rounded-xl backdrop-blur-sm",
+        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm",
         "hover:shadow-lg hover:-translate-y-1",
-        "flex items-center gap-2 md:gap-4",
+        "flex items-center gap-2 md:gap-3",
         isSelected ? 
           `${colorScheme.bg} shadow-lg` : 
           `${colorScheme.bg} opacity-80 hover:opacity-100`
       )}
     >
       <div className={cn(
-        "p-2 md:p-4 rounded-lg bg-white/50 backdrop-blur-sm"
+        "p-2 rounded-lg bg-white/50 backdrop-blur-sm"
       )}>
         {type === 'physical' ? (
-          <CreditCard className={cn("h-4 w-4 md:h-6 md:w-6", colorScheme.iconColor)} />
+          <CreditCard className={cn("h-4 w-4", colorScheme.iconColor)} />
         ) : (
-          <Wifi className={cn("h-4 w-4 md:h-6 md:w-6", colorScheme.iconColor)} />
+          <Wifi className={cn("h-4 w-4", colorScheme.iconColor)} />
         )}
       </div>
       
       <div className="flex-1 text-left">
-        <h3 className="text-sm md:text-lg font-semibold">{title}</h3>
-        <p className="text-base md:text-xl font-bold text-primary flex items-baseline gap-2">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        <p className="text-base font-bold text-primary flex items-baseline gap-1">
           {amount}
-          <span className="text-sm md:text-base font-normal text-gray-500">{currency}</span>
+          <span className="text-sm font-normal text-gray-500">{currency}</span>
         </p>
       </div>
     </button>

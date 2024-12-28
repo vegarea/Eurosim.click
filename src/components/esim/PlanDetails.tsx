@@ -54,27 +54,27 @@ export function PlanDetails({
       exit={{ opacity: 0, y: -20 }}
       className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
     >
-      <h2 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <h2 className="text-lg md:text-xl font-bold mb-3 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
         {title}
       </h2>
 
-      <div className="space-y-3 mb-4">
+      <div className="space-y-2 mb-4">
         {features.map((feature, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center gap-3"
+            className="flex items-center gap-2"
           >
-            <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
-            <span className="text-gray-700">{feature}</span>
+            <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
+            <span className="text-sm text-gray-700">{feature}</span>
           </motion.div>
         ))}
       </div>
 
-      <div className="mb-6">
-        <p className="text-3xl font-bold text-primary flex items-baseline gap-2">
+      <div className="mb-4">
+        <p className="text-2xl font-bold text-primary flex items-baseline gap-2">
           {amount}
           <span className="text-base font-normal text-gray-500">{currency}</span>
         </p>
@@ -90,7 +90,7 @@ export function PlanDetails({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-6"
+        className="mt-4"
       >
         <Button 
           onClick={handlePurchase}
