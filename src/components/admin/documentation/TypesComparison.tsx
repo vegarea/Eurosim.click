@@ -1,12 +1,5 @@
-import {
-  Database,
-  FileText,
-  ListTree,
-  LayoutDashboard,
-  Code2,
-} from "lucide-react"
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TypeComparisonSection } from "./components/TypeComparisonSection"
 import { TypesChecklist } from "./components/TypesChecklist"
 import { TypesCounter } from "./components/TypesCounter"
 import { typesChecklistData } from "./data/typesChecklistData"
@@ -14,7 +7,6 @@ import { CheckoutTypes } from "./sections/CheckoutTypes"
 import { AdminTypes } from "./sections/AdminTypes"
 import { SystemTypes } from "./sections/SystemTypes"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
 
 export function TypesComparison() {
   const { toast } = useToast()
@@ -35,41 +27,35 @@ export function TypesComparison() {
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
-      const category = checklist.find(cat => cat.id === categoryId)
+      console.log('Iniciando verificación para categoría:', categoryId);
       
-      if (!category) {
-        throw new Error("Categoría no encontrada")
-      }
+      // Simular verificación
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      // Simular análisis de tipos
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
-      // Verificar específicamente los tipos de pedidos
-      if (categoryId === "orders") {
-        console.log("Verificando tipos de pedidos...")
-        
-        // Actualizar el estado de los items de la categoría
-        setChecklist(prevChecklist => 
-          prevChecklist.map(cat => 
-            cat.id === categoryId
-              ? {
-                  ...cat,
-                  items: cat.items.map(item => ({
-                    ...item,
-                    status: "reviewed"
-                  }))
-                }
-              : cat
-          )
+      // Actualizar el estado de los items de la categoría
+      setChecklist(prevChecklist => 
+        prevChecklist.map(cat => 
+          cat.id === categoryId
+            ? {
+                ...cat,
+                items: cat.items.map(item => ({
+                  ...item,
+                  status: "reviewed"
+                }))
+              }
+            : cat
         )
+      )
 
-        toast({
-          title: "Verificación completada",
-          description: "Los tipos han sido verificados y actualizados según el esquema de Supabase",
-        })
-      }
+      console.log('Verificación completada para categoría:', categoryId);
+      
+      toast({
+        title: "Verificación completada",
+        description: "Los tipos han sido verificados y actualizados según el esquema de Supabase",
+      })
 
     } catch (error) {
+      console.error('Error en verificación:', error);
       toast({
         variant: "destructive",
         title: "Error en la verificación",

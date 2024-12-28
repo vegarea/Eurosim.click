@@ -7,5 +7,7 @@ export interface ChecklistItem {
     name: string
     status: ChecklistItemStatus
     description: string
+    currentType?: string
+    supabaseType?: string
   }>
 }

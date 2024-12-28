@@ -14,9 +14,10 @@ export function TypesChecklist({ items, onVerifyTypes }: TypesChecklistProps) {
 
   const handleVerify = async (categoryId: string) => {
     if (onVerifyTypes) {
+      console.log('Verificando tipos para categoría:', categoryId);
       toast({
         title: "Verificando tipos",
-        description: "Analizando y documentando tipos del área seleccionada...",
+        description: "Analizando y actualizando tipos del área seleccionada...",
       })
       onVerifyTypes(categoryId)
     }
