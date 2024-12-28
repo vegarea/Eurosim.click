@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Order, OrderStatus } from '@/types';
+import { Order, OrderStatus } from '@/types/order/orderTypes';
 import { toast } from 'sonner';
+import { transformDatabaseOrderToOrder } from '@/utils/order/orderTransformers';
 
 export function useOrdersData() {
   const queryClient = useQueryClient();
@@ -26,11 +27,7 @@ export function useOrdersData() {
             description,
             price
           ),
-          order_items(
-            quantity,
-            unit_price,
-            total_price
-          )
+          order_notes(*)
         `)
         .order('created_at', { ascending: false });
 
@@ -39,40 +36,7 @@ export function useOrdersData() {
         throw error;
       }
 
-      return data.map((order: any): Order => ({
-        id: order.id,
-        customer_id: order.customer_id,
-        product_id: order.product_id,
-        customer: order.customer?.name || 'Unknown',
-        email: order.customer?.email,
-        phone: order.customer?.phone,
-        total: order.total_amount / 100,
-        total_amount: order.total_amount,
-        status: order.status,
-        type: order.type,
-        payment_method: order.payment_method,
-        payment_status: order.payment_status,
-        title: order.product?.title,
-        description: order.product?.description,
-        quantity: order.quantity,
-        shipping_address: order.shipping_address,
-        stripe_payment_intent_id: order.stripe_payment_intent_id,
-        stripe_receipt_url: order.stripe_receipt_url,
-        paypal_order_id: order.paypal_order_id,
-        paypal_receipt_url: order.paypal_receipt_url,
-        tracking_number: order.tracking_number,
-        carrier: order.carrier,
-        activation_date: order.activation_date,
-        metadata: order.metadata,
-        created_at: order.created_at,
-        updated_at: order.updated_at,
-        documentation: {
-          passportNumber: order.customer?.passport_number,
-          birthDate: order.customer?.birth_date,
-          gender: order.customer?.gender,
-          activationDate: order.activation_date
-        }
-      }));
+      return data.map(transformDatabaseOrderToOrder);
     },
   });
 
@@ -98,10 +62,43 @@ export function useOrdersData() {
     },
   });
 
+  const addOrderNote = useMutation({
+    mutationFn: async ({ 
+      orderId, 
+      content, 
+      isInternal = false 
+    }: { 
+      orderId: string; 
+      content: string; 
+      isInternal?: boolean;
+    }) => {
+      const { error } = await supabase
+        .from('order_notes')
+        .insert({
+          order_id: orderId,
+          content,
+          is_internal: isInternal,
+          user_id: 'current-user-id', // En una app real, esto vendría del contexto de auth
+          type: 'user_note'
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      toast.success('Nota añadida correctamente');
+    },
+    onError: (error) => {
+      console.error('Error adding order note:', error);
+      toast.error('Error al añadir la nota');
+    },
+  });
+
   return {
     orders,
     isLoading,
     error,
     updateOrderStatus,
+    addOrderNote,
   };
 }

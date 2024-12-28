@@ -1,49 +1,6 @@
-import { Json } from "@/integrations/supabase/types"
+import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from '@/types/database.types';
 
-export type OrderStatus = 'payment_pending' | 'payment_failed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
-export type OrderType = 'physical' | 'esim';
-export type PaymentMethod = 'stripe' | 'paypal';
-
-export interface ShippingAddress {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  postal_code: string;
-  phone: string;
-}
-
-export interface OrderCustomer {
-  name: string;
-  email: string;
-  phone?: string;
-  documentation?: CustomerDocumentation;
-}
-
-export interface CustomerDocumentation {
-  passportNumber?: string;
-  birthDate?: string;
-  gender?: string;
-  activationDate?: string;
-}
-
-export interface OrderProduct {
-  title: string;
-  description: string;
-  price: number;
-}
-
-export interface OrderEvent {
-  id: string;
-  order_id: string;
-  type: string;
-  description: string;
-  user_id?: string;
-  metadata?: Record<string, any>;
-  created_at: string;
-  user_name?: string;
-}
+export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod };
 
 export interface OrderNote {
   id: string;
@@ -58,18 +15,35 @@ export interface OrderNote {
   user_name?: string;
 }
 
-export interface CreateOrderDTO {
-  customer_id: string;
-  product_id: string;
-  type: OrderType;
-  status?: OrderStatus;
-  payment_status?: PaymentStatus;
-  total_amount: number;
-  quantity: number;
-  shipping_address?: Json;
-  activation_date?: string;
-  notes?: string[];
-  metadata?: Json;
+export interface OrderEvent {
+  id: string;
+  order_id: string;
+  type: string;
+  description: string;
+  user_id?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  user_name?: string;
+}
+
+export interface CustomerDocumentation {
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  activationDate?: string;
+}
+
+export interface OrderCustomer {
+  name: string;
+  email: string;
+  phone?: string;
+  documentation?: CustomerDocumentation;
+}
+
+export interface OrderProduct {
+  title: string;
+  description: string;
+  price: number;
 }
 
 export interface Order {
@@ -83,15 +57,26 @@ export interface Order {
   quantity: number;
   payment_method?: PaymentMethod;
   payment_status: PaymentStatus;
-  shipping_address?: ShippingAddress;
+  shipping_address?: Record<string, any>;
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
   notes: OrderNote[];
-  events: OrderEvent[];
+  events?: OrderEvent[];
   product?: OrderProduct;
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
-  documentation?: CustomerDocumentation;
+}
+
+export interface CreateOrderDTO {
+  customer_id: string;
+  product_id: string;
+  type: OrderType;
+  total_amount: number;
+  quantity: number;
+  shipping_address?: Record<string, any>;
+  activation_date?: string;
+  notes?: string[];
+  metadata?: Record<string, any>;
 }
