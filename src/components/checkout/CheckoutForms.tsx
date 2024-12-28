@@ -1,7 +1,6 @@
 import { Progress } from "@/components/ui/progress"
 import { ShippingForm } from "./ShippingForm"
 import { DocumentationForm } from "./DocumentationForm"
-import { ReviewStep } from "./ReviewStep"
 import { PaymentStep } from "./PaymentStep"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
@@ -13,7 +12,7 @@ export function CheckoutForms() {
   const [isFormValid, setIsFormValid] = useState(false)
   const [formData, setFormData] = useState<Record<string, any>>({})
   
-  const progress = (step / 4) * 100
+  const progress = (step / 3) * 100
 
   const handleFormValidityChange = (isValid: boolean) => {
     setIsFormValid(isValid)
@@ -21,9 +20,9 @@ export function CheckoutForms() {
 
   const handleFormSubmit = (values: any) => {
     setFormData({ ...formData, ...values })
-    if (step < 4) {
+    if (step < 3) {
       setStep(step + 1)
-      setIsFormValid(step === 3) // Mantenemos la validación activa en el paso de revisión
+      setIsFormValid(false)
     }
   }
 
@@ -32,10 +31,6 @@ export function CheckoutForms() {
       setStep(step - 1)
       setIsFormValid(true)
     }
-  }
-
-  const handleUpdateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const renderStepContent = () => {
@@ -57,13 +52,6 @@ export function CheckoutForms() {
           />
         )
       case 3:
-        return (
-          <ReviewStep
-            formData={formData}
-            onUpdateField={handleUpdateField}
-          />
-        )
-      case 4:
         return <PaymentStep />
       default:
         return null
@@ -74,7 +62,7 @@ export function CheckoutForms() {
     <div className="bg-white rounded-xl shadow-sm p-6">
       <div className="mb-8 space-y-4 max-w-3xl mx-auto">
         <div className="flex justify-between items-center">
-          {['Información', 'Documentación', 'Revisión', 'Pago'].map((stepName, index) => (
+          {['Información', 'Documentación', 'Pago'].map((stepName, index) => (
             <motion.div
               key={stepName}
               className={`flex items-center ${index + 1 <= step ? 'text-primary' : 'text-gray-400'}`}
@@ -102,18 +90,18 @@ export function CheckoutForms() {
             onClick={handleBack}
             className="flex items-center gap-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="h-4 w-4" />
             Volver
           </Button>
         )}
-        {step < 4 && (
+        {step < 3 && (
           <Button
             className="ml-auto flex items-center gap-2"
             onClick={() => isFormValid && handleFormSubmit(formData)}
             disabled={!isFormValid}
           >
             Siguiente
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="h-4 w-4" />
           </Button>
         )}
       </div>
