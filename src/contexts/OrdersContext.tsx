@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
-import { Order } from "@/components/admin/orders/types"
+import type { Order, OrderStatus } from "@/types/database"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
@@ -41,23 +41,25 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      const formattedOrders = data.map(order => ({
+      const formattedOrders: Order[] = data.map(order => ({
         id: order.id,
         date: order.created_at,
         customer: order.customers?.name || 'Cliente no encontrado',
         email: order.customers?.email,
         phone: order.customers?.phone,
-        total: order.total_amount / 100, // Convertir de centavos a euros
-        status: order.status,
-        type: order.type,
+        total: order.total_amount / 100,
+        status: order.status as OrderStatus,
+        type: order.type as "physical" | "esim",
         paymentMethod: order.payment_method,
         title: order.products?.title,
         description: order.products?.description,
         quantity: order.quantity,
-        shippingAddress: order.shipping_address?.street,
-        city: order.shipping_address?.city,
-        state: order.shipping_address?.state,
-        zipCode: order.shipping_address?.postal_code,
+        shippingAddress: order.shipping_address ? {
+          street: (order.shipping_address as any).street,
+          city: (order.shipping_address as any).city,
+          state: (order.shipping_address as any).state,
+          zipCode: (order.shipping_address as any).postal_code
+        } : undefined
       }))
 
       setOrders(formattedOrders)
@@ -82,7 +84,6 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      // Actualizar el estado local
       setOrders(orders.map(order => 
         order.id === orderId 
           ? { ...order, ...updates }

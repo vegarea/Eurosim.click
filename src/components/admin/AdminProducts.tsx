@@ -38,11 +38,15 @@ export function AdminProducts() {
     }
   }
 
-  const handleAddProduct = async (product: Product) => {
+  const handleAddProduct = async (productData: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'metadata'>) => {
     try {
       const { error } = await supabase
         .from('products')
-        .insert(product)
+        .insert({
+          ...productData,
+          status: 'active',
+          metadata: null
+        })
 
       if (error) throw error
 
@@ -51,7 +55,7 @@ export function AdminProducts() {
         description: "El producto se ha añadido correctamente"
       })
       
-      fetchProducts() // Refresh the list
+      fetchProducts()
     } catch (error) {
       console.error('Error adding product:', error)
       toast({
