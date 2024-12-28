@@ -2,10 +2,8 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TypesChecklist } from "./components/TypesChecklist"
 import { TypesCounter } from "./components/TypesCounter"
+import { TypesList } from "./components/TypesList"
 import { typesChecklistData } from "./data/typesChecklistData"
-import { CheckoutTypes } from "./sections/CheckoutTypes"
-import { AdminTypes } from "./sections/AdminTypes"
-import { SystemTypes } from "./sections/SystemTypes"
 import { useToast } from "@/hooks/use-toast"
 import { scanProjectTypes } from "./utils/typeScanner"
 
@@ -68,33 +66,7 @@ export function TypesComparison() {
         detailedCounts={detailedCounts}
       />
       
-      <Tabs defaultValue="checklist" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="checklist">Vista General</TabsTrigger>
-          <TabsTrigger value="checkout">Área de Compra</TabsTrigger>
-          <TabsTrigger value="admin">Panel Admin</TabsTrigger>
-          <TabsTrigger value="system">Sistema</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="checklist">
-          <TypesChecklist 
-            items={checklist} 
-            onVerifyTypes={handleVerifyTypes}
-          />
-        </TabsContent>
-
-        <TabsContent value="checkout">
-          <CheckoutTypes />
-        </TabsContent>
-
-        <TabsContent value="admin">
-          <AdminTypes />
-        </TabsContent>
-
-        <TabsContent value="system">
-          <SystemTypes />
-        </TabsContent>
-      </Tabs>
+      <TypesList />
     </div>
   )
 }
