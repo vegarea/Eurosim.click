@@ -11,48 +11,74 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
+import { Order } from "@/types/database"
+
+interface CustomerData {
+  customer_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  orders: Order[];
+  totalSpent: number;
+  shippingInfo: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  documentation: {
+    passportNumber?: string;
+    birthDate?: string;
+    gender?: string;
+    activationDate?: string;
+  };
+}
 
 export function AdminCustomers() {
   const { orders } = useOrders()
   const [search, setSearch] = useState("")
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   // Crear un mapa de clientes únicos basado en los pedidos
   const customers = orders.reduce((acc, order) => {
-    if (!acc[order.customer]) {
-      acc[order.customer] = {
-        name: order.customer,
-        email: order.email || "No especificado",
-        phone: order.phone || "No especificado",
+    const customerId = order.customer_id
+    if (!acc[customerId]) {
+      acc[customerId] = {
+        customer_id: customerId,
+        name: order.customer_name || "No especificado",
+        email: order.customer_email || "No especificado",
+        phone: order.metadata?.phone || "No especificado",
         orders: [],
         totalSpent: 0,
         shippingInfo: {},
         documentation: {}
       }
     }
-    acc[order.customer].orders.push(order)
-    acc[order.customer].totalSpent += order.total
+    acc[customerId].orders.push(order)
+    acc[customerId].totalSpent += order.total_amount
 
     // Actualizar información de envío y documentación si está disponible
-    if (order.shippingAddress) {
-      acc[order.customer].shippingInfo = {
-        address: order.shippingAddress,
-        city: order.city,
-        state: order.state,
-        zipCode: order.zipCode
+    if (order.shipping_address) {
+      acc[customerId].shippingInfo = {
+        address: order.shipping_address.street,
+        city: order.shipping_address.city,
+        state: order.shipping_address.state,
+        zipCode: order.shipping_address.postal_code
       }
     }
-    if (order.passportNumber) {
-      acc[order.customer].documentation = {
-        passportNumber: order.passportNumber,
-        birthDate: order.birthDate,
-        gender: order.gender,
-        activationDate: order.activationDate
+    
+    // La documentación ahora se maneja a través de metadata
+    if (order.metadata) {
+      acc[customerId].documentation = {
+        passportNumber: order.metadata.passport_number,
+        birthDate: order.metadata.birth_date,
+        gender: order.metadata.gender,
+        activationDate: order.activation_date
       }
     }
     return acc
-  }, {} as Record<string, any>)
+  }, {} as Record<string, CustomerData>)
 
   // Filtrar clientes basado en la búsqueda
   const filteredCustomers = Object.values(customers).filter(customer => 

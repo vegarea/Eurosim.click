@@ -9,9 +9,30 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+interface CustomerData {
+  customer_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  orders: any[];
+  totalSpent: number;
+  shippingInfo: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  };
+  documentation: {
+    passportNumber?: string;
+    birthDate?: string;
+    gender?: string;
+    activationDate?: string;
+  };
+}
+
 interface CustomersTableProps {
-  customers: any[]
-  onViewDetails: (customer: any) => void
+  customers: CustomerData[]
+  onViewDetails: (customer: CustomerData) => void
 }
 
 export function CustomersTable({ customers, onViewDetails }: CustomersTableProps) {
@@ -29,7 +50,7 @@ export function CustomersTable({ customers, onViewDetails }: CustomersTableProps
         </TableHeader>
         <TableBody>
           {customers.map((customer) => (
-            <TableRow key={customer.name}>
+            <TableRow key={customer.customer_id}>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-gray-500" />
@@ -53,7 +74,7 @@ export function CustomersTable({ customers, onViewDetails }: CustomersTableProps
               </TableCell>
               <TableCell>
                 <span className="font-medium">
-                  ${customer.totalSpent.toFixed(2)}
+                  ${(customer.totalSpent / 100).toFixed(2)}
                 </span>
               </TableCell>
               <TableCell>
