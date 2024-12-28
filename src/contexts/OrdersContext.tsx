@@ -1,41 +1,27 @@
-import { createContext, useContext, ReactNode } from 'react';
-import { Order, OrderStatus } from '@/components/admin/orders/types';
-import { useOrdersData } from '@/hooks/useOrdersData';
+import React, { createContext, useContext, useState } from 'react';
+import { OrderUI } from '@/types/order.types';
+import { mockOrders } from '@/components/admin/orders/mockData';
 
 interface OrdersContextType {
-  orders: Order[];
-  isLoading: boolean;
-  error: Error | null;
-  updateOrder: (orderId: string, updates: Partial<Order>) => void;
+  orders: OrderUI[];
+  updateOrder: (orderId: string, updates: Partial<OrderUI>) => void;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
-export function OrdersProvider({ children }: { children: ReactNode }) {
-  const { 
-    orders = [], 
-    isLoading, 
-    error, 
-    updateOrderStatus 
-  } = useOrdersData();
+export function OrdersProvider({ children }: { children: React.ReactNode }) {
+  const [orders, setOrders] = useState<OrderUI[]>(mockOrders);
 
-  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
-    if (updates.status) {
-      await updateOrderStatus.mutateAsync({
-        orderId,
-        newStatus: updates.status as OrderStatus,
-        reason: updates.metadata?.statusChangeReason
-      });
-    }
+  const updateOrder = (orderId: string, updates: Partial<OrderUI>) => {
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, ...updates } : order
+      )
+    );
   };
 
   return (
-    <OrdersContext.Provider value={{
-      orders,
-      isLoading,
-      error: error as Error | null,
-      updateOrder
-    }}>
+    <OrdersContext.Provider value={{ orders, updateOrder }}>
       {children}
     </OrdersContext.Provider>
   );
