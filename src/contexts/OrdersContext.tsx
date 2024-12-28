@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, useEffect } from "react"
-import { Order, OrderStatus } from "@/types/supabase/orders"
+import { Order, OrderStatus, transformOrder, OrderWithDetails } from "@/types/supabase/orders"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
 interface OrdersContextType {
-  orders: Order[];
+  orders: OrderWithDetails[];
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>;
   isLoading: boolean;
   error: Error | null;
@@ -13,7 +13,7 @@ interface OrdersContextType {
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<OrderWithDetails[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -41,14 +41,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      const ordersWithDetails = data.map(order => ({
-        ...order,
-        customer: order.customers?.name || 'Unknown',
-        date: order.created_at,
-        total: order.total_amount / 100, // Convertir de centavos a unidades
-      }))
-
-      setOrders(ordersWithDetails)
+      const transformedOrders = data.map(order => transformOrder(order))
+      setOrders(transformedOrders)
       setIsLoading(false)
     } catch (error) {
       console.error('Error fetching orders:', error)
@@ -67,11 +61,13 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      setOrders(orders.map(order => 
-        order.id === orderId 
-          ? { ...order, ...updates }
-          : order
-      ))
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order.id === orderId 
+            ? transformOrder({ ...order, ...updates })
+            : order
+        )
+      )
 
       toast.success('Pedido actualizado correctamente')
     } catch (error) {
