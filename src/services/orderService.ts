@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order, PaymentStatus, OrderStatus, ShippingAddress } from "@/types";
-import { transformShippingAddress, prepareShippingAddress } from "@/utils/transformations";
+import { toast } from "sonner";
+import { Order } from "@/types";
 
 export const orderService = {
   async createOrder(orderData: {
@@ -9,87 +9,118 @@ export const orderService = {
     type: 'physical' | 'esim';
     total_amount: number;
     quantity: number;
-    shipping_address?: ShippingAddress;
+    shipping_address?: any;
     activation_date?: string;
-  }): Promise<Order> {
-    console.group('📝 Order Service - createOrder');
-    console.log('Input order data:', orderData);
-    
-    try {
-      const orderPayload = {
-        ...orderData,
-        status: 'payment_pending' as OrderStatus,
-        payment_status: 'pending' as PaymentStatus,
-        ...(orderData.shipping_address && {
-          shipping_address: prepareShippingAddress(orderData.shipping_address)
-        })
-      };
+  }) {
+    console.group('📦 Order Service - createOrder');
+    console.log('Creating order with data:', orderData);
 
+    try {
       const { data: order, error } = await supabase
         .from('orders')
-        .insert(orderPayload)
+        .insert(orderData)
         .select(`
           *,
-          customer:customers(name),
-          product:products(title, price)
+          customer:customers(
+            name,
+            email,
+            phone
+          ),
+          product:products(
+            title,
+            description,
+            price
+          )
         `)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error creating order:', error);
         throw error;
       }
 
+      if (!order) {
+        console.error('No order was created');
+        throw new Error('Failed to create order');
+      }
+
       console.log('Order created successfully:', order);
-
-      const transformedOrder: Order = {
-        id: order.id,
-        customer: order.customer?.name || 'Unknown',
-        customer_id: order.customer_id,
-        product_id: order.product_id,
-        total: order.total_amount / 100,
-        total_amount: order.total_amount,
-        status: order.status,
-        type: order.type,
-        payment_method: order.payment_method,
-        payment_status: order.payment_status,
-        title: order.product?.title,
-        quantity: order.quantity,
-        shipping_address: order.shipping_address ? transformShippingAddress(order.shipping_address) : undefined,
-        stripe_payment_intent_id: order.stripe_payment_intent_id,
-        stripe_receipt_url: order.stripe_receipt_url,
-        paypal_order_id: order.paypal_order_id,
-        paypal_receipt_url: order.paypal_receipt_url,
-        tracking_number: order.tracking_number,
-        carrier: order.carrier,
-        activation_date: order.activation_date,
-        metadata: order.metadata as Record<string, any>,
-        created_at: order.created_at,
-        updated_at: order.updated_at
-      };
-
-      return transformedOrder;
+      return order;
+    } catch (error) {
+      console.error('Error in createOrder:', error);
+      throw error;
     } finally {
       console.groupEnd();
     }
   },
 
   async createOrderEvent(orderId: string, type: string, description: string) {
+    console.group('📝 Order Service - createOrderEvent');
     console.log('Creating order event:', { orderId, type, description });
-    
-    const { error } = await supabase
-      .from('order_events')
-      .insert({
-        order_id: orderId,
-        type,
-        description
-      });
 
-    if (error) {
-      console.error('Error creating order event:', error);
+    try {
+      const { error } = await supabase
+        .from('order_events')
+        .insert({
+          order_id: orderId,
+          type,
+          description
+        });
+
+      if (error) {
+        console.error('Error creating order event:', error);
+        throw error;
+      }
+
+      console.log('Order event created successfully');
+    } catch (error) {
+      console.error('Error in createOrderEvent:', error);
       throw error;
+    } finally {
+      console.groupEnd();
     }
+  },
 
-    console.log('Order event created successfully');
+  async getOrder(orderId: string): Promise<Order> {
+    console.group('🔍 Order Service - getOrder');
+    console.log('Fetching order:', orderId);
+
+    try {
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          customer:customers(
+            name,
+            email,
+            phone
+          ),
+          product:products(
+            title,
+            description,
+            price
+          )
+        `)
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching order:', error);
+        throw error;
+      }
+
+      if (!order) {
+        console.error('Order not found');
+        throw new Error('Order not found');
+      }
+
+      console.log('Order fetched successfully:', order);
+      return order as Order;
+    } catch (error) {
+      console.error('Error in getOrder:', error);
+      throw error;
+    } finally {
+      console.groupEnd();
+    }
   }
 };
