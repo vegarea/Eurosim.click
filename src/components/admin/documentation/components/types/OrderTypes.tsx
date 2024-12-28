@@ -1,95 +1,82 @@
 export const orderTypes = [
   {
-    name: "CartItem",
-    description: "Tipo para los items del carrito de compras",
-    currentType: `interface CartItem {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  quantity: number
-}`,
-    supabaseType: `type CartItem = Database["public"]["Tables"]["cart_items"]["Row"] = {
-  id: string
-  product_id: string
-  quantity: number
-  created_at: string
-  updated_at: string | null
-  metadata: Json | null
-}`,
-    locations: [
-      "src/contexts/CartContext.tsx",
-      "src/components/cart/Cart.tsx",
-      "src/components/cart/CartItem.tsx"
-    ],
-    relations: [
-      {
-        type: "many_to_one",
-        with: "Product",
-        description: "Cada item del carrito pertenece a un producto"
-      }
-    ],
-    requiredFields: [
-      "product_id",
-      "quantity"
-    ],
-    category: "component",
-    status: "pending"
-  },
-  {
     name: "Order",
-    description: "Tipo para los pedidos realizados",
+    description: "Tipo principal para pedidos",
     currentType: `interface Order {
-  id: string
-  status: OrderStatus
-  customer: string
-  total: number
-  type: "physical" | "esim"
-  paymentMethod?: string
-  date: string
-  title?: string
-  description?: string
-  quantity?: number
-  passportNumber?: string
-  birthDate?: string
-  gender?: 'M' | 'F'
-  activationDate?: string
-  notes?: OrderNote[]
-  events?: OrderEvent[]
+  id: string;
+  customer_id: string;
+  product_id: string;
+  status: OrderStatus;
+  type: OrderType;
+  total_amount: number;
+  quantity: number;
+  payment_method?: PaymentMethod;
+  payment_status: PaymentStatus;
+  shipping_address?: ShippingAddress;
+  tracking_number?: string;
+  carrier?: string;
+  activation_date?: string;
+  notes?: string[];
+  metadata?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
 }`,
-    supabaseType: `type Order = Database["public"]["Tables"]["orders"]["Row"] = {
-  id: string
-  customer_id: string
-  status: Database["public"]["Enums"]["order_status"]
-  type: Database["public"]["Enums"]["order_type"]
-  total_amount: number
-  payment_method: Database["public"]["Enums"]["payment_method"]
-  created_at: string
-  updated_at: string | null
-  shipping_address_id: string | null
-  metadata: Json | null
-}`,
+    supabaseType: `type Order = Database["public"]["Tables"]["orders"]["Row"]`,
     locations: [
-      "src/components/admin/orders/types.ts",
-      "src/components/checkout/types.ts",
-      "src/contexts/OrdersContext.tsx",
-      "src/pages/OrderDetails.tsx"
+      "src/types/database/orders.ts",
+      "src/components/admin/orders/types.ts"
     ],
     relations: [
       {
         type: "one_to_many",
-        with: "CartItem",
-        description: "Un pedido puede tener múltiples items del carrito"
+        with: "OrderItem",
+        description: "Un pedido puede tener múltiples items"
       }
     ],
     requiredFields: [
       "customer_id",
-      "total_amount",
+      "product_id",
       "status",
-      "type"
+      "type",
+      "total_amount",
+      "quantity"
     ],
     category: "context",
-    status: "pending"
+    status: "updated"
+  },
+  {
+    name: "OrderItem",
+    description: "Tipo para items individuales de un pedido",
+    currentType: `interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  metadata?: Record<string, any>;
+  created_at?: string;
+  updated_at?: string;
+}`,
+    supabaseType: `type OrderItem = Database["public"]["Tables"]["order_items"]["Row"]`,
+    locations: [
+      "src/types/database/orderItems.ts"
+    ],
+    relations: [
+      {
+        type: "many_to_one",
+        with: "Order",
+        description: "Cada item pertenece a un pedido"
+      }
+    ],
+    requiredFields: [
+      "order_id",
+      "product_id",
+      "quantity",
+      "unit_price",
+      "total_price"
+    ],
+    category: "component",
+    status: "updated"
   }
-]
+];

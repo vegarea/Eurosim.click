@@ -1,13 +1,12 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
 
 export interface ShippingAddress {
-  fullName: string;
-  email: string;
-  phone: string;
-  address: string;
+  street: string;
   city: string;
   state: string;
-  zipCode: string;
+  country: string;
+  postal_code: string;
+  phone: string;
 }
 
 export interface Order {
