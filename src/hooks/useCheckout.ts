@@ -16,9 +16,11 @@ export const useCheckout = () => {
       // 1. Validate products exist and are active
       console.log('Validating products...');
       for (const item of items) {
+        console.log('Checking product:', item.title);
+        
         const { data: product, error: productError } = await supabase
           .from('products')
-          .select('id, status')
+          .select('id, status, title')
           .eq('title', item.title)
           .eq('status', 'active')
           .maybeSingle();
@@ -28,10 +30,15 @@ export const useCheckout = () => {
           throw new Error('Error al validar el producto');
         }
 
+        console.log('Product query result:', product);
+
         if (!product) {
           console.error('Product not found or inactive:', item.title);
           throw new Error(`El producto "${item.title}" no está disponible actualmente`);
         }
+
+        // Log the found product for debugging
+        console.log('Found active product:', product);
       }
 
       // 2. Create customer
@@ -63,15 +70,17 @@ export const useCheckout = () => {
         // Get product again to ensure it's still active
         const { data: product, error: productError } = await supabase
           .from('products')
-          .select('id, status')
+          .select('id, status, title')
           .eq('title', item.title)
           .eq('status', 'active')
-          .single();
+          .maybeSingle();
 
         if (productError || !product) {
           console.error('Error getting product:', productError);
           throw new Error(`El producto "${item.title}" ya no está disponible`);
         }
+
+        console.log('Creating order for product:', product);
 
         // Create order
         const { data: order, error: orderError } = await supabase
