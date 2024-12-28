@@ -1,20 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Smartphone, HelpCircle } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { compatibleDevices } from "@/data/compatibleDevices";
 
 export function SimHero() {
   return (
@@ -40,88 +24,6 @@ export function SimHero() {
               <p className="text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Envío a todo México, activación sencilla y soporte en español 24/7. La manera más confiable de mantenerte conectado en Europa.
               </p>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-2">
-                      <HelpCircle className="h-4 w-4" />
-                      ¿Cómo funciona?
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>¿Cómo funciona la SIM física?</DialogTitle>
-                      <DialogDescription>
-                        <div className="space-y-4 mt-4">
-                          <p>
-                            La SIM física es una tarjeta que se inserta en tu dispositivo para conectarte a internet en Europa.
-                          </p>
-                          <div className="space-y-2">
-                            <h4 className="font-semibold">Proceso sencillo:</h4>
-                            <ol className="list-decimal pl-5 space-y-1">
-                              <li>Compra tu SIM</li>
-                              <li>Recíbela en tu domicilio</li>
-                              <li>Insértala en tu dispositivo al llegar a Europa</li>
-                              <li>¡Listo! Comienza a navegar</li>
-                            </ol>
-                          </div>
-                          <div className="space-y-2">
-                            <h4 className="font-semibold">Ventajas:</h4>
-                            <ul className="list-disc pl-5 space-y-1">
-                              <li>Compatible con todos los dispositivos</li>
-                              <li>No requiere configuración especial</li>
-                              <li>Incluye adaptadores para todos los tamaños</li>
-                              <li>Activación automática al llegar a Europa</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-2">
-                      <Smartphone className="h-4 w-4" />
-                      Verifica la compatibilidad
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Dispositivos Compatibles</DialogTitle>
-                      <DialogDescription>
-                        La SIM física es compatible con todos los dispositivos móviles
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="mt-4">
-                      <Accordion type="single" collapsible className="w-full">
-                        {compatibleDevices.map((brand) => (
-                          <AccordionItem key={brand.name} value={brand.name}>
-                            <AccordionTrigger>{brand.name}</AccordionTrigger>
-                            <AccordionContent>
-                              <ul className="space-y-2">
-                                {brand.models.map((model) => (
-                                  <li
-                                    key={model.name}
-                                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
-                                  >
-                                    <span>{model.name}</span>
-                                    <span className="text-green-500 text-sm font-medium">
-                                      Compatible
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
             </div>
           </div>
 
