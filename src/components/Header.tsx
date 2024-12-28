@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart, Globe2, ArrowRight } from "lucide-react";
+import { Menu, ShoppingCart, MapPin, Signal, Wifi } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -15,16 +15,16 @@ export function Header() {
 
   const menuItems = [
     { label: "Inicio", href: "/" },
-    { label: "eSIMs", href: "/e-sims" },
-    { label: "SIM Card", href: "/sims" },
+    { label: "eSIMs", href: "/e-sims", icon: <Wifi className="w-4 h-4" /> },
+    { label: "SIM Card", href: "/sims", icon: <Signal className="w-4 h-4" /> },
     { label: "Contacto", href: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-sm bg-white/80 supports-[backdrop-filter]:bg-white/60">
-      <div className="absolute inset-0 border-b border-slate-100/80" />
+    <header className="sticky top-0 z-50 w-full">
+      <div className="absolute inset-0 bg-white/80 backdrop-blur-md border-b border-slate-100/80" />
       
       <div className="container relative flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -36,37 +36,38 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-6">
           {menuItems.map((item) => (
             <Link
               key={item.label}
               to={item.href}
-              className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
+              className={`group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 isActive(item.href)
                   ? "bg-brand-50 text-brand-600"
                   : "text-gray-600 hover:bg-gray-50"
               }`}
             >
+              {item.icon && (
+                <span className={`${isActive(item.href) ? "text-brand-600" : "text-gray-400 group-hover:text-gray-600"}`}>
+                  {item.icon}
+                </span>
+              )}
               {item.label}
             </Link>
           ))}
         </nav>
 
         {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-          >
-            <Globe2 className="h-4 w-4 mr-2" />
-            ES
-          </Button>
+        <div className="hidden md:flex items-center gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
+            <MapPin className="w-4 h-4 text-brand-600" />
+            <span>Cobertura en toda Europa</span>
+          </div>
 
           <Button 
             variant="ghost" 
             size="sm"
-            className="text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+            className="relative text-gray-600 hover:text-brand-600 hover:bg-brand-50"
           >
             <ShoppingCart className="h-4 w-4" />
             {cartItems > 0 && (
@@ -74,14 +75,6 @@ export function Header() {
                 {cartItems}
               </span>
             )}
-          </Button>
-
-          <Button 
-            size="sm"
-            className="bg-gradient-to-r from-brand-600 to-secondary hover:opacity-90 text-white gap-2 shadow-sm"
-          >
-            Comprar Ahora
-            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
 
@@ -106,36 +99,34 @@ export function Header() {
                 <Link
                   key={item.label}
                   to={item.href}
-                  className={`px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
                     isActive(item.href)
                       ? "bg-brand-50 text-brand-600"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
+                  {item.icon && (
+                    <span className={isActive(item.href) ? "text-brand-600" : "text-gray-400"}>
+                      {item.icon}
+                    </span>
+                  )}
                   {item.label}
                 </Link>
               ))}
+              
               <div className="mt-4 space-y-3">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-                >
-                  <Globe2 className="h-4 w-4 mr-2" />
-                  Español
-                </Button>
+                <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                  <MapPin className="w-4 h-4 text-brand-600" />
+                  <span>Cobertura en toda Europa</span>
+                </div>
+                
                 <Button 
                   variant="ghost"
                   className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Carrito ({cartItems})
-                </Button>
-                <Button 
-                  className="w-full bg-gradient-to-r from-brand-600 to-secondary hover:opacity-90 text-white gap-2"
-                >
-                  Comprar Ahora
-                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </nav>
