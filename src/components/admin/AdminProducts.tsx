@@ -27,6 +27,7 @@ export function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
+      console.log("Fetching products from database...")
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -36,6 +37,7 @@ export function AdminProducts() {
         throw error
       }
 
+      console.log("Products fetched:", data)
       const transformedProducts = (data as SupabaseProduct[]).map(transformSupabaseProduct)
       setProducts(transformedProducts)
     } catch (error) {
@@ -89,31 +91,34 @@ export function AdminProducts() {
 
   const handleEditProduct = async (id: string, updates: Partial<Product>) => {
     try {
-      // Preparar los datos para la actualización
-      const updateData = {
-        title: updates.title,
-        description: updates.description,
-        type: updates.type,
-        price: updates.price, // Ya viene en centavos desde EditProductDialog
-        features: updates.features,
-        data_eu_gb: updates.data_eu_gb,
-        data_es_gb: updates.data_es_gb,
-        stock: updates.type === 'physical' ? updates.stock : null,
-      }
-
-      console.log('Actualizando producto:', {
+      console.log('Actualizando producto en la base de datos:', {
         id,
-        updateData
+        updates
       })
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('products')
-        .update(updateData)
+        .update({
+          title: updates.title,
+          description: updates.description,
+          type: updates.type,
+          price: updates.price,
+          features: updates.features,
+          data_eu_gb: updates.data_eu_gb,
+          data_es_gb: updates.data_es_gb,
+          stock: updates.type === 'physical' ? updates.stock : null,
+        })
         .eq('id', id)
+        .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error de Supabase:', error)
+        throw error
+      }
 
-      // Recargar los productos después de la actualización
+      console.log('Respuesta de Supabase:', data)
+
+      // Recargar todos los productos para asegurar datos actualizados
       await fetchProducts()
       
       toast({
