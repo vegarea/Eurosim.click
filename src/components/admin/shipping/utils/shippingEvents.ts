@@ -1,5 +1,4 @@
-import { OrderEvent, OrderStatus } from "../../orders/types"
-import { getTrackingMessage } from "../config/carriers"
+import { OrderEvent, OrderStatus } from "../../orders/types";
 
 export const createShippingConfirmationEvent = (
   trackingNumber: string, 
@@ -7,10 +6,10 @@ export const createShippingConfirmationEvent = (
 ): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
-  description: getTrackingMessage(carrier, trackingNumber),
-  userId: "current-user-id", // Esto debería venir del contexto de autenticación
-  userName: "Manager Name", // Esto debería venir del contexto de autenticación
-  createdAt: new Date().toISOString(),
+  description: `Pedido enviado con ${carrier}. Número de seguimiento: ${trackingNumber}`,
+  user_id: "current-user-id",
+  user_name: "Manager Name",
+  created_at: new Date().toISOString(),
   metadata: {
     oldStatus: "processing" as OrderStatus,
     newStatus: "shipped" as OrderStatus,
@@ -18,18 +17,18 @@ export const createShippingConfirmationEvent = (
     carrier,
     automated: false
   }
-})
+});
 
 export const createDeliveryConfirmationEvent = (): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
   description: "Pedido marcado como entregado",
-  userId: "current-user-id", // Esto debería venir del contexto de autenticación
-  userName: "Manager Name", // Esto debería venir del contexto de autenticación
-  createdAt: new Date().toISOString(),
+  user_id: "current-user-id",
+  user_name: "Manager Name",
+  created_at: new Date().toISOString(),
   metadata: {
     oldStatus: "shipped" as OrderStatus,
     newStatus: "delivered" as OrderStatus,
     automated: false
   }
-})
+});
