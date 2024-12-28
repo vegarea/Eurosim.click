@@ -53,38 +53,38 @@ export function PlanDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden"
+      className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden max-h-[600px]"
     >
-      {/* Encabezado destacado con precio y GB */}
-      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-6">
-        <div className="flex justify-between items-center mb-4">
+      {/* Header con precio y GB */}
+      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+        <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             {title}
           </h2>
           <div className="text-right">
-            <p className="text-4xl font-bold text-primary flex items-baseline gap-1 justify-end">
+            <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
               {amount}
               <span className="text-sm font-normal text-gray-500">{currency}</span>
             </p>
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/80 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-primary">{europeGB}GB</p>
-            <p className="text-sm text-gray-600">Europa</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white/80 rounded-lg p-2 text-center">
+            <p className="text-xl font-bold text-primary">{europeGB}GB</p>
+            <p className="text-xs text-gray-600">Europa</p>
           </div>
-          <div className="bg-white/80 rounded-lg p-3 text-center">
-            <p className="text-2xl font-bold text-primary">{spainGB}GB</p>
-            <p className="text-sm text-gray-600">España</p>
+          <div className="bg-white/80 rounded-lg p-2 text-center">
+            <p className="text-xl font-bold text-primary">{spainGB}GB</p>
+            <p className="text-xs text-gray-600">España</p>
           </div>
         </div>
       </div>
 
       {/* Contenido principal */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         {/* Características */}
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {filteredFeatures.map((feature, index) => (
             <motion.div
               key={index}
@@ -99,18 +99,21 @@ export function PlanDetails({
           ))}
         </div>
 
-        {/* Medidor de uso */}
-        <UsageMeter
-          europeGB={europeGB}
-          spainGB={spainGB}
-          isHighlighted={true}
-        />
+        {/* Medidor de uso con altura reducida */}
+        <div className="scale-95 origin-top">
+          <UsageMeter
+            europeGB={europeGB}
+            spainGB={spainGB}
+            isHighlighted={true}
+          />
+        </div>
 
         {/* Botón de compra */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="pt-2"
         >
           <Button 
             onClick={handlePurchase}

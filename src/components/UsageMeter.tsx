@@ -39,14 +39,14 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`p-4 rounded-xl backdrop-blur-sm ${
+      className={`p-3 rounded-xl backdrop-blur-sm ${
         isHighlighted 
           ? 'bg-gradient-to-br from-primary/10 to-secondary/10 shadow-lg' 
           : 'bg-white/50'
       }`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-base font-semibold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           Días Estimados de Uso
         </h3>
         <Dialog>
@@ -67,38 +67,37 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
                   <li>Búsqueda frecuente de restaurantes, atracciones, etc</li>
                   <li>Uso de aplicaciones de streaming para música</li>
                 </ul>
-                <p className="mt-2 text-xs text-gray-500">El consumo real dependerá de tus hábitos de uso.</p>
               </DialogDescription>
             </DialogHeader>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Medidor Europa */}
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="space-y-1.5"
+          className="space-y-1"
         >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className="fi fi-eu w-4 h-4 rounded-sm shadow-sm"></span>
+              <span className="fi fi-eu w-3 h-3 rounded-sm shadow-sm"></span>
               <span className="text-sm font-medium">Europa</span>
             </div>
             <motion.span
               key={europeDays}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="font-bold text-base"
+              className="text-sm font-bold"
             >
               {europeDays} días
             </motion.span>
           </div>
-          <Progress value={europeProgress} className="h-2" />
+          <Progress value={europeProgress} className="h-1.5" />
           <p className="text-xs text-gray-500 text-right">
-            {europeGB}GB ≈ {europeDays} días de uso
+            {europeGB}GB ≈ {europeDays} días
           </p>
         </motion.div>
 
@@ -107,25 +106,25 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="space-y-1.5"
+          className="space-y-1"
         >
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <span className="fi fi-es w-4 h-4 rounded-sm shadow-sm"></span>
+              <span className="fi fi-es w-3 h-3 rounded-sm shadow-sm"></span>
               <span className="text-sm font-medium">España</span>
             </div>
             <motion.span
               key={spainDays}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="font-bold text-base"
+              className="text-sm font-bold"
             >
               {spainDays} días
             </motion.span>
           </div>
-          <Progress value={spainProgress} className="h-2" />
+          <Progress value={spainProgress} className="h-1.5" />
           <p className="text-xs text-gray-500 text-right">
-            {spainGB}GB ≈ {spainDays} días de uso
+            {spainGB}GB ≈ {spainDays} días
           </p>
         </motion.div>
       </div>
