@@ -1,14 +1,11 @@
 import { useState } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TypesChecklist } from "./components/TypesChecklist"
 import { TypesCounter } from "./components/TypesCounter"
-import { checkoutTypes } from "./sections/CheckoutTypes"
+import { TypesList } from "./components/TypesList"
 import { useToast } from "@/hooks/use-toast"
 import { scanProjectTypes } from "./utils/typeScanner"
 
 export function TypesComparison() {
   const { toast } = useToast()
-  const [checklist, setChecklist] = useState([checkoutTypes])
   
   // Análisis detallado de tipos en el proyecto
   const typeAnalysis = scanProjectTypes()
@@ -22,58 +19,15 @@ export function TypesComparison() {
     hooks: typeAnalysis.hooks
   }
 
-  const handleVerifyTypes = async (categoryId: string) => {
-    try {
-      console.log('Iniciando verificación y actualización para categoría:', categoryId)
-      
-      setChecklist(prevChecklist => 
-        prevChecklist.map(cat => 
-          cat.id === categoryId
-            ? {
-                ...cat,
-                items: cat.items.map(item => ({
-                  ...item,
-                  status: "completed",
-                }))
-              }
-            : cat
-        )
-      )
-
-      console.log('Tipos actualizados para categoría:', categoryId)
-      
-      toast({
-        title: "Tipos actualizados",
-        description: "Los tipos han sido actualizados al formato de Supabase",
-      })
-
-    } catch (error) {
-      console.error('Error en actualización:', error)
-      toast({
-        variant: "destructive",
-        title: "Error en la actualización",
-        description: "No se pudieron actualizar los tipos. Por favor, intenta nuevamente.",
-      })
-    }
-  }
-
   return (
     <div className="space-y-6">
       <TypesCounter 
-        totalTypes={4} // Actualizamos al número real de tipos encontrados
-        reviewedTypes={0}
-        detailedCounts={{
-          components: 1, // CartItem
-          forms: 2,    // DocumentationForm, ShippingForm
-          contexts: 1, // OrderContext
-          hooks: 0
-        }}
+        totalTypes={totalTypes}
+        reviewedTypes={reviewedTypes}
+        detailedCounts={detailedCounts}
       />
       
-      <TypesChecklist 
-        items={checklist}
-        onVerifyTypes={handleVerifyTypes}
-      />
+      <TypesList />
     </div>
   )
 }
