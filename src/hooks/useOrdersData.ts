@@ -19,8 +19,7 @@ export function useOrdersData() {
             phone,
             passport_number,
             birth_date,
-            gender,
-            activation_date
+            gender
           ),
           product:products(
             title,
@@ -67,7 +66,7 @@ export function useOrdersData() {
           passportNumber: order.customer?.passport_number,
           birthDate: order.customer?.birth_date,
           gender: order.customer?.gender,
-          activationDate: order.customer?.activation_date
+          activationDate: order.activation_date // Changed to get from order instead of customer
         }
       }));
     },
