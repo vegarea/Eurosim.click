@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart, MapPin, Signal, Wifi } from "lucide-react";
+import { Menu, ShoppingCart, Signal, Wifi } from "lucide-react";
+import EUFlag from "@/components/icons/EUFlag";
 import {
   Sheet,
   SheetContent,
@@ -60,7 +61,7 @@ export function Header() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
-            <MapPin className="w-4 h-4 text-brand-600" />
+            <EUFlag className="w-4 h-4" />
             <span>Cobertura en toda Europa</span>
           </div>
 
@@ -117,7 +118,7 @@ export function Header() {
               
               <div className="mt-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-                  <MapPin className="w-4 h-4 text-brand-600" />
+                  <EUFlag className="w-4 h-4" />
                   <span>Cobertura en toda Europa</span>
                 </div>
                 
