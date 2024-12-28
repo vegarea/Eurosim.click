@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 import { UIOrder, OrderStatus } from '@/types/supabase/base'
-import { useOrders } from '@/hooks/useOrders'
+import { useOrders as useOrdersHook } from '@/hooks/useOrders'
 
 interface OrdersContextType {
   orders: UIOrder[]
@@ -12,7 +12,7 @@ interface OrdersContextType {
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const ordersHook = useOrders()
+  const ordersHook = useOrdersHook()
 
   return (
     <OrdersContext.Provider value={ordersHook}>
@@ -21,7 +21,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function useOrdersContext() {
+export function useOrders() {
   const context = useContext(OrdersContext)
   if (context === undefined) {
     throw new Error('useOrders must be used within an OrdersProvider')

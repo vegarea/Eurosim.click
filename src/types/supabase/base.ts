@@ -7,38 +7,7 @@ export type SupabaseProduct = Database['public']['Tables']['products']['Row']
 export type SupabaseOrderEvent = Database['public']['Tables']['order_events']['Row']
 export type SupabaseOrderNote = Database['public']['Tables']['order_notes']['Row']
 
-// Tipos para la UI
-export interface UIOrder {
-  id: string
-  customerId: string
-  productId: string
-  status: OrderStatus
-  type: OrderType
-  total: number
-  quantity: number
-  paymentMethod: PaymentMethod
-  paymentStatus: PaymentStatus
-  shippingAddress: ShippingAddress | null
-  trackingNumber: string | null
-  carrier: string | null
-  activationDate: string | null
-  notes: OrderNote[] | null
-  events: OrderEvent[] | null
-  metadata: Record<string, any> | null
-  createdAt: string
-  updatedAt: string
-  // Campos calculados/relacionados
-  customer?: {
-    name: string
-    email: string | null
-    phone: string | null
-  }
-  product?: {
-    title: string
-    description: string
-  }
-}
-
+// Enums
 export type OrderStatus = 
   | "payment_pending"
   | "payment_failed" 
@@ -51,6 +20,7 @@ export type OrderType = "physical" | "esim"
 export type PaymentMethod = "stripe" | "paypal"
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded"
 
+// Interfaces para la UI
 export interface ShippingAddress {
   street: string
   city: string
@@ -75,7 +45,39 @@ export interface OrderNote {
   orderId: string
   text: string
   userId: string
+  userName: string
   createdAt: string
+}
+
+// Tipo para la UI
+export interface UIOrder {
+  id: string
+  customerId: string
+  productId: string
+  status: OrderStatus
+  type: OrderType
+  total: number
+  quantity: number
+  paymentMethod: PaymentMethod
+  paymentStatus: PaymentStatus
+  shippingAddress: ShippingAddress | null
+  trackingNumber: string | null
+  carrier: string | null
+  activationDate: string | null
+  notes: OrderNote[] | null
+  events: OrderEvent[] | null
+  metadata: Record<string, any> | null
+  createdAt: string
+  updatedAt: string
+  customer?: {
+    name: string
+    email: string | null
+    phone: string | null
+  }
+  product?: {
+    title: string
+    description: string
+  }
 }
 
 // Funciones de transformación
@@ -102,6 +104,7 @@ export function transformToUIOrder(order: SupabaseOrder & {
       orderId: order.id,
       text: (note as any).text,
       userId: (note as any).user_id,
+      userName: (note as any).user_name || 'Unknown',
       createdAt: (note as any).created_at
     })) || [],
     events: order.events?.map(event => ({
@@ -131,7 +134,7 @@ export function transformToSupabaseOrder(order: Partial<UIOrder>): Partial<Supab
     quantity: order.quantity,
     payment_method: order.paymentMethod,
     payment_status: order.paymentStatus,
-    shipping_address: order.shippingAddress,
+    shipping_address: order.shippingAddress as any,
     tracking_number: order.trackingNumber,
     carrier: order.carrier,
     activation_date: order.activationDate,
@@ -149,6 +152,6 @@ export function transformToSupabaseOrder(order: Partial<UIOrder>): Partial<Supab
       metadata: event.metadata,
       created_at: event.createdAt
     })),
-    metadata: order.metadata
+    metadata: order.metadata as any
   }
 }

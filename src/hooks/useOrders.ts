@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/integrations/supabase/client'
-import { UIOrder, SupabaseOrder, transformToUIOrder, transformToSupabaseOrder, OrderStatus } from '@/types/supabase/base'
+import { UIOrder, SupabaseOrder, transformToUIOrder, transformToSupabaseOrder } from '@/types/supabase/base'
 import { toast } from 'sonner'
 
 export function useOrders() {
