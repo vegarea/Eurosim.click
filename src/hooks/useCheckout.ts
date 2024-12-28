@@ -10,11 +10,11 @@ export const useCheckout = () => {
   const { items, clearCart } = useCart();
 
   const processCheckout = async (formData: any) => {
-    console.log('Starting checkout with data:', formData);
+    console.log('Starting checkout process with data:', formData);
     setIsProcessing(true);
     
     try {
-      // 1. Crear/actualizar cliente
+      // 1. Crear o actualizar cliente
       const customer = await customerService.findOrCreateCustomer({
         name: formData.fullName,
         email: formData.email,
@@ -29,46 +29,57 @@ export const useCheckout = () => {
           postal_code: formData.zipCode,
           country: 'ES',
           phone: formData.phone
-        } : undefined
+        } : null
       });
 
-      // 2. Crear orden
-      const order = await orderService.createOrder({
-        customer_id: customer.id,
-        product_id: items[0].id,
-        type: items[0].type,
-        total_amount: items[0].price * items[0].quantity * 100,
-        quantity: items[0].quantity,
-        shipping_address: customer.default_shipping_address,
-        activation_date: items[0].type === 'esim' ? formData.activationDate : undefined
-      });
+      // 2. Crear órdenes
+      const orders = [];
+      for (const item of items) {
+        const order = await orderService.createOrder({
+          customer_id: customer.id,
+          product_id: item.id,
+          type: item.type,
+          total_amount: item.price * item.quantity * 100,
+          quantity: item.quantity,
+          shipping_address: item.type === 'physical' ? customer.default_shipping_address : null,
+          activation_date: item.type === 'esim' ? formData.activationDate : null
+        });
 
-      // 3. Registrar evento
-      await orderService.createOrderEvent(
-        order.id,
-        'created',
-        'Orden creada exitosamente'
-      );
+        orders.push(order);
 
-      // 4. Crear sesión de Stripe
+        await orderService.createOrderEvent(
+          order.id,
+          'created',
+          'Orden creada exitosamente'
+        );
+      }
+
+      // 3. Crear sesión de Stripe
       const session = await stripeService.createCheckoutSession({
-        products: items,
+        products: items.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          price: item.price * 100,
+          quantity: item.quantity,
+          type: item.type
+        })),
         customerData: {
           name: customer.name,
           email: customer.email,
           phone: customer.phone || ''
         },
         metadata: {
-          orderId: order.id,
+          orderId: orders[0].id,
           customerId: customer.id
         }
       });
 
-      // 5. Redireccionar a Stripe
+      // 4. Redireccionar a Stripe
       window.location.href = session.url;
       return true;
     } catch (error) {
-      console.error('Error in checkout:', error);
+      console.error('Error in checkout process:', error);
       toast.error(error instanceof Error ? error.message : 'Error al procesar el pedido');
       return false;
     } finally {
