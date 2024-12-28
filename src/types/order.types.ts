@@ -48,6 +48,7 @@ export interface Order {
   gender?: string;
   activationDate?: string;
   created_at?: string;
+  updated_at?: string;
   notes?: OrderNote[];
   events?: OrderEvent[];
 }
