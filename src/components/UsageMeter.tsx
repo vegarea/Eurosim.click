@@ -45,13 +45,13 @@ export function UsageMeter({ europeGB, spainGB, isHighlighted = false }: UsageMe
           : 'bg-white/50'
       }`}
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-center relative mb-3">
         <h3 className="text-sm font-semibold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           Días Estimados de Uso
         </h3>
         <Dialog>
           <DialogTrigger asChild>
-            <button className="inline-flex items-center justify-center">
+            <button className="absolute right-0 inline-flex items-center justify-center">
               <Info className="h-4 w-4 text-gray-500 cursor-help" />
             </button>
           </DialogTrigger>
