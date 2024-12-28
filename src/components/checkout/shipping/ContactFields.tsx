@@ -10,7 +10,7 @@ interface ContactFieldsProps {
 
 export function ContactFields({ form }: ContactFieldsProps) {
   return (
-    <>
+    <div className="space-y-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -27,7 +27,7 @@ export function ContactFields({ form }: ContactFieldsProps) {
               </FormLabel>
               <FormControl>
                 <Input 
-                  placeholder="Juan Pérez" 
+                  placeholder="Como aparece en tu documento" 
                   {...field} 
                   className="transition-all duration-200 focus:scale-[1.01] pl-10"
                 />
@@ -38,62 +38,60 @@ export function ContactFields({ form }: ContactFieldsProps) {
         />
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </FormLabel>
-                <FormControl>
-                  <Input 
-                    type="email" 
-                    placeholder="juan@ejemplo.com" 
-                    {...field} 
-                    className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </FormLabel>
+              <FormControl>
+                <Input 
+                  type="email"
+                  placeholder="tu@email.com" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Teléfono
-                </FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="55 1234 5678" 
-                    {...field} 
-                    className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </motion.div>
-      </div>
-    </>
-  )
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+      >
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2">
+                <Phone className="w-4 h-4" />
+                Teléfono
+              </FormLabel>
+              <FormControl>
+                <Input 
+                  placeholder="+34 612 345 678" 
+                  {...field} 
+                  className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </motion.div>
+    </div>
+  );
 }
