@@ -5,27 +5,77 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Image, Upload, Building2, Phone, Facebook, Instagram } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { supabase } from "@/integrations/supabase/client"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 export function CompanySettings() {
   const { toast } = useToast()
-  const [logo, setLogo] = useState("/logo.png")
+  const queryClient = useQueryClient()
+  const [isUploading, setIsUploading] = useState(false)
   const [companyName, setCompanyName] = useState("Mi Empresa")
   const [whatsapp, setWhatsapp] = useState("+34600000000")
   const [facebookUrl, setFacebookUrl] = useState("https://facebook.com/")
   const [instagramUrl, setInstagramUrl] = useState("https://instagram.com/")
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Fetch current logo
+  const { data: settings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('logo_url')
+        .single()
+      
+      if (error) throw error
+      return data
+    }
+  })
+
+  const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setLogo(reader.result as string)
-        toast({
-          title: "Logo actualizado",
-          description: "El nuevo logo se ha guardado correctamente.",
-        })
-      }
-      reader.readAsDataURL(file)
+    if (!file) return
+
+    try {
+      setIsUploading(true)
+
+      // Upload file to Supabase Storage
+      const fileExt = file.name.split('.').pop()
+      const fileName = `logo-${Date.now()}.${fileExt}`
+      const { error: uploadError, data } = await supabase.storage
+        .from('site_assets')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('site_assets')
+        .getPublicUrl(fileName)
+
+      // Update site settings with new logo URL
+      const { error: updateError } = await supabase
+        .from('site_settings')
+        .update({ logo_url: publicUrl })
+        .eq('id', settings?.id)
+
+      if (updateError) throw updateError
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] })
+
+      toast({
+        title: "Logo actualizado",
+        description: "El nuevo logo se ha guardado correctamente.",
+      })
+    } catch (error) {
+      console.error('Error uploading logo:', error)
+      toast({
+        title: "Error al actualizar el logo",
+        description: "No se pudo guardar el nuevo logo. Por favor, intenta de nuevo.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -49,12 +99,21 @@ export function CompanySettings() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-center p-4 border-2 border-dashed rounded-lg">
-          <img src={logo} alt="Logo actual" className="max-h-32 object-contain" />
+          <img 
+            src={settings?.logo_url || "/logo.png"} 
+            alt="Logo actual" 
+            className="max-h-32 object-contain" 
+          />
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="outline" className="w-full" onClick={() => document.getElementById('logo-upload')?.click()}>
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => document.getElementById('logo-upload')?.click()}
+            disabled={isUploading}
+          >
             <Upload className="mr-2 h-4 w-4" />
-            Subir nuevo logo
+            {isUploading ? 'Subiendo...' : 'Subir nuevo logo'}
           </Button>
           <input
             id="logo-upload"
@@ -62,6 +121,7 @@ export function CompanySettings() {
             accept="image/*"
             className="hidden"
             onChange={handleLogoChange}
+            disabled={isUploading}
           />
         </div>
         <div className="space-y-2">
