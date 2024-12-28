@@ -1,4 +1,4 @@
-import { FileJson, ArrowRight } from "lucide-react"
+import { FileJson } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { TypeDefinition } from "../types/WorkflowTypes"
 import { TypeCard } from "./TypeCard"
