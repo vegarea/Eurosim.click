@@ -14,15 +14,19 @@ export const useCheckout = () => {
     setIsProcessing(true);
     
     try {
+      // Determinar si necesitamos dirección de envío
+      const needsShipping = items.some(item => item.type === 'physical');
+      
       // 1. Crear o actualizar cliente
-      const customer = await customerService.findOrCreateCustomer({
+      const customerPayload = {
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
         passport_number: formData.passportNumber,
         birth_date: formData.birthDate,
         gender: formData.gender,
-        shipping_address: items.some(item => item.type === 'physical') ? {
+        // Solo incluir shipping_address si es necesario
+        shipping_address: needsShipping ? {
           street: formData.address,
           city: formData.city,
           state: formData.state,
@@ -30,7 +34,9 @@ export const useCheckout = () => {
           country: 'ES',
           phone: formData.phone
         } : null
-      });
+      };
+
+      const customer = await customerService.findOrCreateCustomer(customerPayload);
 
       // 2. Crear órdenes
       const orders = [];
@@ -41,7 +47,7 @@ export const useCheckout = () => {
           type: item.type,
           total_amount: item.price * item.quantity * 100,
           quantity: item.quantity,
-          shipping_address: item.type === 'physical' ? customer.default_shipping_address : null,
+          shipping_address: item.type === 'physical' ? customerPayload.shipping_address : null,
           activation_date: item.type === 'esim' ? formData.activationDate : null
         });
 

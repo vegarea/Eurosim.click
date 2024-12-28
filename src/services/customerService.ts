@@ -9,7 +9,7 @@ export const customerService = {
     passport_number?: string;
     birth_date?: string;
     gender?: string;
-    shipping_address?: ShippingAddress;
+    shipping_address?: ShippingAddress | null;
   }): Promise<Customer> {
     console.log('Finding or creating customer with data:', customerData);
 
@@ -25,20 +25,26 @@ export const customerService = {
       throw searchError;
     }
 
+    // Preparar los datos para actualizar/crear
+    const customerPayload = {
+      name: customerData.name,
+      phone: customerData.phone,
+      passport_number: customerData.passport_number,
+      birth_date: customerData.birth_date,
+      gender: customerData.gender,
+      // Solo incluir shipping_address si se proporciona
+      ...(customerData.shipping_address && {
+        default_shipping_address: customerData.shipping_address
+      })
+    };
+
     if (existingCustomer) {
       console.log('Found existing customer:', existingCustomer);
       
       // Actualizar cliente existente
       const { data: updatedCustomer, error: updateError } = await supabase
         .from('customers')
-        .update({
-          name: customerData.name,
-          phone: customerData.phone,
-          passport_number: customerData.passport_number,
-          birth_date: customerData.birth_date,
-          gender: customerData.gender,
-          default_shipping_address: customerData.shipping_address as Record<string, any>
-        })
+        .update(customerPayload)
         .eq('id', existingCustomer.id)
         .select()
         .single();
@@ -55,8 +61,8 @@ export const customerService = {
     const { data: newCustomer, error: createError } = await supabase
       .from('customers')
       .insert({
-        ...customerData,
-        default_shipping_address: customerData.shipping_address as Record<string, any>
+        email: customerData.email,
+        ...customerPayload
       })
       .select()
       .single();
