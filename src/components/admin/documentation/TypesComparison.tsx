@@ -7,29 +7,28 @@ import { CheckoutTypes } from "./sections/CheckoutTypes"
 import { AdminTypes } from "./sections/AdminTypes"
 import { SystemTypes } from "./sections/SystemTypes"
 import { useToast } from "@/hooks/use-toast"
+import { scanProjectTypes } from "./utils/typeScanner"
 
 export function TypesComparison() {
   const { toast } = useToast()
   const [checklist, setChecklist] = useState(typesChecklistData)
   
-  const totalTypes = checklist.reduce(
-    (acc, category) => acc + category.items.length,
-    0
-  )
+  // Análisis detallado de tipos en el proyecto
+  const typeAnalysis = scanProjectTypes()
   
-  const reviewedTypes = checklist.reduce(
-    (acc, category) => 
-      acc + category.items.filter(
-        item => item.status === "completed" || item.status === "reviewed"
-      ).length,
-    0
-  )
+  const totalTypes = typeAnalysis.total
+  const reviewedTypes = typeAnalysis.reviewed
+  const detailedCounts = {
+    components: typeAnalysis.components,
+    forms: typeAnalysis.forms,
+    contexts: typeAnalysis.contexts,
+    hooks: typeAnalysis.hooks
+  }
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
       console.log('Iniciando verificación y actualización para categoría:', categoryId);
       
-      // Actualizar el estado de los items de la categoría
       setChecklist(prevChecklist => 
         prevChecklist.map(cat => 
           cat.id === categoryId
@@ -63,7 +62,11 @@ export function TypesComparison() {
 
   return (
     <div className="space-y-6">
-      <TypesCounter totalTypes={totalTypes} reviewedTypes={reviewedTypes} />
+      <TypesCounter 
+        totalTypes={totalTypes} 
+        reviewedTypes={reviewedTypes}
+        detailedCounts={detailedCounts}
+      />
       
       <Tabs defaultValue="checklist" className="space-y-4">
         <TabsList>
