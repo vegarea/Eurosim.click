@@ -1,12 +1,13 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { Order, OrderStatus } from "./orders/types"
+import { OrderStatus } from "./orders/types"
 import { useOrders } from "@/contexts/OrdersContext"
 import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function AdminOrders() {
-  const { orders, updateOrder } = useOrders()
+  const { orders, updateOrder, isLoading, error } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
@@ -18,9 +19,16 @@ export function AdminOrders() {
     return matchesSearch && matchesStatus
   })
 
-  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrder(orderId, { status: newStatus })
-    toast.success("Estado del pedido actualizado correctamente")
+  const handleStatusChange = async (orderId: string, newStatus: OrderStatus) => {
+    await updateOrder(orderId, { status: newStatus })
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-red-500">Error al cargar los pedidos. Por favor, intenta de nuevo más tarde.</p>
+      </div>
+    )
   }
 
   return (
@@ -36,10 +44,18 @@ export function AdminOrders() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <OrdersTable 
-        orders={filteredOrders}
-        onStatusChange={handleStatusChange}
-      />
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      ) : (
+        <OrdersTable 
+          orders={filteredOrders}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </div>
   )
 }
