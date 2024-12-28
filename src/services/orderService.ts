@@ -1,6 +1,7 @@
 import { Order, CreateOrderDTO, ShippingAddress } from "@/types/order/orderTypes";
 import { orderQueries } from "./order/orderQueries";
 import { transformShippingAddressToJson, prepareOrderForCreate } from "@/utils/order/orderTransformers";
+import { validateCreateOrderData, validateOrderStatus, validateOrderNote } from "@/utils/order/orderValidators";
 
 export const orderService = {
   async createOrder(orderData: {
@@ -23,6 +24,12 @@ export const orderService = {
           : undefined
       });
 
+      // Validar datos antes de crear la orden
+      const errors = validateCreateOrderData(createOrderDTO);
+      if (errors.length > 0) {
+        throw new Error(`Error al crear orden: ${errors.join(", ")}`);
+      }
+
       return await orderQueries.createOrder(createOrderDTO);
     } catch (error) {
       console.error('Error in createOrder:', error);
@@ -34,6 +41,28 @@ export const orderService = {
 
   async getOrder(orderId: string): Promise<Order> {
     return orderQueries.getOrder(orderId);
+  },
+
+  async updateOrderStatus(orderId: string, newStatus: Order['status']): Promise<Order> {
+    const order = await this.getOrder(orderId);
+    
+    // Validar cambio de estado
+    const errors = validateOrderStatus(order, newStatus);
+    if (errors.length > 0) {
+      throw new Error(`Error al actualizar estado: ${errors.join(", ")}`);
+    }
+
+    return await orderQueries.updateOrderStatus(orderId, newStatus);
+  },
+
+  async addOrderNote(orderId: string, content: string, isInternal: boolean = false): Promise<void> {
+    // Validar contenido de la nota
+    const errors = validateOrderNote(content);
+    if (errors.length > 0) {
+      throw new Error(`Error al añadir nota: ${errors.join(", ")}`);
+    }
+
+    await orderQueries.addOrderNote(orderId, content, isInternal);
   },
 
   async createOrderEvent(orderId: string, type: string, description: string) {
