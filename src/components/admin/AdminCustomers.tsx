@@ -11,27 +11,12 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
-import { Order } from "@/types/database"
+import { Order } from "@/types/database/orders"
+import { Customer } from "@/types/database/customers"
 
-interface CustomerData {
-  customer_id: string;
-  name: string;
-  email: string;
-  phone: string;
+interface CustomerData extends Customer {
   orders: Order[];
   totalSpent: number;
-  shippingInfo: {
-    address?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-  };
-  documentation: {
-    passportNumber?: string;
-    birthDate?: string;
-    gender?: string;
-    activationDate?: string;
-  };
 }
 
 export function AdminCustomers() {
@@ -44,15 +29,33 @@ export function AdminCustomers() {
   const customers = orders.reduce((acc, order) => {
     const customerId = order.customer_id
     if (!acc[customerId]) {
+      // Extraer información del cliente del metadata del pedido
+      const metadata = order.metadata as Record<string, any> | null
+      
       acc[customerId] = {
-        customer_id: customerId,
-        name: order.customer_name || "No especificado",
-        email: order.metadata?.customer_email as string || "No especificado",
-        phone: order.metadata?.customer_phone as string || "No especificado",
+        id: customerId,
+        name: metadata?.customer_name || "No especificado",
+        email: metadata?.customer_email || "No especificado",
+        phone: metadata?.customer_phone || "No especificado",
         orders: [],
         totalSpent: 0,
-        shippingInfo: {},
-        documentation: {}
+        // Inicializar campos opcionales
+        passport_number: null,
+        birth_date: null,
+        gender: null,
+        default_shipping_address: null,
+        billing_address: null,
+        preferred_language: 'es',
+        marketing_preferences: {
+          email_marketing: false,
+          sms_marketing: false,
+          push_notifications: false
+        },
+        stripe_customer_id: null,
+        paypal_customer_id: null,
+        metadata: {},
+        created_at: order.created_at,
+        updated_at: order.updated_at
       }
     }
     acc[customerId].orders.push(order)
@@ -60,21 +63,14 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].shippingInfo = {
-        address: (order.shipping_address as any).street,
-        city: (order.shipping_address as any).city,
-        state: (order.shipping_address as any).state,
-        zipCode: (order.shipping_address as any).postal_code
-      }
+      acc[customerId].default_shipping_address = order.shipping_address as any
     }
     
     if (order.metadata) {
-      acc[customerId].documentation = {
-        passportNumber: order.metadata.passport_number,
-        birthDate: order.metadata.birth_date,
-        gender: order.metadata.gender,
-        activationDate: order.activation_date
-      }
+      const metadata = order.metadata as Record<string, any>
+      acc[customerId].passport_number = metadata.passport_number || null
+      acc[customerId].birth_date = metadata.birth_date || null
+      acc[customerId].gender = metadata.gender || null
     }
     return acc
   }, {} as Record<string, CustomerData>)
