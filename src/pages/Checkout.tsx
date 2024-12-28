@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/CartContext"
 import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
-import { ReviewStep } from "@/components/checkout/ReviewStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
@@ -12,7 +11,7 @@ import { CheckoutLayout } from "@/components/checkout/CheckoutLayout"
 import { useCheckoutFlow } from "@/hooks/useCheckoutFlow"
 import { ShippingFormData, DocumentationFormData } from "@/types/checkout.types"
 
-const CHECKOUT_STEPS = ['Información', 'Documentación', 'Revisión', 'Pago']
+const CHECKOUT_STEPS = ['Información', 'Documentación', 'Pago']
 
 export default function Checkout() {
   const { items } = useCart()
@@ -72,13 +71,6 @@ export default function Checkout() {
         )
       case 3:
         return (
-          <ReviewStep
-            formData={formData}
-            onUpdateField={handleUpdateField}
-          />
-        )
-      case 4:
-        return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
               Método de pago
@@ -94,7 +86,7 @@ export default function Checkout() {
   return (
     <CheckoutLayout 
       onLoadTestData={() => loadTestData(hasPhysicalSim)}
-      showCheckoutButton={step === 4}
+      showCheckoutButton={step === 3}
       isButtonEnabled={isFormValid && !isProcessing}
       onCheckout={() => handleFormSubmit(formData)}
       isProcessing={isProcessing}
@@ -115,7 +107,7 @@ export default function Checkout() {
             Volver
           </Button>
         )}
-        {step < 4 && (
+        {step < 3 && (
           <Button
             className="ml-auto flex items-center gap-2"
             onClick={() => isFormValid && handleFormSubmit(formData)}

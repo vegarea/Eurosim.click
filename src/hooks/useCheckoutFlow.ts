@@ -58,7 +58,7 @@ export function useCheckoutFlow() {
   const handleFormSubmit = async (values: Partial<CheckoutFormData>) => {
     console.log('Form submitted with values:', values)
     
-    if (step === 4) {
+    if (step === 3) {
       console.log('Processing final checkout step with data:', formData)
       const success = await processCheckout(formData)
       if (success) {
@@ -67,7 +67,7 @@ export function useCheckoutFlow() {
     } else {
       setFormData(prev => ({ ...prev, ...values }))
       setStep(step + 1)
-      setIsFormValid(step === 3)
+      setIsFormValid(step === 2)
     }
   }
 
