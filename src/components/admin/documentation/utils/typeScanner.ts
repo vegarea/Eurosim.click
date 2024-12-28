@@ -11,12 +11,12 @@ interface TypeAnalysis {
 
 export function scanProjectTypes(): TypeAnalysis {
   return {
-    total: 4,        // Total de tipos encontrados en la sección de checkout
+    total: 6,        // Total de tipos encontrados
     reviewed: 0,     // Ninguno revisado aún
-    components: 1,   // CartItem
+    components: 3,   // CartItem, EmailTemplate, Product
     forms: 2,        // DocumentationForm, ShippingForm
     contexts: 1,     // OrderContext
-    hooks: 0         // No hay hooks con tipos propios en esta sección
+    hooks: 0         // No hay hooks con tipos propios
   }
 }
 
