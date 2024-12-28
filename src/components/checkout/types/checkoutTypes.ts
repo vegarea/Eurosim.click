@@ -1,10 +1,10 @@
 import { 
   ShippingAddress,
-  ShippingAddressForm,
   DocumentValidation,
   DocumentValidationForm,
+  ShippingAddressForm,
   Customer
-} from "@/components/admin/documentation/types/WorkflowTypes"
+} from "@/components/admin/documentation/types/workflow/WorkflowTypes"
 
 export interface CheckoutFormData extends Partial<Customer> {
   shippingAddress?: ShippingAddress;

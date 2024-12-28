@@ -6,7 +6,7 @@ import { useEffect } from "react"
 import { DocumentationFormProps } from "./types/checkoutTypes"
 import { PersonalInfoFields } from "./documentation/PersonalInfoFields"
 import { DateFields } from "./documentation/DateFields"
-import { DocumentValidationForm } from "@/components/admin/documentation/types/WorkflowTypes"
+import { DocumentValidationForm } from "@/components/admin/documentation/types/workflow/WorkflowTypes"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -41,7 +41,11 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
         onValidityChange(form.formState.isValid);
       }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      if (typeof subscription === 'function') {
+        subscription();
+      }
+    };
   }, [form, onValidityChange]);
 
   return (
