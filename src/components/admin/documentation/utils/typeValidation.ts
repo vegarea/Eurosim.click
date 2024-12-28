@@ -29,7 +29,6 @@ export function getValidationMessage(dbType: string, tsType: string): string {
   if (isValidTypeMapping(dbType, tsType)) {
     return 'Tipos coinciden correctamente';
   }
-
   return `El tipo de BD "${dbType}" debería mapearse a "${getTypeScriptType(dbType)}" en TypeScript`;
 }
 

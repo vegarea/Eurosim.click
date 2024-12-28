@@ -15,7 +15,14 @@ export interface BaseOrder {
   stripe_receipt_url?: string;
   paypal_order_id?: string;
   paypal_receipt_url?: string;
-  shipping_address?: Record<string, any>;
+  shipping_address?: {
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    postal_code: string;
+    phone: string;
+  };
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
@@ -23,18 +30,6 @@ export interface BaseOrder {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
-}
-
-export interface OrderEvent {
-  id: string;
-  order_id: string;
-  type: string;
-  description: string;
-  user_id?: string;
-  metadata?: Record<string, any>;
-  created_at: string;
-  // Campos calculados para la UI
-  user_name?: string;
 }
 
 export interface OrderNote {
@@ -47,19 +42,37 @@ export interface OrderNote {
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
-  // Campo calculado para la UI
   user_name?: string;
 }
 
-// Tipo extendido que incluye campos calculados y transformados para la UI
-export interface OrderUI extends BaseOrder {
+export interface OrderEvent {
+  id: string;
+  order_id: string;
+  type: string;
+  description: string;
+  user_id?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  user_name?: string;
+}
+
+// Tipo extendido para la UI que incluye campos calculados
+export interface OrderUI extends Omit<BaseOrder, 'total_amount' | 'shipping_address'> {
   customer?: string;
   email?: string;
   phone?: string;
   title?: string;
   description?: string;
-  total?: number;
-  date?: string;
+  total: number;
+  date: string;
+  shippingAddress?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  passportNumber?: string;
+  birthDate?: string;
+  gender?: string;
+  activationDate?: string;
   events?: OrderEvent[];
   formatted_notes?: OrderNote[];
 }
@@ -76,5 +89,5 @@ export interface OrderWithRelations extends BaseOrder {
     gender?: string;
   };
   events: OrderEvent[];
-  notes: OrderNote[];
+  formatted_notes: OrderNote[];
 }
