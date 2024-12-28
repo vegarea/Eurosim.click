@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/select"
 import { useState } from "react"
 import { Product } from "./types"
-import { formatCurrency } from "@/utils/currency"
 
 interface EditProductDialogProps {
   product: Product
@@ -29,7 +28,7 @@ interface EditProductDialogProps {
 export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
   const [editedProduct, setEditedProduct] = useState<Partial<Product>>({
     ...product,
-    price: product.price / 100 // Convertir centavos a pesos para la edición
+    price: Math.floor(product.price / 100) // Convertir centavos a pesos para la edición
   })
   const [open, setOpen] = useState(false)
 
@@ -102,7 +101,7 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
               placeholder="Ingrese el precio en pesos"
             />
             <p className="text-sm text-muted-foreground">
-              Precio actual: {formatCurrency(editedProduct.price || 0)}
+              Precio actual: ${editedProduct.price || 0} MXN
             </p>
           </div>
           <div className="grid gap-2">

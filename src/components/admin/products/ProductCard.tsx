@@ -38,7 +38,7 @@ export function ProductCard({ product, onDelete, onEdit }: ProductCardProps) {
       </div>
       <div className="mb-4">
         <p className="text-2xl font-bold text-primary">
-          ${(product.price / 100).toFixed(2)}
+          ${Math.floor(product.price / 100)}
           <span className="text-sm font-normal text-muted-foreground ml-1">MXN</span>
         </p>
       </div>
