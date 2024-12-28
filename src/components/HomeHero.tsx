@@ -10,8 +10,12 @@ import SimQuiz from "@/components/SimQuiz";
 export function HomeHero() {
   return (
     <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden">
-      {/* Fondo animado con gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-50 to-white animate-gradient bg-[length:400%_400%]" />
+      {/* Burbujas de gradiente animadas */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 -left-48 w-96 h-96 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div className="absolute top-1/3 -right-48 w-96 h-96 bg-gradient-to-l from-primary/20 to-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-gradient-to-t from-primary/20 to-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
       
       {/* Fondo con patrón de puntos */}
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
