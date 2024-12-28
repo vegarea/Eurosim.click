@@ -48,7 +48,7 @@ export function useOrdersData() {
         email: order.customer?.email,
         phone: order.customer?.phone,
         date: order.created_at,
-        total: order.total_amount / 100, // Convertir de centavos a unidades
+        total: order.total_amount / 100, // Convert from cents to units
         total_amount: order.total_amount,
         status: order.status,
         type: order.type,
