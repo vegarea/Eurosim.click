@@ -1,4 +1,4 @@
-import { Order } from "./types"
+import { Order } from "@/types/order.types"
 import { CreditCard, ExternalLink } from "lucide-react"
 import {
   Card,
@@ -35,7 +35,7 @@ export function OrderPaymentInfo({ order, paymentData }: OrderPaymentInfoProps) 
             <h3 className="font-medium mb-2">Método de Pago</h3>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="capitalize">
-                {order.paymentMethod || "No especificado"}
+                {order.payment_method || "No especificado"}
               </Badge>
             </div>
           </div>
@@ -49,7 +49,7 @@ export function OrderPaymentInfo({ order, paymentData }: OrderPaymentInfoProps) 
                 rel="noopener noreferrer"
                 className="text-primary hover:underline flex items-center gap-1"
               >
-                Ver en {order.paymentMethod} <ExternalLink className="h-4 w-4" />
+                Ver en {order.payment_method} <ExternalLink className="h-4 w-4" />
               </a>
             </div>
           )}

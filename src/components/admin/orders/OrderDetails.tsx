@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog"
 import { OrderStatusBadge } from "./OrderStatusBadge"
 import { Badge } from "@/components/ui/badge"
-import { Order, OrderStatus } from "./types"
+import { Order, OrderStatus } from "@/types/order.types"
 import {
   Select,
   SelectContent,
@@ -27,7 +27,6 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsProps) {
-  // Usar el estado actual del pedido como valor inicial
   const [status, setStatus] = useState<OrderStatus>(order?.status || "payment_pending")
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
@@ -61,7 +60,6 @@ export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsPro
           </DialogHeader>
 
           <div className="space-y-6">
-            {/* Información básica */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="font-medium mb-1">Cliente</h3>
@@ -83,7 +81,7 @@ export function OrderDetails({ order, onClose, onStatusChange }: OrderDetailsPro
               </div>
               <div>
                 <h3 className="font-medium mb-1">Método de Pago</h3>
-                <p className="capitalize">{order.paymentMethod || "No especificado"}</p>
+                <p className="capitalize">{order.payment_method || "No especificado"}</p>
               </div>
               <div>
                 <h3 className="font-medium mb-1">Estado</h3>
