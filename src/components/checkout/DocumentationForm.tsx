@@ -10,7 +10,9 @@ import { DocumentValidationForm } from "@/components/admin/documentation/types/W
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
+  passportNumber: z.string().min(6, "El número de pasaporte debe tener al menos 6 caracteres")
+    .max(20, "El número de pasaporte no puede exceder 20 caracteres")
+    .regex(/^[A-Z0-9]+$/, "El número de pasaporte solo puede contener letras mayúsculas y números"),
   gender: z.enum(['M', 'F'], {
     required_error: "El género es requerido",
   }),
