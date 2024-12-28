@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus, OrderType, PaymentMethod, DatabaseOrder, ShippingAddress } from './database.types';
+import { OrderStatus, PaymentStatus, OrderType, PaymentMethod, ShippingAddress } from './database.types';
 
 export type { OrderStatus, PaymentStatus, OrderType, PaymentMethod, ShippingAddress };
 
@@ -33,9 +33,23 @@ export interface CustomerDocumentation {
   activationDate?: string;
 }
 
+// Interfaz para el objeto customer que viene de Supabase
+export interface OrderCustomer {
+  name: string;
+  email: string;
+  phone?: string;
+}
+
+// Interfaz para el objeto product que viene de Supabase
+export interface OrderProduct {
+  title: string;
+  description: string;
+  price: number;
+}
+
 // Interfaz UI que extiende la orden de base de datos
 export interface Order extends Omit<DatabaseOrder, 'notes'> {
-  customer?: string;
+  customer?: OrderCustomer;
   email?: string;
   phone?: string;
   title?: string;
@@ -44,6 +58,7 @@ export interface Order extends Omit<DatabaseOrder, 'notes'> {
   notes?: OrderNote[];
   events?: OrderEvent[];
   documentation?: CustomerDocumentation;
+  product?: OrderProduct;
   // Asegurarnos de que usamos created_at en lugar de date
   created_at: string;
 }

@@ -45,7 +45,7 @@ export const orderService = {
       }
 
       console.log('Order created successfully:', order);
-      return order;
+      return order as Order;
     } catch (error) {
       console.error('Error in createOrder:', error);
       throw error;
