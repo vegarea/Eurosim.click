@@ -10,13 +10,13 @@ import { DocumentValidationForm } from "@/components/admin/documentation/types/W
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  birthDate: z.date({
-    required_error: "La fecha de nacimiento es requerida",
-  }),
+  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
   gender: z.enum(['M', 'F'], {
     required_error: "El género es requerido",
   }),
-  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
+  birthDate: z.date({
+    required_error: "La fecha de nacimiento es requerida",
+  }),
   activationDate: z.date({
     required_error: "La fecha de activación es requerida",
   }).min(new Date(), "La fecha debe ser futura"),
@@ -27,9 +27,9 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
-      birthDate: initialData?.birthDate || new Date(),
-      gender: initialData?.gender || 'M',
       passportNumber: initialData?.passportNumber || "",
+      gender: initialData?.gender || 'M',
+      birthDate: initialData?.birthDate || new Date(),
       activationDate: initialData?.activationDate || new Date(),
     },
     mode: "onChange"
