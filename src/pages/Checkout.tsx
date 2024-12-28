@@ -30,7 +30,7 @@ const testData = {
   documentation: {
     fullName: "Juan Pérez",
     birthDate: new Date(),
-    gender: "M",
+    gender: "M" as "M" | "F", // Explicitly type as union type
     passportNumber: "AB123456",
     activationDate: new Date(),
     email: "juan@ejemplo.com",
