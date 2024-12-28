@@ -15,55 +15,79 @@ export const useCheckout = () => {
     try {
       // 1. Create customer
       console.log('Creating customer...');
-      const customerData = {
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        passport_number: formData.passportNumber,
-        birth_date: formData.birthDate,
-        gender: formData.gender,
-        ...(items[0].type === 'physical' && {
-          default_shipping_address: {
-            street: formData.address,
-            city: formData.city,
-            state: formData.state,
-            country: 'España',
-            postal_code: formData.zipCode,
-            phone: formData.phone
-          }
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          passport_number: formData.passportNumber,
+          birth_date: formData.birthDate,
+          gender: formData.gender,
+          ...(items[0].type === 'physical' && {
+            default_shipping_address: {
+              street: formData.address,
+              city: formData.city,
+              state: formData.state,
+              country: 'España',
+              postal_code: formData.zipCode,
+              phone: formData.phone
+            }
+          })
         })
-      };
+        .select()
+        .single();
 
-      const customer = await checkoutService.createCustomer(customerData);
+      if (customerError) {
+        console.error('Error creating customer:', customerError);
+        throw new Error('Error al crear el cliente');
+      }
+
       console.log('Customer created:', customer);
 
       // 2. Create order for each item
       console.log('Creating orders...');
       const orders = [];
       for (const item of items) {
-        const orderData = {
-          customer_id: customer.id,
-          product_id: item.id,
-          type: item.type,
-          total_amount: item.price * item.quantity,
-          quantity: item.quantity,
-          ...(item.type === 'physical' ? {
-            shipping_address: customerData.default_shipping_address
-          } : {
-            activation_date: formData.activationDate
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            customer_id: customer.id,
+            product_id: item.id,
+            type: item.type,
+            total_amount: item.price * item.quantity,
+            quantity: item.quantity,
+            ...(item.type === 'physical' ? {
+              shipping_address: customer.default_shipping_address
+            } : {
+              activation_date: formData.activationDate
+            })
           })
-        };
+          .select()
+          .single();
 
-        const order = await checkoutService.createOrder(orderData);
+        if (orderError) {
+          console.error('Error creating order:', orderError);
+          throw new Error('Error al crear la orden');
+        }
+
         console.log('Order created:', order);
         orders.push(order);
 
         // 3. Create initial order event
-        await checkoutService.createOrderEvent(
-          order.id,
-          'created',
-          'Orden creada exitosamente'
-        );
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert({
+            order_id: order.id,
+            type: 'created',
+            description: 'Orden creada exitosamente'
+          });
+
+        if (eventError) {
+          console.error('Error creating order event:', eventError);
+          // No lanzamos error aquí ya que no es crítico
+        }
+
         console.log('Order event created for order:', order.id);
       }
 
@@ -75,7 +99,11 @@ export const useCheckout = () => {
             ...item,
             price: item.price * 100 // Convert to cents for Stripe
           })),
-          customerData,
+          customerData: {
+            name: customer.name,
+            email: customer.email,
+            phone: customer.phone
+          },
           metadata: {
             orderId: orders[0].id // We'll use the first order ID for tracking
           }
