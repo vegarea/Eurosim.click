@@ -24,8 +24,7 @@ export function Header() {
     { label: "Inicio", href: "/" },
     { label: "Planes eSIM", href: "/e-sims" },
     { label: "SIM Física", href: "/sims" },
-    { label: "Cobertura", href: "/coverage" },
-    { label: "Soporte", href: "/support" },
+    { label: "Contacto", href: "/contact" },
   ];
 
   return (
