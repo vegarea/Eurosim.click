@@ -17,6 +17,14 @@ interface SimCardProps {
   onSelect?: () => void;
 }
 
+// Función para formatear la descripción con GB en negrita
+const formatDescription = (description: string) => {
+  return description.replace(
+    /(\d+GB)/g,
+    '<span class="font-bold">$1</span>'
+  );
+};
+
 export function SimCard({ 
   type, 
   title, 
@@ -30,19 +38,6 @@ export function SimCard({
   const { addItem } = useCart();
   const navigate = useNavigate();
   
-  const handleAddToCart = () => {
-    if (addItem) {
-      addItem({
-        id: `${type}-${title}`,
-        type,
-        title,
-        description,
-        price
-      });
-      navigate('/checkout');
-    }
-  };
-
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
@@ -74,6 +69,17 @@ export function SimCard({
     }
   };
 
+  const handleAddToCart = () => {
+    addItem({
+      id: `${type}-${title}`,
+      type,
+      title,
+      description,
+      price
+    });
+    navigate('/checkout');
+  };
+
   const colorScheme = getColorScheme(title);
   const formattedPrice = formatCurrency(price);
 
@@ -101,10 +107,7 @@ export function SimCard({
             </CardTitle>
             <CardDescription 
               className="text-base mt-1"
-              dangerouslySetInnerHTML={{ __html: description.replace(
-                /(\d+GB)/g,
-                '<span class="font-bold">$1</span>'
-              )}}
+              dangerouslySetInnerHTML={{ __html: formatDescription(description) }}
             />
           </div>
         </div>

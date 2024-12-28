@@ -17,7 +17,6 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Email inválido"),
   birthDate: z.date({
     required_error: "La fecha de nacimiento es requerida",
   }),
@@ -343,4 +342,3 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
     </Form>
   );
 }
-
