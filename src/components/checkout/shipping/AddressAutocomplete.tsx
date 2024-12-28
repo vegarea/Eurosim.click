@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/components/ui/use-toast"
 
 declare global {
   interface Window {
@@ -20,20 +21,34 @@ interface AddressAutocompleteProps {
 export function AddressAutocomplete({ value, onChange, onAddressSelect }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     const loadGoogleMapsScript = async () => {
       try {
-        const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase.functions.invoke('get-google-maps-key')
+        console.log("Fetching Google Maps API key...")
+        const { data, error } = await supabase.functions.invoke('get-google-maps-key')
         
         if (error) {
           console.error('Error fetching Google Maps API key:', error)
+          toast({
+            title: "Error",
+            description: "No se pudo cargar el autocompletado de direcciones",
+            variant: "destructive",
+          })
+          return
+        }
+
+        const GOOGLE_MAPS_API_KEY = data?.GOOGLE_MAPS_API_KEY
+        if (!GOOGLE_MAPS_API_KEY) {
+          console.error('Google Maps API key not found in response')
           return
         }
 
         if (!window.google) {
+          console.log("Loading Google Maps script...")
           window.initGoogleMaps = () => {
-            console.log('Google Maps API loaded')
+            console.log('Google Maps API loaded successfully')
           }
 
           const script = document.createElement('script')
@@ -42,35 +57,50 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           script.defer = true
           document.head.appendChild(script)
 
-          return new Promise<void>((resolve) => {
+          script.onerror = () => {
+            console.error('Error loading Google Maps script')
+            toast({
+              title: "Error",
+              description: "No se pudo cargar el mapa de Google",
+              variant: "destructive",
+            })
+          }
+
+          await new Promise<void>((resolve) => {
             script.onload = () => resolve()
           })
         }
+
+        // Initialize autocomplete after script is loaded
+        if (inputRef.current && window.google) {
+          autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+            componentRestrictions: { country: "mx" },
+            fields: ["address_components", "formatted_address"],
+          })
+
+          autocompleteRef.current.addListener("place_changed", () => {
+            const place = autocompleteRef.current?.getPlace()
+            if (place) {
+              onAddressSelect(place)
+            }
+          })
+        }
       } catch (error) {
-        console.error('Error loading Google Maps:', error)
+        console.error('Error in Google Maps initialization:', error)
+        toast({
+          title: "Error",
+          description: "Hubo un problema al inicializar el autocompletado",
+          variant: "destructive",
+        })
       }
     }
 
-    loadGoogleMapsScript().then(() => {
-      if (inputRef.current && window.google) {
-        autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
-          componentRestrictions: { country: "mx" },
-          fields: ["address_components", "formatted_address"],
-        })
-
-        autocompleteRef.current.addListener("place_changed", () => {
-          const place = autocompleteRef.current?.getPlace()
-          if (place) {
-            onAddressSelect(place)
-          }
-        })
-      }
-    })
+    loadGoogleMapsScript()
 
     return () => {
       // Cleanup if needed
     }
-  }, [onAddressSelect])
+  }, [onAddressSelect, toast])
 
   return (
     <FormItem>
