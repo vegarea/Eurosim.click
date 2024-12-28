@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlanDetailsProps {
   title: string;
@@ -27,21 +28,36 @@ export function PlanDetails({
   const { addItem } = useCart();
   const navigate = useNavigate();
 
-  const handlePurchase = () => {
-    addItem({
-      id: `esim-${title}`,
-      type: "esim",
-      title,
-      description,
-      price
-    });
-    
-    toast({
-      title: "Producto añadido al carrito",
-      description: `Has seleccionado el plan ${title}`,
-    });
-    
-    navigate('/checkout');
+  const handlePurchase = async () => {
+    try {
+      // Obtener el ID del producto basado en el título
+      const { data: product, error } = await supabase
+        .from('products')
+        .select('id')
+        .eq('title', title)
+        .eq('type', 'esim')
+        .single();
+
+      if (error) throw error;
+      if (!product) throw new Error('Producto no encontrado');
+
+      await addItem({
+        id: product.id,
+        type: "esim",
+        title,
+        description,
+        price
+      });
+      
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Error al añadir al carrito:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo añadir el producto al carrito. Por favor, intenta de nuevo.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

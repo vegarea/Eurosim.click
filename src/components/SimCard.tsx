@@ -76,24 +76,19 @@ export function SimCard({
   const handleAddToCart = async () => {
     setIsLoading(true);
     try {
-      // Validate product exists and is active
+      // Obtener el ID del producto basado en el título
       const { data: product, error } = await supabase
         .from('products')
-        .select('id, status')
+        .select('id')
         .eq('title', title)
-        .eq('status', 'active')
-        .maybeSingle();
+        .eq('type', 'physical')
+        .single();
 
-      if (error) {
-        throw new Error('Error al verificar disponibilidad del producto');
-      }
+      if (error) throw error;
+      if (!product) throw new Error('Producto no encontrado');
 
-      if (!product) {
-        throw new Error('Este producto no está disponible actualmente');
-      }
-
-      addItem({
-        id: product.id, // Use the real product ID
+      await addItem({
+        id: product.id,
         type,
         title,
         description,
