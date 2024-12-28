@@ -8,6 +8,26 @@ export const blogTypes: ChecklistCategory = {
       name: "BlogPost",
       status: "pending",
       description: "Tipos para las entradas del blog",
+      category: "component",
+      currentType: `interface BlogPost {
+  id: string
+  title: string
+  content: string
+  author: string
+  publishDate: Date
+  status: "draft" | "published"
+}`,
+      supabaseType: `type BlogPost = Database["public"]["Tables"]["blog_posts"]["Row"] = {
+  id: string
+  title: string
+  content: string
+  author_id: string
+  publish_date: string
+  status: Database["public"]["Enums"]["post_status"]
+  created_at: string
+  updated_at: string | null
+  metadata: Json | null
+}`,
       locations: [
         "src/components/admin/blog/types.ts",
         "src/components/blog/BlogPost.tsx"

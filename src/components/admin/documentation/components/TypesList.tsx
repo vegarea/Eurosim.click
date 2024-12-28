@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Info } from "lucide-react"
+import { ChecklistItem } from "../types/ChecklistTypes"
 import { orderTypes } from "./types/OrderTypes"
 import { formTypes } from "./types/FormTypes"
 import { adminTypes } from "./types/AdminTypes"
@@ -34,7 +35,7 @@ export function TypesList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {types.map((type, index) => (
+              {types.map((type: ChecklistItem, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium bg-white sticky left-0 border-r">
                     <div className="flex items-center gap-2">
