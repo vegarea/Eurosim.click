@@ -5,7 +5,6 @@ import { Json } from "@/integrations/supabase/types"
 const transformShippingAddress = (address: Json | null): ShippingAddress | null => {
   if (!address) return null;
   
-  // Asegurarnos de que el objeto tiene la estructura correcta
   const addressObj = address as Record<string, string>;
   
   if (!addressObj.street || !addressObj.city || !addressObj.state || 
@@ -38,9 +37,17 @@ export const orderService = {
     console.log('Creating order with data:', orderData);
 
     try {
+      // Convertir ShippingAddress a Json antes de enviarlo a Supabase
+      const supabaseOrderData = {
+        ...orderData,
+        shipping_address: orderData.shipping_address as unknown as Json,
+        status: 'payment_pending',
+        payment_status: 'pending'
+      };
+
       const { data: order, error } = await supabase
         .from('orders')
-        .insert(orderData)
+        .insert(supabaseOrderData)
         .select(`
           *,
           customer:customers(
@@ -66,11 +73,35 @@ export const orderService = {
         throw new Error('Failed to create order');
       }
 
-      // Transformar la dirección de envío antes de devolver la orden
-      const transformedOrder = {
-        ...order,
-        shipping_address: transformShippingAddress(order.shipping_address)
-      } as Order;
+      // Transformar la respuesta al tipo Order
+      const transformedOrder: Order = {
+        id: order.id,
+        customer_id: order.customer_id,
+        product_id: order.product_id,
+        customer: order.customer ? {
+          name: order.customer.name,
+          email: order.customer.email,
+          phone: order.customer.phone
+        } : undefined,
+        status: order.status,
+        type: order.type,
+        total_amount: order.total_amount,
+        quantity: order.quantity,
+        payment_method: order.payment_method,
+        payment_status: order.payment_status,
+        shipping_address: transformShippingAddress(order.shipping_address),
+        tracking_number: order.tracking_number,
+        carrier: order.carrier,
+        activation_date: order.activation_date,
+        notes: [], // Inicializar como array vacío
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        product: order.product ? {
+          title: order.product.title,
+          description: order.product.description,
+          price: order.product.price
+        } : undefined
+      };
 
       console.log('Order created successfully:', transformedOrder);
       return transformedOrder;
@@ -142,11 +173,35 @@ export const orderService = {
         throw new Error('Order not found');
       }
 
-      // Transformar la dirección de envío antes de devolver la orden
-      const transformedOrder = {
-        ...order,
-        shipping_address: transformShippingAddress(order.shipping_address)
-      } as Order;
+      // Transformar la respuesta al tipo Order
+      const transformedOrder: Order = {
+        id: order.id,
+        customer_id: order.customer_id,
+        product_id: order.product_id,
+        customer: order.customer ? {
+          name: order.customer.name,
+          email: order.customer.email,
+          phone: order.customer.phone
+        } : undefined,
+        status: order.status,
+        type: order.type,
+        total_amount: order.total_amount,
+        quantity: order.quantity,
+        payment_method: order.payment_method,
+        payment_status: order.payment_status,
+        shipping_address: transformShippingAddress(order.shipping_address),
+        tracking_number: order.tracking_number,
+        carrier: order.carrier,
+        activation_date: order.activation_date,
+        notes: [], // Inicializar como array vacío
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        product: order.product ? {
+          title: order.product.title,
+          description: order.product.description,
+          price: order.product.price
+        } : undefined
+      };
 
       console.log('Order fetched successfully:', transformedOrder);
       return transformedOrder;
