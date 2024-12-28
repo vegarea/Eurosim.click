@@ -1,18 +1,18 @@
 import React, { createContext, useContext, useState } from 'react';
-import { OrderUI } from '@/types/order.types';
+import { Order } from '@/types/order.types';
 import { mockOrders } from '@/components/admin/orders/mockData';
 
 interface OrdersContextType {
-  orders: OrderUI[];
-  updateOrder: (orderId: string, updates: Partial<OrderUI>) => void;
+  orders: Order[];
+  updateOrder: (orderId: string, updates: Partial<Order>) => void;
 }
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState<OrderUI[]>(mockOrders);
+  const [orders, setOrders] = useState<Order[]>(mockOrders);
 
-  const updateOrder = (orderId: string, updates: Partial<OrderUI>) => {
+  const updateOrder = (orderId: string, updates: Partial<Order>) => {
     setOrders(prevOrders =>
       prevOrders.map(order =>
         order.id === orderId ? { ...order, ...updates } : order

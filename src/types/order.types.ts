@@ -1,7 +1,7 @@
 import { OrderStatus, PaymentStatus, OrderType, PaymentMethod } from './database.types';
 
 // Tipo base que coincide exactamente con la estructura de la base de datos
-export interface BaseOrder {
+export interface Order {
   id: string;
   customer_id: string;
   product_id: string;
@@ -26,10 +26,19 @@ export interface BaseOrder {
   tracking_number?: string;
   carrier?: string;
   activation_date?: string;
-  notes?: string[];
+  notes?: OrderNote[];
   metadata?: Record<string, any>;
   created_at: string;
   updated_at: string;
+  // Campos calculados para la UI
+  customer?: string;
+  email?: string;
+  phone?: string;
+  title?: string;
+  description?: string;
+  total?: number;
+  date?: string;
+  events?: OrderEvent[];
 }
 
 export interface OrderNote {
@@ -56,29 +65,20 @@ export interface OrderEvent {
   user_name?: string;
 }
 
-// Tipo extendido para la UI que incluye campos calculados
-export interface OrderUI extends Omit<BaseOrder, 'total_amount' | 'shipping_address'> {
-  customer?: string;
-  email?: string;
+// Tipo para la UI que incluye campos calculados
+export interface OrderUI extends Order {
+  customer: string;
+  email: string;
   phone?: string;
   title?: string;
   description?: string;
   total: number;
   date: string;
-  shippingAddress?: string;
-  city?: string;
-  state?: string;
-  zipCode?: string;
-  passportNumber?: string;
-  birthDate?: string;
-  gender?: string;
-  activationDate?: string;
-  events?: OrderEvent[];
-  formatted_notes?: OrderNote[];
+  events: OrderEvent[];
 }
 
 // Tipo que incluye todas las relaciones completas
-export interface OrderWithRelations extends BaseOrder {
+export interface OrderWithRelations extends Order {
   customer: {
     id: string;
     name: string;
@@ -89,5 +89,5 @@ export interface OrderWithRelations extends BaseOrder {
     gender?: string;
   };
   events: OrderEvent[];
-  formatted_notes: OrderNote[];
+  notes: OrderNote[];
 }
