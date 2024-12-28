@@ -76,10 +76,10 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
               className="bg-gray-50 p-4 rounded-lg space-y-2"
             >
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <span className="font-medium">{note.user_name}</span>
-                <span>{formatDateTime(note.created_at)}</span>
+                <span className="font-medium">{note.userName}</span>
+                <span>{formatDateTime(note.createdAt)}</span>
               </div>
-              <p className="text-gray-700">{note.content}</p>
+              <p className="text-gray-700">{note.text}</p>
             </div>
           ))}
         </div>

@@ -25,21 +25,21 @@ export function OrderShippingInfo({ order }: OrderShippingInfoProps) {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-1">Dirección de envío</h3>
-              <p>{order.shipping_address?.street || "No especificada"}</p>
+              <p>{order.shippingAddress || "No especificada"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Ciudad</h3>
-              <p>{order.shipping_address?.city || "No especificada"}</p>
+              <p>{order.city || "No especificada"}</p>
             </div>
           </div>
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-1">Estado</h3>
-              <p>{order.shipping_address?.state || "No especificado"}</p>
+              <p>{order.state || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Código Postal</h3>
-              <p>{order.shipping_address?.postal_code || "No especificado"}</p>
+              <p>{order.zipCode || "No especificado"}</p>
             </div>
           </div>
         </div>

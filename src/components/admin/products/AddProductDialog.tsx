@@ -20,25 +20,24 @@ import {
 import { useState } from "react"
 
 interface Product {
+  id: string
   type: "physical" | "esim"
   title: string
   description: string
   price: number
   features: string[]
-  europe_gb?: number
-  spain_gb?: number
-  status: "active" | "inactive"
+  europeGB?: number
+  spainGB?: number
 }
 
 interface AddProductDialogProps {
-  onAddProduct: (product: Omit<Product, 'id' | 'created_at' | 'updated_at'>) => void
+  onAddProduct: (product: Product) => void
 }
 
 export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
     type: "physical",
-    features: [],
-    status: "active"
+    features: []
   })
 
   const handleAddProduct = () => {
@@ -46,21 +45,21 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
       return
     }
 
-    const product = {
+    const product: Product = {
+      id: `${newProduct.type}-${newProduct.title?.toLowerCase().replace(/\s+/g, '-')}`,
       type: newProduct.type as "physical" | "esim",
       title: newProduct.title,
       description: newProduct.description,
       price: Number(newProduct.price),
       features: newProduct.features || [],
-      status: "active" as const,
       ...(newProduct.type === "esim" ? {
-        europe_gb: Number(newProduct.europe_gb),
-        spain_gb: Number(newProduct.spain_gb)
+        europeGB: Number(newProduct.europeGB),
+        spainGB: Number(newProduct.spainGB)
       } : {})
     }
 
     onAddProduct(product)
-    setNewProduct({ type: "physical", features: [], status: "active" })
+    setNewProduct({ type: "physical", features: [] })
   }
 
   return (
@@ -131,8 +130,8 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
                 <Input
                   id="europeGB"
                   type="number"
-                  value={newProduct.europe_gb || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, europe_gb: parseFloat(e.target.value) })}
+                  value={newProduct.europeGB || ""}
+                  onChange={(e) => setNewProduct({ ...newProduct, europeGB: parseFloat(e.target.value) })}
                 />
               </div>
               <div className="grid gap-2">
@@ -140,8 +139,8 @@ export function AddProductDialog({ onAddProduct }: AddProductDialogProps) {
                 <Input
                   id="spainGB"
                   type="number"
-                  value={newProduct.spain_gb || ""}
-                  onChange={(e) => setNewProduct({ ...newProduct, spain_gb: parseFloat(e.target.value) })}
+                  value={newProduct.spainGB || ""}
+                  onChange={(e) => setNewProduct({ ...newProduct, spainGB: parseFloat(e.target.value) })}
                 />
               </div>
             </>

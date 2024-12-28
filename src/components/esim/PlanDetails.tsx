@@ -1,47 +1,47 @@
 import { motion } from "framer-motion";
+import { UsageMeter } from "@/components/UsageMeter";
 import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 interface PlanDetailsProps {
-  id: string;
   title: string;
   description: string;
-  price: number;
   features: string[];
   europeGB: number;
   spainGB: number;
-  type: "physical" | "esim";
+  price: number;
 }
 
 export function PlanDetails({ 
-  id,
   title, 
   description, 
-  price, 
-  features,
-  europeGB,
+  features, 
+  europeGB, 
   spainGB,
-  type
+  price 
 }: PlanDetailsProps) {
+  const { toast } = useToast();
   const { addItem } = useCart();
   const navigate = useNavigate();
 
-  const handleAddToCart = async () => {
-    try {
-      await addItem({
-        id,
-        type,
-        title,
-        description,
-        price
-      });
-      navigate('/checkout');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al añadir al carrito');
-    }
+  const handlePurchase = () => {
+    addItem({
+      id: `esim-${title}`,
+      type: "esim",
+      title,
+      description,
+      price
+    });
+    
+    toast({
+      title: "Producto añadido al carrito",
+      description: `Has seleccionado el plan ${title}`,
+    });
+    
+    navigate('/checkout');
   };
 
   return (
@@ -49,45 +49,54 @@ export function PlanDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white rounded-xl shadow-lg p-6 space-y-6"
+      className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
     >
-      <div>
-        <h3 className="text-2xl font-bold">{title}</h3>
-        <p className="text-gray-600">{description}</p>
+      <h2 className="text-xl md:text-2xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+        {title}
+      </h2>
+
+      <div className="space-y-3 mb-4">
+        {features.map((feature, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="flex items-center gap-3"
+          >
+            <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary" />
+            <span className="text-gray-700">{feature}</span>
+          </motion.div>
+        ))}
       </div>
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-baseline">
-          <span className="text-3xl font-bold">${price}</span>
-          <span className="text-gray-500">MXN</span>
-        </div>
-
-        <div className="space-y-2">
-          <div className="bg-primary/5 p-4 rounded-lg">
-            <h4 className="font-semibold mb-2">Datos incluidos:</h4>
-            <div className="space-y-1">
-              <p className="text-sm text-gray-600">Europa: {europeGB}GB</p>
-              <p className="text-sm text-gray-600">España: {spainGB}GB</p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                <span className="text-sm text-gray-600">{feature}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="mb-6">
+        <p className="text-3xl font-bold text-primary">
+          ${price}
+          <span className="text-sm font-normal text-gray-600 ml-1">MXN</span>
+        </p>
       </div>
 
-      <Button 
-        className="w-full bg-gradient-to-r from-primary to-primary/90"
-        onClick={handleAddToCart}
+      <UsageMeter
+        europeGB={europeGB}
+        spainGB={spainGB}
+        isHighlighted={true}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="mt-6"
       >
-        Comprar ahora
-      </Button>
+        <Button 
+          onClick={handlePurchase}
+          className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+        >
+          <ShoppingCart className="w-4 h-4" />
+          Comprar
+        </Button>
+      </motion.div>
     </motion.div>
   );
 }

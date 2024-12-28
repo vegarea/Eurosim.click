@@ -5,7 +5,7 @@ export const settingsWorkflows: WorkflowItem[] = [
     id: "FL-601",
     title: "Configuración de marca",
     description: "Gestión de identidad visual y datos de empresa",
-    status: "working",
+    status: "reviewed",
     components: [
       "CompanySettings.tsx",
       "StyleSettings.tsx"
@@ -14,19 +14,18 @@ export const settingsWorkflows: WorkflowItem[] = [
       "settings (tabla)"
     ],
     details: `
-✓ Gestión de logo de empresa
-✓ Nombre de empresa
-✓ Datos de contacto (WhatsApp, redes sociales)
-✓ Imágenes principales del sitio
-✓ Colores del tema (primario/secundario)
-✓ Integración con Supabase Storage para imágenes
-✓ Persistencia de configuración implementada`
+- Gestión de logo de empresa
+- Nombre de empresa
+- Datos de contacto (WhatsApp, redes sociales)
+- Imágenes principales del sitio
+- Colores del tema (primario/secundario)
+- UI implementada, pendiente conexión con Supabase Storage para imágenes y persistencia de configuración`
   },
   {
     id: "FL-602",
     title: "Configuración de E-commerce",
     description: "Gestión de configuraciones monetarias y fiscales",
-    status: "working",
+    status: "reviewed",
     components: [
       "EcommerceSettings.tsx"
     ],
@@ -34,11 +33,10 @@ export const settingsWorkflows: WorkflowItem[] = [
       "settings (tabla)"
     ],
     details: `
-✓ Configuración de moneda (MXN)
-✓ Tasa de impuestos
-✓ Soporte multi-moneda implementado
-✓ Persistencia en Supabase completada
-✓ Validaciones de formato implementadas`
+- Configuración de moneda (MXN)
+- Tasa de impuestos
+- Próximamente: soporte multi-moneda
+- UI implementada, pendiente conexión con Supabase para persistencia`
   },
   {
     id: "FL-603",
@@ -52,16 +50,16 @@ export const settingsWorkflows: WorkflowItem[] = [
       "settings (tabla)"
     ],
     details: `
-✓ Meta títulos
-✓ Meta descripciones
-✓ Configuración general SEO
-✓ Sistema completamente funcional`
+- Meta títulos
+- Meta descripciones
+- Configuración general SEO
+- Sistema completamente funcional`
   },
   {
     id: "FL-604",
     title: "Integraciones externas",
     description: "Gestión de integraciones con servicios externos",
-    status: "working",
+    status: "reviewed",
     components: [
       "IntegrationsSettings.tsx",
       "EmailIntegration.tsx",
@@ -69,16 +67,14 @@ export const settingsWorkflows: WorkflowItem[] = [
       "MakeWebhooks.tsx"
     ],
     database: [
-      "api_configurations (tabla)",
+      "settings (tabla)",
       "webhooks (tabla)"
     ],
     details: `
-✓ Integración con Brevo (email) implementada
-✓ Webhooks de Make.com configurados
-✓ Integración con Zapier completada
-✓ Gestión de API keys con Supabase Vault
-✓ Sistema de logs implementado
-✓ Validaciones de API keys en tiempo real
-✓ Monitoreo de estado de integraciones`
+- Integración con Brevo (email)
+- Webhooks de Make.com
+- Integración con Zapier
+- Gestión de API keys
+- UI implementada, pendiente conexión con Supabase Vault para almacenamiento seguro de API keys`
   }
 ]

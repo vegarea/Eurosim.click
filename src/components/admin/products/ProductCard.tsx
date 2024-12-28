@@ -8,9 +8,8 @@ interface Product {
   description: string
   price: number
   features: string[]
-  europe_gb?: number
-  spain_gb?: number
-  status: "active" | "inactive"
+  europeGB?: number
+  spainGB?: number
 }
 
 interface ProductCardProps {
@@ -58,7 +57,7 @@ export function ProductCard({ product, onDelete }: ProductCardProps) {
       {product.type === "esim" && (
         <div className="mt-4 pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            GB Europa: {product.europe_gb} / España: {product.spain_gb}
+            GB Europa: {product.europeGB} / España: {product.spainGB}
           </p>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from "@/types"
+import { Order } from "./types"
 import { User, ExternalLink, Clock } from "lucide-react"
 import {
   Card,
@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { OrderStatusControl } from "./OrderStatusControl"
+import { OrderStatus } from "./types"
 
 interface OrderCustomerInfoProps {
   order: Order
@@ -39,12 +40,12 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             <div>
               <h3 className="font-medium mb-1">Cliente</h3>
               <p className="flex items-center gap-2">
-                {order.customer?.name || 'No especificado'}
+                {order.customer}
                 <Button 
                   variant="ghost" 
                   size="sm"
                   className="h-6 px-2"
-                  onClick={() => window.open(`/admin/customers/${order.customer_id}`, '_blank')}
+                  onClick={() => window.open(`/admin/customers/${order.id}`, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
@@ -52,17 +53,17 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             </div>
             <div>
               <h3 className="font-medium mb-1">Email</h3>
-              <p>{order.customer?.email || "No especificado"}</p>
+              <p>{order.email || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Teléfono</h3>
-              <p>{order.customer?.phone || "No especificado"}</p>
+              <p>{order.phone || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Fecha y Hora</h3>
               <div className="flex items-center gap-1 text-gray-600">
                 <Clock className="h-4 w-4" />
-                <span>{formatDateTime(order.created_at)}</span>
+                <span>{formatDateTime(order.date)}</span>
               </div>
             </div>
           </div>

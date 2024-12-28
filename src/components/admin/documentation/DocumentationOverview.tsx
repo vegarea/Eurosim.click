@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ValidationStatus } from "./components/ValidationStatus"
 
 export function DocumentationOverview() {
   return (
@@ -15,46 +14,69 @@ export function DocumentationOverview() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FolderOpen className="h-5 w-5 text-primary" />
-            Estado del Proyecto
+            Resumen del Proyecto
           </CardTitle>
           <CardDescription>
-            Vista general de la estructura, validaciones y estado de implementación
+            Vista general de la estructura y componentes del sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6">
-            <ValidationStatus 
-              type="typescript"
-              status="warning"
-              message="Se encontraron algunas discrepancias en los tipos"
-              details={[
-                "El tipo Order en TypeScript no coincide exactamente con la tabla orders",
-                "Faltan algunas propiedades en la interfaz Customer",
-                "Revisar mapeo de enums en payment_status"
-              ]}
-            />
-            
-            <ValidationStatus 
-              type="documentation"
-              status="success"
-              message="La documentación está actualizada y es consistente"
-              details={[
-                "Todas las tablas están documentadas correctamente",
-                "Las relaciones están documentadas y son válidas",
-                "Las políticas RLS están documentadas y configuradas"
-              ]}
-            />
-            
-            <ValidationStatus 
-              type="workflow"
-              status="warning"
-              message="Algunos flujos requieren atención"
-              details={[
-                "El flujo de pagos necesita actualización de tipos",
-                "Validar integraciones con proveedores de pago",
-                "Revisar manejo de errores en flujo de documentación"
-              ]}
-            />
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Características Principales</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Gestión de productos (SIMs físicas y eSIMs)
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Sistema de pedidos y pagos
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Blog con generación automática de contenido
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Sistema de envíos y tracking
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Gestión de clientes y documentación
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Automatización de correos electrónicos
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tecnologías Utilizadas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Frontend: React + TypeScript + Tailwind
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Backend: Supabase (PostgreSQL + Auth)
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Pagos: Stripe + PayPal
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • IA: OpenAI para generación de contenido
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Email: SendGrid/SMTP para notificaciones
+                  </li>
+                  <li className="flex items-center gap-2 text-sm text-muted-foreground">
+                    • Integración con APIs de carriers
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>

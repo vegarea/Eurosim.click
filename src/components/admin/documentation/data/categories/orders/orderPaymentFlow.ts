@@ -4,7 +4,7 @@ export const orderPaymentFlow: WorkflowItem = {
   id: "FL-103",
   title: "Procesamiento de pagos",
   description: "Integración completa con sistemas de pago",
-  status: "working",
+  status: "reviewed",
   components: [
     "PaymentProcessor.tsx",
     "PaymentMethods.tsx",
@@ -17,13 +17,16 @@ export const orderPaymentFlow: WorkflowItem = {
     "payment_logs (tabla)"
   ],
   details: `
-✓ Interfaz de selección de método de pago implementada
-✓ Componentes de procesamiento implementados
-✓ Manejo de estados de pago implementado
-✓ Visualización de confirmación implementada
-✓ Historial de transacciones en UI implementado
-✓ Integración con Stripe configurada
-✓ Registro de transacciones en BD implementado
-✓ Manejo de webhooks configurado
-✓ Sistema de reembolsos implementado`
+Implementado y revisado:
+✓ Interfaz de selección de método de pago
+✓ Componentes de procesamiento
+✓ Manejo de estados de pago
+✓ Visualización de confirmación
+✓ Historial de transacciones en UI
+
+Pendiente conexión Supabase:
+- Integración con Stripe
+- Registro de transacciones en BD
+- Manejo de webhooks
+- Sistema de reembolsos`
 }

@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { DocumentationFormData } from "@/types/checkout.types"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -31,7 +30,13 @@ const formSchema = z.object({
 interface DocumentationFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<DocumentationFormData>;
+  initialData?: {
+    fullName: string;
+    birthDate: Date;
+    gender: string;
+    passportNumber: string;
+    activationDate: Date;
+  };
 }
 
 export function DocumentationForm({ onSubmit, onValidityChange, initialData }: DocumentationFormProps) {

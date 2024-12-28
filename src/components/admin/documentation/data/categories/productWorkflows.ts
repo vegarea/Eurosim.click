@@ -26,7 +26,7 @@ export const productWorkflows: WorkflowItem[] = [
     id: "FL-202",
     title: "Control de inventario SIMs físicas",
     description: "Gestión del stock de SIMs físicas",
-    status: "working",
+    status: "reviewed",
     components: [
       "AdminProducts.tsx",
       "ProductCard.tsx"
@@ -35,14 +35,12 @@ export const productWorkflows: WorkflowItem[] = [
       "products (tabla) - campo stock"
     ],
     details: `
-✓ UI para visualización de stock implementada
-✓ Componentes para gestión de inventario listos
-✓ Conexión con Supabase implementada para:
+- UI para visualización de stock implementada
+- Componentes para gestión de inventario listos
+- Pendiente: Conexión con Supabase para:
   * Actualización en tiempo real del stock
   * Alertas de stock bajo
-  * Sincronización con pedidos
-✓ Políticas RLS configuradas
-✓ Bucket de almacenamiento configurado`
+  * Sincronización con pedidos`
   },
   {
     id: "FL-203",
@@ -81,19 +79,17 @@ export const productWorkflows: WorkflowItem[] = [
     id: "FL-205",
     title: "Gestión de imágenes",
     description: "Sistema de gestión de imágenes de productos",
-    status: "working",
+    status: "reviewed",
     components: [
       "ProductCard.tsx",
       "AddProductDialog.tsx"
     ],
     details: `
-✓ UI para carga de imágenes implementada
-✓ Previsualización de imágenes funcionando
-✓ Conexión con Supabase Storage implementada:
-  * Almacenamiento de imágenes en bucket 'products'
-  * CDN y optimización configurados
-  * Gestión de versiones implementada
-✓ Políticas de acceso configuradas
-✓ Sistema de carga y eliminación funcionando`
+- UI para carga de imágenes implementada
+- Previsualización de imágenes funcionando
+- Pendiente: Conexión con Supabase Storage para:
+  * Almacenamiento de imágenes
+  * CDN y optimización
+  * Gestión de versiones`
   }
 ]

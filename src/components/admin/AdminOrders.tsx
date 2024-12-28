@@ -1,54 +1,26 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { OrderStatus } from "@/types"
-import { useOrdersData } from "@/hooks/useOrdersData"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import { Order, OrderStatus } from "./orders/types"
+import { useOrders } from "@/contexts/OrdersContext"
+import { toast } from "sonner"
 
 export function AdminOrders() {
-  const { orders = [], isLoading, error, updateOrderStatus } = useOrdersData()
+  const { orders, updateOrder } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
-  const filteredOrders = orders?.filter((order) => {
+  const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.customer?.name || '').toLowerCase().includes(search.toLowerCase())
+      order.customer.toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
-  }) || []
+  })
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrderStatus.mutate({ orderId, newStatus })
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Error al cargar los pedidos: {error.message}
-        </AlertDescription>
-      </Alert>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-8 w-48" />
-        </div>
-        <Skeleton className="h-12 w-full" />
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-16 w-full" />
-          ))}
-        </div>
-      </div>
-    )
+    updateOrder(orderId, { status: newStatus })
+    toast.success("Estado del pedido actualizado correctamente")
   }
 
   return (
@@ -64,18 +36,10 @@ export function AdminOrders() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      {orders.length === 0 ? (
-        <Alert>
-          <AlertDescription>
-            No hay pedidos disponibles en este momento.
-          </AlertDescription>
-        </Alert>
-      ) : (
-        <OrdersTable 
-          orders={filteredOrders}
-          onStatusChange={handleStatusChange}
-        />
-      )}
+      <OrdersTable 
+        orders={filteredOrders}
+        onStatusChange={handleStatusChange}
+      />
     </div>
   )
 }

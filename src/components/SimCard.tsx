@@ -5,9 +5,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 import { formatCurrency } from "@/utils/currency";
-import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
-import { toast } from "sonner";
 
 interface SimCardProps {
   type: "physical" | "esim";
@@ -40,49 +37,50 @@ export function SimCard({
 }: SimCardProps) {
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Map of product titles to their IDs
-  const PRODUCT_IDS: Record<string, string> = {
-    "Prepago XL": "bcdcf122-bd8b-484b-aff8-f97e23d56d2c",
-    "Prepago XXL": "9f0819db-c004-49d1-ab56-60a47b058703"
-  };
   
-  const handleAddToCart = async () => {
-    setIsLoading(true);
-    try {
-      const productId = PRODUCT_IDS[title];
-      
-      if (!productId) {
-        throw new Error('Producto no encontrado');
-      }
-
-      await addItem({
-        id: productId,
-        type,
-        title,
-        description,
-        price
-      });
-      
-      navigate('/checkout');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al añadir al carrito');
-    } finally {
-      setIsLoading(false);
+  // Función para determinar el color según el título
+  const getColorScheme = (title: string) => {
+    switch (title) {
+      case "Tarifa M":
+        return {
+          iconBg: "from-[#F2FCE2] to-[#E5F7D3]",
+          iconColor: "text-green-600"
+        };
+      case "Tarifa L":
+        return {
+          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          iconColor: "text-blue-600"
+        };
+      case "Tarifa XL":
+        return {
+          iconBg: "from-[#E5DEFF] to-[#D6CFFF]",
+          iconColor: "text-purple-600"
+        };
+      case "Tarifa XXL":
+        return {
+          iconBg: "from-[#FFDEE2] to-[#FFD0D5]",
+          iconColor: "text-pink-600"
+        };
+      default:
+        return {
+          iconBg: "from-[#D3E4FD] to-[#C4D9F7]",
+          iconColor: "text-blue-600"
+        };
     }
   };
 
-  const colorScheme = {
-    iconBg: type === 'physical' 
-      ? "from-[#D3E4FD] to-[#C4D9F7]"
-      : "from-[#E5DEFF] to-[#D6CFFF]",
-    iconColor: type === 'physical' 
-      ? "text-blue-600"
-      : "text-purple-600"
+  const handleAddToCart = () => {
+    addItem({
+      id: `${type}-${title}`,
+      type,
+      title,
+      description,
+      price
+    });
+    navigate('/checkout');
   };
 
+  const colorScheme = getColorScheme(title);
   const formattedPrice = formatCurrency(price);
 
   return (
@@ -136,9 +134,8 @@ export function SimCard({
         <Button 
           className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
           onClick={handleAddToCart}
-          disabled={isLoading}
         >
-          {isLoading ? 'Verificando...' : 'Añadir al Carrito'}
+          Añadir al Carrito
         </Button>
       </CardContent>
 

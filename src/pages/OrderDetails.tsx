@@ -17,7 +17,6 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
-import { OrderNote } from "@/types/order.types"
 
 const statusOrder = [
   "payment_pending",
@@ -73,16 +72,12 @@ export default function OrderDetails() {
   }
 
   const handleAddNote = (text: string) => {
-    const newNote: OrderNote = {
+    const newNote = {
       id: crypto.randomUUID(),
-      order_id: order.id,
-      user_id: "current-user-id", // En una app real, esto vendría del contexto de autenticación
-      content: text,
-      type: "user_note",
-      is_internal: false,
-      metadata: {},
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      text,
+      userId: "current-user-id", // En una app real, esto vendría del contexto de autenticación
+      userName: "Admin", // En una app real, esto vendría del contexto de autenticación
+      createdAt: new Date().toISOString()
     }
 
     const currentNotes = order.notes || []

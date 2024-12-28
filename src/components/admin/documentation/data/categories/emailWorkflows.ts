@@ -28,47 +28,38 @@ export const emailWorkflows: WorkflowItem[] = [
     id: "FL-502",
     title: "Envío automático de emails",
     description: "Sistema de envío automático basado en eventos del sistema",
-    status: "working",
+    status: "reviewed",
     components: [
       "OrderStatusConfirmDialog.tsx",
       "EmailLogs.tsx"
     ],
     database: [
       "email_templates (tabla)",
-      "email_logs (tabla)",
-      "api_configurations (tabla)"
+      "email_logs (tabla)"
     ],
     details: `
-✓ Integración con Brevo completada
-✓ Envío automático al cambiar estado de orden implementado
-✓ Registro de emails enviados funcionando
-✓ Visualización de historial de envíos activa
-✓ Reemplazo automático de variables implementado
-✓ Conexión con Supabase establecida:
-  - Políticas RLS configuradas
-  - Triggers para cambios de estado
-  - Registro de emails enviados
-  - Plantillas de email persistidas`
+- Integración con Brevo para envío de emails
+- Envío automático al cambiar estado de orden
+- Registro de emails enviados
+- Visualización de historial de envíos
+- Reemplazo automático de variables
+- Pendiente conexión con Supabase para persistencia`
   },
   {
     id: "FL-503",
     title: "Configuración del servicio de email",
     description: "Gestión de configuraciones del servicio de email (Brevo)",
-    status: "working",
+    status: "reviewed",
     components: [
       "ApiKeySetup.tsx",
       "EmailIntegration.tsx"
     ],
-    database: [
-      "api_configurations (tabla)"
-    ],
+    database: [],
     details: `
-✓ Configuración de API key de Brevo implementada
-✓ Validación de credenciales funcionando
-✓ Almacenamiento seguro de API key en Supabase
-✓ Interfaz de configuración en settings completada
-✓ Sistema de validación automática implementado
-✓ Integración con Supabase Vault completada
-✓ Políticas de seguridad RLS configuradas`
+- Configuración de API key de Brevo
+- Validación de credenciales
+- Almacenamiento seguro de API key
+- Interfaz de configuración en settings
+- Pendiente integración con Supabase Vault para almacenamiento seguro de API keys`
   }
 ]

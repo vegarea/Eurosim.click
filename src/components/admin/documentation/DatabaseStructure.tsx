@@ -9,8 +9,6 @@ import {
 import { useState, useEffect } from "react"
 import { TableCard } from "./components/TableCard"
 import { TableSearch } from "./components/TableSearch"
-import { supabase } from "@/integrations/supabase/client"
-import { useToast } from "@/components/ui/use-toast"
 
 interface TableInfo {
   name: string
@@ -25,7 +23,6 @@ export function DatabaseStructure() {
   const [tables, setTables] = useState<TableInfo[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const { toast } = useToast()
 
   useEffect(() => {
     const loadTableDocumentation = async () => {
@@ -56,18 +53,6 @@ export function DatabaseStructure() {
         ]
         
         console.log('Loading table files:', tableFiles)
-
-        // Verificar qué tablas existen en Supabase usando nuestra nueva función
-        const { data: existingTables, error: tablesError } = await supabase
-          .rpc('get_public_tables')
-        
-        if (tablesError) {
-          console.error('Error fetching tables:', tablesError)
-          throw tablesError
-        }
-
-        const existingTableNames = existingTables?.map(t => t.table_name.toLowerCase()) || []
-        console.log('Existing tables in Supabase:', existingTableNames)
         
         const loadedTables = await Promise.all(
           tableFiles.map(async (file) => {
@@ -90,17 +75,13 @@ export function DatabaseStructure() {
                     .filter(field => field !== '----' && field !== '')
                 : []
 
-              // Convertir el nombre de la tabla a formato snake_case para comparar
-              const tableName = file.name.toLowerCase().replace(/ /g, '_').replace(/-/g, '_')
-              const isConnected = existingTableNames.includes(tableName)
-
               return {
                 name: nameMatch ? nameMatch[1].trim() : file.name,
                 description: descriptionMatch ? descriptionMatch[1].trim() : '',
                 fields: fields.slice(0, 5),
                 path: file.path,
                 content,
-                isConnected
+                isConnected: false
               }
             } catch (error) {
               console.error(`Error processing ${file.path}:`, error)
@@ -112,32 +93,18 @@ export function DatabaseStructure() {
         const validTables = loadedTables.filter((table): table is TableInfo => table !== null)
         const sortedTables = validTables.sort((a, b) => a.name.localeCompare(b.name))
         
-        console.log('Loaded tables with connection status:', sortedTables)
+        console.log('Loaded tables:', sortedTables)
         
         setTables(sortedTables)
         setLoading(false)
-
-        // Mostrar toast con el resumen
-        const connectedCount = sortedTables.filter(t => t.isConnected).length
-        toast({
-          title: "Estado de las tablas",
-          description: `${connectedCount} de ${sortedTables.length} tablas están conectadas con Supabase.`,
-          duration: 5000,
-        })
-
       } catch (error) {
         console.error('Error loading documentation:', error)
         setLoading(false)
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "No se pudo cargar el estado de las tablas.",
-        })
       }
     }
 
     loadTableDocumentation()
-  }, [toast])
+  }, [])
 
   const filteredTables = tables.filter(table => 
     table.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
