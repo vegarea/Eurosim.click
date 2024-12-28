@@ -14,19 +14,22 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export default function ESims() {
   const isMobile = useIsMobile();
   const [selectedPlan, setSelectedPlan] = useState({
-    title: "E-SIM L",
-    description: "16GB Europa / 160GB España",
-    price: 817,
+    id: "ccdbdc7f-674a-4cf5-baae-b9105b821105",
+    title: "E-SIM S",
+    description: "8GB Europa / 100GB España",
+    price: 419,
     features: [
-      "16GB datos en toda Europa",
-      "160GB exclusivo España",
+      "8GB datos en toda Europa",
+      "100GB exclusivo España",
     ],
-    europeGB: 16,
-    spainGB: 160
+    europeGB: 8,
+    spainGB: 100,
+    type: "esim" as const
   });
 
   const simCards = [
     {
+      id: "ccdbdc7f-674a-4cf5-baae-b9105b821105",
       type: "esim" as const,
       title: "E-SIM S",
       description: "8GB Europa / 100GB España",
@@ -39,6 +42,7 @@ export default function ESims() {
       spainGB: 100
     },
     {
+      id: "2c6d8a85-0211-472b-b6d6-4a207a4f9f8d",
       type: "esim" as const,
       title: "E-SIM M",
       description: "11GB Europa / 140GB España",
@@ -51,6 +55,7 @@ export default function ESims() {
       spainGB: 140
     },
     {
+      id: "5304a466-dc0f-4f85-abe6-19564dd10f1b",
       type: "esim" as const,
       title: "E-SIM L",
       description: "16GB Europa / 160GB España",
@@ -63,6 +68,7 @@ export default function ESims() {
       spainGB: 160
     },
     {
+      id: "77993e6d-057a-4d99-8154-32c00fab068a",
       type: "esim" as const,
       title: "E-SIM XL",
       description: "22GB Europa / 190GB España",
@@ -93,7 +99,7 @@ export default function ESims() {
               <div className="grid grid-cols-2 gap-2 md:gap-4">
                 {simCards.map((card) => (
                   <ProductButton
-                    key={card.title}
+                    key={card.id}
                     title={card.title}
                     price={card.price}
                     type={card.type}
