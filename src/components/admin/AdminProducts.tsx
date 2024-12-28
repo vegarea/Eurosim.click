@@ -64,7 +64,7 @@ export function AdminProducts() {
           data_es_gb: product.data_es_gb,
           status: 'active',
           stock: product.type === 'physical' ? product.stock : null,
-          validity_days: 30 // Default value
+          validity_days: 30
         }])
         .select()
 
@@ -89,21 +89,26 @@ export function AdminProducts() {
 
   const handleEditProduct = async (id: string, updates: Partial<Product>) => {
     try {
-      console.log('Actualizando producto con ID:', id)
-      console.log('Datos de actualización:', updates)
+      // Preparar los datos para la actualización
+      const updateData = {
+        title: updates.title,
+        description: updates.description,
+        type: updates.type,
+        price: updates.price, // Ya viene en centavos desde EditProductDialog
+        features: updates.features,
+        data_eu_gb: updates.data_eu_gb,
+        data_es_gb: updates.data_es_gb,
+        stock: updates.type === 'physical' ? updates.stock : null,
+      }
+
+      console.log('Actualizando producto:', {
+        id,
+        updateData
+      })
 
       const { error } = await supabase
         .from('products')
-        .update({
-          title: updates.title,
-          description: updates.description,
-          type: updates.type,
-          price: updates.price, // Este es el precio en centavos
-          features: updates.features,
-          data_eu_gb: updates.data_eu_gb,
-          data_es_gb: updates.data_es_gb,
-          stock: updates.type === 'physical' ? updates.stock : null,
-        })
+        .update(updateData)
         .eq('id', id)
 
       if (error) throw error

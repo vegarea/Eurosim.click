@@ -44,16 +44,14 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
       price: Math.round(editedProduct.price * 100)
     }
 
-    console.log('Enviando actualización con precio en centavos:', updates.price)
+    console.log('Enviando actualización:', updates)
     onEdit(product.id, updates)
     setOpen(false)
   }
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^\d]/g, '')
-    const numericValue = parseInt(value, 10)
-    const priceInPesos = isNaN(numericValue) ? 0 : numericValue
-    
+    const priceInPesos = value === '' ? 0 : parseInt(value, 10)
     setEditedProduct({ ...editedProduct, price: priceInPesos })
   }
 
@@ -127,7 +125,7 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
               id="data_eu_gb"
               type="number"
               value={editedProduct.data_eu_gb || ""}
-              onChange={(e) => setEditedProduct({ ...editedProduct, data_eu_gb: parseFloat(e.target.value) })}
+              onChange={(e) => setEditedProduct({ ...editedProduct, data_eu_gb: parseInt(e.target.value) })}
             />
           </div>
           <div className="grid gap-2">
@@ -136,7 +134,7 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
               id="data_es_gb"
               type="number"
               value={editedProduct.data_es_gb || ""}
-              onChange={(e) => setEditedProduct({ ...editedProduct, data_es_gb: parseFloat(e.target.value) })}
+              onChange={(e) => setEditedProduct({ ...editedProduct, data_es_gb: parseInt(e.target.value) })}
             />
           </div>
           {editedProduct.type === "physical" && (
@@ -146,7 +144,7 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
                 id="stock"
                 type="number"
                 value={editedProduct.stock || ""}
-                onChange={(e) => setEditedProduct({ ...editedProduct, stock: parseFloat(e.target.value) })}
+                onChange={(e) => setEditedProduct({ ...editedProduct, stock: parseInt(e.target.value) })}
               />
             </div>
           )}

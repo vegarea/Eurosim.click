@@ -13,11 +13,7 @@ export function ProductList({ products, onDelete, onEdit }: ProductListProps) {
       {products.map((product) => (
         <ProductCard
           key={product.id}
-          product={{
-            ...product,
-            europeGB: product.data_eu_gb,
-            spainGB: product.data_es_gb
-          }}
+          product={product}
           onDelete={onDelete}
           onEdit={onEdit}
         />
