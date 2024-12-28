@@ -1,11 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
-import { 
-  Customer, 
-  CustomerFromDB, 
-  convertDBCustomerToCustomer, 
-  convertCustomerToDBCustomer 
-} from "@/types/database/customers"
+import { Customer } from "@/types/database/customers"
 import { toast } from "sonner"
 
 export function useCustomers() {
@@ -24,22 +19,21 @@ export function useCustomers() {
         throw error
       }
 
-      return (data as CustomerFromDB[]).map(convertDBCustomerToCustomer)
+      return data as Customer[]
     }
   })
 
   const updateCustomer = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Customer> & { id: string }) => {
-      const dbUpdates = convertCustomerToDBCustomer(updates)
       const { data, error } = await supabase
         .from('customers')
-        .update(dbUpdates)
+        .update(updates)
         .eq('id', id)
         .select()
         .single()
 
       if (error) throw error
-      return convertDBCustomerToCustomer(data as CustomerFromDB)
+      return data as Customer
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
