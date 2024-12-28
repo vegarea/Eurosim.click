@@ -13,18 +13,9 @@ export default function Auth() {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession()
-      if (error) {
-        console.error("Error checking session:", error)
-        toast({
-          variant: "destructive",
-          title: "Error de autenticación",
-          description: "No se pudo verificar tu sesión. Por favor, intenta de nuevo."
-        })
-        return
-      }
       
-      // Si hay sesión, verificamos que sea un admin o manager
       if (session) {
+        // Si hay sesión, verificamos que sea un admin o manager
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
