@@ -1,40 +1,9 @@
 import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { ProductCard } from "./products/ProductCard"
-import { AddProductDialog } from "./products/AddProductDialog"
 import { supabase } from "@/integrations/supabase/client"
-
-interface Product {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  features: string[]
-  data_eu_gb?: number
-  data_es_gb?: number
-  created_at: Date
-  updated_at: Date
-  status: "active" | "inactive" | "out_of_stock"
-  stock?: number
-  metadata?: Record<string, any>
-}
-
-interface SupabaseProduct {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  features: unknown
-  data_eu_gb: number
-  data_es_gb: number
-  created_at: string
-  updated_at: string
-  status: "active" | "inactive" | "out_of_stock"
-  stock: number | null
-  metadata: Record<string, any> | null
-}
+import { ProductHeader } from "./products/ProductHeader"
+import { ProductList } from "./products/ProductList"
+import { Product, SupabaseProduct } from "./products/types"
 
 export function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([])
@@ -148,24 +117,8 @@ export function AdminProducts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Gestión de Productos</h1>
-        <AddProductDialog onAddProduct={handleAddProduct} />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={{
-              ...product,
-              europeGB: product.data_eu_gb,
-              spainGB: product.data_es_gb
-            }}
-            onDelete={handleDeleteProduct}
-          />
-        ))}
-      </div>
+      <ProductHeader onAddProduct={handleAddProduct} />
+      <ProductList products={products} onDelete={handleDeleteProduct} />
     </div>
   )
 }
