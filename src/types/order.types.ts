@@ -37,7 +37,7 @@ export interface Order {
   total: number;
   total_amount: number;
   status: OrderStatus;
-  type: "physical" | "esim";
+  type: OrderType;
   payment_method?: PaymentMethod;
   payment_status: PaymentStatus;
   title?: string;
@@ -47,10 +47,6 @@ export interface Order {
   city?: string;
   state?: string;
   zipCode?: string;
-  passportNumber?: string;
-  birthDate?: string;
-  gender?: string;
-  activationDate?: string;
   created_at?: string;
   updated_at?: string;
   notes?: OrderNote[];
