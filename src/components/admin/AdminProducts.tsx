@@ -34,6 +34,7 @@ export function AdminProducts() {
         .order('created_at', { ascending: false })
 
       if (error) {
+        console.error('Error fetching products:', error)
         throw error
       }
 
@@ -54,6 +55,9 @@ export function AdminProducts() {
 
   const handleAddProduct = async (product: Product) => {
     try {
+      const { data: session } = await supabase.auth.getSession()
+      console.log("Current session:", session)
+
       const { data, error } = await supabase
         .from('products')
         .insert([{
@@ -70,7 +74,10 @@ export function AdminProducts() {
         }])
         .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error details:', error)
+        throw error
+      }
 
       const transformedNewProducts = (data as SupabaseProduct[]).map(transformSupabaseProduct)
       setProducts([...transformedNewProducts, ...products])
@@ -91,23 +98,27 @@ export function AdminProducts() {
 
   const handleEditProduct = async (id: string, updates: Partial<Product>) => {
     try {
-      console.log('Actualizando producto en la base de datos:', {
-        id,
-        updates
-      })
+      const { data: session } = await supabase.auth.getSession()
+      console.log("Current session for edit:", session)
+      console.log('Actualizando producto. ID:', id)
+      console.log('Datos de actualización:', updates)
+
+      // Verificar que el precio esté en centavos
+      const priceInCents = typeof updates.price === 'number' ? 
+        Math.round(updates.price * 100) : updates.price
+
+      const updateData = {
+        ...updates,
+        price: priceInCents,
+        features: Array.isArray(updates.features) ? updates.features : [],
+        stock: updates.type === 'physical' ? updates.stock : null,
+      }
+
+      console.log('Datos finales para actualización:', updateData)
 
       const { data, error } = await supabase
         .from('products')
-        .update({
-          title: updates.title,
-          description: updates.description,
-          type: updates.type,
-          price: updates.price,
-          features: updates.features,
-          data_eu_gb: updates.data_eu_gb,
-          data_es_gb: updates.data_es_gb,
-          stock: updates.type === 'physical' ? updates.stock : null,
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
 
@@ -137,12 +148,18 @@ export function AdminProducts() {
 
   const handleDeleteProduct = async (id: string) => {
     try {
+      const { data: session } = await supabase.auth.getSession()
+      console.log("Current session for delete:", session)
+
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id)
 
-      if (error) throw error
+      if (error) {
+        console.error('Error details:', error)
+        throw error
+      }
 
       setProducts(products.filter(p => p.id !== id))
       toast({

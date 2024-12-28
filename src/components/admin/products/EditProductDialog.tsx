@@ -38,14 +38,8 @@ export function EditProductDialog({ product, onEdit }: EditProductDialogProps) {
       return
     }
 
-    // Convertir el precio de pesos a centavos antes de guardar
-    const updates = {
-      ...editedProduct,
-      price: Math.round(editedProduct.price * 100)
-    }
-
-    console.log('Enviando actualización:', updates)
-    onEdit(product.id, updates)
+    console.log('Enviando producto para editar:', editedProduct)
+    onEdit(product.id, editedProduct)
     setOpen(false)
   }
 
