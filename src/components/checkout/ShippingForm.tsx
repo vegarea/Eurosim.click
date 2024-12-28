@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { User, Mail, Phone, MapPin, Building, Map } from "lucide-react"
+import { ShippingFormData } from "@/types/checkout.types"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -21,15 +22,7 @@ interface ShippingFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
   email?: string;
-  initialData?: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
+  initialData?: Partial<ShippingFormData>;
 }
 
 export function ShippingForm({ onSubmit, onValidityChange, email = '', initialData }: ShippingFormProps) {

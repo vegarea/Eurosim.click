@@ -47,7 +47,7 @@ export default function Checkout() {
               <ShippingForm 
                 onSubmit={handleFormSubmit}
                 onValidityChange={handleFormValidityChange}
-                initialData={formData as Partial<ShippingFormData>}
+                initialData={formData}
               />
             ) : (
               <ESimForm 
@@ -67,7 +67,7 @@ export default function Checkout() {
           <DocumentationForm
             onSubmit={handleFormSubmit}
             onValidityChange={handleFormValidityChange}
-            initialData={formData as Partial<DocumentationFormData>}
+            initialData={formData}
           />
         )
       case 3:
