@@ -11,14 +11,9 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
+import { ExtendedCustomer } from "@/types/database/customers"
 import { Order } from "@/types/database/orders"
-import { Customer } from "@/types/database/customers"
 import { ShippingAddress } from "@/types/database/common"
-
-interface ExtendedCustomer extends Customer {
-  orders: Order[];
-  totalSpent: number;
-}
 
 export function AdminCustomers() {
   const { orders } = useOrders()
@@ -40,7 +35,6 @@ export function AdminCustomers() {
         phone: metadata?.customer_phone || null,
         orders: [],
         totalSpent: 0,
-        // Inicializar campos requeridos según el tipo Customer
         passport_number: null,
         birth_date: null,
         gender: null,
