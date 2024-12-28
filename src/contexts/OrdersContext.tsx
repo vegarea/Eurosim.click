@@ -1,36 +1,50 @@
-import React, { createContext, useContext, useState } from "react"
-import { Order } from "@/components/admin/orders/types"
-import { mockOrders } from "@/components/admin/orders/mockData"
+import { createContext, useContext, ReactNode } from 'react';
+import { Order, OrderStatus } from '@/components/admin/orders/types';
+import { useOrdersData } from '@/hooks/useOrdersData';
 
 interface OrdersContextType {
-  orders: Order[]
-  updateOrder: (orderId: string, updates: Partial<Order>) => void
+  orders: Order[];
+  isLoading: boolean;
+  error: Error | null;
+  updateOrder: (orderId: string, updates: Partial<Order>) => void;
 }
 
-const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
+const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
-export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState(mockOrders)
+export function OrdersProvider({ children }: { children: ReactNode }) {
+  const { 
+    orders = [], 
+    isLoading, 
+    error, 
+    updateOrderStatus 
+  } = useOrdersData();
 
-  const updateOrder = (orderId: string, updates: Partial<Order>) => {
-    setOrders(orders.map(order => 
-      order.id === orderId 
-        ? { ...order, ...updates }
-        : order
-    ))
-  }
+  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
+    if (updates.status) {
+      await updateOrderStatus.mutateAsync({
+        orderId,
+        newStatus: updates.status as OrderStatus,
+        reason: updates.metadata?.statusChangeReason
+      });
+    }
+  };
 
   return (
-    <OrdersContext.Provider value={{ orders, updateOrder }}>
+    <OrdersContext.Provider value={{
+      orders,
+      isLoading,
+      error: error as Error | null,
+      updateOrder
+    }}>
       {children}
     </OrdersContext.Provider>
-  )
+  );
 }
 
 export function useOrders() {
-  const context = useContext(OrdersContext)
+  const context = useContext(OrdersContext);
   if (context === undefined) {
-    throw new Error('useOrders must be used within an OrdersProvider')
+    throw new Error('useOrders must be used within an OrdersProvider');
   }
-  return context
+  return context;
 }

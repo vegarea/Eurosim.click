@@ -4,7 +4,7 @@ export const orderStatusFlow: WorkflowItem = {
   id: "FL-102",
   title: "Gestión de estados del pedido",
   description: "Sistema de cambios de estado y seguimiento de pedidos",
-  status: "reviewed",
+  status: "working",
   components: [
     "OrderStatusControl.tsx",
     "OrderHistory.tsx",
@@ -18,17 +18,14 @@ export const orderStatusFlow: WorkflowItem = {
     "order_events (tabla)"
   ],
   details: `
-Implementado y revisado:
-✓ Componentes de control de estado
-✓ Timeline de eventos
-✓ Sistema de badges por estado
-✓ Diálogos de confirmación
-✓ Validaciones por tipo de pedido
-✓ Historial de cambios en UI
-
-Pendiente conexión Supabase:
-- Registro de eventos en base de datos
-- Historial de cambios en BD
-- Notificaciones automáticas
-- Políticas RLS para cambios de estado`
+✓ Componentes de control de estado implementados
+✓ Timeline de eventos implementado
+✓ Sistema de badges por estado implementado
+✓ Diálogos de confirmación implementados
+✓ Validaciones por tipo de pedido implementadas
+✓ Historial de cambios en UI implementado
+✓ Registro de eventos en base de datos implementado
+✓ Historial de cambios en BD implementado
+✓ Notificaciones automáticas configuradas
+✓ Políticas RLS para cambios de estado configuradas`
 }
