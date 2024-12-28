@@ -1,4 +1,4 @@
-export type { Database, Json } from './base'
+export type { Database, Json, PublicSchema } from './base'
 export type {
   CustomersTable,
   OrderEventsTable,

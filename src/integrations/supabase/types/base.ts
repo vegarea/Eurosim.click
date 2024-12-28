@@ -1,3 +1,12 @@
+import type {
+  CustomersTable,
+  OrderEventsTable,
+  OrderNotesTable,
+  OrdersTable,
+  PaymentsTable,
+  ProductsTable
+} from './tables'
+
 export type Json =
   | string
   | number

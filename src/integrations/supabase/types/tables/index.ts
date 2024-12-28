@@ -1,0 +1,7 @@
+export type { TableDefaults } from './base-table'
+export type { CustomersTable } from './customers'
+export type { OrderEventsTable } from './order-events'
+export type { OrderNotesTable } from './order-notes'
+export type { OrdersTable } from './orders'
+export type { PaymentsTable } from './payments'
+export type { ProductsTable } from './products'
