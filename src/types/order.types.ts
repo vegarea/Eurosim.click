@@ -35,6 +35,7 @@ export interface Order {
   phone?: string;
   date: string;
   total: number;
+  total_amount: number;
   status: OrderStatus;
   type: "physical" | "esim";
   payment_method?: PaymentMethod;
