@@ -18,11 +18,11 @@ export const useCheckout = () => {
       for (const item of items) {
         console.log('Checking product:', item.title);
         
+        // Primero intentamos encontrar el producto sin filtrar por status
         const { data: product, error: productError } = await supabase
           .from('products')
           .select('id, status, title')
-          .eq('title', item.title)
-          .eq('status', 'active')
+          .ilike('title', item.title)
           .maybeSingle();
 
         if (productError) {
@@ -33,7 +33,12 @@ export const useCheckout = () => {
         console.log('Product query result:', product);
 
         if (!product) {
-          console.error('Product not found or inactive:', item.title);
+          console.error('Product not found:', item.title);
+          throw new Error(`El producto "${item.title}" no existe`);
+        }
+
+        if (product.status !== 'active') {
+          console.error('Product is inactive:', item.title);
           throw new Error(`El producto "${item.title}" no está disponible actualmente`);
         }
 
@@ -71,13 +76,16 @@ export const useCheckout = () => {
         const { data: product, error: productError } = await supabase
           .from('products')
           .select('id, status, title')
-          .eq('title', item.title)
-          .eq('status', 'active')
+          .ilike('title', item.title)
           .maybeSingle();
 
         if (productError || !product) {
           console.error('Error getting product:', productError);
           throw new Error(`El producto "${item.title}" ya no está disponible`);
+        }
+
+        if (product.status !== 'active') {
+          throw new Error(`El producto "${item.title}" ya no está activo`);
         }
 
         console.log('Creating order for product:', product);
