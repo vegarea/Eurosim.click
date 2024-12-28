@@ -1,4 +1,6 @@
 import { ReviewField } from "./ReviewField"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface ReviewStepProps {
   formData: any
@@ -8,6 +10,12 @@ interface ReviewStepProps {
 export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
   const fieldLabels: Record<string, string> = {
     fullName: "Nombre completo",
+    email: "Correo electrónico",
+    phone: "Teléfono",
+    address: "Dirección",
+    city: "Ciudad",
+    state: "Estado/Provincia",
+    zipCode: "Código postal",
     birthDate: "Fecha de nacimiento",
     gender: "Género",
     passportNumber: "Número de pasaporte",
@@ -17,6 +25,22 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
   const genderMap: Record<string, string> = {
     M: "Masculino",
     F: "Femenino"
+  }
+
+  const formatValue = (key: string, value: any): string => {
+    if (!value) return "No especificado";
+
+    if (key.includes("Date")) {
+      // Verifica si value es un objeto Date o un string de fecha
+      const date = value instanceof Date ? value : new Date(value);
+      return format(date, "PPP", { locale: es });
+    }
+    
+    if (key === "gender") {
+      return genderMap[value as string] || value;
+    }
+
+    return String(value);
   }
 
   return (
@@ -30,13 +54,13 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
 
       <div className="bg-white p-6 rounded-lg shadow-sm">
         {Object.entries(formData).map(([key, value]) => {
-          const displayValue = key === 'gender' ? genderMap[value as string] || value : value;
+          if (value === undefined || value === null) return null;
           
           return (
             <ReviewField
               key={key}
-              label={fieldLabels[key]}
-              value={displayValue as string | Date}
+              label={fieldLabels[key] || key}
+              value={formatValue(key, value)}
               onUpdate={(newValue) => onUpdateField(key, newValue)}
               type={key.includes("Date") ? "date" : "text"}
               isActivationDate={key === "activationDate"}
