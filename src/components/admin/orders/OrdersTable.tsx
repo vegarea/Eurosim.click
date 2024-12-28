@@ -48,8 +48,8 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               onClick={() => navigate(`/admin/orders/${order.id}`)}
             >
               <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-              <TableCell>{order.customer}</TableCell>
+              <TableCell>{new Date(order.created_at || '').toLocaleDateString()}</TableCell>
+              <TableCell>{order.customer_name}</TableCell>
               <TableCell>
                 <Badge 
                   variant="secondary" 
@@ -58,13 +58,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                   {order.type === "physical" ? "SIM Física" : "E-SIM"}
                 </Badge>
               </TableCell>
-              <TableCell>${order.total.toFixed(2)}</TableCell>
+              <TableCell>${(order.total_amount / 100).toFixed(2)}</TableCell>
               <TableCell>
                 <OrderStatusBadge status={order.status} />
               </TableCell>
               <TableCell>
-                {order.paymentMethod ? (
-                  <span className="capitalize">{order.paymentMethod}</span>
+                {order.payment_method ? (
+                  <span className="capitalize">{order.payment_method}</span>
                 ) : (
                   <span className="text-gray-400">-</span>
                 )}

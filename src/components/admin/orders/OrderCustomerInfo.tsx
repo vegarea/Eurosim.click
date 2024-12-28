@@ -40,12 +40,12 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             <div>
               <h3 className="font-medium mb-1">Cliente</h3>
               <p className="flex items-center gap-2">
-                {order.customer}
+                {order.customer_name}
                 <Button 
                   variant="ghost" 
                   size="sm"
                   className="h-6 px-2"
-                  onClick={() => window.open(`/admin/customers/${order.id}`, '_blank')}
+                  onClick={() => window.open(`/admin/customers/${order.customer_id}`, '_blank')}
                 >
                   <ExternalLink className="h-4 w-4" />
                 </Button>
@@ -53,17 +53,17 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             </div>
             <div>
               <h3 className="font-medium mb-1">Email</h3>
-              <p>{order.email || "No especificado"}</p>
+              <p>{order.customer_email || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Teléfono</h3>
-              <p>{order.phone || "No especificado"}</p>
+              <p>{order.customer_phone || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Fecha y Hora</h3>
               <div className="flex items-center gap-1 text-gray-600">
                 <Clock className="h-4 w-4" />
-                <span>{formatDateTime(order.date)}</span>
+                <span>{formatDateTime(order.created_at || '')}</span>
               </div>
             </div>
           </div>
