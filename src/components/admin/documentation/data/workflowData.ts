@@ -6,8 +6,14 @@ import { shippingWorkflows } from "./categories/shippingWorkflows"
 import { blogWorkflows } from "./categories/blogWorkflows"
 import { emailWorkflows } from "./categories/emailWorkflows"
 import { settingsWorkflows } from "./categories/settingsWorkflows"
+import { validationWorkflows } from "./categories/validationWorkflows"
 
 export const workflowData: WorkflowCategory[] = [
+  {
+    id: "validation",
+    title: "Validación y Verificación",
+    items: validationWorkflows
+  },
   {
     id: "auth",
     title: "Autenticación y Usuarios",
