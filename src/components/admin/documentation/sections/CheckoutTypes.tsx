@@ -1,4 +1,4 @@
-import { ShoppingCart, Package, ClipboardList } from "lucide-react"
+import { ShoppingCart, Package, ClipboardList, Truck } from "lucide-react"
 import { TypeComparisonSection } from "../components/TypeComparisonSection"
 
 export function CheckoutTypes() {
@@ -54,6 +54,36 @@ export function CheckoutTypes() {
         relatedFiles={[
           "src/components/admin/orders/types.ts",
           "src/components/checkout/CartItem.tsx"
+        ]}
+      />
+
+      <TypeComparisonSection
+        title="Información de Envío"
+        icon={<Truck className="h-5 w-5" />}
+        currentType={`type ShippingInfo = {
+  address: string
+  city: string
+  state: string
+  zipCode: string
+  carrier?: string
+  trackingNumber?: string
+}`}
+        supabaseType={`type ShippingInfo = {
+  id: uuid
+  order_id: uuid
+  address: text
+  city: text
+  state: text
+  zip_code: text
+  carrier: text
+  tracking_number: text
+  created_at: timestamp
+  updated_at: timestamp
+}`}
+        status="reviewed"
+        relatedFiles={[
+          "src/components/admin/shipping/types.ts",
+          "src/components/checkout/ShippingForm.tsx"
         ]}
       />
     </div>

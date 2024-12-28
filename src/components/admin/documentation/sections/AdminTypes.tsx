@@ -1,4 +1,4 @@
-import { Package, ClipboardList, Users } from "lucide-react"
+import { Package, ClipboardList, Users, Truck } from "lucide-react"
 import { TypeComparisonSection } from "../components/TypeComparisonSection"
 
 export function AdminTypes() {
@@ -66,6 +66,32 @@ export function AdminTypes() {
         relatedFiles={[
           "src/components/admin/customers/types.ts",
           "src/components/admin/customers/CustomersTable.tsx"
+        ]}
+      />
+
+      <TypeComparisonSection
+        title="Gestión de Envíos"
+        icon={<Truck className="h-5 w-5" />}
+        currentType={`type ShippingManagement = {
+  id: string
+  orderId: string
+  carrier: string
+  trackingNumber: string
+  status: string
+}`}
+        supabaseType={`type ShippingManagement = {
+  id: uuid
+  order_id: uuid
+  carrier: text
+  tracking_number: text
+  status: ShippingStatus
+  created_at: timestamp
+  updated_at: timestamp
+}`}
+        status="reviewed"
+        relatedFiles={[
+          "src/components/admin/shipping/types.ts",
+          "src/components/admin/shipping/ShippingTabs.tsx"
         ]}
       />
     </div>
