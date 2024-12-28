@@ -13,7 +13,28 @@ export const useCheckout = () => {
     setIsProcessing(true);
     
     try {
-      // 1. Create customer
+      // 1. Validate products exist and are active
+      console.log('Validating products...');
+      for (const item of items) {
+        const { data: product, error: productError } = await supabase
+          .from('products')
+          .select('id, status')
+          .eq('title', item.title)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        if (productError) {
+          console.error('Error validating product:', productError);
+          throw new Error('Error al validar el producto');
+        }
+
+        if (!product) {
+          console.error('Product not found or inactive:', item.title);
+          throw new Error(`El producto "${item.title}" no está disponible actualmente`);
+        }
+      }
+
+      // 2. Create customer
       console.log('Creating customer...');
       const { data: customer, error: customerError } = await supabase
         .from('customers')
@@ -24,16 +45,6 @@ export const useCheckout = () => {
           passport_number: formData.passportNumber,
           birth_date: formData.birthDate,
           gender: formData.gender,
-          ...(items[0].type === 'physical' && {
-            default_shipping_address: {
-              street: formData.address,
-              city: formData.city,
-              state: formData.state,
-              country: 'España',
-              postal_code: formData.zipCode,
-              phone: formData.phone
-            }
-          })
         })
         .select('*')
         .single();
@@ -43,37 +54,26 @@ export const useCheckout = () => {
         throw new Error('Error al crear el cliente');
       }
 
-      if (!customer) {
-        console.error('No customer data received');
-        throw new Error('Error al crear el cliente: no se recibieron datos');
-      }
-
       console.log('Customer created:', customer);
 
-      // 2. Get product IDs from database
-      console.log('Getting product IDs...');
+      // 3. Create orders
+      console.log('Creating orders...');
       const orders = [];
       for (const item of items) {
-        // Get real product ID from database
+        // Get product again to ensure it's still active
         const { data: product, error: productError } = await supabase
           .from('products')
-          .select('id')
+          .select('id, status')
           .eq('title', item.title)
+          .eq('status', 'active')
           .single();
 
-        if (productError) {
+        if (productError || !product) {
           console.error('Error getting product:', productError);
-          throw new Error('Error al obtener el producto');
+          throw new Error(`El producto "${item.title}" ya no está disponible`);
         }
 
-        if (!product) {
-          console.error('Product not found:', item.title);
-          throw new Error(`Producto no encontrado: ${item.title}`);
-        }
-
-        console.log('Found product:', product);
-
-        // 3. Create order with real product ID
+        // Create order
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
@@ -96,15 +96,10 @@ export const useCheckout = () => {
           throw new Error('Error al crear la orden');
         }
 
-        if (!order) {
-          console.error('No order data received');
-          throw new Error('Error al crear la orden: no se recibieron datos');
-        }
-
         console.log('Order created:', order);
         orders.push(order);
 
-        // 4. Create initial order event
+        // Create order event
         const { error: eventError } = await supabase
           .from('order_events')
           .insert({
@@ -121,7 +116,7 @@ export const useCheckout = () => {
         console.log('Order event created for order:', order.id);
       }
 
-      // 5. Create Stripe checkout session
+      // 4. Create Stripe checkout session
       console.log('Creating Stripe checkout session...');
       const { data: stripeSession, error: stripeError } = await supabase.functions.invoke('create-checkout-session', {
         body: {
@@ -150,14 +145,14 @@ export const useCheckout = () => {
         throw new Error('No se recibió la URL de pago de Stripe');
       }
 
-      // 6. Redirect to Stripe checkout
+      // 5. Redirect to Stripe checkout
       console.log('Redirecting to Stripe checkout:', stripeSession.url);
       window.location.href = stripeSession.url;
 
       return true;
     } catch (error) {
       console.error('Error in checkout process:', error);
-      toast.error('Error al procesar el pedido');
+      toast.error(error instanceof Error ? error.message : 'Error al procesar el pedido');
       return false;
     } finally {
       setIsProcessing(false);

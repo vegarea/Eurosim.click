@@ -5,6 +5,9 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 import { formatCurrency } from "@/utils/currency";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface SimCardProps {
   type: "physical" | "esim";
@@ -37,6 +40,7 @@ export function SimCard({
 }: SimCardProps) {
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
@@ -69,15 +73,39 @@ export function SimCard({
     }
   };
 
-  const handleAddToCart = () => {
-    addItem({
-      id: `${type}-${title}`,
-      type,
-      title,
-      description,
-      price
-    });
-    navigate('/checkout');
+  const handleAddToCart = async () => {
+    setIsLoading(true);
+    try {
+      // Validate product exists and is active
+      const { data: product, error } = await supabase
+        .from('products')
+        .select('id, status')
+        .eq('title', title)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (error) {
+        throw new Error('Error al verificar disponibilidad del producto');
+      }
+
+      if (!product) {
+        throw new Error('Este producto no está disponible actualmente');
+      }
+
+      addItem({
+        id: product.id, // Use the real product ID
+        type,
+        title,
+        description,
+        price
+      });
+      navigate('/checkout');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al añadir al carrito');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const colorScheme = getColorScheme(title);
@@ -134,8 +162,9 @@ export function SimCard({
         <Button 
           className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20"
           onClick={handleAddToCart}
+          disabled={isLoading}
         >
-          Añadir al Carrito
+          {isLoading ? 'Verificando...' : 'Añadir al Carrito'}
         </Button>
       </CardContent>
 
