@@ -87,6 +87,40 @@ export function AdminProducts() {
     }
   }
 
+  const handleEditProduct = async (id: string, updates: Partial<Product>) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          title: updates.title,
+          description: updates.description,
+          type: updates.type,
+          price: updates.price,
+          features: updates.features,
+          data_eu_gb: updates.data_eu_gb,
+          data_es_gb: updates.data_es_gb,
+          stock: updates.type === 'physical' ? updates.stock : null,
+        })
+        .eq('id', id)
+
+      if (error) throw error
+
+      setProducts(products.map(p => p.id === id ? { ...p, ...updates } : p))
+      
+      toast({
+        title: "Producto actualizado",
+        description: "El producto se ha actualizado correctamente"
+      })
+    } catch (error) {
+      console.error('Error updating product:', error)
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el producto",
+        variant: "destructive"
+      })
+    }
+  }
+
   const handleDeleteProduct = async (id: string) => {
     try {
       const { error } = await supabase
@@ -118,7 +152,11 @@ export function AdminProducts() {
   return (
     <div className="space-y-6">
       <ProductHeader onAddProduct={handleAddProduct} />
-      <ProductList products={products} onDelete={handleDeleteProduct} />
+      <ProductList 
+        products={products} 
+        onDelete={handleDeleteProduct}
+        onEdit={handleEditProduct}
+      />
     </div>
   )
 }

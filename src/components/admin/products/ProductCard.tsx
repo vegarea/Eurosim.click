@@ -1,27 +1,22 @@
 import { Wifi, CreditCard, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-interface Product {
-  id: string
-  type: "physical" | "esim"
-  title: string
-  description: string
-  price: number
-  features: string[]
-  europeGB?: number
-  spainGB?: number
-  status: "active" | "inactive" | "out_of_stock"
-}
+import { EditProductDialog } from "./EditProductDialog"
+import { Product } from "./types"
 
 interface ProductCardProps {
-  product: Product
+  product: Product & {
+    europeGB?: number
+    spainGB?: number
+  }
   onDelete: (id: string) => void
+  onEdit: (id: string, updates: Partial<Product>) => void
 }
 
-export function ProductCard({ product, onDelete }: ProductCardProps) {
+export function ProductCard({ product, onDelete, onEdit }: ProductCardProps) {
   return (
     <div className="relative bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex gap-2">
+        <EditProductDialog product={product} onEdit={onEdit} />
         <Button
           variant="ghost"
           size="icon"
