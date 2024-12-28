@@ -55,25 +55,27 @@ export function PlanDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm p-3 rounded-xl shadow-lg"
+      className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
     >
-      <div className="flex justify-between items-start mb-2">
+      {/* Header con título y precio */}
+      <div className="flex justify-between items-start">
         <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           {title}
         </h2>
         <div className="text-right">
-          <p className="text-2xl font-bold text-primary flex items-baseline gap-1 justify-end">
+          <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
             {amount}
             <span className="text-sm font-normal text-gray-500">{currency}</span>
           </p>
           <div className="flex items-center gap-2 justify-end">
-            <span className="text-lg font-semibold text-primary">{europeGB}GB</span>
+            <span className="text-xl font-semibold text-primary">{europeGB}GB</span>
             <span className="text-sm text-gray-600">en toda Europa</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-1.5 mb-3">
+      {/* Lista de características */}
+      <div className="mt-4 space-y-2">
         {filteredFeatures.map((feature, index) => (
           <motion.div
             key={index}
@@ -88,17 +90,21 @@ export function PlanDetails({
         ))}
       </div>
 
-      <UsageMeter
-        europeGB={europeGB}
-        spainGB={spainGB}
-        isHighlighted={true}
-      />
+      {/* Medidor de uso */}
+      <div className="mt-4">
+        <UsageMeter
+          europeGB={europeGB}
+          spainGB={spainGB}
+          isHighlighted={true}
+        />
+      </div>
 
+      {/* Botón de compra */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-3"
+        className="mt-4"
       >
         <Button 
           onClick={handlePurchase}
