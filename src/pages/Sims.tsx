@@ -3,8 +3,7 @@ import { SimCard } from "@/components/SimCard";
 import { DeliveryBenefits } from "@/components/DeliveryBenefits";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { Truck, Calendar } from "lucide-react";
-import MexicoFlag from "@/components/icons/MexicoFlag";
+import { SimHero } from "@/components/SimHero";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
@@ -45,6 +44,7 @@ const Sims = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
+      <SimHero />
       
       <div className="container mx-auto px-4 py-8 lg:py-12 relative">
         <div className="max-w-6xl mx-auto">
