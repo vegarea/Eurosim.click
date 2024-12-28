@@ -57,11 +57,9 @@ export function DatabaseStructure() {
         
         console.log('Loading table files:', tableFiles)
 
-        // Verificar qué tablas existen en Supabase
+        // Verificar qué tablas existen en Supabase usando nuestra nueva función
         const { data: existingTables, error: tablesError } = await supabase
-          .from('information_schema.tables')
-          .select('table_name')
-          .eq('table_schema', 'public')
+          .rpc('get_public_tables')
         
         if (tablesError) {
           console.error('Error fetching tables:', tablesError)
