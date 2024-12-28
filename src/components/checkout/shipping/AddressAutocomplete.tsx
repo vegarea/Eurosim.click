@@ -4,6 +4,13 @@ import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/f
 import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 
+declare global {
+  interface Window {
+    google: typeof google;
+    initGoogleMaps: () => void;
+  }
+}
+
 interface AddressAutocompleteProps {
   value: string
   onChange: (value: string) => void
@@ -16,18 +23,31 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
 
   useEffect(() => {
     const loadGoogleMapsScript = async () => {
-      const { data: { GOOGLE_MAPS_API_KEY } } = await supabase.functions.invoke('get-google-maps-key')
-      
-      if (!window.google) {
-        const script = document.createElement('script')
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`
-        script.async = true
-        script.defer = true
-        document.head.appendChild(script)
+      try {
+        const { data: { GOOGLE_MAPS_API_KEY }, error } = await supabase.functions.invoke('get-google-maps-key')
         
-        return new Promise<void>((resolve) => {
-          script.onload = () => resolve()
-        })
+        if (error) {
+          console.error('Error fetching Google Maps API key:', error)
+          return
+        }
+
+        if (!window.google) {
+          window.initGoogleMaps = () => {
+            console.log('Google Maps API loaded')
+          }
+
+          const script = document.createElement('script')
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`
+          script.async = true
+          script.defer = true
+          document.head.appendChild(script)
+
+          return new Promise<void>((resolve) => {
+            script.onload = () => resolve()
+          })
+        }
+      } catch (error) {
+        console.error('Error loading Google Maps:', error)
       }
     }
 
