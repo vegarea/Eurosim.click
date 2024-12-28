@@ -48,7 +48,7 @@ export function AdminCustomers() {
         customer_id: customerId,
         name: order.customer_name || "No especificado",
         email: order.customer_email || "No especificado",
-        phone: order.metadata?.phone || "No especificado",
+        phone: (order.metadata as any)?.phone || "No especificado",
         orders: [],
         totalSpent: 0,
         shippingInfo: {},
@@ -59,21 +59,23 @@ export function AdminCustomers() {
     acc[customerId].totalSpent += order.total_amount
 
     // Actualizar información de envío y documentación si está disponible
-    if (order.shipping_address) {
+    const shippingAddress = order.shipping_address as any
+    if (shippingAddress) {
       acc[customerId].shippingInfo = {
-        address: order.shipping_address.street,
-        city: order.shipping_address.city,
-        state: order.shipping_address.state,
-        zipCode: order.shipping_address.postal_code
+        address: shippingAddress.street,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        zipCode: shippingAddress.postal_code
       }
     }
     
     // La documentación ahora se maneja a través de metadata
-    if (order.metadata) {
+    const metadata = order.metadata as any
+    if (metadata) {
       acc[customerId].documentation = {
-        passportNumber: order.metadata.passport_number,
-        birthDate: order.metadata.birth_date,
-        gender: order.metadata.gender,
+        passportNumber: metadata.passport_number,
+        birthDate: metadata.birth_date,
+        gender: metadata.gender,
         activationDate: order.activation_date
       }
     }
