@@ -13,52 +13,144 @@ interface TypeItem {
 
 const types: TypeItem[] = [
   {
-    name: "Order",
-    currentType: `type Order = {
+    name: "CartItem",
+    currentType: `interface CartItem {
   id: string
-  status: OrderStatus
-  customer: string
-  total: number
   type: "physical" | "esim"
-  // ... otros campos
+  title: string
+  description: string
+  price: number
+  quantity: number
 }`,
-    supabaseType: `type Order = Database["public"]["Tables"]["orders"]["Row"] = {
+    supabaseType: `type CartItem = Database["public"]["Tables"]["cart_items"]["Row"] = {
   id: string
-  customer_id: string
-  status: Database["public"]["Enums"]["order_status"]
-  type: Database["public"]["Enums"]["order_type"]
-  // ... otros campos
+  product_id: string
+  quantity: number
+  created_at: string
+  updated_at: string | null
+  metadata: Json | null
 }`,
     locations: [
-      "src/components/admin/orders/types.ts",
-      "src/components/checkout/types.ts",
-      "src/contexts/OrdersContext.tsx"
+      "src/contexts/CartContext.tsx",
+      "src/components/cart/Cart.tsx",
+      "src/components/cart/CartItem.tsx"
     ],
     category: "component",
     status: "pending"
   },
   {
-    name: "Customer",
-    currentType: `type Customer = {
+    name: "Order",
+    currentType: `interface Order {
   id: string
-  name: string
-  email: string
+  date: string
+  customer: string
+  email?: string
   phone?: string
+  total: number
+  status: OrderStatus
+  type: OrderType
+  paymentMethod?: "stripe" | "paypal"
+  notes?: OrderNote[]
+  events?: OrderEvent[]
+  title?: string
+  description?: string
+  quantity?: number
+  passportNumber?: string
+  birthDate?: string
+  gender?: 'M' | 'F'
+  activationDate?: string
+  shippingAddress?: string
+  city?: string
+  state?: string
+  zipCode?: string
 }`,
-    supabaseType: `type Customer = Database["public"]["Tables"]["customers"]["Row"] = {
+    supabaseType: `type Order = Database["public"]["Tables"]["orders"]["Row"] = {
   id: string
-  name: string
-  email: string
-  phone: string | null
+  customer_id: string
+  product_id: string
+  status: Database["public"]["Enums"]["order_status"]
+  type: Database["public"]["Enums"]["order_type"]
+  total_amount: number
+  quantity: number
+  payment_method: Database["public"]["Enums"]["payment_method"]
+  payment_status: Database["public"]["Enums"]["payment_status"]
+  shipping_address: Json | null
+  tracking_number: string | null
+  carrier: string | null
+  activation_date: string | null
+  notes: string[] | null
+  metadata: Json | null
+  created_at: string
+  updated_at: string | null
 }`,
     locations: [
-      "src/components/admin/customers/types.ts",
-      "src/components/admin/customers/CustomersTable.tsx"
+      "src/contexts/OrdersContext.tsx",
+      "src/components/admin/orders/types.ts",
+      "src/components/checkout/types.ts",
+      "src/pages/OrderDetails.tsx"
     ],
-    category: "component",
+    category: "context",
     status: "pending"
   },
-  // ... Aquí irían todos los tipos encontrados
+  {
+    name: "DocumentationFormData",
+    currentType: `interface DocumentationFormData {
+  fullName: string
+  birthDate: Date
+  gender: string
+  passportNumber: string
+  activationDate: Date
+}`,
+    supabaseType: `type CustomerDocument = Database["public"]["Tables"]["customer_documents"]["Row"] = {
+  id: string
+  customer_id: string
+  full_name: string
+  birth_date: string
+  gender: Database["public"]["Enums"]["gender"]
+  passport_number: string
+  activation_date: string
+  status: Database["public"]["Enums"]["document_status"]
+  created_at: string
+  updated_at: string | null
+}`,
+    locations: [
+      "src/components/checkout/DocumentationForm.tsx"
+    ],
+    category: "form",
+    status: "pending"
+  },
+  {
+    name: "ShippingFormData",
+    currentType: `interface ShippingFormData {
+  fullName: string
+  email: string
+  phone: string
+  address: string
+  city: string
+  state: string
+  zipCode: string
+}`,
+    supabaseType: `type ShippingAddress = Database["public"]["Tables"]["shipping_addresses"]["Row"] = {
+  id: string
+  customer_id: string
+  full_name: string
+  email: string
+  phone: string
+  street: string
+  city: string
+  state: string
+  postal_code: string
+  country: string
+  is_default: boolean
+  created_at: string
+  updated_at: string | null
+}`,
+    locations: [
+      "src/components/checkout/ShippingForm.tsx"
+    ],
+    category: "form",
+    status: "pending"
+  }
 ]
 
 export function TypesList() {
