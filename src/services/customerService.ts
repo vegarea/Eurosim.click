@@ -37,7 +37,14 @@ export const customerService = {
           passport_number: customerData.passport_number,
           birth_date: customerData.birth_date,
           gender: customerData.gender,
-          default_shipping_address: customerData.shipping_address || null
+          default_shipping_address: customerData.shipping_address ? {
+            street: customerData.shipping_address.street,
+            city: customerData.shipping_address.city,
+            state: customerData.shipping_address.state,
+            country: customerData.shipping_address.country,
+            postal_code: customerData.shipping_address.postal_code,
+            phone: customerData.shipping_address.phone
+          } : null
         })
         .eq('id', existingCustomer.id)
         .select()
@@ -59,7 +66,14 @@ export const customerService = {
       .from('customers')
       .insert({
         ...customerData,
-        default_shipping_address: customerData.shipping_address || null
+        default_shipping_address: customerData.shipping_address ? {
+          street: customerData.shipping_address.street,
+          city: customerData.shipping_address.city,
+          state: customerData.shipping_address.state,
+          country: customerData.shipping_address.country,
+          postal_code: customerData.shipping_address.postal_code,
+          phone: customerData.shipping_address.phone
+        } : null
       })
       .select()
       .single();
