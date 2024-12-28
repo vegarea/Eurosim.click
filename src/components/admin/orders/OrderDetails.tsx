@@ -5,7 +5,7 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/components/admin/orders/types"
+import { OrderStatus } from "@/types/database/enums"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -17,6 +17,7 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
+import { OrderNote } from "@/types/database/common"
 
 const statusOrder = [
   "payment_pending",
@@ -72,12 +73,12 @@ export default function OrderDetails() {
   }
 
   const handleAddNote = (text: string) => {
-    const newNote = {
+    const newNote: OrderNote = {
       id: crypto.randomUUID(),
       text,
-      userId: "current-user-id", // En una app real, esto vendría del contexto de autenticación
-      userName: "Admin", // En una app real, esto vendría del contexto de autenticación
-      createdAt: new Date().toISOString()
+      user_id: "current-user-id", // En una app real, esto vendría del contexto de autenticación
+      user_name: "Admin", // En una app real, esto vendría del contexto de autenticación
+      created_at: new Date().toISOString()
     }
 
     const currentNotes = order.notes || []
