@@ -1,4 +1,9 @@
-import { ChecklistItem } from "../types/ChecklistTypes"
+import { ChecklistCategory } from "../types/ChecklistTypes"
+import { blogTypes } from "../components/types/BlogTypes"
+import { settingsTypes } from "../components/types/SettingsTypes"
+import { orderTypes } from "../components/types/OrderTypes"
+import { formTypes } from "../components/types/FormTypes"
+import { adminTypes } from "../components/types/AdminTypes"
 
 interface TypeAnalysis {
   total: number
@@ -9,14 +14,39 @@ interface TypeAnalysis {
   hooks: number
 }
 
+function countTypesByCategory(types: any[]): { [key: string]: number } {
+  return types.reduce((acc, type) => {
+    const category = type.category || 'unknown';
+    acc[category] = (acc[category] || 0) + 1;
+    return acc;
+  }, {});
+}
+
 export function scanProjectTypes(): TypeAnalysis {
+  // Combine all type definitions from different modules
+  const allTypes = [
+    ...orderTypes,
+    ...formTypes,
+    ...adminTypes,
+    ...blogTypes.items,
+    ...settingsTypes.items
+  ];
+
+  // Count types by their categories
+  const categoryCounts = countTypesByCategory(allTypes);
+
+  // Count reviewed types
+  const reviewedTypes = allTypes.filter(type => 
+    type.status === "reviewed" || type.status === "completed"
+  ).length;
+
   return {
-    total: 10,       // Total de tipos encontrados
-    reviewed: 0,     // Ninguno revisado aún
-    components: 5,   // CartItem, EmailTemplate, Product, BlogPost, BlogPostImage
-    forms: 2,        // DocumentationForm, ShippingForm
-    contexts: 1,     // OrderContext
-    hooks: 0         // No hay hooks con tipos propios
+    total: allTypes.length,
+    reviewed: reviewedTypes,
+    components: categoryCounts['component'] || 0,
+    forms: categoryCounts['form'] || 0,
+    contexts: categoryCounts['context'] || 0,
+    hooks: categoryCounts['hook'] || 0
   }
 }
 
@@ -24,12 +54,20 @@ export function analyzeTypeCompatibility(
   currentType: string, 
   supabaseType: string
 ): boolean {
-  return true
+  // Basic implementation - can be enhanced later
+  return true;
 }
 
 export function findTypeLocations(typeName: string): string[] {
-  return [
-    `src/components/admin/${typeName.toLowerCase()}/types.ts`,
-    `src/types/${typeName.toLowerCase()}.ts`
-  ]
+  // Get all defined locations for this type from our type definitions
+  const allTypes = [
+    ...orderTypes,
+    ...formTypes,
+    ...adminTypes,
+    ...blogTypes.items,
+    ...settingsTypes.items
+  ];
+
+  const typeDefinition = allTypes.find(type => type.name === typeName);
+  return typeDefinition?.locations || [];
 }
