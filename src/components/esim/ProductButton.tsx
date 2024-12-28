@@ -1,5 +1,6 @@
 import { CreditCard, Wifi } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/utils/currency";
 
 interface ProductButtonProps {
   title: string;
@@ -42,6 +43,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
   };
 
   const colorScheme = getColorScheme(title);
+  const formattedPrice = formatCurrency(price / 100);
 
   return (
     <button
@@ -69,8 +71,7 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
       <div className="flex-1 text-left">
         <h3 className="text-sm md:text-lg font-semibold">{title}</h3>
         <p className="text-base md:text-xl font-bold text-primary">
-          ${price}
-          <span className="text-xs md:text-sm font-normal text-gray-600 ml-1">MXN</span>
+          {formattedPrice}
         </p>
       </div>
     </button>

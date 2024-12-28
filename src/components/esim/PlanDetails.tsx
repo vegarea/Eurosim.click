@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "@/utils/currency";
 
 interface PlanDetailsProps {
   title: string;
@@ -44,6 +45,8 @@ export function PlanDetails({
     navigate('/checkout');
   };
 
+  const formattedPrice = formatCurrency(price / 100);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -72,8 +75,7 @@ export function PlanDetails({
 
       <div className="mb-6">
         <p className="text-3xl font-bold text-primary">
-          ${price}
-          <span className="text-sm font-normal text-gray-600 ml-1">MXN</span>
+          {formattedPrice}
         </p>
       </div>
 
