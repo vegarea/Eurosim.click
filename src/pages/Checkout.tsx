@@ -15,6 +15,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Check, ArrowRight, ArrowLeft } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { Json } from "@/types/database/common"
 
 // Test data that matches the expected prop types for each form
 const testData = {
@@ -70,10 +71,16 @@ export default function Checkout() {
   }
 
   const handleFormSubmit = (values: any) => {
-    setFormData({ ...formData, ...values })
+    // Asegurarse de que la dirección de envío se guarde como Json
+    const formDataWithShippingAddress = {
+      ...values,
+      shipping_address: values.shippingAddress as unknown as Json
+    };
+    
+    setFormData({ ...formData, ...formDataWithShippingAddress });
     if (step < 4) {
-      setStep(step + 1)
-      setIsFormValid(step === 3) // Mantenemos la validación activa en el paso de revisión
+      setStep(step + 1);
+      setIsFormValid(step === 3);
     }
   }
 

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { User, Mail, Phone, MapPin, Building, Map } from "lucide-react"
+import { Json } from "@/types/database/common"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
@@ -21,15 +22,7 @@ interface ShippingFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   onValidityChange?: (isValid: boolean) => void;
   email?: string;
-  initialData?: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  };
+  initialData?: z.infer<typeof formSchema>;
 }
 
 export function ShippingForm({ onSubmit, onValidityChange, email = '', initialData }: ShippingFormProps) {
@@ -56,9 +49,25 @@ export function ShippingForm({ onSubmit, onValidityChange, email = '', initialDa
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
 
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    // Convertir los datos del formulario al formato Json para Supabase
+    const shippingAddress: Json = {
+      street: values.address,
+      city: values.city,
+      state: values.state,
+      postal_code: values.zipCode,
+      phone: values.phone
+    };
+
+    onSubmit({
+      ...values,
+      shippingAddress
+    } as unknown as z.infer<typeof formSchema>);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
