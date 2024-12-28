@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, ShoppingCart, Signal, Wifi } from "lucide-react";
 import EUFlag from "@/components/icons/EUFlag";
+import { LogoSite } from "./LogoSite";
 import {
   Sheet,
   SheetContent,
@@ -35,12 +36,7 @@ export function Header() {
       
       <div className="container relative flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link 
-          to="/" 
-          className="flex items-center transition-transform hover:scale-105"
-        >
-          <img src="/logo.png" alt="Euro Connect" className="h-8 w-auto drop-shadow-sm" />
-        </Link>
+        <LogoSite />
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
