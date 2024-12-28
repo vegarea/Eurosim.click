@@ -16,8 +16,7 @@ export function scanProjectTypes(): TypeAnalysis {
     components: 5,   // CartItem, EmailTemplate, Product, BlogPost, BlogPostImage
     forms: 2,        // DocumentationForm, ShippingForm
     contexts: 1,     // OrderContext
-    hooks: 0,        // No hay hooks con tipos propios
-    settings: 2      // CompanySettings, StyleSettings
+    hooks: 0         // No hay hooks con tipos propios
   }
 }
 
