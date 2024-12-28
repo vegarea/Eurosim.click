@@ -50,15 +50,35 @@ export const useCheckout = () => {
 
       console.log('Customer created:', customer);
 
-      // 2. Create order for each item
-      console.log('Creating orders...');
+      // 2. Get product IDs from database
+      console.log('Getting product IDs...');
       const orders = [];
       for (const item of items) {
+        // Get real product ID from database
+        const { data: product, error: productError } = await supabase
+          .from('products')
+          .select('id')
+          .eq('title', item.title)
+          .single();
+
+        if (productError) {
+          console.error('Error getting product:', productError);
+          throw new Error('Error al obtener el producto');
+        }
+
+        if (!product) {
+          console.error('Product not found:', item.title);
+          throw new Error(`Producto no encontrado: ${item.title}`);
+        }
+
+        console.log('Found product:', product);
+
+        // 3. Create order with real product ID
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert({
             customer_id: customer.id,
-            product_id: item.id,
+            product_id: product.id,
             type: item.type,
             total_amount: item.price * item.quantity,
             quantity: item.quantity,
@@ -84,7 +104,7 @@ export const useCheckout = () => {
         console.log('Order created:', order);
         orders.push(order);
 
-        // 3. Create initial order event
+        // 4. Create initial order event
         const { error: eventError } = await supabase
           .from('order_events')
           .insert({
@@ -101,7 +121,7 @@ export const useCheckout = () => {
         console.log('Order event created for order:', order.id);
       }
 
-      // 4. Create Stripe checkout session
+      // 5. Create Stripe checkout session
       console.log('Creating Stripe checkout session...');
       const { data: stripeSession, error: stripeError } = await supabase.functions.invoke('create-checkout-session', {
         body: {
@@ -130,7 +150,7 @@ export const useCheckout = () => {
         throw new Error('No se recibió la URL de pago de Stripe');
       }
 
-      // 5. Redirect to Stripe checkout
+      // 6. Redirect to Stripe checkout
       console.log('Redirecting to Stripe checkout:', stripeSession.url);
       window.location.href = stripeSession.url;
 
