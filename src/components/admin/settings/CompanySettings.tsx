@@ -17,13 +17,13 @@ export function CompanySettings() {
   const [facebookUrl, setFacebookUrl] = useState("https://facebook.com/")
   const [instagramUrl, setInstagramUrl] = useState("https://instagram.com/")
 
-  // Fetch current logo
+  // Fetch current logo and id
   const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('logo_url')
+        .select('id, logo_url')
         .single()
       
       if (error) throw error
