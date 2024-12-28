@@ -13,7 +13,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export function CountryCoverage() {
+interface CountryCoverageProps {
+  defaultOpen?: boolean;
+}
+
+export function CountryCoverage({ defaultOpen = false }: CountryCoverageProps) {
   const countries = [
     { name: "Alemania", code: "de" },
     { name: "Austria", code: "at" },
@@ -57,7 +61,12 @@ export function CountryCoverage() {
       animate={{ opacity: 1, y: 0 }}
       className="bg-white rounded-2xl p-6 shadow-lg mb-16"
     >
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion 
+        type="single" 
+        collapsible 
+        className="w-full"
+        defaultValue={defaultOpen ? "coverage" : undefined}
+      >
         <AccordionItem value="coverage">
           <AccordionTrigger className="flex items-center gap-2 text-xl font-semibold hover:no-underline">
             <div className="flex items-center gap-2">

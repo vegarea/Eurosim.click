@@ -78,7 +78,7 @@ export function Header() {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-3xl">
-              <CountryCoverage />
+              <CountryCoverage defaultOpen={true} />
             </DialogContent>
           </Dialog>
 
@@ -145,7 +145,7 @@ export function Header() {
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl">
-                    <CountryCoverage />
+                    <CountryCoverage defaultOpen={true} />
                   </DialogContent>
                 </Dialog>
                 
