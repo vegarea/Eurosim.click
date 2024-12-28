@@ -53,64 +53,74 @@ export function PlanDetails({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm p-4 rounded-xl shadow-lg"
+      className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden"
     >
-      <div className="flex justify-between items-start border-b border-gray-100 pb-3">
-        <div className="flex flex-col">
-          <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      {/* Encabezado destacado con precio y GB */}
+      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             {title}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">{description}</p>
+          <div className="text-right">
+            <p className="text-4xl font-bold text-primary flex items-baseline gap-1 justify-end">
+              {amount}
+              <span className="text-sm font-normal text-gray-500">{currency}</span>
+            </p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
-            {amount}
-            <span className="text-sm font-normal text-gray-500">{currency}</span>
-          </p>
-          <div className="flex items-center gap-2 justify-end">
-            <span className="text-xl font-semibold text-primary">{europeGB}GB</span>
-            <span className="text-sm text-gray-600">en toda Europa</span>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/80 rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-primary">{europeGB}GB</p>
+            <p className="text-sm text-gray-600">Europa</p>
+          </div>
+          <div className="bg-white/80 rounded-lg p-3 text-center">
+            <p className="text-2xl font-bold text-primary">{spainGB}GB</p>
+            <p className="text-sm text-gray-600">España</p>
           </div>
         </div>
       </div>
 
-      <div className="py-3 border-b border-gray-100">
-        {filteredFeatures.map((feature, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="flex items-center gap-2 mb-2 last:mb-0"
-          >
-            <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
-            <span className="text-sm text-gray-700">{feature}</span>
-          </motion.div>
-        ))}
-      </div>
+      {/* Contenido principal */}
+      <div className="p-6 space-y-6">
+        {/* Características */}
+        <div className="space-y-2">
+          {filteredFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="flex items-center gap-2"
+            >
+              <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
+              <span className="text-sm text-gray-700">{feature}</span>
+            </motion.div>
+          ))}
+        </div>
 
-      <div className="py-3 border-b border-gray-100">
+        {/* Medidor de uso */}
         <UsageMeter
           europeGB={europeGB}
           spainGB={spainGB}
           isHighlighted={true}
         />
-      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="pt-3"
-      >
-        <Button 
-          onClick={handlePurchase}
-          className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+        {/* Botón de compra */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
         >
-          <ShoppingCart className="w-4 h-4" />
-          Comprar
-        </Button>
-      </motion.div>
+          <Button 
+            onClick={handlePurchase}
+            className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            Comprar
+          </Button>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
