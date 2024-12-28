@@ -1,4 +1,3 @@
-// Enums de la base de datos
 export type OrderStatus = 'payment_pending' | 'payment_failed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 export type OrderType = 'physical' | 'esim';
@@ -23,13 +22,13 @@ export interface Customer {
   passport_number?: string;
   birth_date?: string;
   gender?: string;
-  default_shipping_address?: ShippingAddress;
-  billing_address?: Record<string, any>;
+  default_shipping_address?: ShippingAddress | null;
+  billing_address?: Record<string, any> | null;
   preferred_language?: string;
-  marketing_preferences?: Record<string, any>;
+  marketing_preferences?: Record<string, any> | null;
   stripe_customer_id?: string;
   paypal_customer_id?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, any> | null;
   created_at: string;
   updated_at: string;
 }

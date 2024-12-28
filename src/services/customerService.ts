@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Customer } from "@/types";
+import { Customer, ShippingAddress } from "@/types";
 
 export const customerService = {
   async findOrCreateCustomer(customerData: {
@@ -9,7 +9,7 @@ export const customerService = {
     passport_number?: string;
     birth_date?: string;
     gender?: string;
-    shipping_address?: any;
+    shipping_address?: ShippingAddress;
   }): Promise<Customer> {
     console.log('Finding or creating customer with data:', customerData);
 
@@ -37,7 +37,7 @@ export const customerService = {
           passport_number: customerData.passport_number,
           birth_date: customerData.birth_date,
           gender: customerData.gender,
-          default_shipping_address: customerData.shipping_address
+          default_shipping_address: customerData.shipping_address || null
         })
         .eq('id', existingCustomer.id)
         .select()
@@ -48,8 +48,10 @@ export const customerService = {
         throw updateError;
       }
 
-      console.log('Customer updated successfully:', updatedCustomer);
-      return updatedCustomer;
+      return {
+        ...updatedCustomer,
+        default_shipping_address: updatedCustomer.default_shipping_address as ShippingAddress
+      } as Customer;
     }
 
     // Crear nuevo cliente
@@ -57,7 +59,7 @@ export const customerService = {
       .from('customers')
       .insert({
         ...customerData,
-        default_shipping_address: customerData.shipping_address
+        default_shipping_address: customerData.shipping_address || null
       })
       .select()
       .single();
@@ -67,7 +69,9 @@ export const customerService = {
       throw createError;
     }
 
-    console.log('New customer created successfully:', newCustomer);
-    return newCustomer;
+    return {
+      ...newCustomer,
+      default_shipping_address: newCustomer.default_shipping_address as ShippingAddress
+    } as Customer;
   }
 };

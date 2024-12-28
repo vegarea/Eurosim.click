@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Customer, Order } from "@/types";
+import { Order } from "@/types";
 
 export const orderService = {
   async createOrder(orderData: {
@@ -20,7 +20,11 @@ export const orderService = {
         status: 'payment_pending',
         payment_status: 'pending'
       })
-      .select()
+      .select(`
+        *,
+        customer:customers(name),
+        product:products(title, price)
+      `)
       .single();
 
     if (error) {
@@ -28,8 +32,27 @@ export const orderService = {
       throw error;
     }
 
-    console.log('Order created successfully:', order);
-    return order;
+    // Transformar la respuesta al tipo Order
+    const transformedOrder: Order = {
+      id: order.id,
+      customer: order.customer?.name || 'Unknown',
+      customer_id: order.customer_id,
+      product_id: order.product_id,
+      date: order.created_at,
+      total: order.total_amount / 100,
+      total_amount: order.total_amount,
+      status: order.status,
+      type: order.type,
+      payment_method: order.payment_method,
+      payment_status: order.payment_status,
+      title: order.product?.title,
+      quantity: order.quantity,
+      created_at: order.created_at,
+      updated_at: order.updated_at
+    };
+
+    console.log('Order created successfully:', transformedOrder);
+    return transformedOrder;
   },
 
   async createOrderEvent(orderId: string, type: string, description: string) {
