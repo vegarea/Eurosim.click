@@ -69,7 +69,7 @@ export default function ESims() {
           {!isLoading && (
             <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row'} gap-6 md:gap-8`}>
               <div className={`${isMobile ? 'w-full' : 'md:w-[65%]'} order-2 md:order-1`}>
-                <div className="grid grid-cols-2 gap-2 md:gap-4">
+                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-4`}>
                   {simCards.map((card) => (
                     <ProductButton
                       key={card.title}
