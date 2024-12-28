@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export default function ESims() {
   const isMobile = useIsMobile();
   const [selectedPlan, setSelectedPlan] = useState({
+    id: "esim-xl",
     title: "Tarifa XL",
     description: "16GB Europa / 160GB España",
     price: 817,
@@ -27,6 +28,7 @@ export default function ESims() {
 
   const simCards = [
     {
+      id: "esim-m",
       type: "esim" as const,
       title: "Tarifa M",
       description: "8GB Europa / 100GB España",
@@ -39,6 +41,7 @@ export default function ESims() {
       spainGB: 100
     },
     {
+      id: "esim-l",
       type: "esim" as const,
       title: "Tarifa L",
       description: "11GB Europa / 140GB España",
@@ -51,6 +54,7 @@ export default function ESims() {
       spainGB: 140
     },
     {
+      id: "esim-xl",
       type: "esim" as const,
       title: "Tarifa XL",
       description: "16GB Europa / 160GB España",
@@ -63,6 +67,7 @@ export default function ESims() {
       spainGB: 160
     },
     {
+      id: "esim-xxl",
       type: "esim" as const,
       title: "Tarifa XXL",
       description: "22GB Europa / 190GB España",
@@ -93,7 +98,7 @@ export default function ESims() {
               <div className="grid grid-cols-2 gap-2 md:gap-4">
                 {simCards.map((card) => (
                   <ProductButton
-                    key={card.title}
+                    key={card.id}
                     title={card.title}
                     price={card.price}
                     type={card.type}
