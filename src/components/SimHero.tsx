@@ -45,7 +45,7 @@ export function SimHero() {
                     className="w-full aspect-[4/3] object-cover rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
                   />
                   <div className="absolute -bottom-4 -right-4 bg-white px-4 py-2 rounded-xl shadow-lg transform rotate-3">
-                    <p className="text-sm font-medium text-gray-900">¡Envío gratis a todo México! 🚚</p>
+                    <p className="text-sm font-medium text-gray-900">¡Cobertura en toda Europa! 🌍</p>
                   </div>
                 </div>
               </div>
