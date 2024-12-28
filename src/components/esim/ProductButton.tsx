@@ -14,29 +14,33 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
   // Función para determinar el color según el título
   const getColorScheme = (title: string) => {
     switch (title) {
-      case "Tarifa M":
+      case "E-SIM S":
+      case "Tarifa S":
         return {
-          bg: "from-[#F2FCE2] to-[#E5F7D3]",
+          bg: "bg-[#F2FCE2]",
           iconColor: "text-green-600"
         };
-      case "Tarifa L":
+      case "E-SIM M":
+      case "Tarifa M":
         return {
-          bg: "from-[#D3E4FD] to-[#C4D9F7]",
+          bg: "bg-[#D3E4FD]",
           iconColor: "text-blue-600"
         };
-      case "Tarifa XL":
+      case "E-SIM L":
+      case "Tarifa L":
         return {
-          bg: "from-[#E5DEFF] to-[#D6CFFF]",
+          bg: "bg-[#E5DEFF]",
           iconColor: "text-purple-600"
         };
-      case "Tarifa XXL":
+      case "E-SIM XL":
+      case "Tarifa XL":
         return {
-          bg: "from-[#FFDEE2] to-[#FFD0D5]",
+          bg: "bg-[#FFDEE2]",
           iconColor: "text-pink-600"
         };
       default:
         return {
-          bg: "from-[#D3E4FD] to-[#C4D9F7]",
+          bg: "bg-[#D3E4FD]",
           iconColor: "text-blue-600"
         };
     }
@@ -53,8 +57,8 @@ export function ProductButton({ title, price, isSelected, onClick, type }: Produ
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-4",
         isSelected ? 
-          `bg-gradient-to-r ${colorScheme.bg} shadow-lg` : 
-          `bg-gradient-to-r ${colorScheme.bg} opacity-80 hover:opacity-100`
+          `${colorScheme.bg} shadow-lg` : 
+          `${colorScheme.bg} opacity-80 hover:opacity-100`
       )}
     >
       <div className={cn(
