@@ -60,7 +60,8 @@ export function AdminCustomers() {
 
     // Actualizar información de envío y documentación si está disponible
     if (order.shipping_address) {
-      acc[customerId].default_shipping_address = order.shipping_address as Json
+      // El shipping_address ya viene como Json de la base de datos
+      acc[customerId].default_shipping_address = order.shipping_address
     }
     
     if (order.metadata) {
