@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { Order, OrderStatus } from "./orders/types"
-import { useOrders } from "@/contexts/OrdersContext"
-import { toast } from "sonner"
+import { OrderStatus } from "@/types"
+import { useOrdersData } from "@/hooks/useOrdersData"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function AdminOrders() {
-  const { orders, updateOrder } = useOrders()
+  const { orders, isLoading, updateOrderStatus } = useOrdersData()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
@@ -19,8 +19,23 @@ export function AdminOrders() {
   })
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
-    updateOrder(orderId, { status: newStatus })
-    toast.success("Estado del pedido actualizado correctamente")
+    updateOrderStatus.mutate({ orderId, newStatus });
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <Skeleton className="h-12 w-full" />
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (

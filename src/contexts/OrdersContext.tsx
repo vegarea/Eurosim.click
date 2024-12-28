@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
-import { Order } from '@/types/order.types';
-import { mockOrders } from '@/components/admin/orders/mockData';
+import React, { createContext, useContext } from 'react';
+import { Order } from '@/types';
+import { useOrdersData } from '@/hooks/useOrdersData';
 
 interface OrdersContextType {
   orders: Order[];
@@ -10,14 +10,12 @@ interface OrdersContextType {
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const { orders, updateOrderStatus } = useOrdersData();
 
   const updateOrder = (orderId: string, updates: Partial<Order>) => {
-    setOrders(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId ? { ...order, ...updates } : order
-      )
-    );
+    if (updates.status) {
+      updateOrderStatus.mutate({ orderId, newStatus: updates.status });
+    }
   };
 
   return (
