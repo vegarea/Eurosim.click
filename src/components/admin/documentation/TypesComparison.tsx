@@ -1,4 +1,15 @@
+import {
+  Database,
+  FileText,
+  ListTree,
+  LayoutDashboard,
+  Code2,
+} from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DatabaseStructure } from "./DatabaseStructure"
+import { ProjectWorkflow } from "./ProjectWorkflow"
+import { DocumentationOverview } from "./DocumentationOverview"
+import { TypesComparison } from "./TypesComparison"
 import { TypeComparisonSection } from "./components/TypeComparisonSection"
 import { TypesChecklist } from "./components/TypesChecklist"
 import { TypesCounter } from "./components/TypesCounter"
@@ -74,15 +85,30 @@ export function TypesComparison() {
 
         // Actualizar la documentación en la sección de checkout
         toast({
-          title: "Verificación de tipos completada",
-          description: `Se han documentado las diferencias entre los tipos actuales y los tipos de Supabase para Pedidos y Items de Pedido`,
+          title: "✅ Verificación completada",
+          description: `Se han verificado y actualizado los tipos de Pedidos y Items de Pedido`,
         })
+
+        // Actualizar el estado visual de los items verificados
+        const updatedCategory = {
+          ...category,
+          items: category.items.map(item => ({
+            ...item,
+            status: "reviewed" as const
+          }))
+        }
+
+        // Actualizar el estado en typesChecklistData
+        const categoryIndex = typesChecklistData.findIndex(cat => cat.id === categoryId)
+        if (categoryIndex !== -1) {
+          typesChecklistData[categoryIndex] = updatedCategory
+        }
       }
 
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error en la verificación",
+        title: "❌ Error en la verificación",
         description: "No se pudieron verificar los tipos. Por favor, intenta nuevamente.",
       })
     }
