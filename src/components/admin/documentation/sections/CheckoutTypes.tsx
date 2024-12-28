@@ -1,52 +1,59 @@
-import { ShoppingCart, Package } from "lucide-react"
+import { ShoppingCart, Package, ClipboardList } from "lucide-react"
 import { TypeComparisonSection } from "../components/TypeComparisonSection"
 
 export function CheckoutTypes() {
   return (
     <div className="space-y-6">
       <TypeComparisonSection
-        title="Formulario de Checkout"
-        icon={<ShoppingCart className="h-5 w-5" />}
-        currentType={`type CheckoutForm = {
-  customer: CustomerInfo
-  shipping: ShippingInfo
-  payment: PaymentInfo
-  documentation?: DocumentationInfo
+        title="Pedidos"
+        icon={<ClipboardList className="h-5 w-5" />}
+        currentType={`type Order = {
+  id: string
+  status: string
+  customer: string
+  total: number
+  type: string
+  paymentMethod?: string
 }`}
         supabaseType={`type Order = {
   id: uuid
   customer_id: uuid
-  shipping_address: jsonb
+  status: OrderStatus
+  type: "physical" | "esim"
+  total_amount: integer
   payment_method: PaymentMethod
-  documentation_status: string
   created_at: timestamp
+  updated_at: timestamp
 }`}
         status="pending"
         relatedFiles={[
-          "src/components/checkout/CheckoutForm.tsx",
+          "src/components/admin/orders/types.ts",
           "src/components/checkout/types.ts"
         ]}
       />
 
       <TypeComparisonSection
-        title="Carrito de Compras"
+        title="Items de Pedido"
         icon={<Package className="h-5 w-5" />}
-        currentType={`type CartItem = {
+        currentType={`type OrderItem = {
   id: string
   quantity: number
   price: number
+  productId: string
 }`}
-        supabaseType={`type CartItem = {
+        supabaseType={`type OrderItem = {
   id: uuid
+  order_id: uuid
   product_id: uuid
   quantity: integer
-  price: integer
+  unit_price: integer
+  total_price: integer
   created_at: timestamp
 }`}
         status="pending"
         relatedFiles={[
-          "src/components/cart/CartContext.tsx",
-          "src/components/cart/types.ts"
+          "src/components/admin/orders/types.ts",
+          "src/components/checkout/CartItem.tsx"
         ]}
       />
     </div>

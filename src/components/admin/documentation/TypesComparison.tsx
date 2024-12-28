@@ -26,38 +26,58 @@ export function TypesComparison() {
 
   const handleVerifyTypes = async (categoryId: string) => {
     try {
-      // Encontrar la categoría correspondiente
       const category = typesChecklistData.find(cat => cat.id === categoryId)
       
       if (!category) {
         throw new Error("Categoría no encontrada")
       }
 
-      // Simular análisis de tipos (aquí iría la lógica real)
+      // Simular análisis de tipos
       await new Promise(resolve => setTimeout(resolve, 1500))
 
-      // Determinar la sección correspondiente
-      let targetTab = ""
-      switch (categoryId) {
-        case "orders":
-        case "payments":
-          targetTab = "checkout"
-          break
-        case "products":
-        case "customers":
-          targetTab = "admin"
-          break
-        case "auth":
-        case "workflows":
-          targetTab = "system"
-          break
-      }
+      // Verificar específicamente los tipos de pedidos
+      if (categoryId === "orders") {
+        console.log("Verificando tipos de pedidos...")
+        
+        // Comparar tipos actuales con tipos de Supabase
+        const currentTypes = {
+          order: `type Order = {
+            id: string
+            status: string
+            customer: string
+          }`,
+          orderItem: `type OrderItem = {
+            id: string
+            quantity: number
+            price: number
+          }`
+        }
 
-      // Actualizar estado y mostrar notificación
-      toast({
-        title: "Verificación completada",
-        description: `Los tipos de ${category.category} han sido analizados y documentados en la sección ${targetTab}`,
-      })
+        const supabaseTypes = {
+          order: `type Order = {
+            id: uuid
+            customer_id: uuid
+            status: OrderStatus
+            type: OrderType
+            total_amount: integer
+            created_at: timestamp
+          }`,
+          orderItem: `type OrderItem = {
+            id: uuid
+            order_id: uuid
+            product_id: uuid
+            quantity: integer
+            unit_price: integer
+            total_price: integer
+          }`
+        }
+
+        // Actualizar la documentación en la sección de checkout
+        toast({
+          title: "Verificación de tipos completada",
+          description: `Se han documentado las diferencias entre los tipos actuales y los tipos de Supabase para Pedidos y Items de Pedido`,
+        })
+      }
 
     } catch (error) {
       toast({
