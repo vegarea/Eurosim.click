@@ -40,6 +40,8 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
     })
   }
 
+  const notes = (order.notes || []) as OrderNote[];
+
   return (
     <Card>
       <CardHeader>
@@ -64,20 +66,20 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
         </form>
 
         <div className="mt-6 space-y-4">
-          {order.notes?.length === 0 && (
+          {notes.length === 0 && (
             <p className="text-gray-500 text-center py-4">
               No hay notas para este pedido
             </p>
           )}
           
-          {order.notes?.map((note) => (
+          {notes.map((note) => (
             <div 
               key={note.id} 
               className="bg-gray-50 p-4 rounded-lg space-y-2"
             >
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <span className="font-medium">{note.userName}</span>
-                <span>{formatDateTime(note.createdAt)}</span>
+                <span className="font-medium">{note.user_name}</span>
+                <span>{formatDateTime(note.created_at)}</span>
               </div>
               <p className="text-gray-700">{note.text}</p>
             </div>

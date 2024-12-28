@@ -12,6 +12,8 @@ interface OrderDocumentationProps {
 }
 
 export function OrderDocumentation({ order }: OrderDocumentationProps) {
+  const metadata = order.metadata as any;
+  
   return (
     <Card>
       <CardHeader>
@@ -24,19 +26,19 @@ export function OrderDocumentation({ order }: OrderDocumentationProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="text-sm font-medium text-gray-500">Pasaporte</h4>
-            <p>{order.passportNumber || "No especificado"}</p>
+            <p>{metadata?.passport_number || "No especificado"}</p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">Fecha de nacimiento</h4>
-            <p>{order.birthDate || "No especificada"}</p>
+            <p>{metadata?.birth_date || "No especificada"}</p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">Género</h4>
-            <p>{order.gender === 'M' ? 'Masculino' : order.gender === 'F' ? 'Femenino' : 'No especificado'}</p>
+            <p>{metadata?.gender === 'M' ? 'Masculino' : metadata?.gender === 'F' ? 'Femenino' : 'No especificado'}</p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">Fecha de activación</h4>
-            <p>{order.activationDate || "No especificada"}</p>
+            <p>{order.activation_date ? new Date(order.activation_date).toLocaleDateString() : "No especificada"}</p>
           </div>
         </div>
       </CardContent>

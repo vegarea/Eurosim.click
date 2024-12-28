@@ -12,6 +12,8 @@ interface OrderShippingInfoProps {
 }
 
 export function OrderShippingInfo({ order }: OrderShippingInfoProps) {
+  const shippingAddress = order.shipping_address as any;
+
   return (
     <Card>
       <CardHeader>
@@ -25,21 +27,21 @@ export function OrderShippingInfo({ order }: OrderShippingInfoProps) {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-1">Dirección de envío</h3>
-              <p>{order.shippingAddress || "No especificada"}</p>
+              <p>{shippingAddress?.street || "No especificada"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Ciudad</h3>
-              <p>{order.city || "No especificada"}</p>
+              <p>{shippingAddress?.city || "No especificada"}</p>
             </div>
           </div>
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-1">Estado</h3>
-              <p>{order.state || "No especificado"}</p>
+              <p>{shippingAddress?.state || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Código Postal</h3>
-              <p>{order.zipCode || "No especificado"}</p>
+              <p>{shippingAddress?.postal_code || "No especificado"}</p>
             </div>
           </div>
         </div>

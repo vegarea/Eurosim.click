@@ -92,14 +92,14 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
                     >
                       {event.type.replace('_', ' ')}
                     </Badge>
-                    {event.userName && (
+                    {event.user_name && (
                       <span className="text-sm font-medium">
-                        {event.userName}
+                        {event.user_name}
                       </span>
                     )}
                   </div>
                   <span className="text-sm text-gray-500">
-                    {formatDateTime(event.createdAt)}
+                    {formatDateTime(event.created_at)}
                   </span>
                 </div>
                 <p className="text-gray-700">{event.description}</p>

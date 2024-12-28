@@ -8,16 +8,18 @@ export type PaymentStatus = Database["public"]["Enums"]["payment_status"];
 export interface OrderNote {
   id: string;
   text: string;
-  userId: string;
-  userName: string;
-  createdAt: string;
+  created_at: string;
+  user_id: string;
+  user_name: string;
 }
 
 export interface OrderEvent {
   id: string;
-  date: string;
   type: string;
   description: string;
+  created_at: string;
+  user_id?: string;
+  user_name?: string;
   metadata?: Record<string, any>;
 }
 
