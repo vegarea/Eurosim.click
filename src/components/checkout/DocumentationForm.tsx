@@ -67,7 +67,7 @@ export function DocumentationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
           <p className="text-blue-700 text-sm">
             Para cumplir con las regulaciones de la Unión Europea y poder asignarte un número local europeo,
@@ -75,14 +75,16 @@ export function DocumentationForm({
           </p>
         </div>
 
-        <PersonalInfoFields form={form} />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <DateFields form={form} isPhysicalSim={isPhysicalSim} />
-          <GenderField form={form} />
+        <div className="space-y-8">
+          <PersonalInfoFields form={form} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <DateFields form={form} isPhysicalSim={isPhysicalSim} />
+            <div className="space-y-8">
+              <GenderField form={form} />
+              <PassportField form={form} />
+            </div>
+          </div>
         </div>
-
-        <PassportField form={form} />
       </form>
     </Form>
   );

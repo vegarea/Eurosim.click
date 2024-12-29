@@ -1,7 +1,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Calendar as CalendarIcon } from "lucide-react"
-import { format, addDays } from "date-fns"
+import { format, addDays, subYears } from "date-fns"
 import { es } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
@@ -17,9 +17,11 @@ interface DateFieldsProps {
 
 export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
   const minActivationDate = addDays(new Date(), isPhysicalSim ? 4 : 2);
+  const maxBirthDate = subYears(new Date(), 18);
+  const minBirthDate = subYears(new Date(), 100);
 
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -40,7 +42,7 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "pl-10 text-left font-normal",
+                        "pl-10 text-left font-normal w-full",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -58,8 +60,12 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
+                      date > maxBirthDate || date < minBirthDate
                     }
+                    defaultMonth={subYears(new Date(), 30)}
+                    fromYear={1924}
+                    toYear={2006}
+                    captionLayout="dropdown-buttons"
                     initialFocus
                     className="bg-white"
                   />
@@ -85,18 +91,13 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
                 <CalendarIcon className="w-4 h-4" />
                 Fecha de activación
               </FormLabel>
-              <p className="text-sm text-muted-foreground mb-2">
-                {isPhysicalSim 
-                  ? "La fecha debe ser al menos 4 días después de hoy para permitir el envío"
-                  : "La fecha debe ser al menos 2 días después de hoy para la activación"}
-              </p>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "pl-10 text-left font-normal bg-primary/5 border-primary/20",
+                        "pl-10 text-left font-normal w-full",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -124,6 +125,6 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
           )}
         />
       </motion.div>
-    </>
+    </div>
   )
 }
