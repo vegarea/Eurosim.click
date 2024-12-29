@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Order } from "@/types/database/orders";
+import { Json } from "@/types/database/common";
 
 export interface OrderData {
   productId: string;
@@ -104,8 +105,14 @@ class CheckoutService {
       throw orderError;
     }
 
+    // Asegurarnos de que metadata es un objeto y tiene customerInfo
+    const metadata = order.metadata as { customerInfo?: OrderData['customerInfo'] };
+    if (!metadata || !metadata.customerInfo) {
+      throw new Error("Customer information not found in order metadata");
+    }
+
     // Crear cliente con la información guardada
-    const customerInfo = order.metadata.customerInfo;
+    const customerInfo = metadata.customerInfo;
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
