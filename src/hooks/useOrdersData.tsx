@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
-import { Order } from "@/types/database/orders"
+import { Order, OrderMetadata } from "@/types/database/orders"
 import { toast } from "sonner"
 
 export function useOrdersData() {
@@ -27,21 +27,16 @@ export function useOrdersData() {
         throw error
       }
 
-      // Transform the data to match our Order type
-      return data.map((order: any) => ({
-        ...order,
-        customer_name: order.customers?.name,
-        customer_email: order.customers?.email,
-        customer_phone: order.customers?.phone
-      })) as Order[]
+      return data as Order[]
     }
   })
 
   const updateOrder = useMutation({
     mutationFn: async ({ orderId, updates }: { orderId: string, updates: Partial<Order> }) => {
-      // Convert OrderNote[] to string[] if notes are being updated
+      // Asegurarse de que metadata sea un objeto JSON válido
       const processedUpdates = {
         ...updates,
+        metadata: updates.metadata as Json,
         notes: updates.notes?.map(note => 
           typeof note === 'string' ? note : JSON.stringify(note)
         )

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order } from "@/types/database/orders";
+import { Order, OrderMetadata } from "@/types/database/orders";
 import { Json } from "@/types/database/common";
 
 export interface OrderData {
@@ -24,6 +24,10 @@ class CheckoutService {
   async createTemporaryOrder(orderData: OrderData): Promise<Order> {
     console.log("Creating temporary order:", orderData);
     
+    const metadata: OrderMetadata = {
+      customerInfo: orderData.customerInfo
+    };
+
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
@@ -37,9 +41,7 @@ class CheckoutService {
         shipping_address: orderData.shippingAddress || null,
         activation_date: orderData.activationDate || null,
         notes: [],
-        metadata: {
-          customerInfo: orderData.customerInfo
-        } as Json
+        metadata
       })
       .select()
       .single();
@@ -93,8 +95,8 @@ class CheckoutService {
       throw orderError;
     }
 
-    const metadata = order.metadata as { customerInfo?: OrderData['customerInfo'] };
-    if (!metadata || !metadata.customerInfo) {
+    const metadata = order.metadata as OrderMetadata;
+    if (!metadata?.customerInfo) {
       throw new Error("Customer information not found in order metadata");
     }
 
