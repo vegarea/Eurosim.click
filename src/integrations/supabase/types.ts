@@ -306,7 +306,7 @@ export type Database = {
         | "delivered"
         | "cancelled"
       order_type: "physical" | "esim"
-      payment_method: "stripe" | "paypal"
+      payment_method: "stripe" | "paypal" | "test"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       product_status: "active" | "inactive" | "out_of_stock"
       product_type: "physical" | "esim"

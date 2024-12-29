@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/utils/currency";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -15,7 +16,8 @@ interface CartProps {
 
 export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onCheckout }: CartProps) {
   const { toast } = useToast();
-  const { items, removeItem, updateQuantity } = useCart();
+  const { items, removeItem, updateQuantity, clearCart } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckout = async () => {
     try {
@@ -33,32 +35,56 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       
       console.log("Iniciando checkout con:", { item });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          productId: item.id,
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('id', item.customerId)
+        .single();
+
+      if (customerError) {
+        console.error('Error getting customer:', customerError);
+        throw customerError;
+      }
+
+      // Crear el pedido con método de pago "test"
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_id: customerData.id,
+          product_id: item.id,
+          type: item.type,
+          total_amount: item.price * item.quantity,
           quantity: item.quantity,
-          type: item.type
-        },
+          payment_method: 'test',
+          payment_status: 'completed', // Auto-completado para pruebas
+          status: 'processing'
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('Error creating order:', orderError);
+        throw orderError;
+      }
+
+      console.log("Pedido creado:", orderData);
+
+      // Limpiar el carrito
+      clearCart();
+
+      // Redirigir a la página de agradecimiento
+      navigate('/thank-you');
+
+      toast({
+        title: "¡Pedido realizado!",
+        description: "Tu pedido de prueba ha sido procesado correctamente.",
       });
 
-      if (error) {
-        console.error('Error initiating checkout:', error);
-        throw error;
-      }
-
-      console.log("Respuesta de checkout:", data);
-
-      // Redirigir a Stripe
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No se recibió URL de checkout');
-      }
     } catch (error) {
-      console.error('Error initiating checkout:', error);
+      console.error('Error processing test checkout:', error);
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu pago. Por favor intenta de nuevo.",
+        description: "Hubo un problema al procesar tu pedido. Por favor intenta de nuevo.",
         variant: "destructive",
       });
     }
