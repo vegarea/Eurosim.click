@@ -21,7 +21,14 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
 
   const handleCheckout = async () => {
     try {
+      console.log("[Cart] Iniciando checkout", {
+        items,
+        totalItems: items.length,
+        hasItems: items.length > 0
+      });
+
       if (items.length === 0) {
+        console.log("[Cart] Error: Carrito vacío");
         toast({
           title: "Carrito vacío",
           description: "Agrega productos a tu carrito para continuar",
@@ -32,6 +39,7 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
 
       // Por ahora manejamos solo un item
       const item = items[0];
+      console.log("[Cart] Procesando item", item);
 
       // 1. Crear orden temporal
       const orderData = {
@@ -45,20 +53,24 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
         }
       };
 
+      console.log("[Cart] Creando orden temporal con datos:", orderData);
       const order = await checkoutService.createTemporaryOrder(orderData);
-      console.log("Temporary order created:", order);
+      console.log("[Cart] Orden temporal creada:", order);
 
       // 2. Procesar pago de prueba
+      console.log("[Cart] Iniciando proceso de pago para orden:", order.id);
       const paymentResult = await checkoutService.processTestPayment(order.id);
-      console.log("Payment processed:", paymentResult);
+      console.log("[Cart] Resultado del pago:", paymentResult);
 
       // 3. Si el pago es exitoso, finalizar orden
       if (paymentResult.success) {
+        console.log("[Cart] Pago exitoso, finalizando orden");
         const finalOrder = await checkoutService.finalizeOrder(order.id, paymentResult);
-        console.log("Order finalized:", finalOrder);
+        console.log("[Cart] Orden finalizada:", finalOrder);
 
         // Limpiar carrito y redirigir
         clearCart();
+        console.log("[Cart] Carrito limpiado, redirigiendo a thank-you");
         navigate('/thank-you');
 
         toast({
@@ -66,11 +78,12 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
           description: "Tu pedido de prueba ha sido procesado correctamente.",
         });
       } else {
+        console.error("[Cart] Error en el pago:", paymentResult.error);
         throw new Error(paymentResult.error || "Error procesando el pago");
       }
 
     } catch (error) {
-      console.error('Error processing checkout:', error);
+      console.error('[Cart] Error en el proceso de checkout:', error);
       toast({
         title: "Error",
         description: "Hubo un problema al procesar tu pedido. Por favor intenta de nuevo.",
@@ -82,6 +95,15 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const shipping = items.some(item => item.type === "physical") ? 160 : 0;
   const total = subtotal + shipping;
+
+  console.log("[Cart] Estado actual del carrito:", {
+    items,
+    subtotal,
+    shipping,
+    total,
+    showCheckoutButton,
+    isButtonEnabled
+  });
 
   return (
     <motion.div 
