@@ -45,7 +45,7 @@ export function DateFields({ form, isPhysicalSim = false, type, label }: DateFie
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-full pl-10 text-left font-normal",
+                      "w-full pl-3 text-left font-normal",
                       !field.value && "text-muted-foreground"
                     )}
                   >
@@ -71,7 +71,7 @@ export function DateFields({ form, isPhysicalSim = false, type, label }: DateFie
                     toYear={2006}
                     captionLayout="dropdown-buttons"
                     initialFocus
-                    className="bg-white"
+                    className="rounded-md border"
                   />
                 ) : (
                   <Calendar
@@ -80,7 +80,7 @@ export function DateFields({ form, isPhysicalSim = false, type, label }: DateFie
                     onSelect={field.onChange}
                     disabled={(date) => date < minActivationDate}
                     initialFocus
-                    className="bg-white"
+                    className="rounded-md border"
                   />
                 )}
               </PopoverContent>
