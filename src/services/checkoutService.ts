@@ -1,16 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order, Customer } from "@/types/database";
+import { TablesInsert } from "@/integrations/supabase/types";
 
-interface OrderData {
-  productId: string;
-  type: "physical" | "esim";
-  totalAmount: number;
-  quantity: number;
-  metadata: {
-    name: string;
-    email: string;
-  };
-}
+type OrderInsert = TablesInsert<"orders">;
 
 interface PaymentResult {
   success: boolean;
@@ -18,15 +9,15 @@ interface PaymentResult {
 }
 
 export const checkoutService = {
-  async createTemporaryOrder(orderData: OrderData) {
+  async createTemporaryOrder(orderData: Omit<OrderInsert, "id" | "status" | "payment_status">) {
     console.log("[checkoutService] Creating temporary order:", orderData);
     
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
-        product_id: orderData.productId,
+        product_id: orderData.product_id,
         type: orderData.type,
-        total_amount: orderData.totalAmount,
+        total_amount: orderData.total_amount,
         quantity: orderData.quantity,
         status: 'payment_pending',
         payment_status: 'pending',
@@ -87,12 +78,12 @@ export const checkoutService = {
       throw orderError;
     }
 
-    // Crear cliente
+    // Crear cliente usando los tipos exactos de Supabase
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
-        name: order.metadata.name,
-        email: order.metadata.email
+        name: (order.metadata as { name: string }).name,
+        email: (order.metadata as { email: string }).email
       })
       .select()
       .single();

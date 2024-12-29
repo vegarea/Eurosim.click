@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { formatCurrency } from "@/utils/currency";
 import { useNavigate } from "react-router-dom";
 import { checkoutService } from "@/services/checkoutService";
+import { OrderInsert } from "@/integrations/supabase/types";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -41,13 +42,13 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       const item = items[0];
       console.log("[Cart] Procesando item", item);
 
-      // 1. Crear orden temporal
-      const orderData = {
-        productId: item.id,
+      // 1. Crear orden temporal usando los tipos exactos de Supabase
+      const orderData: Omit<OrderInsert, "id" | "status" | "payment_status"> = {
+        product_id: item.id,
         type: item.type,
-        totalAmount: item.price * item.quantity,
+        total_amount: item.price * item.quantity,
         quantity: item.quantity,
-        customerInfo: {
+        metadata: {
           name: item.customerName || 'Test Customer',
           email: item.customerEmail || 'test@example.com'
         }
