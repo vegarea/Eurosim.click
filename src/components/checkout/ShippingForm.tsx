@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form } from "@/components/ui/form"
-import { useState, useEffect } from "react"
+import { Form, FormField } from "@/components/ui/form"
+import { useState } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
@@ -36,17 +36,6 @@ export function ShippingForm({
     },
     mode: "onChange"
   })
-
-  // Observar cambios en la validez del formulario
-  useEffect(() => {
-    console.log("Form state changed:", {
-      isDirty: form.formState.isDirty,
-      isValid: form.formState.isValid,
-      errors: form.formState.errors
-    });
-    
-    onValidityChange?.(form.formState.isValid);
-  }, [form.formState, onValidityChange]);
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
@@ -84,8 +73,7 @@ export function ShippingForm({
     setShowLocationFields(true)
   }
 
-  const handleFormSubmit = (values: ShippingFormValues) => {
-    console.log("Form submitted with values:", values);
+  const handleSubmit = (values: ShippingFormValues) => {
     const shippingAddress: Json = {
       street: values.address,
       city: values.city,
@@ -102,17 +90,23 @@ export function ShippingForm({
 
   return (
     <Form {...form}>
-      <div className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <PersonalInfoFields form={form} />
         
-        <AddressAutocomplete
-          value={form.getValues("address")}
-          onChange={(value) => form.setValue("address", value, { shouldValidate: true })}
-          onAddressSelect={handleAddressSelect}
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <AddressAutocomplete
+              value={field.value}
+              onChange={field.onChange}
+              onAddressSelect={handleAddressSelect}
+            />
+          )}
         />
 
         <LocationFields form={form} show={showLocationFields} />
-      </div>
+      </form>
     </Form>
   )
 }
