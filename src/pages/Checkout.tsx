@@ -81,9 +81,9 @@ export default function Checkout() {
     };
     
     setFormData({ ...formData, ...formDataWithShippingAddress });
-    if (step < 4) {
+    if (step < 3) {
       setStep(step + 1);
-      setIsFormValid(step === 3);
+      setIsFormValid(false);
     }
   }
 
@@ -154,7 +154,7 @@ export default function Checkout() {
             >
               <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
                 <Cart 
-                  showCheckoutButton={step === 4} 
+                  showCheckoutButton={step === 3} 
                   isButtonEnabled={isFormValid}
                   onCheckout={handleFormSubmit}
                 />

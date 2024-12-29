@@ -7,8 +7,8 @@ interface CheckoutProgressProps {
 }
 
 export function CheckoutProgress({ step }: CheckoutProgressProps) {
-  const progress = (step / 4) * 100;
-  const steps = ['Información', 'Documentación', 'Revisión', 'Pago'];
+  const progress = (step / 3) * 100;
+  const steps = ['Información', 'Documentación', 'Pago'];
 
   return (
     <div className="mb-8 space-y-4 max-w-3xl mx-auto">

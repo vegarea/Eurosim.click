@@ -2,7 +2,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { InfoIcon } from "lucide-react"
 import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
-import { ReviewStep } from "@/components/checkout/ReviewStep"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
 
@@ -68,13 +67,6 @@ export function CheckoutContent({
           />
         );
       case 3:
-        return (
-          <ReviewStep
-            formData={formData}
-            onUpdateField={onUpdateField}
-          />
-        );
-      case 4:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-6">
