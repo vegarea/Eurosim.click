@@ -19,46 +19,29 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
 
   const handleCheckout = async () => {
     try {
-      if (items.length === 0) {
-        toast({
-          title: "Carrito vacío",
-          description: "Agrega productos a tu carrito para continuar",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Por ahora manejamos solo un item
-      const item = items[0];
-      
-      console.log("Iniciando checkout con:", { item });
+      console.log('Probando conexión con Stripe...');
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          productId: item.id,
-          quantity: item.quantity,
-          type: item.type
-        },
+        body: {} // No necesitamos enviar datos para la prueba
       });
 
       if (error) {
-        console.error('Error initiating checkout:', error);
+        console.error('Error al conectar con Stripe:', error);
         throw error;
       }
 
-      console.log("Respuesta de checkout:", data);
+      console.log('Respuesta de Stripe:', data);
 
-      // Redirigir a Stripe
       if (data?.url) {
         window.location.href = data.url;
       } else {
         throw new Error('No se recibió URL de checkout');
       }
     } catch (error) {
-      console.error('Error initiating checkout:', error);
+      console.error('Error en checkout:', error);
       toast({
         title: "Error",
-        description: "Hubo un problema al procesar tu pago. Por favor intenta de nuevo.",
+        description: "Hubo un problema al conectar con el sistema de pago. Por favor intenta de nuevo.",
         variant: "destructive",
       });
     }
@@ -125,7 +108,7 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
                 size="lg"
                 onClick={handleCheckout}
               >
-                Continuar al pago
+                Probar conexión con Stripe
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </motion.div>
