@@ -4,7 +4,7 @@ import { Truck, PackageCheck } from "lucide-react"
 import { Order } from "@/types/database/orders"
 import { OrderEvent } from "@/types/database/common"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
-import { useOrders } from "@/contexts/OrdersContext"
+import { useOrdersData } from "@/hooks/useOrdersData"
 import { useState } from "react"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { ShippingTabs } from "./components/ShippingTabs"
@@ -15,7 +15,7 @@ import {
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
-  const { orders, updateOrder } = useOrders()
+  const { orders, updateOrder } = useOrdersData()
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 

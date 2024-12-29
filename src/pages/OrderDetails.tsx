@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { useOrders } from "@/contexts/OrdersContext"
+import { useOrdersData } from "@/hooks/useOrdersData"
 import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/components/admin/orders/types"
+import { OrderStatus } from "@/types/database/enums"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -37,7 +37,7 @@ const mockPaymentData = {
 
 export default function OrderDetails() {
   const { orderId } = useParams()
-  const { orders, updateOrder } = useOrders()
+  const { orders, updateOrder } = useOrdersData()
   const order = orders.find(o => o.id === orderId)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)

@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Order } from "../orders/types"
+import { Order } from "@/types/database/orders"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
-import { useOrders } from "@/contexts/OrdersContext"
+import { useOrdersData } from "@/hooks/useOrdersData"
 
 export function AdminESimDelivery() {
   const { toast } = useToast()
-  const { orders, updateOrder } = useOrders()
+  const { orders, updateOrder } = useOrdersData()
   const eSimOrders = orders.filter(order => order.type === "esim")
 
   // Filtrar pedidos por estado
