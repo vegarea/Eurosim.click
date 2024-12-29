@@ -27,7 +27,10 @@ export function PhoneField({ form }: PhoneFieldProps) {
   useEffect(() => {
     const currentValue = form.getValues('phone')
     if (currentValue) {
-      setIsValid(isValidPhoneNumber(currentValue))
+      const valid = isValidPhoneNumber(currentValue)
+      setIsValid(valid)
+      // Trigger validación inicial
+      form.trigger('phone')
     }
   }, [form])
 
