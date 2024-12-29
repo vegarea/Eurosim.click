@@ -17,7 +17,8 @@ export function CheckoutNavigation({
   onSubmit,
   formData 
 }: CheckoutNavigationProps) {
-  const [canProceed, setCanProceed] = useState(false);
+  // Temporalmente establecemos canProceed siempre como true
+  const [canProceed, setCanProceed] = useState(true);
 
   useEffect(() => {
     console.log("CheckoutNavigation state:", {
@@ -25,7 +26,8 @@ export function CheckoutNavigation({
       isFormValid,
       formData
     });
-    setCanProceed(isFormValid);
+    // Temporalmente mantenemos setCanProceed como true
+    setCanProceed(true);
   }, [step, isFormValid, formData]);
 
   return (
@@ -43,8 +45,8 @@ export function CheckoutNavigation({
       {step < 4 && (
         <Button
           className="ml-auto flex items-center gap-2"
-          onClick={() => canProceed && onSubmit(formData)}
-          disabled={!canProceed}
+          onClick={() => onSubmit(formData)}
+          // Temporalmente removemos la condición disabled
         >
           Siguiente
           <ArrowRight className="w-4 h-4" />
