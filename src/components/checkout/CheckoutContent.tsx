@@ -4,6 +4,7 @@ import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
+import { useEffect } from "react"
 
 interface CheckoutContentProps {
   step: number;
@@ -26,6 +27,20 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
+  // Validar el estado inicial cuando cambia el paso
+  useEffect(() => {
+    console.log("CheckoutContent step changed:", {
+      step,
+      hasPhysicalSim,
+      formData
+    });
+  }, [step, hasPhysicalSim, formData]);
+
+  const handleValidityChange = (isValid: boolean) => {
+    console.log("Form validity changed:", { step, isValid });
+    onFormValidityChange(isValid);
+  };
+
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -42,13 +57,13 @@ export function CheckoutContent({
             {hasPhysicalSim ? (
               <ShippingForm 
                 onSubmit={onFormSubmit}
-                onValidityChange={onFormValidityChange}
+                onValidityChange={handleValidityChange}
                 initialData={isTestMode ? testData.shipping : undefined}
               />
             ) : (
               <ESimForm 
                 onSubmit={onFormSubmit}
-                onValidityChange={onFormValidityChange}
+                onValidityChange={handleValidityChange}
                 initialData={isTestMode ? {
                   fullName: testData.documentation.fullName,
                   email: testData.documentation.email,
@@ -62,7 +77,7 @@ export function CheckoutContent({
         return (
           <DocumentationForm
             onSubmit={onFormSubmit}
-            onValidityChange={onFormValidityChange}
+            onValidityChange={handleValidityChange}
             initialData={isTestMode ? testData.documentation : undefined}
           />
         );

@@ -34,14 +34,47 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
     mode: "onChange"
   })
 
+  // Observar cambios en el formulario y validar
   useEffect(() => {
     const subscription = form.watch(() => {
       if (onValidityChange) {
-        onValidityChange(form.formState.isValid);
+        const formValues = form.getValues();
+        const isValid = form.formState.isValid && 
+                       formValues.fullName.length >= 2 && 
+                       formValues.email.includes('@') && 
+                       formValues.phone.length >= 10;
+        
+        console.log("ESimForm validation state:", {
+          isValid,
+          values: formValues,
+          errors: form.formState.errors
+        });
+        
+        onValidityChange(isValid);
       }
     });
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
+
+  // Validar datos iniciales si existen
+  useEffect(() => {
+    if (initialData) {
+      Object.entries(initialData).forEach(([key, value]) => {
+        form.setValue(key as keyof z.infer<typeof formSchema>, value, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        });
+      });
+
+      // Forzar validación inicial
+      form.trigger().then((isValid) => {
+        if (onValidityChange) {
+          onValidityChange(isValid);
+        }
+      });
+    }
+  }, [initialData, form, onValidityChange]);
 
   return (
     <Form {...form}>
@@ -65,6 +98,7 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="Juan Pérez" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                    onBlur={() => form.trigger("fullName")}
                   />
                 </FormControl>
                 <FormMessage />
@@ -93,6 +127,7 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="juan@ejemplo.com" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                    onBlur={() => form.trigger("email")}
                   />
                 </FormControl>
                 <FormMessage />
@@ -120,6 +155,7 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="55 1234 5678" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                    onBlur={() => form.trigger("phone")}
                   />
                 </FormControl>
                 <FormMessage />
