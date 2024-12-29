@@ -67,11 +67,11 @@
 }
 
 .PhoneInputCountry {
-  @apply absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-2;
+  @apply absolute left-3 top-1/2 -translate-y-1/2 flex items-center;
 }
 
 .PhoneInputCountrySelect {
-  @apply opacity-0 absolute left-0 top-0 h-full w-[90px] cursor-pointer;
+  @apply opacity-0 absolute left-0 top-0 h-full w-[65px] cursor-pointer;
 }
 
 .PhoneInputCountryIcon {
@@ -79,11 +79,11 @@
 }
 
 .PhoneInputCountrySelectArrow {
-  @apply border-t-4 border-t-gray-400 border-x-4 border-x-transparent ml-1;
+  @apply border-t-4 border-t-gray-400 border-x-4 border-x-transparent ml-0.5;
 }
 
 .PhoneInputInput {
-  @apply h-10 w-full rounded-md border border-input bg-background pl-[90px] pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  @apply h-10 w-full rounded-md border border-input bg-background pl-[65px] pr-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
 }
 
 /* Estilo cuando el número es válido */
