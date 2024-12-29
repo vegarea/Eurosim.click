@@ -31,18 +31,28 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       // Por ahora manejamos solo un item
       const item = items[0];
       
-      const { data: { url }, error } = await supabase.functions.invoke('create-checkout', {
+      console.log("Iniciando checkout con:", { item });
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           productId: item.id,
-          customerId: item.customerId, // Asegúrate de tener el customerId disponible
+          quantity: item.quantity,
+          type: item.type
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error initiating checkout:', error);
+        throw error;
+      }
+
+      console.log("Respuesta de checkout:", data);
 
       // Redirigir a Stripe
-      if (url) {
-        window.location.href = url;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No se recibió URL de checkout');
       }
     } catch (error) {
       console.error('Error initiating checkout:', error);
@@ -114,16 +124,10 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
                 className="w-full mt-8 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
                 size="lg"
                 onClick={handleCheckout}
-                disabled={!isButtonEnabled}
               >
                 Continuar al pago
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              {!isButtonEnabled && (
-                <p className="mt-2 text-center text-sm text-gray-500">
-                  Por favor, completa todos los campos requeridos
-                </p>
-              )}
             </motion.div>
           )}
 

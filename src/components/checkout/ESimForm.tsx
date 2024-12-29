@@ -38,7 +38,7 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
   useEffect(() => {
     const subscription = form.watch(() => {
       const formState = form.getValues();
-      const hasAllFields = formState.fullName && formState.email && formState.phone;
+      const hasAllFields = Boolean(formState.fullName && formState.email && formState.phone);
       const isValid = form.formState.isValid && hasAllFields;
       
       console.log("ESimForm: Form state changed", {
@@ -71,7 +71,7 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
       // Forzar validación inicial
       form.trigger().then((isValid) => {
         const formState = form.getValues();
-        const hasAllFields = formState.fullName && formState.email && formState.phone;
+        const hasAllFields = Boolean(formState.fullName && formState.email && formState.phone);
         
         console.log("ESimForm: Initial validation", {
           isValid,
