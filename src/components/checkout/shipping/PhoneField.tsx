@@ -1,32 +1,15 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { Phone } from "lucide-react"
-import MexicoFlag from "@/components/icons/MexicoFlag"
 import { UseFormReturn } from "react-hook-form"
 import { ShippingFormValues } from "./types"
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 interface PhoneFieldProps {
   form: UseFormReturn<ShippingFormValues>
 }
 
 export function PhoneField({ form }: PhoneFieldProps) {
-  const formatPhoneNumber = (value: string) => {
-    // Eliminar todo excepto números
-    const numbers = value.replace(/\D/g, '')
-    
-    // Si no hay números, retornar vacío
-    if (numbers.length === 0) return ''
-    
-    // Formatear el número según la longitud
-    if (numbers.length <= 2) return numbers
-    if (numbers.length <= 6) return `${numbers.slice(0, 2)} ${numbers.slice(2)}`
-    if (numbers.length <= 10) {
-      return `${numbers.slice(0, 2)} ${numbers.slice(2, 6)} ${numbers.slice(6)}`
-    }
-    // Limitar a 10 dígitos
-    return `${numbers.slice(0, 2)} ${numbers.slice(2, 6)} ${numbers.slice(6, 10)}`
-  }
-
   return (
     <FormField
       control={form.control}
@@ -37,26 +20,24 @@ export function PhoneField({ form }: PhoneFieldProps) {
             <Phone className="w-4 h-4" />
             Teléfono
           </FormLabel>
-          <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <MexicoFlag className="w-5 h-4" />
-              <span className="text-sm text-gray-500">+52</span>
-            </div>
-            <FormControl>
-              <Input
-                {...field}
-                className="pl-20"
-                placeholder="462 111 3546"
-                onChange={(e) => {
-                  const formatted = formatPhoneNumber(e.target.value)
-                  field.onChange(formatted)
-                }}
-              />
-            </FormControl>
-          </div>
+          <FormControl>
+            <PhoneInput
+              country={'mx'}
+              value={field.value}
+              onChange={(phone) => field.onChange(phone)}
+              inputClass="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-[52px]"
+              containerClass="relative"
+              buttonClass="absolute top-0 left-0 bottom-0 border-r rounded-l-md px-2 flex items-center justify-center bg-background border border-input"
+              searchClass="!w-full"
+              dropdownClass="!w-full"
+              enableSearch={true}
+              disableSearchIcon={true}
+              placeholder="1234567890"
+            />
+          </FormControl>
           <FormMessage />
           <p className="text-sm text-gray-500 mt-1">
-            Ejemplo: 462 111 3546 (10 dígitos)
+            Selecciona el país e ingresa el número sin el código de país
           </p>
         </FormItem>
       )}
