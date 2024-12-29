@@ -35,35 +35,11 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       
       console.log("Iniciando checkout con:", { item });
 
-      // Primero creamos o actualizamos el cliente
-      const { data: customerData, error: customerError } = await supabase
-        .from('customers')
-        .upsert({
-          id: item.customerId,
-          name: item.customerName || 'Cliente Test',
-          email: item.customerEmail || 'test@example.com',
-        }, {
-          onConflict: 'id'
-        })
-        .select()
-        .maybeSingle();
-
-      if (customerError) {
-        console.error('Error creating/updating customer:', customerError);
-        throw customerError;
-      }
-
-      if (!customerData) {
-        throw new Error('No se pudo crear el cliente');
-      }
-
-      console.log("Cliente creado/actualizado:", customerData);
-
-      // Crear el pedido con método de pago "test"
+      // Primero creamos el pedido con estado pending
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
-          customer_id: customerData.id,
+          customer_id: item.customerId || '00000000-0000-0000-0000-000000000000', // ID temporal
           product_id: item.id,
           type: item.type,
           total_amount: item.price * item.quantity,
@@ -81,6 +57,34 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       }
 
       console.log("Pedido creado:", orderData);
+
+      // Si el pago es exitoso, creamos el cliente
+      const { data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          name: item.customerName || 'Cliente Test',
+          email: item.customerEmail || 'test@example.com',
+        })
+        .select()
+        .single();
+
+      if (customerError) {
+        console.error('Error creating customer:', customerError);
+        throw customerError;
+      }
+
+      console.log("Cliente creado:", customerData);
+
+      // Actualizamos el pedido con el ID real del cliente
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ customer_id: customerData.id })
+        .eq('id', orderData.id);
+
+      if (updateError) {
+        console.error('Error updating order with customer:', updateError);
+        throw updateError;
+      }
 
       // Limpiar el carrito
       clearCart();
