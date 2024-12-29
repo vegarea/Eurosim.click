@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { Order, OrderStatus } from "./orders/types"
-import { useOrders } from "@/contexts/OrdersContext"
-import { toast } from "sonner"
+import { OrderStatus } from "./orders/types"
+import { useOrdersData } from "@/hooks/useOrdersData"
+import { Loader2 } from "lucide-react"
 
 export function AdminOrders() {
-  const { orders, updateOrder } = useOrders()
+  const { orders, isLoading, error, updateOrder } = useOrdersData()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
@@ -20,7 +20,22 @@ export function AdminOrders() {
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrder(orderId, { status: newStatus })
-    toast.success("Estado del pedido actualizado correctamente")
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        Error al cargar los pedidos. Por favor, intenta de nuevo.
+      </div>
+    )
   }
 
   return (
