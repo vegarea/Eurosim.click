@@ -61,37 +61,23 @@
   }
 }
 
-@layer utilities {
-  /* Estilos personalizados para react-phone-input-2 */
-  .react-tel-input .country-list {
-    @apply text-sm shadow-lg border border-input;
-  }
+/* Estilos personalizados para PhoneInput */
+.PhoneInput {
+  @apply flex items-center gap-2;
+}
 
-  .react-tel-input .country-list .country {
-    @apply px-3 py-2 hover:bg-gray-50;
-  }
+.PhoneInputCountry {
+  @apply flex items-center gap-1;
+}
 
-  .react-tel-input .country-list .country.highlight {
-    @apply bg-gray-50;
-  }
+.PhoneInputCountrySelect {
+  @apply h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+}
 
-  .react-tel-input .country-list .country .country-name {
-    @apply text-sm;
-  }
+.PhoneInputCountryIcon {
+  @apply w-5 h-4 overflow-hidden rounded-sm;
+}
 
-  .react-tel-input .country-list .country .dial-code {
-    @apply text-sm text-gray-500;
-  }
-
-  .react-tel-input .flag-dropdown {
-    @apply border-0 bg-transparent hover:bg-gray-50 transition-colors;
-  }
-
-  .react-tel-input .selected-flag {
-    @apply bg-transparent hover:bg-gray-50 transition-colors;
-  }
-
-  .react-tel-input .search-box {
-    @apply text-sm border border-input rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
-  }
+.PhoneInputInput {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
 }
