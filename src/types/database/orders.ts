@@ -1,6 +1,5 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
 import { Json } from "./common";
-import { OrderMetadata } from "./metadata";
 
 export interface Order {
   id: string;
@@ -21,19 +20,9 @@ export interface Order {
   carrier: string | null;
   activation_date: string | null;
   notes: string[] | null;
-  metadata: OrderMetadata | null;
+  metadata: Json | null;
   created_at: string | null;
   updated_at: string | null;
-  events?: Array<{
-    id: string;
-    type: string;
-    description: string;
-    created_at: string;
-    metadata?: Record<string, any>;
-  }>;
-}
-
-export interface ExtendedOrder extends Order {
   customers?: {
     name: string | null;
     email: string | null;

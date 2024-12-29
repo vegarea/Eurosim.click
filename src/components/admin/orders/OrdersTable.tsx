@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -6,25 +6,25 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { OrderStatusBadge } from "./OrderStatusBadge"
-import { Order } from "./types"
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { OrderStatusBadge } from "./OrderStatusBadge";
+import { Order } from "./types";
 
 interface OrdersTableProps {
-  orders: Order[]
-  onStatusChange: (orderId: string, newStatus: Order['status']) => void
+  orders: Order[];
+  onStatusChange: (orderId: string, newStatus: Order['status']) => void;
 }
 
 const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
   if (type === "physical") {
-    return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]" // Soft blue
+    return "bg-[#D3E4FD] text-blue-700 hover:bg-[#D3E4FD]"; // Soft blue
   }
-  return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]" // Soft purple
-}
+  return "bg-[#E5DEFF] text-purple-700 hover:bg-[#E5DEFF]"; // Soft purple
+};
 
 export function OrdersTable({ orders }: OrdersTableProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
     <div className="rounded-md border">
@@ -49,7 +49,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
             >
               <TableCell className="font-medium">{order.id}</TableCell>
               <TableCell>{new Date(order.created_at || '').toLocaleDateString()}</TableCell>
-              <TableCell>{order.customer_name}</TableCell>
+              <TableCell>{order.customers?.name || "No especificado"}</TableCell>
               <TableCell>
                 <Badge 
                   variant="secondary" 
@@ -74,5 +74,5 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

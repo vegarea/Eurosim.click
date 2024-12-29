@@ -1,18 +1,18 @@
-import { Order } from "./types"
-import { User, ExternalLink, Clock } from "lucide-react"
+import { Order } from "./types";
+import { User, ExternalLink, Clock } from "lucide-react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { OrderStatusControl } from "./OrderStatusControl"
-import { OrderStatus } from "./types"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { OrderStatusControl } from "./OrderStatusControl";
+import { OrderStatus } from "./types";
 
 interface OrderCustomerInfoProps {
-  order: Order
-  onStatusChange: (newStatus: OrderStatus) => void
+  order: Order;
+  onStatusChange: (newStatus: OrderStatus) => void;
 }
 
 export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoProps) {
@@ -23,8 +23,8 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    })
-  }
+    });
+  };
 
   return (
     <Card>
@@ -40,7 +40,7 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             <div>
               <h3 className="font-medium mb-1">Cliente</h3>
               <p className="flex items-center gap-2">
-                {order.customer_name}
+                {order.customers?.name || "No especificado"}
                 <Button 
                   variant="ghost" 
                   size="sm"
@@ -53,11 +53,11 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
             </div>
             <div>
               <h3 className="font-medium mb-1">Email</h3>
-              <p>{order.customer_email || "No especificado"}</p>
+              <p>{order.customers?.email || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Teléfono</h3>
-              <p>{order.customer_phone || "No especificado"}</p>
+              <p>{order.customers?.phone || "No especificado"}</p>
             </div>
             <div>
               <h3 className="font-medium mb-1">Fecha y Hora</h3>
@@ -78,5 +78,5 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
