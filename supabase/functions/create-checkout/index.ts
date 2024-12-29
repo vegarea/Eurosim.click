@@ -13,25 +13,24 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency, description } = await req.json()
-    console.log('Creando sesión de prueba:', { amount, currency, description })
+    console.log('Creating test checkout session...')
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // Crear sesión de checkout simple
+    // Create simple test session with fixed amount
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
-            currency: currency,
+            currency: 'mxn',
             product_data: {
-              name: 'Prueba de Stripe',
-              description: description,
+              name: 'Test Product',
+              description: 'Testing Stripe Integration',
             },
-            unit_amount: amount, // en centavos
+            unit_amount: 2000, // 20 MXN
           },
           quantity: 1,
         },
@@ -41,7 +40,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/checkout`,
     })
 
-    console.log('Sesión de checkout creada:', {
+    console.log('Test checkout session created:', {
       sessionId: session.id,
       url: session.url
     })
@@ -54,7 +53,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creando sesión de checkout:', error)
+    console.error('Error creating test checkout session:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
