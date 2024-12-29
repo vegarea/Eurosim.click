@@ -13,48 +13,52 @@ import { DocumentationFormValues } from "./types"
 interface DateFieldsProps {
   form: UseFormReturn<DocumentationFormValues>;
   isPhysicalSim?: boolean;
+  type: "birth" | "activation";
+  label: string;
 }
 
-export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
+export function DateFields({ form, isPhysicalSim = false, type, label }: DateFieldsProps) {
   const minActivationDate = addDays(new Date(), isPhysicalSim ? 4 : 2);
   const maxBirthDate = subYears(new Date(), 18);
   const minBirthDate = subYears(new Date(), 100);
 
+  const fieldName = type === "birth" ? "birthDate" : "activationDate";
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <FormField
-          control={form.control}
-          name="birthDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4" />
-                Fecha de nacimiento
-              </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "pl-10 text-left font-normal w-full",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: es })
-                      ) : (
-                        <span>Selecciona una fecha</span>
-                      )}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.1 }}
+    >
+      <FormField
+        control={form.control}
+        name={fieldName}
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel className="flex items-center gap-2 mb-2">
+              <CalendarIcon className="w-4 h-4" />
+              {label}
+            </FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full pl-10 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP", { locale: es })
+                    ) : (
+                      <span>Selecciona una fecha</span>
+                    )}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                {type === "birth" ? (
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -69,47 +73,7 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
                     initialFocus
                     className="bg-white"
                   />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.4 }}
-      >
-        <FormField
-          control={form.control}
-          name="activationDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4" />
-                Fecha de activación
-              </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "pl-10 text-left font-normal w-full",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: es })
-                      ) : (
-                        <span>Selecciona una fecha</span>
-                      )}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                ) : (
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -118,13 +82,13 @@ export function DateFields({ form, isPhysicalSim = false }: DateFieldsProps) {
                     initialFocus
                     className="bg-white"
                   />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </motion.div>
-    </div>
-  )
+                )}
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </motion.div>
+  );
 }

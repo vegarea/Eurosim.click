@@ -29,7 +29,7 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
               <Input 
                 placeholder="Como aparece en tu pasaporte" 
                 {...field} 
-                className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                className="w-full pl-10"
               />
             </FormControl>
             <FormMessage />

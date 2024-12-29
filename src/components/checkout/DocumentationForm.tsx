@@ -67,22 +67,35 @@ export function DocumentationForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-blue-700 text-sm">
             Para cumplir con las regulaciones de la Unión Europea y poder asignarte un número local europeo,
             necesitamos algunos datos adicionales. Esta información es requerida por las autoridades de telecomunicaciones.
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           <PersonalInfoFields form={form} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <DateFields form={form} isPhysicalSim={isPhysicalSim} />
-            <div className="space-y-8">
-              <GenderField form={form} />
-              <PassportField form={form} />
-            </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
+            <DateFields 
+              form={form} 
+              isPhysicalSim={isPhysicalSim} 
+              type="birth"
+              label="Fecha de nacimiento"
+            />
+            <DateFields 
+              form={form} 
+              isPhysicalSim={isPhysicalSim} 
+              type="activation"
+              label="Fecha de activación"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
+            <GenderField form={form} />
+            <PassportField form={form} />
           </div>
         </div>
       </form>
