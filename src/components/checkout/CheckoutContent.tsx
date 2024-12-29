@@ -4,7 +4,7 @@ import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 interface CheckoutContentProps {
   step: number;
@@ -27,18 +27,43 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
+  const [currentStepValid, setCurrentStepValid] = useState(false);
+
   // Validar el estado inicial cuando cambia el paso
   useEffect(() => {
-    console.log("CheckoutContent step changed:", {
+    console.log("CheckoutContent: Step changed", {
       step,
       hasPhysicalSim,
-      formData
+      formData,
+      currentStepValid
     });
-  }, [step, hasPhysicalSim, formData]);
+    
+    // Reset validation state when step changes
+    setCurrentStepValid(false);
+    onFormValidityChange(false);
+  }, [step]);
 
   const handleValidityChange = (isValid: boolean) => {
-    console.log("Form validity changed:", { step, isValid });
+    console.log("CheckoutContent: Form validity changed", { 
+      step, 
+      isValid,
+      previousValidity: currentStepValid 
+    });
+    
+    setCurrentStepValid(isValid);
     onFormValidityChange(isValid);
+  };
+
+  const handleFormSubmit = (values: any) => {
+    console.log("CheckoutContent: Form submitted", { 
+      step, 
+      values,
+      isValid: currentStepValid 
+    });
+    
+    if (currentStepValid) {
+      onFormSubmit(values);
+    }
   };
 
   const renderStepContent = () => {
@@ -56,13 +81,13 @@ export function CheckoutContent({
             )}
             {hasPhysicalSim ? (
               <ShippingForm 
-                onSubmit={onFormSubmit}
+                onSubmit={handleFormSubmit}
                 onValidityChange={handleValidityChange}
                 initialData={isTestMode ? testData.shipping : undefined}
               />
             ) : (
               <ESimForm 
-                onSubmit={onFormSubmit}
+                onSubmit={handleFormSubmit}
                 onValidityChange={handleValidityChange}
                 initialData={isTestMode ? {
                   fullName: testData.documentation.fullName,
@@ -76,7 +101,7 @@ export function CheckoutContent({
       case 2:
         return (
           <DocumentationForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleFormSubmit}
             onValidityChange={handleValidityChange}
             initialData={isTestMode ? testData.documentation : undefined}
           />

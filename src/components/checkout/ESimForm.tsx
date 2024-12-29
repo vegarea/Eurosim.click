@@ -32,31 +32,32 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
       phone: initialData?.phone || "",
     },
     mode: "onChange"
-  })
+  });
 
-  // Observar cambios en el formulario y validar
+  // Validar cambios en el formulario
   useEffect(() => {
     const subscription = form.watch(() => {
+      const formState = form.getValues();
+      const hasAllFields = formState.fullName && formState.email && formState.phone;
+      const isValid = form.formState.isValid && hasAllFields;
+      
+      console.log("ESimForm: Form state changed", {
+        values: formState,
+        errors: form.formState.errors,
+        isValid,
+        isDirty: form.formState.isDirty,
+        hasAllFields
+      });
+
       if (onValidityChange) {
-        const formValues = form.getValues();
-        const isValid = form.formState.isValid && 
-                       formValues.fullName.length >= 2 && 
-                       formValues.email.includes('@') && 
-                       formValues.phone.length >= 10;
-        
-        console.log("ESimForm validation state:", {
-          isValid,
-          values: formValues,
-          errors: form.formState.errors
-        });
-        
         onValidityChange(isValid);
       }
     });
+
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
 
-  // Validar datos iniciales si existen
+  // Validar datos iniciales
   useEffect(() => {
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
@@ -69,8 +70,17 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
 
       // Forzar validación inicial
       form.trigger().then((isValid) => {
+        const formState = form.getValues();
+        const hasAllFields = formState.fullName && formState.email && formState.phone;
+        
+        console.log("ESimForm: Initial validation", {
+          isValid,
+          hasAllFields,
+          values: formState
+        });
+
         if (onValidityChange) {
-          onValidityChange(isValid);
+          onValidityChange(isValid && hasAllFields);
         }
       });
     }
@@ -98,7 +108,10 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="Juan Pérez" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                    onBlur={() => form.trigger("fullName")}
+                    onBlur={() => {
+                      field.onBlur();
+                      form.trigger("fullName");
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -127,7 +140,10 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="juan@ejemplo.com" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                    onBlur={() => form.trigger("email")}
+                    onBlur={() => {
+                      field.onBlur();
+                      form.trigger("email");
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -155,7 +171,10 @@ export function ESimForm({ onSubmit, onValidityChange, initialData }: ESimFormPr
                     placeholder="55 1234 5678" 
                     {...field} 
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                    onBlur={() => form.trigger("phone")}
+                    onBlur={() => {
+                      field.onBlur();
+                      form.trigger("phone");
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
