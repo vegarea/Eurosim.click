@@ -8,6 +8,7 @@ import { formatCurrency } from "@/utils/currency";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SimCardProps {
+  id: string; // Añadido el ID real del producto
   type: "physical" | "esim";
   title: string;
   description: string;
@@ -19,6 +20,7 @@ interface SimCardProps {
 }
 
 export function SimCard({ 
+  id,
   type, 
   title, 
   description, 
@@ -74,7 +76,7 @@ export function SimCard({
       // Si no hay usuario, crear un cliente temporal o manejar según tu lógica
       const tempCustomerId = 'temp-' + Math.random().toString(36).substr(2, 9);
       addItem({
-        id: `${type}-${title}`,
+        id, // Usar el ID real del producto
         type,
         title,
         description,
@@ -84,7 +86,7 @@ export function SimCard({
     } else {
       // Si hay usuario, usar su ID como customerId
       addItem({
-        id: `${type}-${title}`,
+        id, // Usar el ID real del producto
         type,
         title,
         description,
