@@ -1,15 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 import { TablesInsert } from "@/integrations/supabase/types";
 
-type OrderInsert = TablesInsert<"orders">;
-
 interface PaymentResult {
   success: boolean;
   error?: string;
 }
 
 export const checkoutService = {
-  async createTemporaryOrder(orderData: Omit<OrderInsert, "id" | "status" | "payment_status">) {
+  async createTemporaryOrder(orderData: Omit<TablesInsert<"orders">, "id" | "status" | "payment_status">) {
     console.log("[checkoutService] Creating temporary order:", orderData);
     
     const { data: order, error } = await supabase
