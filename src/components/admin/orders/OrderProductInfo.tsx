@@ -1,4 +1,5 @@
 import { Order } from "@/types/database/orders"
+import { OrderMetadata } from "@/types/database/common"
 import { Package2, CreditCard, Wifi } from "lucide-react"
 import {
   Card,
@@ -13,6 +14,8 @@ interface OrderProductInfoProps {
 }
 
 export function OrderProductInfo({ order }: OrderProductInfoProps) {
+  const metadata = order.metadata as OrderMetadata | null
+
   return (
     <Card>
       <CardHeader>
@@ -31,7 +34,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
               ) : (
                 <Wifi className="h-4 w-4 text-primary" />
               )}
-              <span>{order.metadata?.product_title || "No especificado"}</span>
+              <span>{metadata?.product_title || "No especificado"}</span>
             </div>
           </div>
           <div>
@@ -43,13 +46,13 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           <div>
             <h3 className="font-medium mb-1">Datos en Europa</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.product_data_eu || "0"}GB
+              {metadata?.product_data_eu || "0"}GB
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Datos en España</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.product_data_es || "0"}GB
+              {metadata?.product_data_es || "0"}GB
             </p>
           </div>
           <div>

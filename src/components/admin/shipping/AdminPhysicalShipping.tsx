@@ -1,16 +1,17 @@
+import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Truck, PackageCheck } from "lucide-react"
 import { Order } from "@/types/database/orders"
+import { OrderMetadata } from "@/types/database/common"
 import { useOrdersData } from "@/hooks/useOrdersData"
-import { useState } from "react"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { ShippingTabs } from "./components/ShippingTabs"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { 
   createShippingConfirmationEvent, 
   createDeliveryConfirmationEvent 
 } from "./utils/shippingEvents"
-import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
@@ -35,8 +36,8 @@ export function AdminPhysicalShipping() {
     const currentOrder = orders.find(o => o.id === selectedOrderId)
     if (!currentOrder) return
 
-    const currentMetadata = currentOrder.metadata || {}
-    const currentEvents = (currentMetadata.events || []) as any[]
+    const currentMetadata = currentOrder.metadata as OrderMetadata | null
+    const currentEvents = currentMetadata?.events || []
     
     updateOrder(selectedOrderId, {
       status: "shipped",
@@ -58,8 +59,8 @@ export function AdminPhysicalShipping() {
 
   const handleDeliverOrder = (order: Order) => {
     const event = createDeliveryConfirmationEvent()
-    const currentMetadata = order.metadata || {}
-    const currentEvents = (currentMetadata.events || []) as any[]
+    const currentMetadata = order.metadata as OrderMetadata | null
+    const currentEvents = currentMetadata?.events || []
     
     updateOrder(order.id, {
       status: "delivered",

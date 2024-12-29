@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
 import { OrderStatus } from "@/types/database/enums"
+import { OrderMetadata } from "@/types/database/common"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -17,7 +18,6 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
-import { OrderNote } from "@/types/database/common"
 
 const statusOrder = [
   "payment_pending",
@@ -26,7 +26,6 @@ const statusOrder = [
   "delivered",
 ] as const
 
-// Mock payment data - In a real app, this would come from your payment provider's API
 const mockPaymentData = {
   paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
   logs: [
@@ -65,38 +64,49 @@ export default function OrderDetails() {
   }
 
   const confirmStatusChange = () => {
-    if (pendingStatus) {
-      updateOrder(order.id, { status: pendingStatus })
+    if (pendingStatus && order) {
+      const currentMetadata = order.metadata as OrderMetadata | null
+      const currentEvents = currentMetadata?.events || []
+      
+      const newEvent = {
+        id: crypto.randomUUID(),
+        type: "status_changed",
+        description: `Estado actualizado a ${pendingStatus}`,
+        created_at: new Date().toISOString(),
+        user_id: "current-user-id",
+        user_name: "Admin",
+        metadata: {
+          oldStatus: order.status,
+          newStatus: pendingStatus,
+          automated: false
+        }
+      }
+
+      updateOrder(order.id, {
+        status: pendingStatus,
+        metadata: {
+          ...currentMetadata,
+          events: [...currentEvents, newEvent]
+        }
+      })
+      
       toast.success("Estado actualizado correctamente")
       setShowConfirmDialog(false)
     }
   }
 
   const handleAddNote = (text: string) => {
-    const newNote: OrderNote = {
-      id: crypto.randomUUID(),
-      text,
-      user_id: "current-user-id", // En una app real, esto vendría del contexto de autenticación
-      user_name: "Admin", // En una app real, esto vendría del contexto de autenticación
-      created_at: new Date().toISOString()
-    }
-
+    if (!order) return
+    
     const currentNotes = order.notes || []
     updateOrder(order.id, {
-      notes: [newNote, ...currentNotes]
+      notes: [...currentNotes, text]
     })
-  }
-
-  const getProgressPercentage = () => {
-    const currentIndex = statusOrder.indexOf(order.status as any)
-    if (currentIndex === -1) return 0
-    return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header y Navegación */}
         <div className="flex items-center justify-between">
           <Link to="/admin/orders">
             <Button variant="ghost" className="gap-2">
@@ -105,7 +115,6 @@ export default function OrderDetails() {
           </Link>
         </div>
 
-        {/* Estado del Pedido y Progreso */}
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
@@ -124,13 +133,11 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        {/* Control de Estado */}
         <OrderCustomerInfo 
           order={order} 
           onStatusChange={handleStatusChange}
         />
 
-        {/* Grid de 2 columnas para información principal */}
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <OrderBasicInfo order={order} />
@@ -145,15 +152,14 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        {/* Historial completo */}
-        <OrderHistory events={order.events} />
+        <OrderHistory events={(order?.metadata as OrderMetadata | null)?.events} />
 
         <OrderStatusConfirmDialog
           open={showConfirmDialog}
           onOpenChange={setShowConfirmDialog}
           pendingStatus={pendingStatus}
           onConfirm={confirmStatusChange}
-          orderType={order.type}
+          orderType={order?.type}
         />
       </div>
     </AdminLayout>
