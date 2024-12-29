@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { productId, customerId } = await req.json()
-    console.log('Creating checkout session for:', { productId, customerId })
+    const { productId, customerId, shippingAddress } = await req.json()
+    console.log('Creating checkout session for:', { productId, customerId, shippingAddress })
 
     // Inicializar clientes
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -27,7 +27,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     )
 
-    // Obtener información del producto
+    // Validar que el producto existe
     const { data: product, error: productError } = await supabaseClient
       .from('products')
       .select('*')
@@ -36,12 +36,18 @@ serve(async (req) => {
 
     if (productError || !product) {
       console.error('Product not found:', productError)
-      throw new Error('Producto no encontrado')
+      return new Response(
+        JSON.stringify({ error: 'Producto no encontrado' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        }
+      )
     }
 
     console.log('Product found:', product)
 
-    // Obtener información del cliente
+    // Validar que el cliente existe
     const { data: customer, error: customerError } = await supabaseClient
       .from('customers')
       .select('*')
@@ -50,10 +56,27 @@ serve(async (req) => {
 
     if (customerError || !customer) {
       console.error('Customer not found:', customerError)
-      throw new Error('Cliente no encontrado')
+      return new Response(
+        JSON.stringify({ error: 'Cliente no encontrado' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        }
+      )
     }
 
     console.log('Customer found:', customer)
+
+    // Validar stock si es producto físico
+    if (product.type === 'physical' && product.stock !== null && product.stock < 1) {
+      return new Response(
+        JSON.stringify({ error: 'Producto sin stock disponible' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      )
+    }
 
     // Crear orden en la base de datos
     const { data: order, error: orderError } = await supabaseClient
@@ -66,14 +89,21 @@ serve(async (req) => {
         quantity: 1,
         payment_method: 'stripe',
         payment_status: 'pending',
-        status: 'payment_pending'
+        status: 'payment_pending',
+        shipping_address: shippingAddress || null,
       })
       .select()
       .single()
 
     if (orderError || !order) {
       console.error('Error creating order:', orderError)
-      throw new Error('Error al crear la orden')
+      return new Response(
+        JSON.stringify({ error: 'Error al crear la orden' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500,
+        }
+      )
     }
 
     console.log('Order created:', order)
@@ -84,7 +114,7 @@ serve(async (req) => {
       line_items: [
         {
           price_data: {
-            currency: 'mxn',
+            currency: 'eur',
             product_data: {
               name: product.title,
               description: product.description || undefined,
