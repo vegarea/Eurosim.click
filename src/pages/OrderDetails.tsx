@@ -41,6 +41,13 @@ export default function OrderDetails() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
 
+  const getProgressPercentage = () => {
+    if (!order) return 0
+    const currentIndex = statusOrder.indexOf(order.status as any)
+    if (currentIndex === -1) return 0
+    return ((currentIndex + 1) / statusOrder.length) * 100
+  }
+
   if (!order) {
     return (
       <AdminLayout>
@@ -152,14 +159,14 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        <OrderHistory events={(order?.metadata as OrderMetadata | null)?.events} />
+        <OrderHistory events={(order.metadata as OrderMetadata)?.events} />
 
         <OrderStatusConfirmDialog
           open={showConfirmDialog}
           onOpenChange={setShowConfirmDialog}
           pendingStatus={pendingStatus}
           onConfirm={confirmStatusChange}
-          orderType={order?.type}
+          orderType={order.type}
         />
       </div>
     </AdminLayout>
