@@ -13,7 +13,7 @@ export function AdminOrders() {
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.metadata?.customerInfo?.name || '').toString().toLowerCase().includes(search.toLowerCase())
+      (order.customers?.name || '').toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
