@@ -1,12 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/types/database";
+import { Order, Customer } from "@/types/database";
 
 interface OrderData {
   productId: string;
-  type: Database["public"]["Enums"]["order_type"];
+  type: "physical" | "esim";
   totalAmount: number;
   quantity: number;
-  customerInfo: {
+  metadata: {
     name: string;
     email: string;
   };
@@ -30,9 +30,7 @@ export const checkoutService = {
         quantity: orderData.quantity,
         status: 'payment_pending',
         payment_status: 'pending',
-        metadata: {
-          customer_info: orderData.customerInfo
-        }
+        metadata: orderData.metadata
       })
       .select()
       .single();
@@ -93,8 +91,8 @@ export const checkoutService = {
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
-        name: order.metadata.customer_info.name,
-        email: order.metadata.customer_info.email
+        name: order.metadata.name,
+        email: order.metadata.email
       })
       .select()
       .single();
