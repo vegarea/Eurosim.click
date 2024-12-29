@@ -19,7 +19,7 @@ export interface Order {
   tracking_number: string | null;
   carrier: string | null;
   activation_date: string | null;
-  notes: OrderNote[] | null;
+  notes: string[] | OrderNote[] | null;
   metadata: Record<string, any> | null;
   created_at: string | null;
   updated_at: string | null;

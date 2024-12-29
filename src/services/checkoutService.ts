@@ -46,6 +46,7 @@ class CheckoutService {
         status: 'payment_pending',
         shipping_address: orderData.shippingAddress,
         activation_date: orderData.activationDate,
+        notes: [],
         metadata: {
           customerInfo: orderData.customerInfo
         }
