@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/utils/currency";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -16,9 +17,40 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
   const { toast } = useToast();
   const { items, removeItem, updateQuantity } = useCart();
 
-  const handleCheckout = () => {
-    if (onCheckout) {
-      onCheckout({});
+  const handleCheckout = async () => {
+    try {
+      if (items.length === 0) {
+        toast({
+          title: "Carrito vacío",
+          description: "Agrega productos a tu carrito para continuar",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Por ahora manejamos solo un item
+      const item = items[0];
+      
+      const { data: { url }, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          productId: item.id,
+          customerId: item.customerId, // Asegúrate de tener el customerId disponible
+        },
+      });
+
+      if (error) throw error;
+
+      // Redirigir a Stripe
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Error initiating checkout:', error);
+      toast({
+        title: "Error",
+        description: "Hubo un problema al procesar tu pago. Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
     }
   };
 
