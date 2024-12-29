@@ -5,7 +5,7 @@ import { ShippingFormValues } from "./types"
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface PhoneFieldProps {
   form: UseFormReturn<ShippingFormValues>
@@ -15,9 +15,21 @@ export function PhoneField({ form }: PhoneFieldProps) {
   const [isValid, setIsValid] = useState(false)
 
   const handlePhoneChange = (value: string | undefined) => {
-    form.setValue('phone', value || '', { shouldValidate: true })
+    form.setValue('phone', value || '', { 
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    })
     setIsValid(!!value && isValidPhoneNumber(value))
   }
+
+  // Validar el número inicial si existe
+  useEffect(() => {
+    const currentValue = form.getValues('phone')
+    if (currentValue) {
+      setIsValid(isValidPhoneNumber(currentValue))
+    }
+  }, [form])
 
   return (
     <FormField
