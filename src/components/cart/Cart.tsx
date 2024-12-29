@@ -35,16 +35,29 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       
       console.log("Iniciando checkout con:", { item });
 
+      // Primero creamos o actualizamos el cliente
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
-        .select('id')
-        .eq('id', item.customerId)
-        .single();
+        .upsert({
+          id: item.customerId,
+          name: item.customerName || 'Cliente Test',
+          email: item.customerEmail || 'test@example.com',
+        }, {
+          onConflict: 'id'
+        })
+        .select()
+        .maybeSingle();
 
       if (customerError) {
-        console.error('Error getting customer:', customerError);
+        console.error('Error creating/updating customer:', customerError);
         throw customerError;
       }
+
+      if (!customerData) {
+        throw new Error('No se pudo crear el cliente');
+      }
+
+      console.log("Cliente creado/actualizado:", customerData);
 
       // Crear el pedido con método de pago "test"
       const { data: orderData, error: orderError } = await supabase
