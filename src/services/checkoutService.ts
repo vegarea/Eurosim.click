@@ -10,18 +10,8 @@ export interface OrderData {
   customerInfo: {
     name: string;
     email: string;
-    phone?: string;
-    passportNumber?: string;
-    birthDate?: string;
-    gender?: "M" | "F";
   };
-  shippingAddress?: {
-    street: string;
-    city: string;
-    state: string;
-    postalCode: string;
-    phone: string;
-  };
+  shippingAddress?: Json;
   activationDate?: string;
 }
 
@@ -44,12 +34,12 @@ class CheckoutService {
         payment_method: 'test',
         payment_status: 'pending',
         status: 'payment_pending',
-        shipping_address: orderData.shippingAddress,
-        activation_date: orderData.activationDate,
+        shipping_address: orderData.shippingAddress || null,
+        activation_date: orderData.activationDate || null,
         notes: [],
         metadata: {
           customerInfo: orderData.customerInfo
-        }
+        } as Json
       })
       .select()
       .single();
@@ -97,7 +87,7 @@ class CheckoutService {
     // Obtener la orden actual
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select('*')
+      .select()
       .eq('id', orderId)
       .single();
 
@@ -113,16 +103,11 @@ class CheckoutService {
     }
 
     // Crear cliente con la información guardada
-    const customerInfo = metadata.customerInfo;
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
-        name: customerInfo.name,
-        email: customerInfo.email,
-        phone: customerInfo.phone,
-        passport_number: customerInfo.passportNumber,
-        birth_date: customerInfo.birthDate,
-        gender: customerInfo.gender
+        name: metadata.customerInfo.name,
+        email: metadata.customerInfo.email,
       })
       .select()
       .single();
