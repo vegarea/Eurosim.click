@@ -1,6 +1,25 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
 import { Json } from "./common";
 
+// Definir la estructura del metadata para orders
+export interface OrderMetadata {
+  customerInfo?: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  events?: Array<{
+    id: string;
+    type: string;
+    description: string;
+    created_at: string;
+    metadata?: Record<string, any>;
+  }>;
+  product_title?: string;
+  product_data_eu?: number;
+  product_data_es?: number;
+}
+
 export interface Order {
   id: string;
   customer_id: string | null;
@@ -20,7 +39,7 @@ export interface Order {
   carrier: string | null;
   activation_date: string | null;
   notes: string[] | null;
-  metadata: Json | null;
+  metadata: OrderMetadata | null;
   created_at: string | null;
   updated_at: string | null;
 }
