@@ -8,7 +8,9 @@ export interface CartItem {
   description: string;
   price: number;
   quantity: number;
-  customerId?: string; // Añadimos el customerId como opcional
+  customerId?: string;
+  customerName?: string;
+  customerEmail?: string;
 }
 
 interface CartContextType {
