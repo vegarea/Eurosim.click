@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
 import { OrderStatus } from "@/types/database/enums"
+import { OrderMetadata } from "@/types/database/common"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -40,6 +41,13 @@ export default function OrderDetails() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
 
+  const getProgressPercentage = () => {
+    if (!order) return 0
+    const currentIndex = statusOrder.indexOf(order.status as any)
+    if (currentIndex === -1) return 0
+    return ((currentIndex + 1) / statusOrder.length) * 100
+  }
+
   if (!order) {
     return (
       <AdminLayout>
@@ -63,24 +71,44 @@ export default function OrderDetails() {
   }
 
   const confirmStatusChange = () => {
-    if (pendingStatus) {
-      updateOrder(order.id, { status: pendingStatus })
+    if (pendingStatus && order) {
+      const currentMetadata = order.metadata as OrderMetadata | null
+      const currentEvents = currentMetadata?.events || []
+      
+      const newEvent = {
+        id: crypto.randomUUID(),
+        type: "status_changed",
+        description: `Estado actualizado a ${pendingStatus}`,
+        created_at: new Date().toISOString(),
+        user_id: "current-user-id",
+        user_name: "Admin",
+        metadata: {
+          oldStatus: order.status,
+          newStatus: pendingStatus,
+          automated: false
+        }
+      }
+
+      updateOrder(order.id, {
+        status: pendingStatus,
+        metadata: {
+          ...currentMetadata,
+          events: [...currentEvents, newEvent]
+        }
+      })
+      
       toast.success("Estado actualizado correctamente")
       setShowConfirmDialog(false)
     }
   }
 
   const handleAddNote = (text: string) => {
+    if (!order) return
+    
     const currentNotes = order.notes || []
     updateOrder(order.id, {
       notes: [...currentNotes, text]
     })
-  }
-
-  const getProgressPercentage = () => {
-    const currentIndex = statusOrder.indexOf(order.status as any)
-    if (currentIndex === -1) return 0
-    return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
   return (
@@ -131,7 +159,7 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        <OrderHistory events={order.metadata?.events || []} />
+        <OrderHistory events={(order.metadata as OrderMetadata)?.events} />
 
         <OrderStatusConfirmDialog
           open={showConfirmDialog}

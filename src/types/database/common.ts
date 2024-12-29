@@ -25,5 +25,4 @@ export interface OrderMetadata {
       automated?: boolean
     }
   }>
-  [key: string]: Json | undefined
 }
