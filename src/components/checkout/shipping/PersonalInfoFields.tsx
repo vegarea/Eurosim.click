@@ -1,9 +1,10 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { User, Mail, Phone } from "lucide-react"
+import { User, Mail } from "lucide-react"
 import { UseFormReturn } from "react-hook-form"
 import { motion } from "framer-motion"
 import { ShippingFormValues } from "./types"
+import { PhoneField } from "./PhoneField"
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<ShippingFormValues>
@@ -73,26 +74,7 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Teléfono
-                </FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="55 1234 5678" 
-                    {...field} 
-                    className="transition-all duration-200 focus:scale-[1.01] pl-10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <PhoneField form={form} />
         </motion.div>
       </div>
     </>
