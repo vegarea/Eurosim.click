@@ -1,4 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// Follow Deno's standard library versioning
+import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
