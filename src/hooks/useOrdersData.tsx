@@ -1,15 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Order } from "@/types/database/orders";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
+import { Order } from "@/types/database/orders"
+import { toast } from "sonner"
 
 export function useOrdersData() {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   const { data: orders = [], isLoading, error } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
-      console.log('Fetching orders...');
+      console.log('Fetching orders...')
       const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -20,38 +20,38 @@ export function useOrdersData() {
             phone
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error fetching orders:', error);
-        throw error;
+        console.error('Error fetching orders:', error)
+        throw error
       }
 
-      return data as Order[];
+      return data as Order[]
     }
-  });
+  })
 
   const updateOrder = useMutation({
-    mutationFn: async ({ orderId, updates }: { orderId: string, updates: Partial<Order> }) => {
+    mutationFn: async (params: { orderId: string, updates: Partial<Order> }) => {
       const { data, error } = await supabase
         .from('orders')
-        .update(updates)
-        .eq('id', orderId)
+        .update(params.updates)
+        .eq('id', params.orderId)
         .select()
-        .single();
+        .single()
 
-      if (error) throw error;
-      return data;
+      if (error) throw error
+      return data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Pedido actualizado correctamente');
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+      toast.success('Pedido actualizado correctamente')
     },
     onError: (error) => {
-      console.error('Error updating order:', error);
-      toast.error('Error al actualizar el pedido');
+      console.error('Error updating order:', error)
+      toast.error('Error al actualizar el pedido')
     }
-  });
+  })
 
   return {
     orders,
@@ -59,5 +59,5 @@ export function useOrdersData() {
     error,
     updateOrder: (orderId: string, updates: Partial<Order>) => 
       updateOrder.mutate({ orderId, updates })
-  };
+  }
 }

@@ -10,6 +10,7 @@ import {
   createShippingConfirmationEvent, 
   createDeliveryConfirmationEvent 
 } from "./utils/shippingEvents"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
