@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
-import { Json, OrderEvent, OrderNote } from "./common";
+import { Json } from "./common";
 
 export interface Order {
   id: string;
@@ -19,8 +19,8 @@ export interface Order {
   tracking_number: string | null;
   carrier: string | null;
   activation_date: string | null;
-  notes: string[] | OrderNote[] | null;
-  metadata: Record<string, any> | null;
+  notes: string[] | null;
+  metadata: Json | null;
   created_at: string | null;
   updated_at: string | null;
   // UI specific fields
