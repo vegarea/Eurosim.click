@@ -5,8 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/utils/currency";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { checkoutService } from "@/services/checkoutService";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -32,92 +32,42 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
 
       // Por ahora manejamos solo un item
       const item = items[0];
-      
-      console.log("Buscando producto en la base de datos:", item.title);
 
-      // Primero obtenemos el ID real del producto
-      const { data: productData, error: productError } = await supabase
-        .from('products')
-        .select('id')
-        .eq('title', item.title)
-        .single();
+      // 1. Crear orden temporal
+      const orderData = {
+        productId: item.id,
+        type: item.type,
+        totalAmount: item.price * item.quantity,
+        quantity: item.quantity,
+        customerInfo: {
+          name: item.customerName || 'Test Customer',
+          email: item.customerEmail || 'test@example.com'
+        }
+      };
 
-      if (productError) {
-        console.error('Error finding product:', productError);
-        throw new Error('No se pudo encontrar el producto');
+      const order = await checkoutService.createTemporaryOrder(orderData);
+      console.log("Temporary order created:", order);
+
+      // 2. Procesar pago de prueba
+      const paymentResult = await checkoutService.processTestPayment(order.id);
+      console.log("Payment processed:", paymentResult);
+
+      // 3. Si el pago es exitoso, finalizar orden
+      if (paymentResult.success) {
+        const finalOrder = await checkoutService.finalizeOrder(order.id, paymentResult);
+        console.log("Order finalized:", finalOrder);
+
+        // Limpiar carrito y redirigir
+        clearCart();
+        navigate('/thank-you');
+
+        toast({
+          title: "¡Pedido realizado!",
+          description: "Tu pedido de prueba ha sido procesado correctamente.",
+        });
+      } else {
+        throw new Error(paymentResult.error || "Error procesando el pago");
       }
-
-      if (!productData) {
-        throw new Error('Producto no encontrado');
-      }
-
-      console.log("Producto encontrado:", productData);
-      
-      // Creamos el pedido temporal con el ID real del producto
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          product_id: productData.id, // Usamos el ID real del producto
-          type: item.type,
-          total_amount: item.price * item.quantity,
-          quantity: item.quantity,
-          payment_method: 'test',
-          payment_status: 'pending',
-          status: 'payment_pending'
-        })
-        .select()
-        .single();
-
-      if (orderError) {
-        console.error('Error creating temporary order:', orderError);
-        throw orderError;
-      }
-
-      console.log("Pedido temporal creado:", orderData);
-
-      // Simular proceso de pago (en producción esto sería con Stripe/PayPal)
-      // Si el pago es exitoso, creamos el cliente
-      const { data: customerData, error: customerError } = await supabase
-        .from('customers')
-        .insert({
-          name: item.customerName || 'Cliente Test',
-          email: item.customerEmail || 'test@example.com',
-        })
-        .select()
-        .single();
-
-      if (customerError) {
-        console.error('Error creating customer:', customerError);
-        throw customerError;
-      }
-
-      console.log("Cliente creado después del pago exitoso:", customerData);
-
-      // Actualizamos el pedido con el ID del cliente y marcamos como pagado
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({ 
-          customer_id: customerData.id,
-          payment_status: 'completed',
-          status: 'processing'
-        })
-        .eq('id', orderData.id);
-
-      if (updateError) {
-        console.error('Error updating order with customer:', updateError);
-        throw updateError;
-      }
-
-      // Limpiar el carrito
-      clearCart();
-
-      // Redirigir a la página de agradecimiento
-      navigate('/thank-you');
-
-      toast({
-        title: "¡Pedido realizado!",
-        description: "Tu pedido de prueba ha sido procesado correctamente.",
-      });
 
     } catch (error) {
       console.error('Error processing checkout:', error);
