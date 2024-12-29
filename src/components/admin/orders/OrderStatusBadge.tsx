@@ -7,6 +7,7 @@ import {
   Truck,
   Ban
 } from "lucide-react"
+import { OrderStatus } from "@/types/database/enums"
 
 export const statusConfig = {
   payment_pending: {
@@ -39,10 +40,10 @@ export const statusConfig = {
     color: "bg-gray-100 text-gray-800",
     icon: Ban,
   },
-}
+} as const
 
 interface OrderStatusBadgeProps {
-  status: keyof typeof statusConfig
+  status: OrderStatus
 }
 
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {

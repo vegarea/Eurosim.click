@@ -1,24 +1,6 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
 import { Json } from "./common";
-
-// Definir la estructura del metadata para orders como un tipo que extiende Json
-export interface OrderMetadata extends Record<string, Json | undefined> {
-  customerInfo?: {
-    name: string;
-    email: string;
-    phone?: string;
-  };
-  events?: Array<{
-    id: string;
-    type: string;
-    description: string;
-    created_at: string;
-    metadata?: Record<string, any>;
-  }>;
-  product_title?: string;
-  product_data_eu?: number;
-  product_data_es?: number;
-}
+import { OrderMetadata } from "./metadata";
 
 export interface Order {
   id: string;
@@ -42,9 +24,15 @@ export interface Order {
   metadata: OrderMetadata | null;
   created_at: string | null;
   updated_at: string | null;
+  events?: Array<{
+    id: string;
+    type: string;
+    description: string;
+    created_at: string;
+    metadata?: Record<string, any>;
+  }>;
 }
 
-// Tipo para usar en componentes que necesitan mostrar información del cliente
 export interface ExtendedOrder extends Order {
   customers?: {
     name: string | null;
