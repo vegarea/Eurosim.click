@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import Stripe from 'https://esm.sh/stripe@14.21.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,13 +14,51 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Iniciando prueba de conexión con Stripe')
-    
+    const { productId, quantity, type } = await req.json()
+    console.log('Creating checkout session for:', { productId, quantity, type })
+
+    // Inicializar clientes
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // Crear una sesión de prueba con un monto más alto
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
+    // Validar que el producto existe
+    const { data: product, error: productError } = await supabaseClient
+      .from('products')
+      .select('*')
+      .eq('id', productId)
+      .single()
+
+    if (productError || !product) {
+      console.error('Product not found:', productError)
+      return new Response(
+        JSON.stringify({ error: 'Producto no encontrado' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404,
+        }
+      )
+    }
+
+    console.log('Product found:', product)
+
+    // Validar stock si es producto físico
+    if (product.type === 'physical' && product.stock !== null && product.stock < quantity) {
+      return new Response(
+        JSON.stringify({ error: 'Producto sin stock disponible' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      )
+    }
+
+    // Crear sesión de checkout
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -27,20 +66,28 @@ serve(async (req) => {
           price_data: {
             currency: 'mxn',
             product_data: {
-              name: 'Producto de Prueba',
-              description: 'Esto es una prueba de conexión',
+              name: product.title,
+              description: product.description || undefined,
             },
-            unit_amount: 2000, // 20 MXN (aproximadamente 1 USD)
+            unit_amount: product.price,
           },
-          quantity: 1,
+          quantity: quantity,
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/thank-you`,
+      success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
+      metadata: {
+        productId: product.id,
+        productType: product.type,
+        quantity: quantity.toString(),
+      },
     })
 
-    console.log('Sesión de Stripe creada exitosamente:', session.id)
+    console.log('Checkout session created:', {
+      sessionId: session.id,
+      url: session.url
+    })
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -50,7 +97,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error conectando con Stripe:', error)
+    console.error('Error creating checkout session:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
