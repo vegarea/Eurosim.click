@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField } from "@/components/ui/form"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
@@ -21,6 +21,8 @@ export function ShippingForm({
   email = '', 
   initialData 
 }: ShippingFormProps) {
+  const [showLocationFields, setShowLocationFields] = useState(false)
+  
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -75,6 +77,8 @@ export function ShippingForm({
     if (city) form.setValue('city', city, { shouldValidate: true })
     if (state) form.setValue('state', state, { shouldValidate: true })
     if (postalCode) form.setValue('zipCode', postalCode, { shouldValidate: true })
+    
+    setShowLocationFields(true)
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
@@ -109,7 +113,7 @@ export function ShippingForm({
           )}
         />
 
-        <LocationFields form={form} />
+        <LocationFields form={form} show={showLocationFields} />
       </form>
     </Form>
   )
