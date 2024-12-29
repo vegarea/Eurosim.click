@@ -5,10 +5,18 @@ import { PartyPopper, CheckCircle, Receipt, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { Order } from "@/types/database/orders"
+
+interface ExtendedOrder extends Order {
+  customers?: {
+    name: string | null;
+    email: string | null;
+  } | null;
+}
 
 export default function ThankYou() {
   const [searchParams] = useSearchParams()
-  const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [orderDetails, setOrderDetails] = useState<ExtendedOrder | null>(null)
   const { toast } = useToast()
   const sessionId = searchParams.get("session_id")
 

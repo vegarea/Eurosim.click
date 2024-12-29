@@ -55,12 +55,10 @@ class CheckoutService {
   async processTestPayment(orderId: string): Promise<PaymentResult> {
     console.log("Processing test payment for order:", orderId);
     
-    // Simular proceso de pago (siempre exitoso en modo test)
     const paymentResult: PaymentResult = {
       success: true
     };
 
-    // Actualizar estado del pago
     const { error } = await supabase
       .from('orders')
       .update({
@@ -84,7 +82,6 @@ class CheckoutService {
       throw new Error("Cannot finalize order with failed payment");
     }
 
-    // Obtener la orden actual
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select()
@@ -96,13 +93,11 @@ class CheckoutService {
       throw orderError;
     }
 
-    // Asegurarnos de que metadata es un objeto y tiene customerInfo
     const metadata = order.metadata as { customerInfo?: OrderData['customerInfo'] };
     if (!metadata || !metadata.customerInfo) {
       throw new Error("Customer information not found in order metadata");
     }
 
-    // Crear cliente con la información guardada
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
@@ -117,7 +112,6 @@ class CheckoutService {
       throw customerError;
     }
 
-    // Actualizar orden con el customer_id
     const { data: updatedOrder, error: updateError } = await supabase
       .from('orders')
       .update({
