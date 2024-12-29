@@ -33,13 +33,31 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       // Por ahora manejamos solo un item
       const item = items[0];
       
-      console.log("Iniciando checkout con:", { item });
+      console.log("Buscando producto en la base de datos:", item.title);
 
-      // Primero creamos el pedido temporal sin cliente
+      // Primero obtenemos el ID real del producto
+      const { data: productData, error: productError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('title', item.title)
+        .single();
+
+      if (productError) {
+        console.error('Error finding product:', productError);
+        throw new Error('No se pudo encontrar el producto');
+      }
+
+      if (!productData) {
+        throw new Error('Producto no encontrado');
+      }
+
+      console.log("Producto encontrado:", productData);
+      
+      // Creamos el pedido temporal con el ID real del producto
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
-          product_id: item.id,
+          product_id: productData.id, // Usamos el ID real del producto
           type: item.type,
           total_amount: item.price * item.quantity,
           quantity: item.quantity,
