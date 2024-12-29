@@ -5,7 +5,6 @@ import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
-// Declare global Google Maps types
 declare global {
   interface Window {
     google: typeof google;
@@ -50,6 +49,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           console.log("Loading Google Maps script...")
           window.initGoogleMaps = () => {
             console.log('Google Maps API loaded successfully')
+            initializeAutocomplete()
           }
 
           const script = document.createElement('script')
@@ -66,21 +66,8 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
               variant: "destructive",
             })
           }
-        }
-
-        // Initialize autocomplete after script is loaded
-        if (inputRef.current && window.google) {
-          autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
-            componentRestrictions: { country: "mx" },
-            fields: ["address_components", "formatted_address"],
-          })
-
-          autocompleteRef.current.addListener("place_changed", () => {
-            const place = autocompleteRef.current?.getPlace()
-            if (place) {
-              onAddressSelect(place)
-            }
-          })
+        } else {
+          initializeAutocomplete()
         }
       } catch (error) {
         console.error('Error in Google Maps initialization:', error)
@@ -92,8 +79,27 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
       }
     }
 
+    const initializeAutocomplete = () => {
+      if (inputRef.current && window.google) {
+        console.log("Initializing autocomplete...")
+        autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+          componentRestrictions: { country: "mx" },
+          fields: ["address_components", "formatted_address"],
+        })
+
+        autocompleteRef.current.addListener("place_changed", () => {
+          const place = autocompleteRef.current?.getPlace()
+          if (place) {
+            console.log("Place selected:", place)
+            onChange(place.formatted_address || "")
+            onAddressSelect(place)
+          }
+        })
+      }
+    }
+
     loadGoogleMapsScript()
-  }, [onAddressSelect, toast])
+  }, [onAddressSelect, onChange, toast])
 
   return (
     <FormItem>

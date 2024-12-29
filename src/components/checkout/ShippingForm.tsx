@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField } from "@/components/ui/form"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
@@ -37,16 +37,8 @@ export function ShippingForm({
     mode: "onChange"
   })
 
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      if (onValidityChange) {
-        onValidityChange(form.formState.isValid)
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [form, onValidityChange])
-
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
+    console.log("Address selected:", place)
     const addressComponents = place.address_components || []
     
     let streetNumber = ''
