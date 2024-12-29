@@ -11,7 +11,6 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
-import { Button } from "@/components/ui/button"
 import { supabase } from "@/integrations/supabase/client"
 
 const testData = {
@@ -45,42 +44,6 @@ export default function Checkout() {
   const navigate = useNavigate()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
-
-  // Función de prueba para Stripe
-  const handleStripeTest = async () => {
-    try {
-      console.log("Iniciando prueba de Stripe...")
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          amount: 2000, // 20 MXN = ~1 USD
-          currency: 'mxn',
-          description: 'Prueba de Stripe'
-        }
-      })
-
-      if (error) {
-        console.error('Error en prueba de Stripe:', error)
-        toast({
-          title: "Error",
-          description: "Hubo un error al conectar con Stripe. Revisa la consola para más detalles.",
-          variant: "destructive",
-        })
-        return
-      }
-
-      console.log("Respuesta de Stripe:", data)
-      if (data?.url) {
-        window.location.href = data.url
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      toast({
-        title: "Error",
-        description: "Hubo un error inesperado. Revisa la consola para más detalles.",
-        variant: "destructive",
-      })
-    }
-  }
 
   useEffect(() => {
     if (items.length === 0) {
@@ -152,17 +115,6 @@ export default function Checkout() {
       
       <main className="container mx-auto py-8 px-4 max-w-5xl">
         <div className="max-w-5xl mx-auto">
-          {/* Botón de prueba para Stripe */}
-          <div className="mb-6 flex justify-center">
-            <Button 
-              onClick={handleStripeTest}
-              variant="outline"
-              className="bg-white hover:bg-gray-100"
-            >
-              Probar conexión con Stripe (20 MXN)
-            </Button>
-          </div>
-
           <CheckoutHeader onLoadTestData={loadTestData} />
           <CheckoutProgress step={step} />
 
