@@ -14,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { productId, customerId, shippingAddress } = await req.json()
-    console.log('Creating checkout session for:', { productId, customerId, shippingAddress })
+    const { productId, quantity, type } = await req.json()
+    console.log('Creating checkout session for:', { productId, quantity, type })
 
     // Inicializar clientes
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -47,28 +47,8 @@ serve(async (req) => {
 
     console.log('Product found:', product)
 
-    // Validar que el cliente existe
-    const { data: customer, error: customerError } = await supabaseClient
-      .from('customers')
-      .select('*')
-      .eq('id', customerId)
-      .single()
-
-    if (customerError || !customer) {
-      console.error('Customer not found:', customerError)
-      return new Response(
-        JSON.stringify({ error: 'Cliente no encontrado' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404,
-        }
-      )
-    }
-
-    console.log('Customer found:', customer)
-
     // Validar stock si es producto físico
-    if (product.type === 'physical' && product.stock !== null && product.stock < 1) {
+    if (product.type === 'physical' && product.stock !== null && product.stock < quantity) {
       return new Response(
         JSON.stringify({ error: 'Producto sin stock disponible' }),
         { 
@@ -78,61 +58,29 @@ serve(async (req) => {
       )
     }
 
-    // Crear orden en la base de datos
-    const { data: order, error: orderError } = await supabaseClient
-      .from('orders')
-      .insert({
-        customer_id: customerId,
-        product_id: productId,
-        type: product.type,
-        total_amount: product.price,
-        quantity: 1,
-        payment_method: 'stripe',
-        payment_status: 'pending',
-        status: 'payment_pending',
-        shipping_address: shippingAddress || null,
-      })
-      .select()
-      .single()
-
-    if (orderError || !order) {
-      console.error('Error creating order:', orderError)
-      return new Response(
-        JSON.stringify({ error: 'Error al crear la orden' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500,
-        }
-      )
-    }
-
-    console.log('Order created:', order)
-
     // Crear sesión de checkout
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
-            currency: 'eur',
+            currency: 'mxn',
             product_data: {
               name: product.title,
               description: product.description || undefined,
             },
             unit_amount: product.price,
           },
-          quantity: 1,
+          quantity: quantity,
         },
       ],
       mode: 'payment',
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
-      customer_email: customer.email,
       metadata: {
-        orderId: order.id,
         productId: product.id,
-        customerId: customer.id,
         productType: product.type,
+        quantity: quantity.toString(),
       },
     })
 
