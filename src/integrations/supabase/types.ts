@@ -115,7 +115,7 @@ export type Database = {
           activation_date: string | null
           carrier: string | null
           created_at: string | null
-          customer_id: string
+          customer_id: string | null
           id: string
           metadata: Json | null
           notes: string[] | null
@@ -138,7 +138,7 @@ export type Database = {
           activation_date?: string | null
           carrier?: string | null
           created_at?: string | null
-          customer_id: string
+          customer_id?: string | null
           id?: string
           metadata?: Json | null
           notes?: string[] | null
@@ -161,7 +161,7 @@ export type Database = {
           activation_date?: string | null
           carrier?: string | null
           created_at?: string | null
-          customer_id?: string
+          customer_id?: string | null
           id?: string
           metadata?: Json | null
           notes?: string[] | null

@@ -35,29 +35,29 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       
       console.log("Iniciando checkout con:", { item });
 
-      // Primero creamos el pedido con estado pending
+      // Primero creamos el pedido temporal sin cliente
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
-          customer_id: item.customerId || '00000000-0000-0000-0000-000000000000', // ID temporal
           product_id: item.id,
           type: item.type,
           total_amount: item.price * item.quantity,
           quantity: item.quantity,
           payment_method: 'test',
-          payment_status: 'completed', // Auto-completado para pruebas
-          status: 'processing'
+          payment_status: 'pending',
+          status: 'payment_pending'
         })
         .select()
         .single();
 
       if (orderError) {
-        console.error('Error creating order:', orderError);
+        console.error('Error creating temporary order:', orderError);
         throw orderError;
       }
 
-      console.log("Pedido creado:", orderData);
+      console.log("Pedido temporal creado:", orderData);
 
+      // Simular proceso de pago (en producción esto sería con Stripe/PayPal)
       // Si el pago es exitoso, creamos el cliente
       const { data: customerData, error: customerError } = await supabase
         .from('customers')
@@ -73,12 +73,16 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
         throw customerError;
       }
 
-      console.log("Cliente creado:", customerData);
+      console.log("Cliente creado después del pago exitoso:", customerData);
 
-      // Actualizamos el pedido con el ID real del cliente
+      // Actualizamos el pedido con el ID del cliente y marcamos como pagado
       const { error: updateError } = await supabase
         .from('orders')
-        .update({ customer_id: customerData.id })
+        .update({ 
+          customer_id: customerData.id,
+          payment_status: 'completed',
+          status: 'processing'
+        })
         .eq('id', orderData.id);
 
       if (updateError) {
@@ -98,7 +102,7 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
       });
 
     } catch (error) {
-      console.error('Error processing test checkout:', error);
+      console.error('Error processing checkout:', error);
       toast({
         title: "Error",
         description: "Hubo un problema al procesar tu pedido. Por favor intenta de nuevo.",
