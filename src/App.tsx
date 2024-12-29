@@ -13,6 +13,7 @@ import Checkout from "./pages/Checkout"
 import AdminPanel from "./pages/AdminPanel"
 import OrderDetails from "./pages/OrderDetails"
 import Login from "./pages/Login"
+import ThankYou from "./pages/ThankYou"
 import "flag-icons/css/flag-icons.min.css"
 
 const queryClient = new QueryClient()
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/sims" element={<Sims />} />
               <Route path="/e-sims" element={<ESims />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/admin/*"
