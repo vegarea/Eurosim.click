@@ -1,3 +1,4 @@
+// Follow Deno's best practices for imports
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 
 const corsHeaders = {
@@ -12,23 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    console.log("Iniciando función get-google-maps-key")
+    console.log("Starting get-google-maps-key function")
     
     const GOOGLE_MAPS_API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY')
-    console.log("Estado de la API key:", GOOGLE_MAPS_API_KEY ? "Existe" : "No existe")
+    console.log("API Key status:", GOOGLE_MAPS_API_KEY ? "Found" : "Missing")
 
     if (!GOOGLE_MAPS_API_KEY) {
-      console.error("API key de Google Maps no configurada")
-      return new Response(
-        JSON.stringify({ error: 'API key de Google Maps no configurada' }),
-        { 
-          status: 500, 
-          headers: { 
-            'Content-Type': 'application/json',
-            ...corsHeaders 
-          } 
-        }
-      )
+      throw new Error('Google Maps API key not configured')
     }
 
     return new Response(
@@ -41,9 +32,9 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error("Error en la función get-google-maps-key:", error)
+    console.error("Function error:", error.message)
     return new Response(
-      JSON.stringify({ error: 'Error interno del servidor' }),
+      JSON.stringify({ error: error.message }),
       { 
         status: 500,
         headers: { 
