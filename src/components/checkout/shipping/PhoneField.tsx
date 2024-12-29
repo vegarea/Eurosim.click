@@ -37,10 +37,10 @@ export function PhoneField({ form }: PhoneFieldProps) {
                 value={field.value}
                 onChange={handlePhoneChange}
                 className={cn(
-                  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                  isValid && "pr-10 border-green-500"
+                  "relative",
+                  isValid && "PhoneInput--valid"
                 )}
-                placeholder="Enter phone number"
+                placeholder="Ingresa tu número con código de país"
               />
               {isValid && (
                 <Check className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
@@ -48,9 +48,6 @@ export function PhoneField({ form }: PhoneFieldProps) {
             </div>
           </FormControl>
           <FormMessage />
-          <p className="text-sm text-gray-500 mt-1">
-            Ingresa tu número con código de país
-          </p>
         </FormItem>
       )}
     />
