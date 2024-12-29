@@ -1,12 +1,11 @@
-// Follow Deno's standard library versioning
-import { serve } from "https://deno.land/std@0.204.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-console.log("Hello from get-google-maps-key function!")
+console.log("Starting get-google-maps-key function!")
 
 serve(async (req) => {
   // Handle CORS preflight requests
