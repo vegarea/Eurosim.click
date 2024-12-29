@@ -1,4 +1,4 @@
-import { Order } from "./types"
+import { Order } from "@/types/database/orders"
 import { Package2, CreditCard, Wifi } from "lucide-react"
 import {
   Card,
@@ -31,7 +31,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
               ) : (
                 <Wifi className="h-4 w-4 text-primary" />
               )}
-              <span>{order.metadata?.title || "No especificado"}</span>
+              <span>{order.metadata?.product_title || "No especificado"}</span>
             </div>
           </div>
           <div>
@@ -43,13 +43,13 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           <div>
             <h3 className="font-medium mb-1">Datos en Europa</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
+              {order.metadata?.product_data_eu || "0"}GB
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Datos en España</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
+              {order.metadata?.product_data_es || "0"}GB
             </p>
           </div>
           <div>

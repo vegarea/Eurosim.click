@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { OrderStatus } from "./orders/types"
+import { OrderStatus } from "@/types/database/enums"
 import { useOrdersData } from "@/hooks/useOrdersData"
 import { Loader2 } from "lucide-react"
 
@@ -13,7 +13,7 @@ export function AdminOrders() {
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.customer_name || '').toLowerCase().includes(search.toLowerCase())
+      (order.metadata?.customer_name || '').toString().toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })

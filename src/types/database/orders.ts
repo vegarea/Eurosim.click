@@ -24,6 +24,3 @@ export interface Order {
   created_at: string | null;
   updated_at: string | null;
 }
-
-export type OrderInsert = Omit<Order, "id" | "created_at" | "updated_at">;
-export type OrderUpdate = Partial<OrderInsert>;

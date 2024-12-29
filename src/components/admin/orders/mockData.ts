@@ -37,10 +37,7 @@ export const mockOrders: Order[] = [
       ]
     },
     created_at: "2024-01-25T10:30:00Z",
-    updated_at: "2024-01-25T10:30:00Z",
-    customer_name: "Juan Pérez",
-    customer_email: "juan@example.com",
-    customer_phone: "+1234567890",
+    updated_at: "2024-01-25T10:30:00Z"
   },
   {
     id: "order-002",
@@ -62,9 +59,6 @@ export const mockOrders: Order[] = [
     activation_date: null,
     created_at: "2024-01-26T12:00:00Z",
     updated_at: "2024-01-26T12:00:00Z",
-    customer_name: "María López",
-    customer_email: "maria@example.com",
-    customer_phone: "+1234567891",
     notes: [],
     metadata: {
       events: []
@@ -90,9 +84,6 @@ export const mockOrders: Order[] = [
     activation_date: null,
     created_at: "2024-01-27T15:30:00Z",
     updated_at: "2024-01-27T15:30:00Z",
-    customer_name: "Carlos Ruiz",
-    customer_email: "carlos@example.com",
-    customer_phone: "+1234567892",
     notes: [],
     metadata: {
       events: [
@@ -130,9 +121,6 @@ export const mockOrders: Order[] = [
     activation_date: null,
     created_at: "2024-01-24T09:15:00Z",
     updated_at: "2024-01-26T14:20:00Z",
-    customer_name: "Ana García",
-    customer_email: "ana@example.com",
-    customer_phone: "+1234567893",
     notes: [],
     metadata: {
       events: [
@@ -170,9 +158,6 @@ export const mockOrders: Order[] = [
     activation_date: null,
     created_at: "2024-01-28T11:45:00Z",
     updated_at: "2024-01-28T11:45:00Z",
-    customer_name: "Roberto Méndez",
-    customer_email: "roberto@example.com",
-    customer_phone: "+1234567894",
     notes: [],
     metadata: {
       events: []
