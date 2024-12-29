@@ -15,6 +15,7 @@ serve(async (req) => {
 
   try {
     const { productId, customerId } = await req.json()
+    console.log('Creating checkout session for:', { productId, customerId })
 
     // Inicializar clientes
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -34,8 +35,11 @@ serve(async (req) => {
       .single()
 
     if (productError || !product) {
+      console.error('Product not found:', productError)
       throw new Error('Producto no encontrado')
     }
+
+    console.log('Product found:', product)
 
     // Obtener información del cliente
     const { data: customer, error: customerError } = await supabaseClient
@@ -45,15 +49,34 @@ serve(async (req) => {
       .single()
 
     if (customerError || !customer) {
+      console.error('Customer not found:', customerError)
       throw new Error('Cliente no encontrado')
     }
 
-    console.log('Creating checkout session for:', {
-      productId,
-      customerId,
-      productTitle: product.title,
-      amount: product.price,
-    })
+    console.log('Customer found:', customer)
+
+    // Crear orden en la base de datos
+    const { data: order, error: orderError } = await supabaseClient
+      .from('orders')
+      .insert({
+        customer_id: customerId,
+        product_id: productId,
+        type: product.type,
+        total_amount: product.price,
+        quantity: 1,
+        payment_method: 'stripe',
+        payment_status: 'pending',
+        status: 'payment_pending'
+      })
+      .select()
+      .single()
+
+    if (orderError || !order) {
+      console.error('Error creating order:', orderError)
+      throw new Error('Error al crear la orden')
+    }
+
+    console.log('Order created:', order)
 
     // Crear sesión de checkout
     const session = await stripe.checkout.sessions.create({
@@ -66,7 +89,7 @@ serve(async (req) => {
               name: product.title,
               description: product.description || undefined,
             },
-            unit_amount: product.price, // El precio ya está en centavos
+            unit_amount: product.price,
           },
           quantity: 1,
         },
@@ -76,10 +99,16 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/checkout`,
       customer_email: customer.email,
       metadata: {
+        orderId: order.id,
         productId: product.id,
         customerId: customer.id,
         productType: product.type,
       },
+    })
+
+    console.log('Checkout session created:', {
+      sessionId: session.id,
+      url: session.url
     })
 
     return new Response(
