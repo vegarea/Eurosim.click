@@ -44,12 +44,12 @@ class CheckoutService {
         payment_method: 'test',
         payment_status: 'pending',
         status: 'payment_pending',
-        shipping_address: orderData.shippingAddress,
+        shipping_address: orderData.shippingAddress as Json,
         activation_date: orderData.activationDate,
         notes: [],
         metadata: {
           customerInfo: orderData.customerInfo
-        }
+        } as Json
       })
       .select()
       .single();
@@ -106,7 +106,6 @@ class CheckoutService {
       throw orderError;
     }
 
-    // Asegurarnos de que metadata es un objeto y tiene customerInfo
     const metadata = order.metadata as { customerInfo?: OrderData['customerInfo'] };
     if (!metadata || !metadata.customerInfo) {
       throw new Error("Customer information not found in order metadata");
