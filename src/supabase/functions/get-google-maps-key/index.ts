@@ -1,5 +1,5 @@
-// Follow Deno's best practices for imports
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
+// @deno-types="https://deno.land/std@0.177.0/http/server.ts"
+import { serve } from "@std/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
