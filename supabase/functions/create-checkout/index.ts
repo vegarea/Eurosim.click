@@ -19,7 +19,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Crear una sesión de prueba simple
+    // Crear una sesión de prueba con un monto más alto
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -30,7 +30,7 @@ serve(async (req) => {
               name: 'Producto de Prueba',
               description: 'Esto es una prueba de conexión',
             },
-            unit_amount: 1000, // 10 MXN
+            unit_amount: 2000, // 20 MXN (aproximadamente 1 USD)
           },
           quantity: 1,
         },
