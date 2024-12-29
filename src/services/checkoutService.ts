@@ -1,44 +1,26 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Order } from "@/types/database/orders";
-import { Json } from "@/types/database/common";
+import { Database } from "@/types/database";
 
-export interface OrderData {
+interface OrderData {
   productId: string;
-  type: "physical" | "esim";
+  type: Database["public"]["Enums"]["order_type"];
   totalAmount: number;
   quantity: number;
   customerInfo: {
     name: string;
     email: string;
   };
-  shippingAddress?: Json;
-  activationDate?: string;
 }
 
-export interface PaymentResult {
+interface PaymentResult {
   success: boolean;
   error?: string;
 }
 
-class CheckoutService {
-  async createTemporaryOrder(orderData: OrderData): Promise<Order> {
-    console.log("[CheckoutService] Creando orden temporal:", {
-      orderData,
-      timestamp: new Date().toISOString()
-    });
+export const checkoutService = {
+  async createTemporaryOrder(orderData: OrderData) {
+    console.log("[checkoutService] Creating temporary order:", orderData);
     
-    const metadata = {
-      customerInfo: orderData.customerInfo
-    };
-
-    console.log("[CheckoutService] Preparando datos para Supabase:", {
-      product_id: orderData.productId,
-      type: orderData.type,
-      total_amount: orderData.totalAmount,
-      quantity: orderData.quantity,
-      metadata
-    });
-
     const { data: order, error } = await supabase
       .from('orders')
       .insert({
@@ -46,97 +28,83 @@ class CheckoutService {
         type: orderData.type,
         total_amount: orderData.totalAmount,
         quantity: orderData.quantity,
-        payment_method: 'test',
-        payment_status: 'pending',
         status: 'payment_pending',
-        shipping_address: orderData.shippingAddress || null,
-        activation_date: orderData.activationDate || null,
-        notes: [],
-        metadata
+        payment_status: 'pending',
+        metadata: {
+          customer_info: orderData.customerInfo
+        }
       })
       .select()
       .single();
 
     if (error) {
-      console.error("[CheckoutService] Error creando orden temporal:", error);
+      console.error("[checkoutService] Error creating order:", error);
       throw error;
     }
 
-    console.log("[CheckoutService] Orden temporal creada exitosamente:", order);
     return order;
-  }
+  },
 
   async processTestPayment(orderId: string): Promise<PaymentResult> {
-    console.log("[CheckoutService] Procesando pago de prueba para orden:", orderId);
+    console.log("[checkoutService] Processing test payment for order:", orderId);
     
-    const paymentResult: PaymentResult = {
-      success: true
-    };
+    // Simular proceso de pago
+    const success = Math.random() > 0.1; // 90% de éxito
+    
+    if (success) {
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_status: 'completed' })
+        .eq('id', orderId);
 
-    console.log("[CheckoutService] Actualizando estado de pago en Supabase");
-    const { error } = await supabase
-      .from('orders')
-      .update({
-        payment_status: paymentResult.success ? 'completed' : 'failed',
-        status: paymentResult.success ? 'processing' : 'payment_failed'
-      })
-      .eq('id', orderId);
+      if (error) {
+        console.error("[checkoutService] Error updating payment status:", error);
+        throw error;
+      }
 
-    if (error) {
-      console.error("[CheckoutService] Error actualizando estado de pago:", error);
-      throw error;
+      return { success: true };
     }
 
-    console.log("[CheckoutService] Pago procesado exitosamente:", paymentResult);
-    return paymentResult;
-  }
+    return {
+      success: false,
+      error: "Pago de prueba fallido"
+    };
+  },
 
-  async finalizeOrder(orderId: string, paymentResult: PaymentResult): Promise<Order> {
-    console.log("[CheckoutService] Finalizando orden:", {
-      orderId,
-      paymentResult,
-      timestamp: new Date().toISOString()
-    });
+  async finalizeOrder(orderId: string, paymentResult: PaymentResult) {
+    console.log("[checkoutService] Finalizing order:", orderId);
     
     if (!paymentResult.success) {
-      console.error("[CheckoutService] No se puede finalizar orden con pago fallido");
-      throw new Error("Cannot finalize order with failed payment");
+      throw new Error("No se puede finalizar una orden con pago fallido");
     }
 
-    console.log("[CheckoutService] Obteniendo detalles de la orden");
     const { data: order, error: orderError } = await supabase
       .from('orders')
-      .select()
+      .select('metadata')
       .eq('id', orderId)
       .single();
 
-    if (orderError || !order) {
-      console.error("[CheckoutService] Error obteniendo orden:", orderError);
+    if (orderError) {
+      console.error("[checkoutService] Error getting order:", orderError);
       throw orderError;
     }
 
-    const metadata = order.metadata as { customerInfo?: { name: string; email: string; } };
-    if (!metadata?.customerInfo) {
-      console.error("[CheckoutService] Error: Información de cliente no encontrada en metadata");
-      throw new Error("Customer information not found in order metadata");
-    }
-
-    console.log("[CheckoutService] Creando cliente en Supabase");
+    // Crear cliente
     const { data: customer, error: customerError } = await supabase
       .from('customers')
       .insert({
-        name: metadata.customerInfo.name,
-        email: metadata.customerInfo.email,
+        name: order.metadata.customer_info.name,
+        email: order.metadata.customer_info.email
       })
       .select()
       .single();
 
     if (customerError) {
-      console.error("[CheckoutService] Error creando cliente:", customerError);
+      console.error("[checkoutService] Error creating customer:", customerError);
       throw customerError;
     }
 
-    console.log("[CheckoutService] Actualizando orden con ID de cliente");
+    // Actualizar orden con customer_id y status
     const { data: updatedOrder, error: updateError } = await supabase
       .from('orders')
       .update({
@@ -148,13 +116,10 @@ class CheckoutService {
       .single();
 
     if (updateError) {
-      console.error("[CheckoutService] Error actualizando orden con cliente:", updateError);
+      console.error("[checkoutService] Error updating order:", updateError);
       throw updateError;
     }
 
-    console.log("[CheckoutService] Orden finalizada exitosamente:", updatedOrder);
     return updatedOrder;
   }
-}
-
-export const checkoutService = new CheckoutService();
+};
