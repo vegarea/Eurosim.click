@@ -1,9 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
-import { checkoutLogger } from "./checkoutLogger";
 import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
 import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
-import { CustomerGender, OrderStatus, PaymentMethod, PaymentStatus } from "@/types/database/enums";
+import { CustomerGender } from "@/types/database/enums";
+import { Json } from "@/types/database/common";
 
 interface CartItem extends OrderItem {
   title: string;
@@ -85,7 +85,7 @@ export class CheckoutProcessor {
       phone: this.formData.phone,
       passport_number: this.formData.passportNumber,
       birth_date: this.formData.birthDate,
-      gender: CustomerGender[this.formData.gender as keyof typeof CustomerGender],
+      gender: this.formData.gender as CustomerGender,
       default_shipping_address: this.formData.shippingAddress || null,
       billing_address: null,
       preferred_language: 'es',
@@ -114,12 +114,12 @@ export class CheckoutProcessor {
     const orderData: Omit<Order, 'id' | 'created_at' | 'updated_at'> = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: OrderStatus.PAYMENT_PENDING,
+      status: "payment_pending",
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: PaymentMethod.TEST,
-      payment_status: PaymentStatus.COMPLETED,
+      payment_method: "test",
+      payment_status: "pending",
       shipping_address: this.formData.shippingAddress || null,
       tracking_number: null,
       carrier: null,
