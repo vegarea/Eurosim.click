@@ -4,7 +4,7 @@
  * DO NOT MODIFY without explicit user permission.
  */
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
-import { Json, OrderEvent } from "./common";
+import { Json } from "./common";
 
 export interface Order {
   id: string;
