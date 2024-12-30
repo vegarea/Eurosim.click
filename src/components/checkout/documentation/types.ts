@@ -12,8 +12,7 @@ export const documentationFormSchema = z.object({
     required_error: "La fecha de nacimiento es requerida",
   }),
   gender: z.nativeEnum(CustomerGender, {
-    errorMap: () => ({ message: "El género es requerido" }),
-    required_error: "El género es requerido",
+    required_error: "El género es requerido"
   }),
   passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
   activationDate: z.date({
