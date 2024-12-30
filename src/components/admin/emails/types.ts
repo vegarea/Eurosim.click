@@ -1,33 +1,43 @@
-import { z } from "zod"
+export interface EmailTemplate {
+  id: string
+  name: string
+  subject: string
+  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  description: string
+  type: "physical" | "esim" | "both"
+  variables: string[]
+  content?: string // Nuevo campo para el contenido HTML
+}
 
-export const documentationFormSchema = z.object({
-  fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  birthDate: z.date({
-    required_error: "La fecha de nacimiento es requerida",
-  }),
-  gender: z.string().min(1, "El género es requerido"),
-  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
-  activationDate: z.date({
-    required_error: "La fecha de activación es requerida",
-  }).min(new Date(), "La fecha debe ser futura"),
-  email: z.string().email("Email inválido").optional(),
-  phone: z.string().optional()
-})
+export const getStatusColor = (status: EmailTemplate["status"]) => {
+  const colors = {
+    payment_pending: "bg-[#8E9196] hover:bg-[#8E9196]/90",
+    processing: "bg-[#9b87f5] hover:bg-[#9b87f5]/90",
+    shipped: "bg-[#7E69AB] hover:bg-[#7E69AB]/90",
+    delivered: "bg-[#6E59A5] hover:bg-[#6E59A5]/90",
+    cancelled: "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+  }
+  return colors[status]
+}
 
-export type DocumentationFormValues = z.infer<typeof documentationFormSchema>
+export const getStatusLabel = (status: EmailTemplate["status"]) => {
+  const labels = {
+    payment_pending: "Pago Pendiente",
+    processing: "En Preparación",
+    shipped: "En Tránsito",
+    delivered: "Entregado",
+    cancelled: "Cancelado"
+  }
+  return labels[status]
+}
 
-export interface DocumentationFormProps {
-  onSubmit: (values: DocumentationFormValues) => void;
-  onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<DocumentationFormValues>;
-  isTestMode?: boolean;
-  testData?: {
-    fullName: string;
-    birthDate: Date;
-    gender: string;
-    passportNumber: string;
-    activationDate: Date;
-    email: string;
-    phone: string;
-  };
+export const getStatusIcon = (status: EmailTemplate["status"]) => {
+  const icons = {
+    payment_pending: "MailWarning",
+    processing: "Mail",
+    shipped: "Mail",
+    delivered: "MailCheck",
+    cancelled: "MailX"
+  }
+  return icons[status]
 }
