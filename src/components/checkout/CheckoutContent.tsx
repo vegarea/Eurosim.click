@@ -1,3 +1,4 @@
+import React from "react"
 import { DocumentationForm } from "./DocumentationForm"
 import { ShippingForm } from "./ShippingForm"
 import { PaymentStep } from "./PaymentStep"
