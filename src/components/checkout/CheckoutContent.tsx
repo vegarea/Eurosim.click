@@ -1,6 +1,6 @@
 import { DocumentationForm } from "./DocumentationForm"
 import { ShippingForm } from "./ShippingForm"
-import { ReviewStep } from "./ReviewStep"
+import { PaymentStep } from "./PaymentStep"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
 
@@ -59,19 +59,7 @@ export function CheckoutContent({
           />
         )
       }
-      return (
-        <ReviewStep
-          formData={formData}
-          onUpdateField={onUpdateField}
-        />
-      )
-    case 3:
-      return (
-        <ReviewStep
-          formData={formData}
-          onUpdateField={onUpdateField}
-        />
-      )
+      return <PaymentStep />
     default:
       return null
   }
