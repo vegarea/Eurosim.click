@@ -8,11 +8,6 @@ import { DocumentationFormValues } from "./documentation/types"
 interface CheckoutContentProps {
   step: number;
   hasPhysicalSim: boolean;
-  isTestMode: boolean;
-  testData: {
-    shipping: ShippingFormValues;
-    documentation: DocumentationFormValues;
-  };
   onFormSubmit: (values: any) => void;
   onFormValidityChange: (isValid: boolean) => void;
   formData: Record<string, any>;
@@ -22,8 +17,6 @@ interface CheckoutContentProps {
 export function CheckoutContent({
   step,
   hasPhysicalSim,
-  isTestMode,
-  testData,
   onFormSubmit,
   onFormValidityChange,
   formData,
@@ -42,8 +35,6 @@ export function CheckoutContent({
           <ShippingForm
             onSubmit={onFormSubmit}
             onValidityChange={onFormValidityChange}
-            isTestMode={isTestMode}
-            testData={testData.shipping}
           />
         )
       }
@@ -51,8 +42,6 @@ export function CheckoutContent({
         <DocumentationForm
           onSubmit={onFormSubmit}
           onValidityChange={onFormValidityChange}
-          isTestMode={isTestMode}
-          testData={testData.documentation}
         />
       )
     case 2:
@@ -61,8 +50,6 @@ export function CheckoutContent({
           <DocumentationForm
             onSubmit={onFormSubmit}
             onValidityChange={onFormValidityChange}
-            isTestMode={isTestMode}
-            testData={testData.documentation}
           />
         )
       }
