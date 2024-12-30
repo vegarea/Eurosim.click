@@ -1,13 +1,10 @@
 import { Header } from "@/components/Header";
-import { ESimHero } from "@/components/ESimHero";
-import { HowItWorks } from "@/components/HowItWorks";
+import { ProductButton } from "@/components/esim/ProductButton";
+import { PlanDetails } from "@/components/esim/PlanDetails";
 import { CommonFeatures } from "@/components/CommonFeatures";
 import { SimFeatures } from "@/components/SimFeatures";
 import { CountryCoverage } from "@/components/CountryCoverage";
-import { ProductButton } from "@/components/esim/ProductButton";
-import { PlanDetails } from "@/components/esim/PlanDetails";
-import { FrequentQuestions } from "@/components/FrequentQuestions";
-import { useState, useEffect } from "react";
+import { PaymentSecurity } from "@/components/PaymentSecurity";
 import { AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
@@ -16,7 +13,7 @@ import { Product } from "@/types/database/products";
 
 export default function ESims() {
   const isMobile = useIsMobile();
-  
+
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['esims'],
     queryFn: async () => {
@@ -46,13 +43,17 @@ export default function ESims() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
-      <ESimHero />
       
-      <div className="container mx-auto px-4 py-8 md:py-12">
+      <div className="container mx-auto px-4 py-8 lg:py-12">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-4xl font-bold text-center mb-6 md:mb-8 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Elige tu eSIM ideal
-          </h2>
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold mb-4">
+              eSIM Europa
+            </h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Conectividad instantánea en toda Europa. Activa tu eSIM en minutos y disfruta de internet de alta velocidad.
+            </p>
+          </div>
 
           {!isLoading && (
             <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:space-x-6'} gap-4`}>
@@ -61,9 +62,7 @@ export default function ESims() {
                   {products.map((product) => (
                     <ProductButton
                       key={product.id}
-                      title={product.title}
-                      price={product.price}
-                      type={product.type}
+                      product={product}
                       isSelected={selectedPlan?.id === product.id}
                       isPopular={product.title === "E-SIM L"}
                       onClick={() => setSelectedPlan(product)}
@@ -72,18 +71,13 @@ export default function ESims() {
                 </div>
               </div>
 
-              <div className={`${isMobile ? 'w-full' : 'md:w-[55%] md:sticky md:top-4'} order-1 md:order-2`}>
-                <div className="max-w-lg mx-auto">
+              <div className={`${isMobile ? 'w-full' : 'md:w-[55%]'} order-1 md:order-2 sticky top-4`}>
+                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4">
                   <AnimatePresence mode="wait">
                     {selectedPlan && (
                       <PlanDetails
                         key={selectedPlan.id}
-                        title={selectedPlan.title}
-                        description={selectedPlan.description || ''}
-                        price={selectedPlan.price}
-                        features={selectedPlan.features as string[] || []}
-                        europeGB={selectedPlan.data_eu_gb}
-                        spainGB={selectedPlan.data_es_gb}
+                        product={selectedPlan}
                       />
                     )}
                   </AnimatePresence>
@@ -92,13 +86,10 @@ export default function ESims() {
             </div>
           )}
 
-          <div className="mt-12 md:mt-24 space-y-12 md:space-y-24">
-            <CountryCoverage />
-            <CommonFeatures />
-            <SimFeatures />
-            <HowItWorks />
-            <FrequentQuestions />
-          </div>
+          <CommonFeatures />
+          <SimFeatures />
+          <CountryCoverage />
+          <PaymentSecurity />
         </div>
       </div>
     </div>

@@ -6,47 +6,30 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "@/utils/currency";
+import { Product } from "@/types/database/products";
 
 interface PlanDetailsProps {
-  title: string;
-  description: string;
-  features: string[];
-  europeGB: number;
-  spainGB: number;
-  price: number;
+  product: Product;
 }
 
-export function PlanDetails({ 
-  title, 
-  description, 
-  features, 
-  europeGB, 
-  spainGB,
-  price 
-}: PlanDetailsProps) {
+export function PlanDetails({ product }: PlanDetailsProps) {
   const { toast } = useToast();
   const { addItem } = useCart();
   const navigate = useNavigate();
 
   const handlePurchase = () => {
-    addItem({
-      id: `esim-${title}`,
-      type: "esim",
-      title,
-      description,
-      price
-    });
+    addItem(product);
     
     toast({
       title: "Producto añadido al carrito",
-      description: `Has seleccionado el plan ${title}`,
+      description: `Has seleccionado el plan ${product.title}`,
     });
     
     navigate('/checkout');
   };
 
-  const [amount, currency] = formatCurrency(price).split(' ');
-  const filteredFeatures = features.filter(feature => !feature.includes('GB datos en toda Europa'));
+  const [amount, currency] = formatCurrency(product.price).split(' ');
+  const features = product.features as string[] || [];
 
   return (
     <motion.div
@@ -59,7 +42,7 @@ export function PlanDetails({
       <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            {title}
+            {product.title}
           </h2>
           <div className="text-right">
             <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
@@ -71,11 +54,11 @@ export function PlanDetails({
         
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/80 rounded-lg p-2 text-center">
-            <p className="text-xl font-bold text-primary">{europeGB}GB</p>
+            <p className="text-xl font-bold text-primary">{product.data_eu_gb}GB</p>
             <p className="text-xs text-gray-600">Europa</p>
           </div>
           <div className="bg-white/80 rounded-lg p-2 text-center">
-            <p className="text-xl font-bold text-primary">{spainGB}GB</p>
+            <p className="text-xl font-bold text-primary">{product.data_es_gb}GB</p>
             <p className="text-xs text-gray-600">España</p>
           </div>
         </div>
@@ -85,7 +68,7 @@ export function PlanDetails({
       <div className="p-4 space-y-4">
         {/* Características */}
         <div className="space-y-1.5">
-          {filteredFeatures.map((feature, index) => (
+          {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, x: -20 }}
@@ -102,8 +85,8 @@ export function PlanDetails({
         {/* Medidor de uso con altura reducida */}
         <div className="scale-95 origin-top">
           <UsageMeter
-            europeGB={europeGB}
-            spainGB={spainGB}
+            europeGB={product.data_eu_gb}
+            spainGB={product.data_es_gb}
             isHighlighted={true}
           />
         </div>
