@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
-import { ExtendedCustomer } from "@/types/database/customers"
-import { Json } from "@/types/database/common"
+import { ExtendedCustomer } from "@/types/ui/customers"
+import { OrderMetadata } from "@/types/ui/orders"
 
 export function AdminCustomers() {
   const { orders } = useOrders()

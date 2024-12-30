@@ -1,7 +1,7 @@
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Truck, PackageCheck } from "lucide-react"
-import { Order } from "@/types/database/orders"
+import { UIOrder, OrderMetadata } from "@/types/ui/orders"
 import { OrderEvent } from "@/types/database/common"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { useOrders } from "@/contexts/OrdersContext"
@@ -24,7 +24,7 @@ export function AdminPhysicalShipping() {
   const shippedOrders = physicalOrders.filter(order => order.status === "shipped")
   const deliveredOrders = physicalOrders.filter(order => order.status === "delivered")
 
-  const handleShipOrder = (order: Order) => {
+  const handleShipOrder = (order: UIOrder) => {
     setSelectedOrderId(order.id)
     setConfirmDialogOpen(true)
   }
@@ -34,14 +34,15 @@ export function AdminPhysicalShipping() {
 
     const event = createShippingConfirmationEvent(trackingNumber, carrier)
     const currentOrder = orders.find(o => o.id === selectedOrderId)
+    const currentMetadata = currentOrder?.metadata as OrderMetadata | null
     
     updateOrder(selectedOrderId, {
       status: "shipped",
       tracking_number: trackingNumber,
       carrier: carrier,
       metadata: {
-        ...currentOrder?.metadata,
-        events: [...((currentOrder?.metadata?.events as OrderEvent[]) || []), event]
+        ...currentMetadata,
+        events: [...(currentMetadata?.events || []), event]
       }
     })
 
@@ -53,7 +54,7 @@ export function AdminPhysicalShipping() {
     setConfirmDialogOpen(false)
   }
 
-  const handleDeliverOrder = (order: Order) => {
+  const handleDeliverOrder = (order: UIOrder) => {
     const event = createDeliveryConfirmationEvent()
     
     updateOrder(order.id, {

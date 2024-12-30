@@ -1,4 +1,4 @@
-import { Order } from "./types"
+import { UIOrder } from "@/types/ui/orders"
 import { Package2, CreditCard, Wifi } from "lucide-react"
 import {
   Card,
@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 
 interface OrderProductInfoProps {
-  order: Order
+  order: UIOrder;
 }
 
 export function OrderProductInfo({ order }: OrderProductInfoProps) {

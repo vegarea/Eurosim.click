@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ExtendedCustomer } from "@/types/database/customers"
+import { ExtendedCustomer } from "@/types/ui/customers"
 
 interface CustomersTableProps {
   customers: ExtendedCustomer[]

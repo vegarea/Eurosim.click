@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Order, OrderNote } from "./types"
+import { UIOrder } from "@/types/ui/orders"
 import {
   Card,
   CardContent,
@@ -12,8 +12,8 @@ import { MessageSquare, Send } from "lucide-react"
 import { toast } from "sonner"
 
 interface OrderNotesProps {
-  order: Order
-  onAddNote: (note: string) => void
+  order: UIOrder;
+  onAddNote: (note: string) => void;
 }
 
 export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
