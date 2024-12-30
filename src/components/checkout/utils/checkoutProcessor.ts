@@ -79,7 +79,7 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
-    const customerData = {
+    const customerData: Omit<Customer, 'id' | 'created_at' | 'updated_at'> = {
       name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone,
@@ -87,11 +87,16 @@ export class CheckoutProcessor {
       birth_date: this.formData.birthDate,
       gender: this.formData.gender as CustomerGender,
       default_shipping_address: this.formData.shippingAddress || null,
+      billing_address: null,
+      preferred_language: 'es',
       marketing_preferences: {
         email_marketing: false,
         sms_marketing: false,
         push_notifications: false
-      }
+      },
+      stripe_customer_id: null,
+      paypal_customer_id: null,
+      metadata: {}
     };
 
     const { data, error } = await supabase
@@ -115,7 +120,12 @@ export class CheckoutProcessor {
       quantity: firstItem.quantity,
       payment_method: "test" as PaymentMethod,
       payment_status: "completed" as PaymentStatus,
-      shipping_address: this.formData.shippingAddress || null
+      shipping_address: this.formData.shippingAddress || null,
+      tracking_number: null,
+      carrier: null,
+      activation_date: null,
+      notes: [],
+      metadata: {}
     };
 
     const { data, error } = await supabase
@@ -137,8 +147,7 @@ export class CheckoutProcessor {
       total_price: item.total_price,
       metadata: {
         product_title: item.title,
-        product_type: item.type,
-        ...item.metadata
+        product_type: item.type
       } as OrderItemMetadata
     }));
 
