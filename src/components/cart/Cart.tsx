@@ -9,7 +9,7 @@ import { formatCurrency } from "@/utils/currency";
 interface CartProps {
   showCheckoutButton?: boolean;
   isButtonEnabled?: boolean;
-  onCheckout?: (values: any) => void;
+  onCheckout?: () => void;
 }
 
 export function Cart({ 
@@ -22,7 +22,7 @@ export function Cart({
 
   const handleCheckout = () => {
     if (onCheckout) {
-      onCheckout({});
+      onCheckout();
     }
   };
 
