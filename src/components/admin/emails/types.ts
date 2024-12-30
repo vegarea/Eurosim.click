@@ -6,7 +6,7 @@ export interface EmailTemplate {
   description: string
   type: "physical" | "esim" | "both"
   variables: string[]
-  content?: string // Nuevo campo para el contenido HTML
+  content?: string
 }
 
 export const getStatusColor = (status: EmailTemplate["status"]) => {
