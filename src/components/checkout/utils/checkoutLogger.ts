@@ -1,34 +1,25 @@
-import { toast } from "sonner"
-
 type CheckoutStep = 
-  | "payment_init" 
-  | "stripe_redirect"
-  | "payment_success"
-  | "customer_creation"
-  | "order_creation"
-  | "order_items_creation"
-  | "email_sent"
+  | "init_checkout"
+  | "validating_cart"
+  | "creating_customer"
+  | "creating_order"
+  | "creating_order_items"
   | "checkout_completed"
+  | "checkout_failed";
 
 interface CheckoutLog {
-  step: CheckoutStep
-  status: "success" | "error" | "warning" | "info"
-  message: string
-  data?: any
-  error?: any
-  timestamp: string
+  step: CheckoutStep;
+  status: "info" | "success" | "error";
+  message: string;
+  data?: any;
+  error?: any;
+  timestamp: string;
 }
 
 class CheckoutLogger {
-  private logs: CheckoutLog[] = []
-  
-  log(
-    step: CheckoutStep, 
-    status: CheckoutLog["status"], 
-    message: string, 
-    data?: any,
-    error?: any
-  ) {
+  private logs: CheckoutLog[] = [];
+
+  log(step: CheckoutStep, status: CheckoutLog["status"], message: string, data?: any, error?: any) {
     const logEntry: CheckoutLog = {
       step,
       status,
@@ -36,47 +27,41 @@ class CheckoutLogger {
       data,
       error,
       timestamp: new Date().toISOString()
-    }
+    };
 
-    this.logs.push(logEntry)
-    
+    this.logs.push(logEntry);
+
     // Console log con formato
-    const logStyle = this.getLogStyle(status)
-    console.group(`[Checkout: ${step}]`)
-    console.log('%cStatus:', logStyle, status.toUpperCase())
-    console.log('Message:', message)
+    const logStyle = this.getLogStyle(status);
+    console.group(`[Checkout: ${step}]`);
+    console.log('%cStatus:', logStyle, status.toUpperCase());
+    console.log('Message:', message);
     if (data) {
-      console.log('Data:', data)
+      console.log('Data:', data);
     }
     if (error) {
-      console.error('Error:', error)
+      console.error('Error:', error);
     }
-    console.log('Timestamp:', logEntry.timestamp)
-    console.groupEnd()
-
-    // Toast para errores
-    if (status === "error") {
-      toast.error(message)
-    }
+    console.log('Timestamp:', logEntry.timestamp);
+    console.groupEnd();
   }
 
   private getLogStyle(status: CheckoutLog["status"]) {
     const styles = {
       success: 'color: #10b981; font-weight: bold;',
       error: 'color: #ef4444; font-weight: bold;',
-      warning: 'color: #f59e0b; font-weight: bold;',
       info: 'color: #3b82f6; font-weight: bold;'
-    }
-    return styles[status]
+    };
+    return styles[status];
   }
 
   getLogs() {
-    return this.logs
+    return this.logs;
   }
 
   clear() {
-    this.logs = []
+    this.logs = [];
   }
 }
 
-export const checkoutLogger = new CheckoutLogger()
+export const checkoutLogger = new CheckoutLogger();

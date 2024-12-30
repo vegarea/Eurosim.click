@@ -1,50 +1,53 @@
-import { useState } from "react"
-import { PaymentMethodSelector } from "./payment/PaymentMethodSelector"
-import { Button } from "@/components/ui/button"
-import { useCart } from "@/contexts/CartContext"
-import { formatCurrency } from "@/utils/currency"
-import { CheckoutProcessor } from "./utils/checkoutProcessor"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { formatCurrency } from "@/utils/currency";
+import { CheckoutProcessor } from "./utils/checkoutProcessor";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface PaymentStepProps {
-  formData: any
-  onSubmit?: () => void
+  formData: any;
+  onSubmit?: () => void;
 }
 
 export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
-  const [selectedMethod, setSelectedMethod] = useState<string>("stripe")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const { items, clearCart } = useCart()
-  const navigate = useNavigate()
+  const [selectedMethod, setSelectedMethod] = useState<string>("test");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { items, clearCart } = useCart();
+  const navigate = useNavigate();
 
   // Calcular el total
-  const total = items.reduce((sum, item) => sum + item.total_price, 0)
+  const total = items.reduce((sum, item) => sum + item.total_price, 0);
 
   const handleCompleteOrder = async () => {
     try {
-      setIsProcessing(true)
+      setIsProcessing(true);
 
       const processor = new CheckoutProcessor(
         formData,
         items,
         total
-      )
+      );
 
-      const result = await processor.process()
+      const result = await processor.process();
 
       if (result.success) {
-        clearCart()
-        onSubmit?.()
+        toast.success("¡Orden completada exitosamente!");
+        clearCart();
+        onSubmit?.();
         // TODO: Redireccionar a página de éxito cuando esté implementada
-        navigate("/")
+        navigate("/");
       }
 
     } catch (error) {
-      console.error("Error processing checkout:", error)
+      console.error("Error processing checkout:", error);
+      toast.error("Error al procesar la orden");
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -77,5 +80,5 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

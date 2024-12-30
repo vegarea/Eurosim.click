@@ -1,9 +1,20 @@
-import { supabase } from "@/integrations/supabase/client"
-import { checkoutLogger } from "./checkoutLogger"
-import { Customer } from "@/types/database/customers"
-import { Order } from "@/types/database/orders"
-import { OrderItem } from "@/types/database/orderItems"
-import { CartItem } from "@/types/ui/cart"
+import { supabase } from "@/integrations/supabase/client";
+import { checkoutLogger } from "./checkoutLogger";
+import { Customer } from "@/types/database/customers";
+import { Order } from "@/types/database/orders";
+import { OrderItem } from "@/types/database/orderItems";
+import { OrderItemMetadata } from "@/types/database/orderItems";
+
+interface CartItem {
+  id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  title: string;
+  type: string;
+  metadata?: OrderItemMetadata;
+}
 
 export class CheckoutProcessor {
   constructor(
@@ -14,110 +25,73 @@ export class CheckoutProcessor {
 
   async process() {
     try {
-      // 1. Iniciar pago con Stripe
       checkoutLogger.log(
-        "payment_init",
+        "init_checkout",
         "info",
-        "Iniciando proceso de pago con Stripe",
-        { amount: this.totalAmount, items: this.cartItems }
-      )
+        "Iniciando proceso de checkout",
+        { formData: this.formData, items: this.cartItems }
+      );
 
-      // TODO: Implementar createStripePaymentIntent()
-      const paymentIntent = await this.createStripePaymentIntent()
-
-      checkoutLogger.log(
-        "stripe_redirect",
-        "info",
-        "Redirigiendo a página de pago de Stripe",
-        { paymentIntentId: paymentIntent.id }
-      )
-
-      // TODO: Implementar redirectToStripe()
-      await this.redirectToStripe(paymentIntent)
-
-      return {
-        success: true,
-        paymentIntentId: paymentIntent.id
+      // 1. Validar carrito
+      if (this.cartItems.length === 0) {
+        throw new Error("El carrito está vacío");
       }
 
-    } catch (error) {
       checkoutLogger.log(
-        "payment_init",
-        "error",
-        "Error al procesar el checkout",
-        null,
-        error
-      )
-      throw error
-    }
-  }
-
-  // Esta función será llamada por el webhook de Stripe
-  async handlePaymentSuccess(paymentIntentId: string) {
-    try {
-      checkoutLogger.log(
-        "payment_success",
+        "validating_cart",
         "success",
-        "Pago confirmado por Stripe",
-        { paymentIntentId }
-      )
+        "Carrito validado correctamente",
+        { items: this.cartItems }
+      );
 
-      // 1. Crear cliente
-      const customer = await this.createCustomer()
+      // 2. Crear cliente
+      const customer = await this.createCustomer();
       checkoutLogger.log(
-        "customer_creation",
+        "creating_customer",
         "success",
         "Cliente creado exitosamente",
         { customerId: customer.id }
-      )
+      );
 
-      // 2. Crear orden
-      const order = await this.createOrder(customer.id, paymentIntentId)
+      // 3. Crear orden
+      const order = await this.createOrder(customer.id);
       checkoutLogger.log(
-        "order_creation",
+        "creating_order",
         "success",
         "Orden creada exitosamente",
         { orderId: order.id }
-      )
+      );
 
-      // 3. Crear items de la orden
-      const orderItems = await this.createOrderItems(order.id)
+      // 4. Crear items de la orden
+      const orderItems = await this.createOrderItems(order.id);
       checkoutLogger.log(
-        "order_items_creation",
+        "creating_order_items",
         "success",
         "Items de orden creados exitosamente",
         { orderItems }
-      )
-
-      // 4. Enviar email de confirmación
-      await this.sendConfirmationEmail(order.id)
-      checkoutLogger.log(
-        "email_sent",
-        "success",
-        "Email de confirmación enviado"
-      )
+      );
 
       checkoutLogger.log(
         "checkout_completed",
         "success",
         "Proceso de checkout completado exitosamente",
         { orderId: order.id }
-      )
+      );
 
       return {
         success: true,
         orderId: order.id
-      }
+      };
 
     } catch (error) {
       checkoutLogger.log(
-        "payment_success",
+        "checkout_failed",
         "error",
-        "Error al procesar pago exitoso",
+        "Error en el proceso de checkout",
         null,
         error
-      )
-      throw error
+      );
+      throw error;
     }
   }
 
@@ -134,32 +108,31 @@ export class CheckoutProcessor {
         default_shipping_address: this.formData.shippingAddress
       })
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
-  private async createOrder(customerId: string, paymentIntentId: string): Promise<Order> {
+  private async createOrder(customerId: string): Promise<Order> {
     const { data, error } = await supabase
       .from("orders")
       .insert({
         customer_id: customerId,
-        product_id: this.cartItems[0].product_id, // TODO: Manejar múltiples productos
+        product_id: this.cartItems[0].product_id,
         status: "processing",
         type: this.cartItems[0].type,
         total_amount: this.totalAmount,
         quantity: this.cartItems[0].quantity,
-        payment_method: "stripe",
+        payment_method: "test",
         payment_status: "completed",
-        stripe_payment_intent_id: paymentIntentId,
         shipping_address: this.formData.shippingAddress
       })
       .select()
-      .single()
+      .single();
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
@@ -171,31 +144,17 @@ export class CheckoutProcessor {
       total_price: item.total_price,
       metadata: {
         product_title: item.title,
-        product_type: item.type
+        product_type: item.type,
+        ...item.metadata
       }
-    }))
+    }));
 
     const { data, error } = await supabase
       .from("order_items")
       .insert(orderItems)
-      .select()
+      .select();
 
-    if (error) throw error
-    return data
-  }
-
-  private async sendConfirmationEmail(orderId: string) {
-    // TODO: Implementar envío de email
-    return Promise.resolve()
-  }
-
-  private async createStripePaymentIntent() {
-    // TODO: Implementar creación de PaymentIntent
-    return Promise.resolve({ id: "mock_payment_intent_id" })
-  }
-
-  private async redirectToStripe(paymentIntent: any) {
-    // TODO: Implementar redirección a Stripe
-    return Promise.resolve()
+    if (error) throw error;
+    return data;
   }
 }
