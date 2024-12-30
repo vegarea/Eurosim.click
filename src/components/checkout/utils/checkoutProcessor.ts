@@ -49,7 +49,7 @@ export class CheckoutProcessor {
       if (existingCustomer) {
         customer = existingCustomer;
         checkoutLogger.log(
-          "customer_found",
+          "creating_customer",
           "info",
           "Cliente existente encontrado",
           { customerId: customer.id }
@@ -57,7 +57,7 @@ export class CheckoutProcessor {
       } else {
         customer = await this.createCustomer();
         checkoutLogger.log(
-          "customer_created",
+          "creating_customer",
           "success",
           "Cliente creado exitosamente",
           { customerId: customer.id }
