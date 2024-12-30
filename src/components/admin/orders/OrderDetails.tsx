@@ -17,7 +17,7 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
-import { OrderNote } from "@/types/database/common"
+import { OrderEvent } from "@/types/database/common"
 
 const statusOrder = [
   "payment_pending",
@@ -73,9 +73,19 @@ export default function OrderDetails() {
   }
 
   const handleAddNote = (text: string) => {
-    const currentNotes = order.notes || []
+    const newEvent: OrderEvent = {
+      id: crypto.randomUUID(),
+      type: "note_added",
+      description: text,
+      created_at: new Date().toISOString(),
+      metadata: {
+        automated: false
+      }
+    }
+
+    const currentEvents = order.events || []
     updateOrder(order.id, {
-      notes: [...currentNotes, text]
+      events: [newEvent, ...currentEvents]
     })
   }
 
