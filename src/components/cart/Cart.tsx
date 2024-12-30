@@ -1,67 +1,111 @@
-import { useCart } from "@/contexts/CartContext"
-import { CartItem } from "./CartItem"
-import { TestPaymentButton } from "../checkout/payment/TestPaymentButton"
-import { formatCurrency } from "@/utils/currency"
+import { Button } from "@/components/ui/button";
+import { CartItem } from "./CartItem";
+import { ShoppingBag, ArrowRight } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import { motion } from "framer-motion";
+import { formatCurrency } from "@/utils/currency";
 
 interface CartProps {
-  showCheckoutButton?: boolean
-  isButtonEnabled?: boolean
-  onCheckout?: () => void
-  formData?: Record<string, any>
+  showCheckoutButton?: boolean;
+  isButtonEnabled?: boolean;
+  onCheckout?: () => void;
 }
 
 export function Cart({ 
-  showCheckoutButton = false, 
-  isButtonEnabled = true,
-  onCheckout,
-  formData = {}
+  showCheckoutButton = true, 
+  isButtonEnabled = false, 
+  onCheckout 
 }: CartProps) {
-  const { items, updateQuantity, removeItem } = useCart()
-  const total = items.reduce((sum, item) => sum + item.total_price, 0)
+  const { toast } = useToast();
+  const { items, removeItem, updateQuantity } = useCart();
 
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Tu carrito está vacío</p>
-      </div>
-    )
-  }
+  const handleCheckout = () => {
+    if (onCheckout) {
+      onCheckout();
+    }
+  };
+
+  const subtotal = items.reduce((acc, item) => acc + item.total_price, 0);
+  const shipping = items.some(item => 
+    item.metadata?.product_type === "physical"
+  ) ? 160 : 0;
+  const total = subtotal + shipping;
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        {items.map((item) => (
-          <CartItem 
-            key={item.id} 
-            item={item}
-            onUpdateQuantity={updateQuantity}
-            onRemove={removeItem}
-          />
-        ))}
-      </div>
-      
-      <div className="pt-4 border-t">
-        <div className="flex justify-between items-center font-semibold">
-          <span>Total</span>
-          <span>{formatCurrency(total)}</span>
-        </div>
+    <motion.div 
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex items-center gap-2 mb-6">
+        <ShoppingBag className="h-5 w-5 text-primary" />
+        <h2 className="text-xl font-semibold">Resumen de tu pedido</h2>
       </div>
 
-      {showCheckoutButton && (
-        <div className="pt-4">
-          {process.env.NODE_ENV === 'development' ? (
-            <TestPaymentButton formData={formData} />
-          ) : (
-            <button
-              className="w-full px-4 py-2 bg-primary text-white rounded-md disabled:opacity-50"
-              disabled={!isButtonEnabled}
-              onClick={onCheckout}
-            >
-              Proceder al pago
-            </button>
-          )}
+      {items.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Tu carrito está vacío</p>
         </div>
+      ) : (
+        <>
+          <div className="divide-y divide-gray-100">
+            {items.map((item) => (
+              <CartItem
+                key={item.id}
+                item={item}
+                onUpdateQuantity={updateQuantity}
+                onRemove={removeItem}
+              />
+            ))}
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Subtotal</span>
+              <span className="font-medium">{formatCurrency(subtotal)}</span>
+            </div>
+            {shipping > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Gastos de envío</span>
+                <span className="font-medium">{formatCurrency(shipping)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-base font-medium pt-4 border-t">
+              <span>Total</span>
+              <span className="text-primary">{formatCurrency(total)}</span>
+            </div>
+          </div>
+
+          {showCheckoutButton && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Button 
+                className="w-full mt-8 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
+                size="lg"
+                onClick={handleCheckout}
+                disabled={!isButtonEnabled}
+              >
+                Continuar al pago
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              {!isButtonEnabled && (
+                <p className="mt-2 text-center text-sm text-gray-500">
+                  Por favor, completa todos los campos requeridos
+                </p>
+              )}
+            </motion.div>
+          )}
+
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Pago seguro con SSL y principales métodos de pago
+          </p>
+        </>
       )}
-    </div>
-  )
+    </motion.div>
+  );
 }
