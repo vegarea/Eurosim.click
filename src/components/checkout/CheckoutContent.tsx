@@ -4,6 +4,7 @@ import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
+import { CheckoutLogger } from "@/components/checkout/CheckoutLogger"
 
 interface CheckoutContentProps {
   step: number;
@@ -63,7 +64,7 @@ export function CheckoutContent({
           <DocumentationForm
             onSubmit={onFormSubmit}
             onValidityChange={onFormValidityChange}
-            initialData={isTestMode ? testData.documentation : undefined}
+            defaultValues={isTestMode ? testData.documentation : undefined}
           />
         );
       case 3:
@@ -80,5 +81,10 @@ export function CheckoutContent({
     }
   };
 
-  return renderStepContent();
+  return (
+    <>
+      <CheckoutLogger step={step} formData={formData} />
+      {renderStepContent()}
+    </>
+  );
 }
