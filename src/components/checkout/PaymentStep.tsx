@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
-import { TestPaymentButton } from "./payment/TestPaymentButton";
 
 export function PaymentStep() {
   const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
@@ -25,8 +24,6 @@ export function PaymentStep() {
           </div>
         </div>
       )}
-
-      <TestPaymentButton />
     </div>
   );
 }
