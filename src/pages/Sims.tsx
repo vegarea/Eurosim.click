@@ -26,21 +26,6 @@ const Sims = () => {
     }
   });
 
-  const simCards = products?.map(product => ({
-    type: "physical" as const,
-    title: product.title,
-    description: `${product.data_eu_gb}GB Europa / ${product.data_es_gb}GB España`,
-    price: product.price,
-    features: [
-      `${product.data_eu_gb}GB datos en toda Europa`,
-      `${product.data_es_gb}GB exclusivo España`,
-      "Velocidad 5G/4G/3G+",
-      "SIM card incluida",
-      `${product.validity_days} días de validez`,
-      "Hotspot incluido"
-    ]
-  })) || [];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
@@ -49,14 +34,14 @@ const Sims = () => {
       <div id="products-section" className="container mx-auto px-4 py-8 lg:py-12 relative scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-4 lg:gap-8 mb-8">
-            {!isLoading && simCards.map((card, index) => (
+            {!isLoading && products?.map((product, index) => (
               <motion.div
-                key={card.title}
+                key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}
               >
-                <SimCard {...card} />
+                <SimCard product={product} />
               </motion.div>
             ))}
           </div>

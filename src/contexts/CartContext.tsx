@@ -2,13 +2,20 @@ import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
 
-export interface CartItem extends Pick<Product, 'id' | 'type' | 'title' | 'description' | 'price'> {
+// Solo usamos los campos necesarios de Product para el carrito
+export interface CartItem {
+  id: string;
+  type: Product['type'];
+  title: string;
+  price: number;
+  data_eu_gb: number;
+  data_es_gb: number;
   quantity: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity">) => void;
+  addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -20,24 +27,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
-  const addItem = (newItem: Omit<CartItem, "quantity">) => {
+  const addItem = (product: Product) => {
     setItems(currentItems => {
-      const existingItem = currentItems.find(item => item.id === newItem.id);
+      const existingItem = currentItems.find(item => item.id === product.id);
       
       if (existingItem) {
         return currentItems.map(item =>
-          item.id === newItem.id
+          item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
 
-      return [...currentItems, { ...newItem, quantity: 1 }];
+      // Añadimos solo los campos necesarios del producto
+      const newItem: CartItem = {
+        id: product.id,
+        type: product.type,
+        title: product.title,
+        price: product.price,
+        data_eu_gb: product.data_eu_gb,
+        data_es_gb: product.data_es_gb,
+        quantity: 1
+      };
+
+      return [...currentItems, newItem];
     });
 
     toast({
       title: "Producto añadido al carrito",
-      description: `Has añadido ${newItem.title} a tu carrito`,
+      description: `Has añadido ${product.title} a tu carrito`,
     });
   };
 

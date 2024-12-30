@@ -8,22 +8,14 @@ import { formatCurrency } from "@/utils/currency";
 import { Product } from "@/types/database/products";
 
 interface SimCardProps {
-  type: Product['type'];
-  title: string;
-  description: string;
-  price: number;
-  features: string[];
+  product: Product;
   isHighlighted?: boolean;
   isSelected?: boolean;
   onSelect?: () => void;
 }
 
 export function SimCard({ 
-  type, 
-  title, 
-  description, 
-  price, 
-  features, 
+  product,
   isHighlighted = false,
   isSelected = false,
   onSelect 
@@ -67,21 +59,15 @@ export function SimCard({
   };
 
   const handleAddToCart = () => {
-    addItem({
-      id: `${type}-${title}`,
-      type,
-      title,
-      description,
-      price
-    });
+    addItem(product);
     navigate('/checkout');
   };
 
-  const colorScheme = getColorScheme(title);
-  const [amount, currency] = formatCurrency(price).split(' ');
+  const colorScheme = getColorScheme(product.title);
+  const [amount, currency] = formatCurrency(product.price).split(' ');
   
-  // Extraer los GB de la descripción
-  const [euGB, esGB] = description.match(/\d+/g)?.map(Number) || [0, 0];
+  // Obtener las características del producto
+  const features = product.features as string[] || [];
 
   return (
     <Card className={`w-full max-w-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 relative overflow-hidden backdrop-blur-sm border-0 bg-gradient-to-br from-white/80 to-white/40 ${
@@ -95,7 +81,7 @@ export function SimCard({
       <CardHeader className="relative">
         <div className="flex items-center gap-3">
           <div className={`p-3 ${colorScheme.bg} rounded-xl backdrop-blur-sm`}>
-            {type === 'physical' ? (
+            {product.type === 'physical' ? (
               <CreditCard className={`h-6 w-6 ${colorScheme.iconColor}`} />
             ) : (
               <Wifi className={`h-6 w-6 ${colorScheme.iconColor}`} />
@@ -103,7 +89,7 @@ export function SimCard({
           </div>
           <div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              {title}
+              {product.title}
             </CardTitle>
           </div>
         </div>
@@ -113,11 +99,11 @@ export function SimCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="fi fi-eu w-6 h-4 rounded shadow-sm" />
-              <span className="text-2xl font-bold text-primary">{euGB}GB</span>
+              <span className="text-2xl font-bold text-primary">{product.data_eu_gb}GB</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <span className="fi fi-es w-5 h-3 rounded shadow-sm" />
-              <span>{esGB}GB España</span>
+              <span>{product.data_es_gb}GB España</span>
             </div>
           </div>
         </div>
@@ -132,16 +118,14 @@ export function SimCard({
         </div>
 
         <ul className="space-y-4 my-8">
-          {features
-            .filter(feature => !feature.includes('GB datos en toda Europa') && !feature.includes('GB exclusivo España'))
-            .map((feature, index) => (
-              <li key={index} className="flex items-center gap-3 group">
-                <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary group-hover:scale-150 transition-transform duration-300" />
-                <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
-                  {feature}
-                </span>
-              </li>
-            ))}
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-center gap-3 group">
+              <div className="h-2 w-2 rounded-full bg-gradient-to-r from-primary to-secondary group-hover:scale-150 transition-transform duration-300" />
+              <span className="text-gray-700 group-hover:text-gray-900 transition-colors duration-300">
+                {feature}
+              </span>
+            </li>
+          ))}
         </ul>
 
         <Button 
