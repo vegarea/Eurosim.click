@@ -1,5 +1,5 @@
 import { Order } from "../database/orders";
-import { OrderEvent, OrderNote } from "../database/common";
+import { OrderEvent } from "../database/common";
 
 export interface UIOrder extends Order {
   customer_name?: string;

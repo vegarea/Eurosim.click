@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { MessageSquare, Send } from "lucide-react"
 import { toast } from "sonner"
-import { UIOrderNote } from "@/types/database/common"
+import { OrderEvent } from "@/types/database/common"
 
 interface OrderNotesProps {
   order: UIOrder;
@@ -41,14 +41,10 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
     })
   }
 
-  // Convertir las notas de string[] a UIOrderNote[] para la UI
-  const notes = (order.notes || []).map((note: string, index: number) => ({
-    id: `note-${index}`,
-    text: note,
-    user_id: 'system',
-    user_name: 'Sistema',
-    created_at: new Date().toISOString()
-  }));
+  // Filtrar eventos que son notas
+  const noteEvents = (order.events || []).filter(
+    (event: OrderEvent) => event.type === 'note_added'
+  );
 
   return (
     <Card>
@@ -74,22 +70,24 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
         </form>
 
         <div className="mt-6 space-y-4">
-          {notes.length === 0 && (
+          {noteEvents.length === 0 && (
             <p className="text-gray-500 text-center py-4">
               No hay notas para este pedido
             </p>
           )}
           
-          {notes.map((note: UIOrderNote) => (
+          {noteEvents.map((event: OrderEvent) => (
             <div 
-              key={note.id} 
+              key={event.id} 
               className="bg-gray-50 p-4 rounded-lg space-y-2"
             >
               <div className="flex items-center justify-between text-sm text-gray-500">
-                <span className="font-medium">{note.user_name}</span>
-                <span>{formatDateTime(note.created_at)}</span>
+                <span className="font-medium">
+                  {event.user_id ? 'Admin' : 'Sistema'}
+                </span>
+                <span>{formatDateTime(event.created_at)}</span>
               </div>
-              <p className="text-gray-700">{note.text}</p>
+              <p className="text-gray-700">{event.description}</p>
             </div>
           ))}
         </div>

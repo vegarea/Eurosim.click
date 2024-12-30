@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums";
-import { Json, OrderEvent, OrderNote } from "./common";
+import { Json, OrderEvent } from "./common";
 
 export interface Order {
   id: string;
