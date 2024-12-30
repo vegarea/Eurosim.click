@@ -34,17 +34,19 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       console.log("Iniciando proceso de orden con datos:", { formData, items })
 
       // 1. Crear el customer
+      const customerData = {
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        passport_number: formData.passportNumber,
+        birth_date: formData.birthDate,
+        gender: formData.gender,
+        default_shipping_address: formData.shippingAddress as Json || null,
+      }
+
       const { data: customer, error: customerError } = await supabase
         .from('customers')
-        .insert({
-          name: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          passport_number: formData.passportNumber,
-          birth_date: formData.birthDate,
-          gender: formData.gender,
-          shipping_address: formData.shippingAddress || null,
-        })
+        .insert(customerData)
         .select()
         .single()
 
@@ -56,20 +58,22 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       console.log("Cliente creado:", customer)
 
       // 2. Crear la orden
+      const orderData = {
+        customer_id: customer.id,
+        status: 'processing',
+        type: items.some(item => item.metadata?.product_type === 'physical') ? 'physical' : 'esim',
+        total_amount: items.reduce((total, item) => total + item.total_price, 0),
+        quantity: items.reduce((total, item) => total + item.quantity, 0),
+        payment_method: 'test',
+        payment_status: 'completed',
+        shipping_address: formData.shippingAddress || null,
+        activation_date: formData.activationDate || null,
+        product_id: items[0].product_id,
+      }
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert({
-          customer_id: customer.id,
-          status: 'processing',
-          type: items.some(item => item.metadata?.product_type === 'physical') ? 'physical' : 'esim',
-          total_amount: items.reduce((total, item) => total + item.total_price, 0),
-          quantity: items.reduce((total, item) => total + item.quantity, 0),
-          payment_method: 'test',
-          payment_status: 'completed',
-          shipping_address: formData.shippingAddress || null,
-          activation_date: formData.activationDate || null,
-          product_id: items[0].product_id,
-        })
+        .insert(orderData)
         .select()
         .single()
 
@@ -81,7 +85,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       console.log("Orden creada:", order)
 
       // 3. Crear los order_items
-      const orderItems = items.map(item => ({
+      const orderItemsData = items.map(item => ({
         order_id: order.id,
         product_id: item.product_id,
         quantity: item.quantity,
@@ -97,7 +101,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
 
       const { error: itemsError } = await supabase
         .from('order_items')
-        .insert(orderItems)
+        .insert(orderItemsData)
 
       if (itemsError) {
         console.error('Error creando items:', itemsError)
