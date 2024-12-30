@@ -4,7 +4,7 @@ import { useCart } from "@/contexts/CartContext"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
-import { Json } from "@/integrations/supabase/types"
+import { Json } from "@/types/database/common"
 
 interface ReviewStepProps {
   formData: any
@@ -88,10 +88,10 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         unit_price: item.unit_price,
         total_price: item.total_price,
         metadata: {
-          product_title: item.metadata.product_title,
-          product_type: item.metadata.product_type,
-          data_eu_gb: item.metadata.data_eu_gb,
-          data_es_gb: item.metadata.data_es_gb
+          product_title: item.metadata?.product_title,
+          product_type: item.metadata?.product_type,
+          data_eu_gb: item.metadata?.data_eu_gb,
+          data_es_gb: item.metadata?.data_es_gb
         } as Json
       }))
 
