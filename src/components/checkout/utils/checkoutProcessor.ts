@@ -33,13 +33,36 @@ export class CheckoutProcessor {
         { items: this.cartItems }
       );
 
-      const customer = await this.createCustomer();
-      checkoutLogger.log(
-        "creating_customer",
-        "success",
-        "Cliente creado exitosamente",
-        { customerId: customer.id }
-      );
+      // Primero buscamos si el cliente ya existe
+      const { data: existingCustomer, error: searchError } = await supabase
+        .from("customers")
+        .select()
+        .eq('email', this.formData.email)
+        .single();
+
+      if (searchError && searchError.code !== 'PGRST116') {
+        throw searchError;
+      }
+
+      let customer: Customer;
+      
+      if (existingCustomer) {
+        customer = existingCustomer;
+        checkoutLogger.log(
+          "customer_found",
+          "info",
+          "Cliente existente encontrado",
+          { customerId: customer.id }
+        );
+      } else {
+        customer = await this.createCustomer();
+        checkoutLogger.log(
+          "customer_created",
+          "success",
+          "Cliente creado exitosamente",
+          { customerId: customer.id }
+        );
+      }
 
       const order = await this.createOrder(customer.id);
       checkoutLogger.log(
