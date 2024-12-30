@@ -59,7 +59,13 @@ export function CheckoutContent({
           />
         )
       }
-      return <PaymentStep onSubmit={onFormSubmit} />
+      return null
+    case 3:
+      return (
+        <PaymentStep 
+          onSubmit={() => onFormSubmit(formData)}
+        />
+      )
     default:
       return null
   }
