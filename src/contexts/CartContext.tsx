@@ -29,8 +29,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
+      // Creamos un ID temporal para order_id que será reemplazado cuando se cree la orden real
+      const tempOrderId = crypto.randomUUID();
+      
       const newItem: OrderItem = {
         id: crypto.randomUUID(),
+        order_id: tempOrderId, // Añadimos el order_id temporal
         product_id: product.id,
         quantity: 1,
         unit_price: product.price,
