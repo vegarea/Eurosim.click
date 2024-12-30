@@ -4,6 +4,7 @@ import { useCheckoutLogger } from "../CheckoutLogger";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { OrderItemInsert } from "@/types/database/orderItems";
 
 export function TestPaymentButton() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,7 +30,72 @@ export function TestPaymentButton() {
         data: { fullName, email }
       });
 
-      // 1. Crear el cliente
+      // 2. Crear la orden primero (sin customer_id)
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          product_id: items[0].product_id,
+          status: 'processing',
+          type: items[0].metadata?.product_type,
+          total_amount: items.reduce((acc, item) => acc + item.total_price, 0),
+          quantity: items[0].quantity,
+          payment_method: 'test',
+          payment_status: 'completed',
+          shipping_address: localStorage.getItem('checkout_shippingAddress') ? 
+            JSON.parse(localStorage.getItem('checkout_shippingAddress') || '{}') : 
+            null,
+          activation_date: localStorage.getItem('checkout_activationDate'),
+          metadata: {
+            customer_name: fullName,
+            customer_email: email,
+            customer_phone: localStorage.getItem('checkout_phone')
+          }
+        })
+        .select('*')
+        .maybeSingle();
+
+      if (orderError || !order) {
+        logCheckoutEvent({
+          step: 3,
+          action: 'Error al crear orden',
+          status: 'error',
+          data: orderError
+        });
+        throw orderError;
+      }
+
+      logCheckoutEvent({
+        step: 3,
+        action: 'Orden creada exitosamente',
+        status: 'success',
+        data: order
+      });
+
+      // 3. Crear los items de la orden
+      const orderItems: OrderItemInsert[] = items.map(item => ({
+        order_id: order.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price,
+        metadata: item.metadata
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        logCheckoutEvent({
+          step: 3,
+          action: 'Error al crear items de la orden',
+          status: 'error',
+          data: itemsError
+        });
+        throw itemsError;
+      }
+
+      // 4. Crear el cliente solo después de verificar el pago
       const { data: customer, error: customerError } = await supabase
         .from('customers')
         .insert({
@@ -55,74 +121,23 @@ export function TestPaymentButton() {
         throw customerError;
       }
 
-      logCheckoutEvent({
-        step: 3,
-        action: 'Cliente creado exitosamente',
-        status: 'success',
-        data: customer
-      });
-
-      // 2. Crear la orden
-      const { data: order, error: orderError } = await supabase
+      // 5. Actualizar la orden con el customer_id
+      const { error: updateOrderError } = await supabase
         .from('orders')
-        .insert({
-          customer_id: customer.id,
-          product_id: items[0].id,
-          status: 'processing',
-          type: items[0].type,
-          total_amount: items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
-          quantity: items[0].quantity,
-          payment_method: 'test',
-          payment_status: 'completed',
-          shipping_address: localStorage.getItem('checkout_shippingAddress') ? 
-            JSON.parse(localStorage.getItem('checkout_shippingAddress') || '{}') : 
-            null,
-          activation_date: localStorage.getItem('checkout_activationDate')
-        })
-        .select('*')
-        .maybeSingle();
+        .update({ customer_id: customer.id })
+        .eq('id', order.id);
 
-      if (orderError || !order) {
+      if (updateOrderError) {
         logCheckoutEvent({
           step: 3,
-          action: 'Error al crear orden',
+          action: 'Error al actualizar orden con customer_id',
           status: 'error',
-          data: orderError
+          data: updateOrderError
         });
-        throw orderError;
+        throw updateOrderError;
       }
 
-      logCheckoutEvent({
-        step: 3,
-        action: 'Orden creada exitosamente',
-        status: 'success',
-        data: order
-      });
-
-      // 3. Crear los items de la orden
-      const orderItems = items.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total_price: item.price * item.quantity
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        logCheckoutEvent({
-          step: 3,
-          action: 'Error al crear items de la orden',
-          status: 'error',
-          data: itemsError
-        });
-        throw itemsError;
-      }
-
-      // 4. Limpiar carrito y mostrar éxito
+      // 6. Limpiar carrito y mostrar éxito
       clearCart();
       toast({
         title: "¡Compra de prueba exitosa!",
@@ -136,7 +151,7 @@ export function TestPaymentButton() {
         data: { orderId: order.id }
       });
 
-      // 5. Limpiar localStorage
+      // 7. Limpiar localStorage
       const checkoutKeys = [
         'checkout_fullName',
         'checkout_email',

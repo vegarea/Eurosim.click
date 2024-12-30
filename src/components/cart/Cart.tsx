@@ -12,7 +12,11 @@ interface CartProps {
   onCheckout?: (values: any) => void;
 }
 
-export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onCheckout }: CartProps) {
+export function Cart({ 
+  showCheckoutButton = true, 
+  isButtonEnabled = false, 
+  onCheckout 
+}: CartProps) {
   const { toast } = useToast();
   const { items, removeItem, updateQuantity } = useCart();
 
@@ -22,8 +26,10 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
     }
   };
 
-  const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const shipping = items.some(item => item.type === "physical") ? 160 : 0;
+  const subtotal = items.reduce((acc, item) => acc + item.total_price, 0);
+  const shipping = items.some(item => 
+    item.metadata?.product_type === "physical"
+  ) ? 160 : 0;
   const total = subtotal + shipping;
 
   return (
@@ -48,7 +54,7 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
             {items.map((item) => (
               <CartItem
                 key={item.id}
-                {...item}
+                item={item}
                 onUpdateQuantity={updateQuantity}
                 onRemove={removeItem}
               />
