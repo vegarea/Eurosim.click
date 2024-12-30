@@ -6,19 +6,10 @@ import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/da
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
 
-interface CartItem {
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  title: string;
-  type: OrderType;
-}
-
 export class CheckoutProcessor {
   constructor(
     private formData: Record<string, any>,
-    private cartItems: CartItem[],
+    private cartItems: OrderItem[],
     private totalAmount: number
   ) {}
 
@@ -116,11 +107,13 @@ export class CheckoutProcessor {
 
   private async createOrder(customerId: string): Promise<Order> {
     const firstItem = this.cartItems[0];
+    const metadata = firstItem.metadata as Record<string, any>;
+    
     const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
       status: "payment_pending",
-      type: firstItem.type,
+      type: metadata.product_type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
       payment_method: "test",
@@ -154,10 +147,7 @@ export class CheckoutProcessor {
       quantity: item.quantity,
       unit_price: item.unit_price,
       total_price: item.total_price,
-      metadata: {
-        product_title: item.title,
-        product_type: item.type
-      } as Json
+      metadata: item.metadata
     }));
 
     const { data, error } = await supabase
