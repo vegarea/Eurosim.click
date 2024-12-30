@@ -12,9 +12,7 @@ export function ShippingForm({
   onSubmit, 
   onValidityChange, 
   email = '', 
-  initialData,
-  isTestMode,
-  testData
+  initialData
 }: ShippingFormProps) {
   const [showLocationFields, setShowLocationFields] = useState(false)
   
@@ -32,17 +30,17 @@ export function ShippingForm({
     mode: "onChange"
   })
 
-  // Si estamos en modo test y tenemos datos de prueba, los usamos
+  // Observar cambios en la validación del formulario
   useEffect(() => {
-    if (isTestMode && testData) {
-      Object.entries(testData).forEach(([key, value]) => {
-        if (value) {
-          form.setValue(key as keyof ShippingFormValues, value);
-        }
-      });
-      setShowLocationFields(true);
-    }
-  }, [isTestMode, testData, form]);
+    const subscription = form.watch(() => {
+      if (onValidityChange) {
+        const isValid = form.formState.isValid;
+        console.log('Form validity changed:', isValid, form.formState.errors);
+        onValidityChange(isValid);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, onValidityChange]);
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
