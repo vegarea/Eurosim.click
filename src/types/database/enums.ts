@@ -1,3 +1,8 @@
+/**
+ * @lovable-protected
+ * This file contains types that match Supabase schema exactly.
+ * DO NOT MODIFY without explicit user permission.
+ */
 export type OrderStatus = 
   | "payment_pending"
   | "payment_failed" 
