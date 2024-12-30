@@ -5,9 +5,10 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 import { formatCurrency } from "@/utils/currency";
+import { Product } from "@/types/database/products";
 
 interface SimCardProps {
-  type: "physical" | "esim";
+  type: Product['type'];
   title: string;
   description: string;
   price: number;

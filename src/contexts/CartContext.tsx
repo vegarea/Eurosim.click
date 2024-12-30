@@ -1,12 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Product } from "@/types/database/products";
 
-export interface CartItem {
-  id: string;
-  type: "physical" | "esim";
-  title: string;
-  description: string;
-  price: number;
+export interface CartItem extends Pick<Product, 'id' | 'type' | 'title' | 'description' | 'price'> {
   quantity: number;
 }
 
