@@ -38,10 +38,12 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
         return 'bg-blue-100 text-blue-800'
       case 'payment_processed':
         return 'bg-purple-100 text-purple-800'
-      case 'automated_update':
+      case 'shipping_updated':
         return 'bg-gray-100 text-gray-800'
       case 'note_added':
         return 'bg-yellow-100 text-yellow-800'
+      case 'document_validated':
+        return 'bg-orange-100 text-orange-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -92,9 +94,9 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
                     >
                       {event.type.replace('_', ' ')}
                     </Badge>
-                    {event.user_name && (
+                    {event.user_id && (
                       <span className="text-sm font-medium">
-                        {event.user_name}
+                        Sistema
                       </span>
                     )}
                   </div>
