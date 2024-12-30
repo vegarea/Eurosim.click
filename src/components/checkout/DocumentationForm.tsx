@@ -13,7 +13,16 @@ import { Button } from "@/components/ui/button"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
-import { DocumentationFormProps, documentationFormSchema, type DocumentationFormValues } from "./documentation/types"
+import { documentationFormSchema, type DocumentationFormValues } from "./documentation/types"
+import { CustomerGender } from "@/types/database/enums"
+
+interface DocumentationFormProps {
+  onSubmit: (values: DocumentationFormValues) => void;
+  onValidityChange?: (isValid: boolean) => void;
+  initialData?: Partial<DocumentationFormValues>;
+  isTestMode?: boolean;
+  testData?: Partial<DocumentationFormValues>;
+}
 
 export function DocumentationForm({ 
   onSubmit, 

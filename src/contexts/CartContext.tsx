@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
-import { OrderItem } from "@/types/database/orderItems";
+import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
+import { Json } from "@/types/database/common";
 
 interface CartContextType {
   items: OrderItem[];
@@ -24,29 +25,32 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (existingItem) {
         return currentItems.map(item =>
           item.product_id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { 
+                ...item, 
+                quantity: item.quantity + 1,
+                total_price: (item.quantity + 1) * item.unit_price
+              }
             : item
         );
       }
 
-      // Creamos un ID temporal para order_id que será reemplazado cuando se cree la orden real
       const tempOrderId = crypto.randomUUID();
       
       const newItem: OrderItem = {
         id: crypto.randomUUID(),
-        order_id: tempOrderId, // Añadimos el order_id temporal
+        order_id: tempOrderId,
         product_id: product.id,
         quantity: 1,
         unit_price: product.price,
         total_price: product.price,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
         metadata: {
           product_title: product.title,
           product_type: product.type,
           data_eu_gb: product.data_eu_gb,
           data_es_gb: product.data_es_gb
-        }
+        } as OrderItemMetadata,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       return [...currentItems, newItem];

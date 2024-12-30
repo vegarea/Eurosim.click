@@ -4,13 +4,25 @@ import { useCart } from "@/contexts/CartContext"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
-import { Json } from "@/types/database/common"
 import { CheckoutLogger, useCheckoutLogger } from "./CheckoutLogger"
 import { PaymentMethod, PaymentStatus, OrderStatus, OrderType } from "@/types/database/enums"
+import { Customer } from "@/types/database/customers"
+import { Order } from "@/types/database/orders"
+import { OrderItem } from "@/types/database/orderItems"
+import { Json } from "@/types/database/common"
 
 interface ReviewStepProps {
-  formData: any
-  onUpdateField: (field: string, value: any) => void
+  formData: {
+    fullName: string;
+    email: string;
+    phone?: string;
+    passportNumber?: string;
+    birthDate?: Date;
+    gender?: "M" | "F";
+    activationDate?: Date;
+    shippingAddress?: Json;
+  };
+  onUpdateField: (field: string, value: any) => void;
 }
 
 export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
