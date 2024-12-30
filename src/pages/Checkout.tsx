@@ -11,6 +11,7 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
+import { CustomerGender } from "@/types/database/enums"
 
 const testData = {
   shipping: {
@@ -25,7 +26,7 @@ const testData = {
   documentation: {
     fullName: "Juan Pérez",
     birthDate: new Date(),
-    gender: "M",
+    gender: "M" as CustomerGender,
     passportNumber: "AB123456",
     activationDate: new Date(),
     email: "juan@ejemplo.com",

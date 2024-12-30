@@ -36,7 +36,7 @@ export function DocumentationForm({
     defaultValues: {
       fullName: initialData?.fullName || "",
       birthDate: initialData?.birthDate || new Date(),
-      gender: initialData?.gender || "",
+      gender: initialData?.gender || undefined,
       passportNumber: initialData?.passportNumber || "",
       activationDate: initialData?.activationDate || new Date(),
     },
