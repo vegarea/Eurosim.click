@@ -59,7 +59,7 @@ export function CheckoutContent({
           />
         )
       }
-      return <PaymentStep />
+      return <PaymentStep onSubmit={onFormSubmit} />
     default:
       return null
   }

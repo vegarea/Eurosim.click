@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { formatCurrency } from "@/utils/currency";
 
-export function PaymentStep() {
+interface PaymentStepProps {
+  onSubmit?: () => void;
+}
+
+export function PaymentStep({ onSubmit }: PaymentStepProps) {
   const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
+  const { items } = useCart();
+
+  // Calcular el total
+  const total = items.reduce((sum, item) => sum + item.total_price, 0);
 
   return (
     <div className="space-y-6">
@@ -15,15 +26,24 @@ export function PaymentStep() {
         onMethodChange={setSelectedMethod}
       />
 
-      {selectedMethod === "stripe" && (
-        <div className="mt-6 space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600">
-              Serás redirigido a Stripe para completar tu pago de forma segura.
-            </p>
+      <div className="mt-8">
+        <div className="bg-gray-50 p-4 rounded-lg mb-4">
+          <div className="flex justify-between items-center">
+            <span className="font-medium">Total a pagar:</span>
+            <span className="text-lg font-bold">
+              {formatCurrency(total)}
+            </span>
           </div>
         </div>
-      )}
+
+        <Button 
+          className="w-full"
+          size="lg"
+          onClick={onSubmit}
+        >
+          Completar Orden
+        </Button>
+      </div>
     </div>
   );
 }
