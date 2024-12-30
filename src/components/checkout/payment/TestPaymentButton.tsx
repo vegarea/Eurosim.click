@@ -18,8 +18,8 @@ export function TestPaymentButton() {
         type: items[0].metadata?.product_type || 'esim',
         total_amount: items.reduce((acc, item) => acc + item.total_price, 0),
         quantity: items.reduce((acc, item) => acc + item.quantity, 0),
-        payment_method: 'test',
-        payment_status: 'completed'
+        payment_method: 'test' as const, // Especificamos el tipo literal
+        payment_status: 'completed' as const // Especificamos el tipo literal
       }
 
       const { data: order, error: orderError } = await supabase
