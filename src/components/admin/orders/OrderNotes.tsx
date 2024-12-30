@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { MessageSquare, Send } from "lucide-react"
 import { toast } from "sonner"
+import { UIOrderNote } from "@/types/database/common"
 
 interface OrderNotesProps {
   order: UIOrder;
@@ -40,7 +41,14 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
     })
   }
 
-  const notes = ((order.metadata?.notes || []) as OrderNote[]);
+  // Convertir las notas de string[] a UIOrderNote[] para la UI
+  const notes = (order.notes || []).map((note: string, index: number) => ({
+    id: `note-${index}`,
+    text: note,
+    user_id: 'system',
+    user_name: 'Sistema',
+    created_at: new Date().toISOString()
+  }));
 
   return (
     <Card>
@@ -72,7 +80,7 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
             </p>
           )}
           
-          {notes.map((note) => (
+          {notes.map((note: UIOrderNote) => (
             <div 
               key={note.id} 
               className="bg-gray-50 p-4 rounded-lg space-y-2"

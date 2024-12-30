@@ -6,25 +6,25 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export interface MarketingPreferences {
-  email_marketing: boolean;
-  sms_marketing: boolean;
-  push_notifications: boolean;
-  language_preference?: string;
-  communication_frequency?: string;
+export interface OrderMetadata {
+  customer_name?: string;
+  customer_email?: string;
+  customer_phone?: string;
+  events?: OrderEvent[];
+  notes?: string[];
+  [key: string]: any;
 }
 
 export interface OrderEvent {
   id: string;
   type: string;
   description: string;
-  user_id?: string;
-  user_name?: string;
   created_at: string;
   metadata?: Record<string, any>;
 }
 
-export interface OrderNote {
+// Note: Esta interfaz es solo para UI, no para almacenamiento
+export interface UIOrderNote {
   id: string;
   text: string;
   user_id: string;

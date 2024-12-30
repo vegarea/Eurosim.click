@@ -5,7 +5,7 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/types/database/enums"
+import { OrderStatus } from "@/components/admin/orders/types"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -73,17 +73,9 @@ export default function OrderDetails() {
   }
 
   const handleAddNote = (text: string) => {
-    const newNote: OrderNote = {
-      id: crypto.randomUUID(),
-      text,
-      user_id: "current-user-id", // En una app real, esto vendría del contexto de autenticación
-      user_name: "Admin", // En una app real, esto vendría del contexto de autenticación
-      created_at: new Date().toISOString()
-    }
-
     const currentNotes = order.notes || []
     updateOrder(order.id, {
-      notes: [newNote, ...currentNotes]
+      notes: [...currentNotes, text]
     })
   }
 

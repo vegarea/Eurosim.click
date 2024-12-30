@@ -11,8 +11,13 @@ import {
 } from "@/components/ui/card"
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
-import { ExtendedCustomer } from "@/types/ui/customers"
-import { OrderMetadata } from "@/types/ui/orders"
+import { Customer } from "@/types/database/customers"
+import { Json } from "@/types/database/common"
+
+export interface ExtendedCustomer extends Customer {
+  orders: any[];
+  totalSpent: number;
+}
 
 export function AdminCustomers() {
   const { orders } = useOrders()
