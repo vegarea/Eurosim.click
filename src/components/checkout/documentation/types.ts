@@ -4,14 +4,13 @@
  * DO NOT MODIFY without explicit user permission.
  */
 import { z } from "zod"
-import { CustomerGender } from "@/types/database/enums"
 
 export const documentationFormSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   birthDate: z.date({
     required_error: "La fecha de nacimiento es requerida",
   }),
-  gender: z.nativeEnum(CustomerGender, {
+  gender: z.enum(["M", "F"], {
     required_error: "El género es requerido"
   }),
   passportNumber: z.string().min(1, "El número de pasaporte es requerido"),

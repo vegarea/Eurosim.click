@@ -1,8 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Customer, CustomerInsert } from "@/types/database/customers";
 import { Order, OrderInsert } from "@/types/database/orders";
-import { OrderItem, OrderItemInsert, OrderItemMetadata } from "@/types/database/orderItems";
-import { CustomerGender, OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
+import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
+import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
 
@@ -90,7 +90,7 @@ export class CheckoutProcessor {
       phone: this.formData.phone || null,
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
-      gender: this.formData.gender as CustomerGender | null,
+      gender: this.formData.gender || null,
       default_shipping_address: this.formData.shippingAddress as Json,
       billing_address: null,
       preferred_language: 'es',
@@ -119,12 +119,12 @@ export class CheckoutProcessor {
     const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending" as OrderStatus,
+      status: "payment_pending",
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test" as PaymentMethod,
-      payment_status: "pending" as PaymentStatus,
+      payment_method: "test",
+      payment_status: "pending",
       shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
@@ -148,21 +148,17 @@ export class CheckoutProcessor {
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItemsData: OrderItemInsert[] = this.cartItems.map(item => {
-      const metadata: OrderItemMetadata = {
+    const orderItemsData: OrderItemInsert[] = this.cartItems.map(item => ({
+      order_id: orderId,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      total_price: item.total_price,
+      metadata: {
         product_title: item.title,
         product_type: item.type
-      };
-
-      return {
-        order_id: orderId,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total_price: item.total_price,
-        metadata: metadata as Json
-      };
-    });
+      } as Json
+    }));
 
     const { data, error } = await supabase
       .from("order_items")
