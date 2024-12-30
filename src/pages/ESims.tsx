@@ -1,97 +1,92 @@
-import { Header } from "@/components/Header";
-import { ProductButton } from "@/components/esim/ProductButton";
-import { PlanDetails } from "@/components/esim/PlanDetails";
-import { CommonFeatures } from "@/components/CommonFeatures";
-import { SimFeatures } from "@/components/SimFeatures";
-import { CountryCoverage } from "@/components/CountryCoverage";
-import { PaymentSecurity } from "@/components/PaymentSecurity";
-import { AnimatePresence } from "framer-motion";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/database/products";
+import { useState, useEffect } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
+import { Product } from "@/types/database/products"
+import { ProductButton } from "@/components/esim/ProductButton"
+import { PlanDetails } from "@/components/esim/PlanDetails"
+import { useCart } from "@/contexts/CartContext"
+import { ESimHero } from "@/components/ESimHero"
+import { Header } from "@/components/Header"
+import { TrustElements } from "@/components/TrustElements"
+import { HowItWorks } from "@/components/HowItWorks"
+import { FrequentQuestions } from "@/components/FrequentQuestions"
+import { CountryCoverage } from "@/components/CountryCoverage"
+import { CommonFeatures } from "@/components/CommonFeatures"
 
 export default function ESims() {
-  const isMobile = useIsMobile();
+  const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
+  const { addItem } = useCart()
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ['esims'],
+    queryKey: ['esim-products'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('type', 'esim')
-        .eq('status', 'active');
-      
+        .eq('status', 'active')
+        .order('price', { ascending: true });
+
       if (error) throw error;
       return data as Product[];
     }
-  });
+  })
 
-  const [selectedPlan, setSelectedPlan] = useState<Product | null>(null);
-
-  // Efecto para establecer el plan por defecto cuando los productos se cargan
   useEffect(() => {
-    if (products.length > 0) {
-      const defaultProduct = products.find(p => p.title === "E-SIM L");
-      if (defaultProduct) {
-        setSelectedPlan(defaultProduct);
-      }
+    if (products.length > 0 && !selectedPlan) {
+      setSelectedPlan(products[1]) // Seleccionar el plan medio por defecto
     }
-  }, [products]);
+  }, [products, selectedPlan])
+
+  const handleAddToCart = () => {
+    if (selectedPlan) {
+      addItem(selectedPlan)
+    }
+  }
+
+  if (isLoading) {
+    return <div>Cargando...</div>
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 lg:py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">
-              eSIM Europa
-            </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Conectividad instantánea en toda Europa. Activa tu eSIM en minutos y disfruta de internet de alta velocidad.
-            </p>
-          </div>
+      <main>
+        <ESimHero />
 
-          {!isLoading && (
-            <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:space-x-6'} gap-4`}>
-              <div className={`${isMobile ? 'w-full' : 'md:w-[45%]'} order-2 md:order-1`}>
-                <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3`}>
-                  {products.map((product) => (
-                    <ProductButton
-                      key={product.id}
-                      product={product}
-                      isSelected={selectedPlan?.id === product.id}
-                      isPopular={product.title === "E-SIM L"}
-                      onClick={() => setSelectedPlan(product)}
-                    />
-                  ))}
-                </div>
-              </div>
+        <section className="py-16 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Elige tu plan eSIM
+            </h2>
 
-              <div className={`${isMobile ? 'w-full' : 'md:w-[55%]'} order-1 md:order-2 sticky top-4`}>
-                <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4">
-                  <AnimatePresence mode="wait">
-                    {selectedPlan && (
-                      <PlanDetails
-                        key={selectedPlan.id}
-                        product={selectedPlan}
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {products.map((product) => (
+                <ProductButton
+                  key={product.id}
+                  product={product}
+                  isSelected={selectedPlan?.id === product.id}
+                  onSelect={() => setSelectedPlan(product)}
+                />
+              ))}
             </div>
-          )}
 
-          <CommonFeatures />
-          <SimFeatures />
-          <CountryCoverage />
-          <PaymentSecurity />
-        </div>
-      </div>
+            {selectedPlan && (
+              <PlanDetails
+                product={selectedPlan}
+                onAddToCart={handleAddToCart}
+              />
+            )}
+          </div>
+        </section>
+
+        <CommonFeatures />
+        <TrustElements />
+        <HowItWorks />
+        <CountryCoverage />
+        <FrequentQuestions />
+      </main>
     </div>
-  );
+  )
 }

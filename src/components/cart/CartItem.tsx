@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/utils/currency";
+import { Product } from "@/types/database/products";
 
 interface CartItemProps {
   id: string;
-  type: "physical" | "esim";
+  type: Product['type'];
   title: string;
   description: string;
   price: number;

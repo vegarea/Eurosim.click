@@ -1,33 +1,26 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
-
-export interface OrderMetadata {
-  customer_name?: string;
-  customer_email?: string;
-  customer_phone?: string;
-  events?: OrderEvent[];
-  notes?: string[];
-  [key: string]: any;
-}
+import { Json } from "./index"
 
 export interface OrderEvent {
-  id: string;
-  type: string;
-  description: string;
-  created_at: string;
-  metadata?: Record<string, any>;
+  id: string
+  type: "created" | "status_changed" | "payment_processed" | "shipping_updated" | "note_added" | "document_validated"
+  description: string
+  created_at: string
+  metadata?: {
+    oldStatus?: string
+    newStatus?: string
+    automated?: boolean
+    trackingNumber?: string
+    carrier?: string
+    [key: string]: any
+  }
 }
 
-// Note: Esta interfaz es solo para UI, no para almacenamiento
 export interface UIOrderNote {
-  id: string;
-  text: string;
-  user_id: string;
-  user_name: string;
-  created_at: string;
+  id: string
+  text: string
+  user_id: string
+  user_name: string
+  created_at: string
 }
+
+export type { Json }

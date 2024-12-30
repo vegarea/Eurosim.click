@@ -2,11 +2,11 @@ import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
 
-// Solo usamos los campos necesarios de Product para el carrito
 export interface CartItem {
   id: string;
   type: Product['type'];
   title: string;
+  description: string;
   price: number;
   data_eu_gb: number;
   data_es_gb: number;
@@ -39,11 +39,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
-      // Añadimos solo los campos necesarios del producto
       const newItem: CartItem = {
         id: product.id,
         type: product.type,
         title: product.title,
+        description: `${product.data_eu_gb}GB Europa / ${product.data_es_gb}GB España`,
         price: product.price,
         data_eu_gb: product.data_eu_gb,
         data_es_gb: product.data_es_gb,
