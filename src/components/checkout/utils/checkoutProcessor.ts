@@ -85,7 +85,7 @@ export class CheckoutProcessor {
       phone: this.formData.phone,
       passport_number: this.formData.passportNumber,
       birth_date: this.formData.birthDate,
-      gender: this.formData.gender as CustomerGender,
+      gender: CustomerGender[this.formData.gender as keyof typeof CustomerGender],
       default_shipping_address: this.formData.shippingAddress || null,
       billing_address: null,
       preferred_language: 'es',
@@ -111,21 +111,25 @@ export class CheckoutProcessor {
 
   private async createOrder(customerId: string): Promise<Order> {
     const firstItem = this.cartItems[0];
-    const orderData = {
+    const orderData: Omit<Order, 'id' | 'created_at' | 'updated_at'> = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending" as OrderStatus,
+      status: OrderStatus.PAYMENT_PENDING,
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test" as PaymentMethod,
-      payment_status: "completed" as PaymentStatus,
+      payment_method: PaymentMethod.TEST,
+      payment_status: PaymentStatus.COMPLETED,
       shipping_address: this.formData.shippingAddress || null,
       tracking_number: null,
       carrier: null,
       activation_date: null,
       notes: [],
-      metadata: {}
+      metadata: {},
+      stripe_payment_intent_id: null,
+      stripe_receipt_url: null,
+      paypal_order_id: null,
+      paypal_receipt_url: null
     };
 
     const { data, error } = await supabase
@@ -139,7 +143,7 @@ export class CheckoutProcessor {
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItems = this.cartItems.map(item => ({
+    const orderItems: Omit<OrderItem, 'id' | 'created_at' | 'updated_at'>[] = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       quantity: item.quantity,
