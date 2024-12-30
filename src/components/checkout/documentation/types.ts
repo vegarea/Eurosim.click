@@ -17,17 +17,17 @@ export const documentationFormSchema = z.object({
 export type DocumentationFormValues = z.infer<typeof documentationFormSchema>
 
 export interface DocumentationFormProps {
-  onSubmit: (values: DocumentationFormValues) => void;
-  onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<DocumentationFormValues>;
-  isTestMode?: boolean;
+  onSubmit: (values: DocumentationFormValues) => void
+  onValidityChange?: (isValid: boolean) => void
+  initialData?: Partial<DocumentationFormValues>
+  isTestMode?: boolean
   testData?: {
-    fullName: string;
-    birthDate: Date;
-    gender: string;
-    passportNumber: string;
-    activationDate: Date;
-    email: string;
-    phone: string;
-  };
+    fullName: string
+    birthDate: Date
+    gender: string
+    passportNumber: string
+    activationDate: Date
+    email: string
+    phone: string
+  }
 }
