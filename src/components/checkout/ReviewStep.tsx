@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 import { Json } from "@/types/database/common"
 import { CheckoutLogger, useCheckoutLogger } from "./CheckoutLogger"
+import { PaymentMethod, PaymentStatus, OrderStatus, OrderType } from "@/types/database/enums"
 
 interface ReviewStepProps {
   formData: any
@@ -38,7 +39,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Iniciando proceso de orden",
         status: "info",
         data: { formData, items }
-      });
+      })
 
       // 1. Crear el customer
       const customerData = {
@@ -47,7 +48,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         phone: formData.phone,
         passport_number: formData.passportNumber,
         birth_date: formData.birthDate,
-        gender: formData.gender
+        gender: formData.gender as "M" | "F"
       }
 
       logCheckoutEvent({
@@ -55,7 +56,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Creando cliente",
         status: "info",
         data: { customerData }
-      });
+      })
 
       const { data: customer, error: customerError } = await supabase
         .from('customers')
@@ -70,7 +71,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
           status: "error",
           data: customerError,
           details: customerError.message
-        });
+        })
         throw customerError
       }
 
@@ -79,18 +80,18 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Cliente creado exitosamente",
         status: "success",
         data: { customer }
-      });
+      })
 
       // 2. Crear la orden
       const orderData = {
         customer_id: customer.id,
-        status: 'processing',
-        type: items.some(item => item.metadata?.product_type === 'physical') ? 'physical' : 'esim',
+        status: 'processing' as OrderStatus,
+        type: items.some(item => item.metadata?.product_type === 'physical') ? 'physical' as OrderType : 'esim' as OrderType,
         total_amount: items.reduce((total, item) => total + item.total_price, 0),
         quantity: items.reduce((total, item) => total + item.quantity, 0),
-        payment_method: 'test',
-        payment_status: 'completed',
-        shipping_address: formData.shippingAddress || null,
+        payment_method: 'test' as PaymentMethod,
+        payment_status: 'completed' as PaymentStatus,
+        shipping_address: formData.shippingAddress as Json,
         activation_date: formData.activationDate || null,
         product_id: items[0].product_id,
       }
@@ -100,7 +101,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Creando orden",
         status: "info",
         data: { orderData }
-      });
+      })
 
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -115,7 +116,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
           status: "error",
           data: orderError,
           details: orderError.message
-        });
+        })
         throw orderError
       }
 
@@ -124,7 +125,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Orden creada exitosamente",
         status: "success",
         data: { order }
-      });
+      })
 
       // 3. Crear los order_items
       const orderItemsData = items.map(item => ({
@@ -146,7 +147,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         action: "Creando items de orden",
         status: "info",
         data: { orderItemsData }
-      });
+      })
 
       const { error: itemsError } = await supabase
         .from('order_items')
@@ -159,7 +160,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
           status: "error",
           data: itemsError,
           details: itemsError.message
-        });
+        })
         throw itemsError
       }
 
@@ -167,7 +168,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         step: 3,
         action: "Items de orden creados exitosamente",
         status: "success"
-      });
+      })
 
       // 4. Limpiar el carrito y mostrar mensaje de éxito
       clearCart()

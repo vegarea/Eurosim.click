@@ -1,61 +1,57 @@
-import { useEffect } from 'react';
-import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from 'react'
+import { useToast } from "@/components/ui/use-toast"
 
 interface LogMessage {
-  step: number;
-  action: string;
-  data?: any;
-  status: 'info' | 'warning' | 'error' | 'success';
-  details?: string;
+  step: number
+  action: string
+  data?: any
+  status: 'info' | 'warning' | 'error' | 'success'
+  details?: string
 }
 
 interface ValidationError {
-  field: string;
-  message: string;
+  field: string
+  message: string
 }
 
 export function useCheckoutLogger() {
-  const { toast } = useToast();
+  const { toast } = useToast()
 
   const logCheckoutEvent = (message: LogMessage) => {
-    const timestamp = new Date().toISOString();
-    const prefix = `[Checkout Step ${message.step}]`;
-    const logStyle = getLogStyle(message.status);
+    const timestamp = new Date().toISOString()
+    const prefix = `[Checkout Step ${message.step}]`
+    const logStyle = getLogStyle(message.status)
     
-    // Grupo principal para el evento
-    console.group(`${prefix} ${message.action}`);
-    console.log('%cTimestamp:', 'color: gray', timestamp);
-    console.log('%cStatus:', logStyle, message.status.toUpperCase());
+    console.group(`${prefix} ${message.action}`)
+    console.log('%cTimestamp:', 'color: gray', timestamp)
+    console.log('%cStatus:', logStyle, message.status.toUpperCase())
     
-    // Si hay detalles adicionales, mostrarlos
     if (message.details) {
-      console.log('%cDetails:', 'color: gray', message.details);
+      console.log('%cDetails:', 'color: gray', message.details)
     }
     
-    // Si hay datos, crear un subgrupo para ellos
     if (message.data) {
-      console.groupCollapsed('Data');
-      logData(message.data);
-      console.groupEnd();
+      console.groupCollapsed('Data')
+      logData(message.data)
+      console.groupEnd()
     }
     
-    console.groupEnd();
+    console.groupEnd()
 
-    // Mostrar toast para errores y advertencias importantes
     if (message.status === 'error') {
       toast({
         title: "Error en el checkout",
         description: message.details || message.action,
         variant: "destructive",
-      });
+      })
     } else if (message.status === 'warning' && message.details) {
       toast({
         title: "Advertencia",
         description: message.details,
-        variant: "warning",
-      });
+        variant: "destructive", // Cambiado de "warning" a "destructive" ya que es el único tipo válido
+      })
     }
-  };
+  }
 
   const logData = (data: any) => {
     if (typeof data === 'object' && data !== null) {
