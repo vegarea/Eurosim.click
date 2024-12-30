@@ -10,15 +10,7 @@ interface CheckoutContentProps {
   isTestMode: boolean;
   testData: {
     shipping: ShippingFormValues;
-    documentation: {
-      fullName: string;
-      birthDate: Date;
-      gender: string;
-      passportNumber: string;
-      activationDate: Date;
-      email: string;
-      phone: string;
-    };
+    documentation: DocumentationFormValues;
   };
   onFormSubmit: (values: any) => void;
   onFormValidityChange: (isValid: boolean) => void;
