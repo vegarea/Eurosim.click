@@ -31,6 +31,8 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
 
   const handleCompleteOrder = async () => {
     try {
+      console.log("Iniciando proceso de orden con datos:", { formData, items })
+
       // 1. Crear el customer
       const { data: customer, error: customerError } = await supabase
         .from('customers')
@@ -46,7 +48,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         .select()
         .single()
 
-      if (customerError) throw customerError
+      if (customerError) {
+        console.error('Error creando customer:', customerError)
+        throw customerError
+      }
+
+      console.log("Cliente creado:", customer)
 
       // 2. Crear la orden
       const { data: order, error: orderError } = await supabase
@@ -66,7 +73,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         .select()
         .single()
 
-      if (orderError) throw orderError
+      if (orderError) {
+        console.error('Error creando orden:', orderError)
+        throw orderError
+      }
+
+      console.log("Orden creada:", order)
 
       // 3. Crear los order_items
       const orderItems = items.map(item => ({
@@ -87,7 +99,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         .from('order_items')
         .insert(orderItems)
 
-      if (itemsError) throw itemsError
+      if (itemsError) {
+        console.error('Error creando items:', itemsError)
+        throw itemsError
+      }
+
+      console.log("Items de orden creados")
 
       // 4. Limpiar el carrito y mostrar mensaje de éxito
       clearCart()
@@ -139,8 +156,9 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
       </div>
 
       <Button 
-        className="w-full"
+        className="w-full bg-primary hover:bg-primary/90"
         onClick={handleCompleteOrder}
+        size="lg"
       >
         Completar Orden
       </Button>
