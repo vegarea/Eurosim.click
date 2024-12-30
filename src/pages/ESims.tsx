@@ -12,6 +12,7 @@ import { AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types/database/products";
 
 export default function ESims() {
   const isMobile = useIsMobile();
@@ -26,51 +27,21 @@ export default function ESims() {
         .eq('status', 'active');
       
       if (error) throw error;
-      return data;
+      return data as Product[];
     }
   });
 
-  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [selectedPlan, setSelectedPlan] = useState<Product | null>(null);
 
   // Efecto para establecer el plan por defecto cuando los productos se cargan
   useEffect(() => {
     if (products.length > 0) {
       const defaultProduct = products.find(p => p.title === "E-SIM L");
       if (defaultProduct) {
-        setSelectedPlan({
-          title: defaultProduct.title,
-          description: `${defaultProduct.data_eu_gb}GB Europa / ${defaultProduct.data_es_gb}GB España`,
-          price: defaultProduct.price,
-          features: [
-            `${defaultProduct.data_eu_gb}GB datos en toda Europa`,
-            `${defaultProduct.data_es_gb}GB exclusivo España`,
-            "Velocidad 5G/4G/3G+",
-            "Hotspot incluido",
-            "El más vendido"
-          ],
-          europeGB: defaultProduct.data_eu_gb,
-          spainGB: defaultProduct.data_es_gb
-        });
+        setSelectedPlan(defaultProduct);
       }
     }
   }, [products]);
-
-  const simCards = products.map(product => ({
-    type: "esim" as const,
-    title: product.title,
-    description: `${product.data_eu_gb}GB Europa / ${product.data_es_gb}GB España`,
-    price: product.price,
-    features: [
-      `${product.data_eu_gb}GB datos en toda Europa`,
-      `${product.data_es_gb}GB exclusivo España`,
-      "Velocidad 5G/4G/3G+",
-      "Hotspot incluido",
-      ...(product.title === "E-SIM L" ? ["El más vendido"] : [])
-    ],
-    europeGB: product.data_eu_gb,
-    spainGB: product.data_es_gb,
-    isPopular: product.title === "E-SIM L"
-  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
@@ -87,15 +58,15 @@ export default function ESims() {
             <div className={`flex ${isMobile ? 'flex-col-reverse' : 'md:flex-row md:items-start md:space-x-6'} gap-4`}>
               <div className={`${isMobile ? 'w-full' : 'md:w-[45%]'} order-2 md:order-1`}>
                 <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-1'} gap-2 md:gap-3`}>
-                  {simCards.map((card) => (
+                  {products.map((product) => (
                     <ProductButton
-                      key={card.title}
-                      title={card.title}
-                      price={card.price}
-                      type={card.type}
-                      isSelected={selectedPlan?.title === card.title}
-                      isPopular={card.isPopular}
-                      onClick={() => setSelectedPlan(card)}
+                      key={product.id}
+                      title={product.title}
+                      price={product.price}
+                      type={product.type}
+                      isSelected={selectedPlan?.id === product.id}
+                      isPopular={product.title === "E-SIM L"}
+                      onClick={() => setSelectedPlan(product)}
                     />
                   ))}
                 </div>
@@ -106,8 +77,13 @@ export default function ESims() {
                   <AnimatePresence mode="wait">
                     {selectedPlan && (
                       <PlanDetails
-                        key={selectedPlan.title}
-                        {...selectedPlan}
+                        key={selectedPlan.id}
+                        title={selectedPlan.title}
+                        description={selectedPlan.description || ''}
+                        price={selectedPlan.price}
+                        features={selectedPlan.features as string[] || []}
+                        europeGB={selectedPlan.data_eu_gb}
+                        spainGB={selectedPlan.data_es_gb}
                       />
                     )}
                   </AnimatePresence>
