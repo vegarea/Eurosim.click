@@ -6,6 +6,12 @@ interface LogMessage {
   action: string;
   data?: any;
   status: 'info' | 'warning' | 'error' | 'success';
+  details?: string;
+}
+
+interface ValidationError {
+  field: string;
+  message: string;
 }
 
 export function useCheckoutLogger() {
@@ -15,42 +21,94 @@ export function useCheckoutLogger() {
     const timestamp = new Date().toISOString();
     const prefix = `[Checkout Step ${message.step}]`;
     const logStyle = getLogStyle(message.status);
-
+    
+    // Grupo principal para el evento
     console.group(`${prefix} ${message.action}`);
     console.log('%cTimestamp:', 'color: gray', timestamp);
     console.log('%cStatus:', logStyle, message.status.toUpperCase());
     
+    // Si hay detalles adicionales, mostrarlos
+    if (message.details) {
+      console.log('%cDetails:', 'color: gray', message.details);
+    }
+    
+    // Si hay datos, crear un subgrupo para ellos
     if (message.data) {
-      console.log('Data:', message.data);
+      console.groupCollapsed('Data');
+      logData(message.data);
+      console.groupEnd();
     }
     
     console.groupEnd();
 
-    // Mostrar toast solo para errores críticos
+    // Mostrar toast para errores y advertencias importantes
     if (message.status === 'error') {
       toast({
         title: "Error en el checkout",
-        description: `${message.action}. Por favor, revisa la consola para más detalles.`,
+        description: message.details || message.action,
         variant: "destructive",
       });
+    } else if (message.status === 'warning' && message.details) {
+      toast({
+        title: "Advertencia",
+        description: message.details,
+        variant: "warning",
+      });
+    }
+  };
+
+  const logData = (data: any) => {
+    if (typeof data === 'object' && data !== null) {
+      Object.entries(data).forEach(([key, value]) => {
+        if (key.toLowerCase().includes('password') || key.toLowerCase().includes('secret')) {
+          console.log(`${key}:`, '[REDACTED]');
+        } else {
+          console.log(`${key}:`, value);
+        }
+      });
+    } else {
+      console.log(data);
     }
   };
 
   const getLogStyle = (status: LogMessage['status']) => {
     const styles = {
-      info: 'color: #3b82f6',
-      warning: 'color: #f59e0b',
-      error: 'color: #ef4444',
-      success: 'color: #10b981',
+      info: 'color: #3b82f6; font-weight: bold;',
+      warning: 'color: #f59e0b; font-weight: bold;',
+      error: 'color: #ef4444; font-weight: bold;',
+      success: 'color: #10b981; font-weight: bold;',
     };
     return styles[status];
   };
 
-  return { logCheckoutEvent };
+  const validateFormData = (formData: Record<string, any>): ValidationError[] => {
+    const errors: ValidationError[] = [];
+    
+    // Validaciones comunes
+    if (!formData.email?.includes('@')) {
+      errors.push({ field: 'email', message: 'Email inválido' });
+    }
+    
+    if (formData.phone && !/^\+?[\d\s-]{8,}$/.test(formData.phone)) {
+      errors.push({ field: 'phone', message: 'Teléfono inválido' });
+    }
+
+    return errors;
+  };
+
+  return { logCheckoutEvent, validateFormData };
 }
 
-export function CheckoutLogger({ step, formData }: { step: number; formData: Record<string, any> }) {
-  const { logCheckoutEvent } = useCheckoutLogger();
+export function CheckoutLogger({ 
+  step, 
+  formData,
+  orderType 
+}: { 
+  step: number; 
+  formData: Record<string, any>;
+  orderType: 'physical' | 'esim';
+}) {
+  const { logCheckoutEvent, validateFormData } = useCheckoutLogger();
 
   useEffect(() => {
     // Log inicial al montar el componente
@@ -58,12 +116,12 @@ export function CheckoutLogger({ step, formData }: { step: number; formData: Rec
       step,
       action: 'Iniciando paso del checkout',
       status: 'info',
-      data: { currentStep: step }
+      data: { currentStep: step, orderType }
     });
 
     // Validar datos según el paso actual
-    validateStepData(step, formData, logCheckoutEvent);
-  }, [step, formData]);
+    validateStepData(step, formData, orderType, logCheckoutEvent, validateFormData);
+  }, [step, formData, orderType]);
 
   return null;
 }
@@ -71,17 +129,40 @@ export function CheckoutLogger({ step, formData }: { step: number; formData: Rec
 function validateStepData(
   step: number, 
   formData: Record<string, any>,
-  logCheckoutEvent: (message: LogMessage) => void
+  orderType: 'physical' | 'esim',
+  logCheckoutEvent: (message: LogMessage) => void,
+  validateFormData: (formData: Record<string, any>) => ValidationError[]
 ) {
+  const errors = validateFormData(formData);
+  
+  if (errors.length > 0) {
+    logCheckoutEvent({
+      step,
+      action: 'Validación de formulario',
+      status: 'warning',
+      data: { errors },
+      details: 'Se encontraron errores en el formulario'
+    });
+    return;
+  }
+
   switch (step) {
     case 1:
-      validateShippingStep(formData, logCheckoutEvent);
+      if (orderType === 'physical') {
+        validateShippingStep(formData, logCheckoutEvent);
+      } else {
+        validateDocumentationStep(formData, logCheckoutEvent);
+      }
       break;
     case 2:
-      validateDocumentationStep(formData, logCheckoutEvent);
+      if (orderType === 'physical') {
+        validateDocumentationStep(formData, logCheckoutEvent);
+      } else {
+        validateReviewStep(formData, logCheckoutEvent);
+      }
       break;
     case 3:
-      validatePaymentStep(formData, logCheckoutEvent);
+      validateReviewStep(formData, logCheckoutEvent);
       break;
   }
 }
@@ -90,7 +171,7 @@ function validateShippingStep(
   formData: Record<string, any>,
   logCheckoutEvent: (message: LogMessage) => void
 ) {
-  const requiredFields = ['fullName', 'email', 'phone'];
+  const requiredFields = ['fullName', 'email', 'phone', 'shippingAddress'];
   const missingFields = requiredFields.filter(field => !formData[field]);
 
   if (missingFields.length > 0) {
@@ -98,7 +179,8 @@ function validateShippingStep(
       step: 1,
       action: 'Validación de información de envío',
       status: 'warning',
-      data: { missingFields }
+      data: { missingFields },
+      details: 'Faltan campos requeridos en el formulario de envío'
     });
   } else {
     logCheckoutEvent({
@@ -108,7 +190,8 @@ function validateShippingStep(
       data: {
         fullName: formData.fullName,
         email: formData.email,
-        phone: formData.phone
+        phone: formData.phone,
+        shippingAddress: formData.shippingAddress
       }
     });
   }
@@ -126,7 +209,8 @@ function validateDocumentationStep(
       step: 2,
       action: 'Validación de documentación',
       status: 'warning',
-      data: { missingFields }
+      data: { missingFields },
+      details: 'Faltan campos requeridos en el formulario de documentación'
     });
   } else {
     logCheckoutEvent({
@@ -142,25 +226,44 @@ function validateDocumentationStep(
   }
 }
 
-function validatePaymentStep(
+function validateReviewStep(
   formData: Record<string, any>,
   logCheckoutEvent: (message: LogMessage) => void
 ) {
-  // Validar que exista un método de pago seleccionado
-  if (!formData.paymentMethod) {
+  // Validar que todos los datos necesarios estén presentes
+  const allRequiredFields = [
+    'fullName',
+    'email',
+    'passportNumber',
+    'birthDate',
+    'gender'
+  ];
+
+  const missingFields = allRequiredFields.filter(field => !formData[field]);
+
+  if (missingFields.length > 0) {
     logCheckoutEvent({
       step: 3,
-      action: 'Método de pago no seleccionado',
+      action: 'Validación final',
       status: 'warning',
-      data: { currentPaymentMethod: formData.paymentMethod }
+      data: { missingFields },
+      details: 'Faltan campos requeridos para completar la orden'
     });
     return;
   }
 
+  // Log de datos finales (sin información sensible)
   logCheckoutEvent({
     step: 3,
-    action: 'Método de pago seleccionado',
+    action: 'Datos finales validados',
     status: 'success',
-    data: { paymentMethod: formData.paymentMethod }
+    data: {
+      fullName: formData.fullName,
+      email: formData.email,
+      hasPassport: !!formData.passportNumber,
+      hasBirthDate: !!formData.birthDate,
+      hasGender: !!formData.gender,
+      hasShippingAddress: !!formData.shippingAddress
+    }
   });
 }

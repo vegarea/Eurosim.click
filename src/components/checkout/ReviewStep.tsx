@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 import { Json } from "@/types/database/common"
+import { CheckoutLogger, useCheckoutLogger } from "./CheckoutLogger"
 
 interface ReviewStepProps {
   formData: any
@@ -15,6 +16,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
   const { items, clearCart } = useCart()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const { logCheckoutEvent } = useCheckoutLogger()
   
   const fieldLabels: Record<string, string> = {
     fullName: "Nombre completo",
@@ -31,7 +33,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
 
   const handleCompleteOrder = async () => {
     try {
-      console.log("Iniciando proceso de orden con datos:", { formData, items })
+      logCheckoutEvent({
+        step: 3,
+        action: "Iniciando proceso de orden",
+        status: "info",
+        data: { formData, items }
+      });
 
       // 1. Crear el customer
       const customerData = {
@@ -40,9 +47,15 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         phone: formData.phone,
         passport_number: formData.passportNumber,
         birth_date: formData.birthDate,
-        gender: formData.gender,
-        default_shipping_address: formData.shippingAddress as Json || null,
+        gender: formData.gender
       }
+
+      logCheckoutEvent({
+        step: 3,
+        action: "Creando cliente",
+        status: "info",
+        data: { customerData }
+      });
 
       const { data: customer, error: customerError } = await supabase
         .from('customers')
@@ -51,11 +64,22 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         .single()
 
       if (customerError) {
-        console.error('Error creando customer:', customerError)
+        logCheckoutEvent({
+          step: 3,
+          action: "Error creando cliente",
+          status: "error",
+          data: customerError,
+          details: customerError.message
+        });
         throw customerError
       }
 
-      console.log("Cliente creado:", customer)
+      logCheckoutEvent({
+        step: 3,
+        action: "Cliente creado exitosamente",
+        status: "success",
+        data: { customer }
+      });
 
       // 2. Crear la orden
       const orderData = {
@@ -71,6 +95,13 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         product_id: items[0].product_id,
       }
 
+      logCheckoutEvent({
+        step: 3,
+        action: "Creando orden",
+        status: "info",
+        data: { orderData }
+      });
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert(orderData)
@@ -78,11 +109,22 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         .single()
 
       if (orderError) {
-        console.error('Error creando orden:', orderError)
+        logCheckoutEvent({
+          step: 3,
+          action: "Error creando orden",
+          status: "error",
+          data: orderError,
+          details: orderError.message
+        });
         throw orderError
       }
 
-      console.log("Orden creada:", order)
+      logCheckoutEvent({
+        step: 3,
+        action: "Orden creada exitosamente",
+        status: "success",
+        data: { order }
+      });
 
       // 3. Crear los order_items
       const orderItemsData = items.map(item => ({
@@ -99,16 +141,33 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         } as Json
       }))
 
+      logCheckoutEvent({
+        step: 3,
+        action: "Creando items de orden",
+        status: "info",
+        data: { orderItemsData }
+      });
+
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItemsData)
 
       if (itemsError) {
-        console.error('Error creando items:', itemsError)
+        logCheckoutEvent({
+          step: 3,
+          action: "Error creando items de orden",
+          status: "error",
+          data: itemsError,
+          details: itemsError.message
+        });
         throw itemsError
       }
 
-      console.log("Items de orden creados")
+      logCheckoutEvent({
+        step: 3,
+        action: "Items de orden creados exitosamente",
+        status: "success"
+      });
 
       // 4. Limpiar el carrito y mostrar mensaje de éxito
       clearCart()
