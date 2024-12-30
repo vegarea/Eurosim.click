@@ -21,13 +21,5 @@ export interface DocumentationFormProps {
   onValidityChange?: (isValid: boolean) => void
   initialData?: Partial<DocumentationFormValues>
   isTestMode?: boolean
-  testData?: {
-    fullName: string
-    birthDate: Date
-    gender: string
-    passportNumber: string
-    activationDate: Date
-    email: string
-    phone: string
-  }
+  testData?: Partial<DocumentationFormValues>
 }
