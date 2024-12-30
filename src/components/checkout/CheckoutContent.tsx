@@ -28,6 +28,13 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
+  // Cuando estamos en el paso de pago, automáticamente marcamos el formulario como válido
+  React.useEffect(() => {
+    if (step === 3) {
+      onFormValidityChange(true);
+    }
+  }, [step, onFormValidityChange]);
+
   switch (step) {
     case 1:
       if (hasPhysicalSim) {
