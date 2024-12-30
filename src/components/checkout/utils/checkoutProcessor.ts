@@ -90,7 +90,7 @@ export class CheckoutProcessor {
       phone: this.formData.phone || null,
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
-      gender: this.formData.gender ? CustomerGender[this.formData.gender as keyof typeof CustomerGender] : null,
+      gender: this.formData.gender as CustomerGender | null,
       default_shipping_address: this.formData.shippingAddress as Json,
       billing_address: null,
       preferred_language: 'es',
@@ -119,12 +119,12 @@ export class CheckoutProcessor {
     const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: OrderStatus.payment_pending,
+      status: "payment_pending" as OrderStatus,
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: PaymentMethod.test,
-      payment_status: PaymentStatus.pending,
+      payment_method: "test" as PaymentMethod,
+      payment_status: "pending" as PaymentStatus,
       shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
@@ -160,7 +160,7 @@ export class CheckoutProcessor {
         quantity: item.quantity,
         unit_price: item.unit_price,
         total_price: item.total_price,
-        metadata: metadata as OrderItemMetadata
+        metadata: metadata as Json
       };
     });
 
