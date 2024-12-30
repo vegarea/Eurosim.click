@@ -12,17 +12,9 @@ export interface OrderItem {
   quantity: number;
   unit_price: number;
   total_price: number;
-  metadata: OrderItemMetadata | null;
+  metadata: Json | null;
   created_at: string | null;
   updated_at: string | null;
-}
-
-export interface OrderItemMetadata {
-  product_title?: string;
-  product_type?: string;
-  data_eu_gb?: number;
-  data_es_gb?: number;
-  [key: string]: any;
 }
 
 export type OrderItemInsert = Omit<OrderItem, "id" | "created_at" | "updated_at">;
