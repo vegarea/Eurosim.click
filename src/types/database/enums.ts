@@ -1,23 +1,41 @@
-/**
- * @lovable-protected
- * This file contains types that match Supabase schema exactly.
- * DO NOT MODIFY without explicit user permission.
- */
-export type OrderStatus = 
-  | "payment_pending"
-  | "payment_failed" 
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
+export enum OrderStatus {
+  payment_pending = "payment_pending",
+  payment_failed = "payment_failed",
+  processing = "processing",
+  shipped = "shipped",
+  delivered = "delivered",
+  cancelled = "cancelled"
+}
 
-export type OrderType = "physical" | "esim";
-export type PaymentMethod = "stripe" | "paypal" | "test";
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
-export type ProductStatus = "active" | "inactive" | "out_of_stock";
-export type ProductType = "physical" | "esim";
+export enum OrderType {
+  physical = "physical",
+  esim = "esim"
+}
 
-// Change from type to enum to use it as a value
+export enum PaymentMethod {
+  stripe = "stripe",
+  paypal = "paypal",
+  test = "test"
+}
+
+export enum PaymentStatus {
+  pending = "pending",
+  completed = "completed",
+  failed = "failed",
+  refunded = "refunded"
+}
+
+export enum ProductStatus {
+  active = "active",
+  inactive = "inactive",
+  out_of_stock = "out_of_stock"
+}
+
+export enum ProductType {
+  physical = "physical",
+  esim = "esim"
+}
+
 export enum CustomerGender {
   M = "M",
   F = "F"
