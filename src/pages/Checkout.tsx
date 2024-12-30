@@ -11,7 +11,6 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
-import { CheckoutLogger } from "@/components/checkout/CheckoutLogger"
 
 const testData = {
   shipping: {
@@ -71,20 +70,9 @@ export default function Checkout() {
     });
   };
 
-  const dispatchFormEvent = (data: any) => {
-    const event = new CustomEvent('checkout-log', {
-      detail: {
-        type: 'form-state-change',
-        data
-      }
-    });
-    window.dispatchEvent(event);
-  };
-
   const handleFormValidityChange = (isValid: boolean) => {
-    setIsFormValid(isValid);
-    dispatchFormEvent({ isValid, errors: {}, values: formData });
-  };
+    setIsFormValid(isValid)
+  }
 
   const handleFormSubmit = (values: any) => {
     const formDataWithShippingAddress = {
@@ -93,16 +81,11 @@ export default function Checkout() {
     };
     
     setFormData({ ...formData, ...formDataWithShippingAddress });
-    dispatchFormEvent({ 
-      step,
-      values: formDataWithShippingAddress
-    });
-
     if (step < 3) {
       setStep(step + 1);
       setIsFormValid(false);
     }
-  };
+  }
 
   const handleUpdateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -128,7 +111,6 @@ export default function Checkout() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
-      <CheckoutLogger />
       
       <main className="container mx-auto py-8 px-4 max-w-5xl">
         <div className="max-w-5xl mx-auto">

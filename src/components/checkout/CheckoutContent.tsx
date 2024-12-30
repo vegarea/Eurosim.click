@@ -63,8 +63,7 @@ export function CheckoutContent({
           <DocumentationForm
             onSubmit={onFormSubmit}
             onValidityChange={onFormValidityChange}
-            defaultValues={isTestMode ? testData.documentation : undefined}
-            isTestMode={isTestMode}
+            initialData={isTestMode ? testData.documentation : undefined}
           />
         );
       case 3:
