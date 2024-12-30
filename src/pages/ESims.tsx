@@ -4,9 +4,8 @@ import { supabase } from "@/integrations/supabase/client"
 import { Product } from "@/types/database/products"
 import { ProductButton } from "@/components/esim/ProductButton"
 import { PlanDetails } from "@/components/esim/PlanDetails"
-import { useCart } from "@/contexts/CartContext"
-import { ESimHero } from "@/components/ESimHero"
 import { Header } from "@/components/Header"
+import { ESimHero } from "@/components/ESimHero"
 import { TrustElements } from "@/components/TrustElements"
 import { HowItWorks } from "@/components/HowItWorks"
 import { FrequentQuestions } from "@/components/FrequentQuestions"
@@ -15,7 +14,6 @@ import { CommonFeatures } from "@/components/CommonFeatures"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
-  const { addItem } = useCart()
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['esim-products'],
@@ -37,12 +35,6 @@ export default function ESims() {
       setSelectedPlan(products[1]) // Seleccionar el plan medio por defecto
     }
   }, [products, selectedPlan])
-
-  const handleAddToCart = () => {
-    if (selectedPlan) {
-      addItem(selectedPlan)
-    }
-  }
 
   if (isLoading) {
     return <div>Cargando...</div>
@@ -67,7 +59,7 @@ export default function ESims() {
                   key={product.id}
                   product={product}
                   isSelected={selectedPlan?.id === product.id}
-                  onSelect={() => setSelectedPlan(product)}
+                  onClick={() => setSelectedPlan(product)}
                 />
               ))}
             </div>
@@ -75,7 +67,6 @@ export default function ESims() {
             {selectedPlan && (
               <PlanDetails
                 product={selectedPlan}
-                onAddToCart={handleAddToCart}
               />
             )}
           </div>

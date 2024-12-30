@@ -7,6 +7,7 @@ interface ProductButtonProps {
   product: Product;
   isSelected: boolean;
   onClick: () => void;
+  onSelect?: () => void; // Añadimos esta prop para compatibilidad
   isPopular?: boolean;
 }
 
@@ -14,13 +15,19 @@ export function ProductButton({
   product,
   isSelected, 
   onClick,
+  onSelect, // Añadimos esta prop
   isPopular = false
 }: ProductButtonProps) {
   const [amount, currency] = formatCurrency(product.price).split(' ');
 
+  const handleClick = () => {
+    onClick();
+    if (onSelect) onSelect();
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       className={cn(
         "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm relative",
         "hover:shadow-lg hover:-translate-y-1",
