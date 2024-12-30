@@ -38,7 +38,6 @@ export function PlanDetails({ product }: PlanDetailsProps) {
       exit={{ opacity: 0, y: -20 }}
       className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden max-h-[600px]"
     >
-      {/* Header con precio y GB */}
       <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -64,9 +63,7 @@ export function PlanDetails({ product }: PlanDetailsProps) {
         </div>
       </div>
 
-      {/* Contenido principal */}
       <div className="p-4 space-y-4">
-        {/* Características */}
         <div className="space-y-1.5">
           {features.map((feature, index) => (
             <motion.div
@@ -82,7 +79,6 @@ export function PlanDetails({ product }: PlanDetailsProps) {
           ))}
         </div>
 
-        {/* Medidor de uso con altura reducida */}
         <div className="scale-95 origin-top">
           <UsageMeter
             europeGB={product.data_eu_gb}
@@ -91,7 +87,6 @@ export function PlanDetails({ product }: PlanDetailsProps) {
           />
         </div>
 
-        {/* Botón de compra */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

@@ -1,20 +1,10 @@
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
-
-export interface CartItem {
-  id: string;
-  type: Product['type'];
-  title: string;
-  description: string;
-  price: number;
-  data_eu_gb: number;
-  data_es_gb: number;
-  quantity: number;
-}
+import { OrderItem } from "@/types/database/orderItems";
 
 interface CartContextType {
-  items: CartItem[];
+  items: OrderItem[];
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -24,30 +14,35 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<OrderItem[]>([]);
   const { toast } = useToast();
 
   const addItem = (product: Product) => {
     setItems(currentItems => {
-      const existingItem = currentItems.find(item => item.id === product.id);
+      const existingItem = currentItems.find(item => item.product_id === product.id);
       
       if (existingItem) {
         return currentItems.map(item =>
-          item.id === product.id
+          item.product_id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
 
-      const newItem: CartItem = {
-        id: product.id,
-        type: product.type,
-        title: product.title,
-        description: `${product.data_eu_gb}GB Europa / ${product.data_es_gb}GB España`,
-        price: product.price,
-        data_eu_gb: product.data_eu_gb,
-        data_es_gb: product.data_es_gb,
-        quantity: 1
+      const newItem: OrderItem = {
+        id: crypto.randomUUID(),
+        product_id: product.id,
+        quantity: 1,
+        unit_price: product.price,
+        total_price: product.price,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        metadata: {
+          product_title: product.title,
+          product_type: product.type,
+          data_eu_gb: product.data_eu_gb,
+          data_es_gb: product.data_es_gb
+        }
       };
 
       return [...currentItems, newItem];
@@ -71,7 +66,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (quantity < 1) return;
     setItems(currentItems =>
       currentItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id ? { 
+          ...item, 
+          quantity,
+          total_price: item.unit_price * quantity 
+        } : item
       )
     );
   };
