@@ -14,15 +14,17 @@ export function CartItem({
   onUpdateQuantity, 
   onRemove 
 }: CartItemProps) {
+  const metadata = item.metadata as Record<string, any>;
+  
   return (
     <div className="py-4 flex items-start gap-4">
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-gray-900 truncate">
-          {item.metadata?.product_title || 'Producto'}
+          {metadata?.product_title || 'Producto'}
         </h3>
         <p className="text-sm text-gray-500">
-          {item.metadata?.product_type === 'esim' ? 
-            `${item.metadata?.data_eu_gb}GB Europa / ${item.metadata?.data_es_gb}GB España` : 
+          {metadata?.product_type === 'esim' ? 
+            `${metadata?.data_eu_gb}GB Europa / ${metadata?.data_es_gb}GB España` : 
             'SIM Física'}
         </p>
         <p className="mt-1 text-sm font-medium text-primary">

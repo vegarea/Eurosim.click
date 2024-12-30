@@ -28,7 +28,7 @@ export function Cart({
 
   const subtotal = items.reduce((acc, item) => acc + item.total_price, 0);
   const shipping = items.some(item => 
-    item.metadata?.product_type === "physical"
+    (item.metadata as Record<string, any>)?.product_type === "physical"
   ) ? 160 : 0;
   const total = subtotal + shipping;
 
