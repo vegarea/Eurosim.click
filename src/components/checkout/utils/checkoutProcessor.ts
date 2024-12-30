@@ -2,12 +2,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
 import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
-import { CustomerGender } from "@/types/database/enums";
+import { CustomerGender, OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
 
 interface CartItem extends OrderItem {
   title: string;
-  type: "physical" | "esim";
+  type: OrderType;
 }
 
 export class CheckoutProcessor {
@@ -82,9 +82,9 @@ export class CheckoutProcessor {
     const customerData = {
       name: this.formData.fullName,
       email: this.formData.email,
-      phone: this.formData.phone,
-      passport_number: this.formData.passportNumber,
-      birth_date: this.formData.birthDate,
+      phone: this.formData.phone || null,
+      passport_number: this.formData.passportNumber || null,
+      birth_date: this.formData.birthDate || null,
       gender: this.formData.gender as CustomerGender | null,
       default_shipping_address: this.formData.shippingAddress || null,
       billing_address: null,
@@ -114,18 +114,22 @@ export class CheckoutProcessor {
     const orderData = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending",
+      status: "payment_pending" as OrderStatus,
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test",
-      payment_status: "pending",
+      payment_method: "test" as PaymentMethod,
+      payment_status: "pending" as PaymentStatus,
       shipping_address: this.formData.shippingAddress || null,
       tracking_number: null,
       carrier: null,
       activation_date: null,
       notes: [],
-      metadata: {}
+      metadata: {},
+      stripe_payment_intent_id: null,
+      stripe_receipt_url: null,
+      paypal_order_id: null,
+      paypal_receipt_url: null
     };
 
     const { data, error } = await supabase
