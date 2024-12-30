@@ -16,7 +16,7 @@ export function Cart({
   onCheckout,
   formData = {}
 }: CartProps) {
-  const { items } = useCart()
+  const { items, updateQuantity, removeItem } = useCart()
   const total = items.reduce((sum, item) => sum + item.total_price, 0)
 
   if (items.length === 0) {
@@ -31,7 +31,12 @@ export function Cart({
     <div className="space-y-4">
       <div className="space-y-2">
         {items.map((item) => (
-          <CartItem key={item.id} item={item} />
+          <CartItem 
+            key={item.id} 
+            item={item}
+            onUpdateQuantity={updateQuantity}
+            onRemove={removeItem}
+          />
         ))}
       </div>
       

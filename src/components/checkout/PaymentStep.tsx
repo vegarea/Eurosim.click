@@ -1,9 +1,11 @@
-import { useState } from "react";
-import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
-import { TestPaymentButton } from "./payment/TestPaymentButton";
+import { useState } from "react"
+import { PaymentMethodSelector } from "./payment/PaymentMethodSelector"
+import { TestPaymentButton } from "./payment/TestPaymentButton"
+import { useCheckoutContext } from "@/contexts/CheckoutContext"
 
 export function PaymentStep() {
-  const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
+  const [selectedMethod, setSelectedMethod] = useState<string>("stripe")
+  const { formData } = useCheckoutContext()
 
   return (
     <div className="space-y-6">
@@ -26,7 +28,7 @@ export function PaymentStep() {
         </div>
       )}
 
-      <TestPaymentButton />
+      <TestPaymentButton formData={formData} />
     </div>
-  );
+  )
 }
