@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
-import { OrderItem } from "@/types/database/orderItems"
+import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems"
 import { toast } from "sonner"
+import { Json } from "@/types/database/common"
 
 export function useOrderItems(orderId?: string) {
   const queryClient = useQueryClient()
@@ -25,16 +26,25 @@ export function useOrderItems(orderId?: string) {
         throw error
       }
 
-      return data as OrderItem[]
+      // Convertir los datos de Supabase al tipo OrderItem
+      return (data as any[]).map(item => ({
+        ...item,
+        metadata: item.metadata as OrderItemMetadata
+      })) as OrderItem[]
     },
     enabled: !orderId || !!orderId
   })
 
   const addOrderItem = useMutation({
     mutationFn: async (newItem: Omit<OrderItem, 'id' | 'created_at' | 'updated_at'>) => {
+      const supabaseItem = {
+        ...newItem,
+        metadata: newItem.metadata as unknown as Json
+      }
+
       const { data, error } = await supabase
         .from('order_items')
-        .insert(newItem)
+        .insert(supabaseItem)
         .select()
         .single()
 
@@ -53,9 +63,14 @@ export function useOrderItems(orderId?: string) {
 
   const updateOrderItem = useMutation({
     mutationFn: async ({ id, ...updates }: Partial<OrderItem> & { id: string }) => {
+      const supabaseUpdates = {
+        ...updates,
+        metadata: updates.metadata as unknown as Json
+      }
+
       const { data, error } = await supabase
         .from('order_items')
-        .update(updates)
+        .update(supabaseUpdates)
         .eq('id', id)
         .select()
         .single()
