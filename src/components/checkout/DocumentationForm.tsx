@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,34 +13,17 @@ import { Button } from "@/components/ui/button"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
+import { DocumentationFormProps, documentationFormSchema, type DocumentationFormValues } from "./documentation/types"
 
-const formSchema = z.object({
-  fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  birthDate: z.date({
-    required_error: "La fecha de nacimiento es requerida",
-  }),
-  gender: z.string().min(1, "El género es requerido"),
-  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
-  activationDate: z.date({
-    required_error: "La fecha de activación es requerida",
-  }).min(new Date(), "La fecha debe ser futura"),
-})
-
-interface DocumentationFormProps {
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
-  onValidityChange?: (isValid: boolean) => void;
-  initialData?: {
-    fullName: string;
-    birthDate: Date;
-    gender: string;
-    passportNumber: string;
-    activationDate: Date;
-  };
-}
-
-export function DocumentationForm({ onSubmit, onValidityChange, initialData }: DocumentationFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+export function DocumentationForm({ 
+  onSubmit, 
+  onValidityChange, 
+  initialData,
+  isTestMode,
+  testData 
+}: DocumentationFormProps) {
+  const form = useForm<DocumentationFormValues>({
+    resolver: zodResolver(documentationFormSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
       birthDate: initialData?.birthDate || new Date(),
@@ -50,7 +32,7 @@ export function DocumentationForm({ onSubmit, onValidityChange, initialData }: D
       activationDate: initialData?.activationDate || new Date(),
     },
     mode: "onChange"
-  });
+  })
 
   // Define years and months arrays for the date selectors
   const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
