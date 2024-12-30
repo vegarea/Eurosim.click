@@ -4,8 +4,13 @@ import { Order } from "@/types/database/orders";
 import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
 import { CustomerGender, OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
+import { Json } from "@/types/database/common";
 
-interface CartItem extends OrderItem {
+interface CartItem {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
   title: string;
   type: OrderType;
 }
@@ -86,17 +91,17 @@ export class CheckoutProcessor {
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
       gender: this.formData.gender as CustomerGender | null,
-      default_shipping_address: this.formData.shippingAddress || null,
-      billing_address: null,
+      default_shipping_address: this.formData.shippingAddress as Json || null,
+      billing_address: null as Json | null,
       preferred_language: 'es',
       marketing_preferences: {
         email_marketing: false,
         sms_marketing: false,
         push_notifications: false
-      },
+      } as Json,
       stripe_customer_id: null,
       paypal_customer_id: null,
-      metadata: {}
+      metadata: {} as Json
     };
 
     const { data, error } = await supabase
@@ -120,12 +125,12 @@ export class CheckoutProcessor {
       quantity: firstItem.quantity,
       payment_method: "test" as PaymentMethod,
       payment_status: "pending" as PaymentStatus,
-      shipping_address: this.formData.shippingAddress || null,
+      shipping_address: this.formData.shippingAddress as Json || null,
       tracking_number: null,
       carrier: null,
       activation_date: null,
       notes: [],
-      metadata: {},
+      metadata: {} as Json,
       stripe_payment_intent_id: null,
       stripe_receipt_url: null,
       paypal_order_id: null,
@@ -152,7 +157,7 @@ export class CheckoutProcessor {
       metadata: {
         product_title: item.title,
         product_type: item.type
-      } as OrderItemMetadata
+      } as Json
     }));
 
     const { data, error } = await supabase
