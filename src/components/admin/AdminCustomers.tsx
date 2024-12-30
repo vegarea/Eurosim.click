@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useOrdersData } from "@/hooks/useOrdersData"
+import { useOrders } from "@/contexts/OrdersContext"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import {
@@ -15,7 +15,7 @@ import { ExtendedCustomer } from "@/types/database/customers"
 import { Json } from "@/types/database/common"
 
 export function AdminCustomers() {
-  const { orders } = useOrdersData()
+  const { orders } = useOrders()
   const [search, setSearch] = useState("")
   const [selectedCustomer, setSelectedCustomer] = useState<ExtendedCustomer | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
@@ -52,7 +52,7 @@ export function AdminCustomers() {
         metadata: {},
         created_at: order.created_at,
         updated_at: order.updated_at
-      } as ExtendedCustomer
+      }
     }
     acc[customerId].orders.push(order)
     acc[customerId].totalSpent += order.total_amount

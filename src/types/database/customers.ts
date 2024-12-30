@@ -1,7 +1,8 @@
-import { Gender } from "./enums";
+import { CustomerGender } from "./enums";
 import { Json } from "./common";
 import { Order } from "./orders";
 
+// Tipo que coincide exactamente con la estructura de Supabase
 export interface Customer {
   id: string;
   name: string;
@@ -9,7 +10,7 @@ export interface Customer {
   phone: string | null;
   passport_number: string | null;
   birth_date: string | null;
-  gender: Gender | null;
+  gender: CustomerGender | null;
   default_shipping_address: Json | null;
   billing_address: Json | null;
   preferred_language: string | null;
@@ -21,6 +22,7 @@ export interface Customer {
   updated_at: string | null;
 }
 
+// Tipo extendido para incluir información calculada en el frontend
 export interface ExtendedCustomer extends Customer {
   orders: Order[];
   totalSpent: number;

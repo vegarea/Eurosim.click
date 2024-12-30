@@ -1,17 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { OrderType } from "@/types/database/enums";
 
 export interface CartItem {
   id: string;
-  type: OrderType;
+  type: "physical" | "esim";
   title: string;
   description: string;
   price: number;
   quantity: number;
-  customerId?: string;
-  customerName?: string;
-  customerEmail?: string;
 }
 
 interface CartContextType {

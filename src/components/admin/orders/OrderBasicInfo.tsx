@@ -1,12 +1,12 @@
-import { Order } from "./types";
-import { Badge } from "@/components/ui/badge";
+import { Order } from "./types"
+import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 
 interface OrderBasicInfoProps {
-  order: Order;
+  order: Order
 }
 
 export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
@@ -16,7 +16,7 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h3 className="font-medium mb-1">Cliente</h3>
-            <p>{order.customers?.name || "No especificado"}</p>
+            <p>{order.customer_name}</p>
           </div>
           <div>
             <h3 className="font-medium mb-1">Fecha</h3>
@@ -39,5 +39,5 @@ export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

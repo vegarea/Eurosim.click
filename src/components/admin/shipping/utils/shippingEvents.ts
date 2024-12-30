@@ -1,26 +1,10 @@
-import { Json } from "@/types/database/common";
+import { OrderEvent } from "../../orders/types";
 import { OrderStatus } from "@/types/database/enums";
-
-interface ShippingEvent {
-  id: string;
-  type: string;
-  description: string;
-  user_id: string;
-  user_name: string;
-  created_at: string;
-  metadata: {
-    oldStatus?: OrderStatus;
-    newStatus?: OrderStatus;
-    trackingNumber?: string;
-    carrier?: string;
-    automated: boolean;
-  };
-}
 
 export const createShippingConfirmationEvent = (
   trackingNumber: string, 
   carrier: string
-): ShippingEvent => ({
+): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
   description: `Pedido enviado con ${carrier}. Número de seguimiento: ${trackingNumber}`,
@@ -28,15 +12,15 @@ export const createShippingConfirmationEvent = (
   user_name: "Manager Name",
   created_at: new Date().toISOString(),
   metadata: {
-    oldStatus: "processing",
-    newStatus: "shipped",
+    oldStatus: "processing" as OrderStatus,
+    newStatus: "shipped" as OrderStatus,
     trackingNumber,
     carrier,
     automated: false
   }
 });
 
-export const createDeliveryConfirmationEvent = (): ShippingEvent => ({
+export const createDeliveryConfirmationEvent = (): OrderEvent => ({
   id: crypto.randomUUID(),
   type: "status_changed",
   description: "Pedido marcado como entregado",
@@ -44,8 +28,8 @@ export const createDeliveryConfirmationEvent = (): ShippingEvent => ({
   user_name: "Manager Name",
   created_at: new Date().toISOString(),
   metadata: {
-    oldStatus: "shipped",
-    newStatus: "delivered",
+    oldStatus: "shipped" as OrderStatus,
+    newStatus: "delivered" as OrderStatus,
     automated: false
   }
 });

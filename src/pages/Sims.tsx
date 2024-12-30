@@ -27,7 +27,6 @@ const Sims = () => {
   });
 
   const simCards = products?.map(product => ({
-    id: product.id, // Pasar el ID real del producto
     type: "physical" as const,
     title: product.title,
     description: `${product.data_eu_gb}GB Europa / ${product.data_es_gb}GB España`,
@@ -52,7 +51,7 @@ const Sims = () => {
           <div className="grid md:grid-cols-2 gap-4 lg:gap-8 mb-8">
             {!isLoading && simCards.map((card, index) => (
               <motion.div
-                key={card.id}
+                key={card.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.2 }}

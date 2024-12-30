@@ -1,13 +1,13 @@
-import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Truck, PackageCheck } from "lucide-react"
 import { Order } from "@/types/database/orders"
-import { OrderMetadata } from "@/types/database/common"
-import { useOrdersData } from "@/hooks/useOrdersData"
+import { OrderEvent } from "@/types/database/common"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
+import { useOrders } from "@/contexts/OrdersContext"
+import { useState } from "react"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { ShippingTabs } from "./components/ShippingTabs"
-import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { 
   createShippingConfirmationEvent, 
   createDeliveryConfirmationEvent 
@@ -15,7 +15,7 @@ import {
 
 export function AdminPhysicalShipping() {
   const { toast } = useToast()
-  const { orders, updateOrder } = useOrdersData()
+  const { orders, updateOrder } = useOrders()
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
 
@@ -34,18 +34,14 @@ export function AdminPhysicalShipping() {
 
     const event = createShippingConfirmationEvent(trackingNumber, carrier)
     const currentOrder = orders.find(o => o.id === selectedOrderId)
-    if (!currentOrder) return
-
-    const currentMetadata = currentOrder.metadata as OrderMetadata | null
-    const currentEvents = currentMetadata?.events || []
     
     updateOrder(selectedOrderId, {
       status: "shipped",
       tracking_number: trackingNumber,
       carrier: carrier,
       metadata: {
-        ...currentMetadata,
-        events: [...currentEvents, event]
+        ...currentOrder?.metadata,
+        events: [...((currentOrder?.metadata?.events as OrderEvent[]) || []), event]
       }
     })
 
@@ -59,14 +55,12 @@ export function AdminPhysicalShipping() {
 
   const handleDeliverOrder = (order: Order) => {
     const event = createDeliveryConfirmationEvent()
-    const currentMetadata = order.metadata as OrderMetadata | null
-    const currentEvents = currentMetadata?.events || []
     
     updateOrder(order.id, {
       status: "delivered",
       metadata: {
-        ...currentMetadata,
-        events: [...currentEvents, event]
+        ...order.metadata,
+        events: [...((order.metadata?.events as OrderEvent[]) || []), event]
       }
     })
 

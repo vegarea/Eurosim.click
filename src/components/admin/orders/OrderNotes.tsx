@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Order } from "@/types/database/orders"
+import { Order, OrderNote } from "./types"
 import {
   Card,
   CardContent,
@@ -40,7 +40,7 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
     })
   }
 
-  const notes = order.notes || []
+  const notes = ((order.metadata?.notes || []) as OrderNote[]);
 
   return (
     <Card>
@@ -72,12 +72,16 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
             </p>
           )}
           
-          {notes.map((note, index) => (
+          {notes.map((note) => (
             <div 
-              key={index} 
+              key={note.id} 
               className="bg-gray-50 p-4 rounded-lg space-y-2"
             >
-              <p className="text-gray-700">{note}</p>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span className="font-medium">{note.user_name}</span>
+                <span>{formatDateTime(note.created_at)}</span>
+              </div>
+              <p className="text-gray-700">{note.text}</p>
             </div>
           ))}
         </div>

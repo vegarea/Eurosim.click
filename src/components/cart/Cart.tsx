@@ -5,9 +5,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import { formatCurrency } from "@/utils/currency";
-import { useNavigate } from "react-router-dom";
-import { checkoutService } from "@/services/checkoutService";
-import { TablesInsert } from "@/integrations/supabase/types";
 
 interface CartProps {
   showCheckoutButton?: boolean;
@@ -17,94 +14,17 @@ interface CartProps {
 
 export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onCheckout }: CartProps) {
   const { toast } = useToast();
-  const { items, removeItem, updateQuantity, clearCart } = useCart();
-  const navigate = useNavigate();
+  const { items, removeItem, updateQuantity } = useCart();
 
-  const handleCheckout = async () => {
-    try {
-      console.log("[Cart] Iniciando checkout", {
-        items,
-        totalItems: items.length,
-        hasItems: items.length > 0
-      });
-
-      if (items.length === 0) {
-        console.log("[Cart] Error: Carrito vacío");
-        toast({
-          title: "Carrito vacío",
-          description: "Agrega productos a tu carrito para continuar",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Por ahora manejamos solo un item
-      const item = items[0];
-      console.log("[Cart] Procesando item", item);
-
-      // 1. Crear orden temporal usando los tipos exactos de Supabase
-      const orderData: Omit<TablesInsert<"orders">, "id" | "status" | "payment_status"> = {
-        product_id: item.id,
-        type: item.type,
-        total_amount: item.price * item.quantity,
-        quantity: item.quantity,
-        metadata: {
-          name: item.customerName || 'Test Customer',
-          email: item.customerEmail || 'test@example.com'
-        }
-      };
-
-      console.log("[Cart] Creando orden temporal con datos:", orderData);
-      const order = await checkoutService.createTemporaryOrder(orderData);
-      console.log("[Cart] Orden temporal creada:", order);
-
-      // 2. Procesar pago de prueba
-      console.log("[Cart] Iniciando proceso de pago para orden:", order.id);
-      const paymentResult = await checkoutService.processTestPayment(order.id);
-      console.log("[Cart] Resultado del pago:", paymentResult);
-
-      // 3. Si el pago es exitoso, finalizar orden
-      if (paymentResult.success) {
-        console.log("[Cart] Pago exitoso, finalizando orden");
-        const finalOrder = await checkoutService.finalizeOrder(order.id, paymentResult);
-        console.log("[Cart] Orden finalizada:", finalOrder);
-
-        // Limpiar carrito y redirigir
-        clearCart();
-        console.log("[Cart] Carrito limpiado, redirigiendo a thank-you");
-        navigate('/thank-you');
-
-        toast({
-          title: "¡Pedido realizado!",
-          description: "Tu pedido de prueba ha sido procesado correctamente.",
-        });
-      } else {
-        console.error("[Cart] Error en el pago:", paymentResult.error);
-        throw new Error(paymentResult.error || "Error procesando el pago");
-      }
-
-    } catch (error) {
-      console.error('[Cart] Error en el proceso de checkout:', error);
-      toast({
-        title: "Error",
-        description: "Hubo un problema al procesar tu pedido. Por favor intenta de nuevo.",
-        variant: "destructive",
-      });
+  const handleCheckout = () => {
+    if (onCheckout) {
+      onCheckout({});
     }
   };
 
   const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   const shipping = items.some(item => item.type === "physical") ? 160 : 0;
   const total = subtotal + shipping;
-
-  console.log("[Cart] Estado actual del carrito:", {
-    items,
-    subtotal,
-    shipping,
-    total,
-    showCheckoutButton,
-    isButtonEnabled
-  });
 
   return (
     <motion.div 
@@ -162,10 +82,16 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = false, onChe
                 className="w-full mt-8 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary animate-gradient"
                 size="lg"
                 onClick={handleCheckout}
+                disabled={!isButtonEnabled}
               >
                 Continuar al pago
                 <ArrowRight className="h-4 w-4" />
               </Button>
+              {!isButtonEnabled && (
+                <p className="mt-2 text-center text-sm text-gray-500">
+                  Por favor, completa todos los campos requeridos
+                </p>
+              )}
             </motion.div>
           )}
 

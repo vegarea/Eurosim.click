@@ -5,10 +5,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import '/node_modules/flag-icons/css/flag-icons.min.css';
 import { formatCurrency } from "@/utils/currency";
-import { supabase } from "@/integrations/supabase/client";
 
 interface SimCardProps {
-  id: string; // Añadido el ID real del producto
   type: "physical" | "esim";
   title: string;
   description: string;
@@ -20,7 +18,6 @@ interface SimCardProps {
 }
 
 export function SimCard({ 
-  id,
   type, 
   title, 
   description, 
@@ -68,33 +65,14 @@ export function SimCard({
     }
   };
 
-  const handleAddToCart = async () => {
-    // Obtener el usuario actual
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      // Si no hay usuario, crear un cliente temporal o manejar según tu lógica
-      const tempCustomerId = 'temp-' + Math.random().toString(36).substr(2, 9);
-      addItem({
-        id, // Usar el ID real del producto
-        type,
-        title,
-        description,
-        price,
-        customerId: tempCustomerId
-      });
-    } else {
-      // Si hay usuario, usar su ID como customerId
-      addItem({
-        id, // Usar el ID real del producto
-        type,
-        title,
-        description,
-        price,
-        customerId: user.id
-      });
-    }
-    
+  const handleAddToCart = () => {
+    addItem({
+      id: `${type}-${title}`,
+      type,
+      title,
+      description,
+      price
+    });
     navigate('/checkout');
   };
 

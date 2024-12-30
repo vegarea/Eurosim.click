@@ -1,4 +1,4 @@
-import { OrderMetadata } from "@/types/database/common"
+import { OrderEvent } from "./types"
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import { History, User, Bot } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 interface OrderHistoryProps {
-  events?: OrderMetadata['events']
+  events?: OrderEvent[]
 }
 
 export function OrderHistory({ events = [] }: OrderHistoryProps) {
@@ -23,14 +23,14 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
     })
   }
 
-  const getEventIcon = (event: OrderMetadata['events'][number]) => {
+  const getEventIcon = (event: OrderEvent) => {
     if (event.metadata?.automated) {
       return <Bot className="h-4 w-4" />
     }
     return <User className="h-4 w-4" />
   }
 
-  const getEventBadgeColor = (type: OrderMetadata['events'][number]['type']) => {
+  const getEventBadgeColor = (type: OrderEvent['type']) => {
     switch (type) {
       case 'created':
         return 'bg-green-100 text-green-800'

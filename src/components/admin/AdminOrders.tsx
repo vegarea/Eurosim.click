@@ -1,41 +1,26 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { OrderStatus } from "@/types/database/enums"
-import { useOrdersData } from "@/hooks/useOrdersData"
-import { Loader2 } from "lucide-react"
+import { Order, OrderStatus } from "./orders/types"
+import { useOrders } from "@/contexts/OrdersContext"
+import { toast } from "sonner"
 
 export function AdminOrders() {
-  const { orders, isLoading, error, updateOrder } = useOrdersData()
+  const { orders, updateOrder } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.customers?.name || '').toLowerCase().includes(search.toLowerCase())
+      (order.customer_name || '').toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrder(orderId, { status: newStatus })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8 text-red-500">
-        Error al cargar los pedidos. Por favor, intenta de nuevo.
-      </div>
-    )
+    toast.success("Estado del pedido actualizado correctamente")
   }
 
   return (

@@ -6,59 +6,27 @@ import { InfoIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function PaymentStep() {
-  const [selectedMethod, setSelectedMethod] = useState<string>("test");
+  const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <RadioGroup
-          defaultValue="test"
+          defaultValue="stripe"
           onValueChange={setSelectedMethod}
           className="grid gap-4"
         >
-          {/* Test Payment Option */}
-          <div>
-            <RadioGroupItem
-              value="test"
-              id="test"
-              className="peer sr-only"
-            />
-            <Label
-              htmlFor="test"
-              className={cn(
-                "flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer",
-              )}
-            >
-              <div className="flex w-full items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <InfoIcon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Pago de prueba
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Solo para testing
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Label>
-          </div>
-
-          {/* Stripe Option - Disabled for now */}
+          {/* Stripe Option */}
           <div>
             <RadioGroupItem
               value="stripe"
               id="stripe"
               className="peer sr-only"
-              disabled
             />
             <Label
               htmlFor="stripe"
               className={cn(
-                "flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-not-allowed opacity-60",
+                "flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-transparent p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer",
               )}
             >
               <div className="flex w-full items-center justify-between">
@@ -73,7 +41,7 @@ export function PaymentStep() {
                       Pagar con tarjeta
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Próximamente
+                      Débito o Crédito
                     </p>
                   </div>
                 </div>
@@ -81,7 +49,7 @@ export function PaymentStep() {
             </Label>
           </div>
 
-          {/* PayPal Option - Disabled */}
+          {/* PayPal Option */}
           <div>
             <RadioGroupItem
               value="paypal"
@@ -116,13 +84,23 @@ export function PaymentStep() {
           </div>
         </RadioGroup>
 
-        {selectedMethod === "test" && (
-          <Alert className="bg-yellow-50 border-yellow-200 mt-4">
-            <InfoIcon className="h-4 w-4 text-yellow-500" />
-            <AlertDescription className="text-yellow-700">
-              Este es un método de pago de prueba. El pedido se procesará automáticamente como pagado.
+        {selectedMethod === "paypal" && (
+          <Alert variant="info" className="bg-blue-50 border-blue-200 mt-4">
+            <InfoIcon className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="text-blue-700">
+              El pago con PayPal no está disponible en este momento. Por favor, selecciona otro método de pago.
             </AlertDescription>
           </Alert>
+        )}
+
+        {selectedMethod === "stripe" && (
+          <div className="mt-6 space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="text-sm text-gray-600">
+                Serás redirigido a Stripe para completar tu pago de forma segura.
+              </p>
+            </div>
+          </div>
         )}
       </div>
     </div>

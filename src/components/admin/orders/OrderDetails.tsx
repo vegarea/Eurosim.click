@@ -1,12 +1,11 @@
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { useOrdersData } from "@/hooks/useOrdersData"
+import { useOrders } from "@/contexts/OrdersContext"
 import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
 import { OrderStatus } from "@/types/database/enums"
-import { OrderMetadata } from "@/types/database/common"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
@@ -18,6 +17,7 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
+import { OrderNote } from "@/types/database/common"
 
 const statusOrder = [
   "payment_pending",
@@ -26,6 +26,7 @@ const statusOrder = [
   "delivered",
 ] as const
 
+// Mock payment data - In a real app, this would come from your payment provider's API
 const mockPaymentData = {
   paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
   logs: [
@@ -36,17 +37,10 @@ const mockPaymentData = {
 
 export default function OrderDetails() {
   const { orderId } = useParams()
-  const { orders, updateOrder } = useOrdersData()
+  const { orders, updateOrder } = useOrders()
   const order = orders.find(o => o.id === orderId)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
-
-  const getProgressPercentage = () => {
-    if (!order) return 0
-    const currentIndex = statusOrder.indexOf(order.status as any)
-    if (currentIndex === -1) return 0
-    return ((currentIndex + 1) / statusOrder.length) * 100
-  }
 
   if (!order) {
     return (
@@ -71,49 +65,38 @@ export default function OrderDetails() {
   }
 
   const confirmStatusChange = () => {
-    if (pendingStatus && order) {
-      const currentMetadata = order.metadata as OrderMetadata | null
-      const currentEvents = currentMetadata?.events || []
-      
-      const newEvent = {
-        id: crypto.randomUUID(),
-        type: "status_changed",
-        description: `Estado actualizado a ${pendingStatus}`,
-        created_at: new Date().toISOString(),
-        user_id: "current-user-id",
-        user_name: "Admin",
-        metadata: {
-          oldStatus: order.status,
-          newStatus: pendingStatus,
-          automated: false
-        }
-      }
-
-      updateOrder(order.id, {
-        status: pendingStatus,
-        metadata: {
-          ...currentMetadata,
-          events: [...currentEvents, newEvent]
-        }
-      })
-      
+    if (pendingStatus) {
+      updateOrder(order.id, { status: pendingStatus })
       toast.success("Estado actualizado correctamente")
       setShowConfirmDialog(false)
     }
   }
 
   const handleAddNote = (text: string) => {
-    if (!order) return
-    
+    const newNote: OrderNote = {
+      id: crypto.randomUUID(),
+      text,
+      user_id: "current-user-id", // En una app real, esto vendría del contexto de autenticación
+      user_name: "Admin", // En una app real, esto vendría del contexto de autenticación
+      created_at: new Date().toISOString()
+    }
+
     const currentNotes = order.notes || []
     updateOrder(order.id, {
-      notes: [...currentNotes, text]
+      notes: [newNote, ...currentNotes]
     })
+  }
+
+  const getProgressPercentage = () => {
+    const currentIndex = statusOrder.indexOf(order.status as any)
+    if (currentIndex === -1) return 0
+    return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Header y Navegación */}
         <div className="flex items-center justify-between">
           <Link to="/admin/orders">
             <Button variant="ghost" className="gap-2">
@@ -122,6 +105,7 @@ export default function OrderDetails() {
           </Link>
         </div>
 
+        {/* Estado del Pedido y Progreso */}
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
@@ -140,11 +124,13 @@ export default function OrderDetails() {
           </div>
         </div>
 
+        {/* Control de Estado */}
         <OrderCustomerInfo 
           order={order} 
           onStatusChange={handleStatusChange}
         />
 
+        {/* Grid de 2 columnas para información principal */}
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-6">
             <OrderBasicInfo order={order} />
@@ -159,7 +145,8 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        <OrderHistory events={(order.metadata as OrderMetadata)?.events} />
+        {/* Historial completo */}
+        <OrderHistory events={order.events} />
 
         <OrderStatusConfirmDialog
           open={showConfirmDialog}

@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight } from "lucide-react"
-import { useEffect, useState } from "react"
 
 interface CheckoutNavigationProps {
   step: number;
@@ -17,19 +16,6 @@ export function CheckoutNavigation({
   onSubmit,
   formData 
 }: CheckoutNavigationProps) {
-  // Temporalmente establecemos canProceed siempre como true
-  const [canProceed, setCanProceed] = useState(true);
-
-  useEffect(() => {
-    console.log("CheckoutNavigation state:", {
-      step,
-      isFormValid,
-      formData
-    });
-    // Temporalmente mantenemos setCanProceed como true
-    setCanProceed(true);
-  }, [step, isFormValid, formData]);
-
   return (
     <div className="flex justify-between mt-8">
       {step > 1 && (
@@ -45,8 +31,8 @@ export function CheckoutNavigation({
       {step < 4 && (
         <Button
           className="ml-auto flex items-center gap-2"
-          onClick={() => onSubmit(formData)}
-          // Temporalmente removemos la condición disabled
+          onClick={() => isFormValid && onSubmit(formData)}
+          disabled={!isFormValid}
         >
           Siguiente
           <ArrowRight className="w-4 h-4" />

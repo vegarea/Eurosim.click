@@ -4,7 +4,6 @@ import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { PaymentStep } from "@/components/checkout/PaymentStep"
 import { ESimForm } from "@/components/checkout/ESimForm"
-import { useEffect, useState } from "react"
 
 interface CheckoutContentProps {
   step: number;
@@ -27,45 +26,6 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
-  const [currentStepValid, setCurrentStepValid] = useState(false);
-
-  // Validar el estado inicial cuando cambia el paso
-  useEffect(() => {
-    console.log("CheckoutContent: Step changed", {
-      step,
-      hasPhysicalSim,
-      formData,
-      currentStepValid
-    });
-    
-    // Reset validation state when step changes
-    setCurrentStepValid(false);
-    onFormValidityChange(false);
-  }, [step]);
-
-  const handleValidityChange = (isValid: boolean) => {
-    console.log("CheckoutContent: Form validity changed", { 
-      step, 
-      isValid,
-      previousValidity: currentStepValid 
-    });
-    
-    setCurrentStepValid(isValid);
-    onFormValidityChange(isValid);
-  };
-
-  const handleFormSubmit = (values: any) => {
-    console.log("CheckoutContent: Form submitted", { 
-      step, 
-      values,
-      isValid: currentStepValid 
-    });
-    
-    if (currentStepValid) {
-      onFormSubmit(values);
-    }
-  };
-
   const renderStepContent = () => {
     switch (step) {
       case 1:
@@ -81,14 +41,14 @@ export function CheckoutContent({
             )}
             {hasPhysicalSim ? (
               <ShippingForm 
-                onSubmit={handleFormSubmit}
-                onValidityChange={handleValidityChange}
+                onSubmit={onFormSubmit}
+                onValidityChange={onFormValidityChange}
                 initialData={isTestMode ? testData.shipping : undefined}
               />
             ) : (
               <ESimForm 
-                onSubmit={handleFormSubmit}
-                onValidityChange={handleValidityChange}
+                onSubmit={onFormSubmit}
+                onValidityChange={onFormValidityChange}
                 initialData={isTestMode ? {
                   fullName: testData.documentation.fullName,
                   email: testData.documentation.email,
@@ -101,8 +61,8 @@ export function CheckoutContent({
       case 2:
         return (
           <DocumentationForm
-            onSubmit={handleFormSubmit}
-            onValidityChange={handleValidityChange}
+            onSubmit={onFormSubmit}
+            onValidityChange={onFormValidityChange}
             initialData={isTestMode ? testData.documentation : undefined}
           />
         );

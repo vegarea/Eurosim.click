@@ -11,7 +11,6 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
-import { supabase } from "@/integrations/supabase/client"
 
 const testData = {
   shipping: {

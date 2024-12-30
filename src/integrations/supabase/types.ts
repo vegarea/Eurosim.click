@@ -115,7 +115,7 @@ export type Database = {
           activation_date: string | null
           carrier: string | null
           created_at: string | null
-          customer_id: string | null
+          customer_id: string
           id: string
           metadata: Json | null
           notes: string[] | null
@@ -138,7 +138,7 @@ export type Database = {
           activation_date?: string | null
           carrier?: string | null
           created_at?: string | null
-          customer_id?: string | null
+          customer_id: string
           id?: string
           metadata?: Json | null
           notes?: string[] | null
@@ -161,7 +161,7 @@ export type Database = {
           activation_date?: string | null
           carrier?: string | null
           created_at?: string | null
-          customer_id?: string | null
+          customer_id?: string
           id?: string
           metadata?: Json | null
           notes?: string[] | null
@@ -306,7 +306,7 @@ export type Database = {
         | "delivered"
         | "cancelled"
       order_type: "physical" | "esim"
-      payment_method: "stripe" | "paypal" | "test"
+      payment_method: "stripe" | "paypal"
       payment_status: "pending" | "completed" | "failed" | "refunded"
       product_status: "active" | "inactive" | "out_of_stock"
       product_type: "physical" | "esim"
