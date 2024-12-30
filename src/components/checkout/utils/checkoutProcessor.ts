@@ -2,24 +2,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { checkoutLogger } from "./checkoutLogger";
 import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
-import { OrderItem } from "@/types/database/orderItems";
-import { OrderItemMetadata } from "@/types/database/orderItems";
-import { CustomerGender } from "@/types/database/enums";
+import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
+import { CustomerGender, OrderStatus, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 
-interface CartItem {
-  id: string;
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
+interface CartItem extends OrderItem {
   title: string;
   type: "physical" | "esim";
-  metadata?: OrderItemMetadata;
 }
 
 export class CheckoutProcessor {
   constructor(
-    private formData: any,
+    private formData: Record<string, any>,
     private cartItems: CartItem[],
     private totalAmount: number
   ) {}
@@ -33,7 +26,6 @@ export class CheckoutProcessor {
         { formData: this.formData, items: this.cartItems }
       );
 
-      // 1. Validar carrito
       if (this.cartItems.length === 0) {
         throw new Error("El carrito está vacío");
       }
@@ -45,7 +37,6 @@ export class CheckoutProcessor {
         { items: this.cartItems }
       );
 
-      // 2. Crear cliente
       const customer = await this.createCustomer();
       checkoutLogger.log(
         "creating_customer",
@@ -54,7 +45,6 @@ export class CheckoutProcessor {
         { customerId: customer.id }
       );
 
-      // 3. Crear orden
       const order = await this.createOrder(customer.id);
       checkoutLogger.log(
         "creating_order",
@@ -63,20 +53,12 @@ export class CheckoutProcessor {
         { orderId: order.id }
       );
 
-      // 4. Crear items de la orden
       const orderItems = await this.createOrderItems(order.id);
       checkoutLogger.log(
         "creating_order_items",
         "success",
         "Items de orden creados exitosamente",
         { orderItems }
-      );
-
-      checkoutLogger.log(
-        "checkout_completed",
-        "success",
-        "Proceso de checkout completado exitosamente",
-        { orderId: order.id }
       );
 
       return {
@@ -104,7 +86,12 @@ export class CheckoutProcessor {
       passport_number: this.formData.passportNumber,
       birth_date: this.formData.birthDate,
       gender: this.formData.gender as CustomerGender,
-      default_shipping_address: this.formData.shippingAddress || null
+      default_shipping_address: this.formData.shippingAddress || null,
+      marketing_preferences: {
+        email_marketing: false,
+        sms_marketing: false,
+        push_notifications: false
+      }
     };
 
     const { data, error } = await supabase
@@ -122,12 +109,12 @@ export class CheckoutProcessor {
     const orderData = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending",
+      status: "payment_pending" as OrderStatus,
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test",
-      payment_status: "completed",
+      payment_method: "test" as PaymentMethod,
+      payment_status: "completed" as PaymentStatus,
       shipping_address: this.formData.shippingAddress || null
     };
 

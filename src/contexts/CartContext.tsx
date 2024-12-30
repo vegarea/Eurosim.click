@@ -2,10 +2,14 @@ import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
 import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
-import { Json } from "@/types/database/common";
+
+interface CartItem extends OrderItem {
+  title: string;
+  type: "physical" | "esim";
+}
 
 interface CartContextType {
-  items: OrderItem[];
+  items: CartItem[];
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -15,7 +19,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<OrderItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
 
   const addItem = (product: Product) => {
@@ -36,13 +40,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       const tempOrderId = crypto.randomUUID();
       
-      const newItem: OrderItem = {
+      const newItem: CartItem = {
         id: crypto.randomUUID(),
         order_id: tempOrderId,
         product_id: product.id,
         quantity: 1,
         unit_price: product.price,
         total_price: product.price,
+        title: product.title,
+        type: product.type,
         metadata: {
           product_title: product.title,
           product_type: product.type,
