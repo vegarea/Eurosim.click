@@ -2,6 +2,7 @@ import { DocumentationForm } from "./DocumentationForm"
 import { ShippingForm } from "./ShippingForm"
 import { ReviewStep } from "./ReviewStep"
 import { ShippingFormValues } from "./shipping/types"
+import { DocumentationFormValues } from "./documentation/types"
 import { Json } from "@/types/database/common"
 
 interface CheckoutContentProps {

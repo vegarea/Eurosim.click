@@ -16,3 +16,12 @@ export const shippingFormSchema = z.object({
 })
 
 export type ShippingFormValues = z.infer<typeof shippingFormSchema>
+
+export interface ShippingFormProps {
+  onSubmit: (values: ShippingFormValues) => void
+  onValidityChange?: (isValid: boolean) => void
+  email?: string
+  initialData?: ShippingFormValues
+  isTestMode?: boolean
+  testData?: Partial<ShippingFormValues>
+}

@@ -1,25 +1,19 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormField } from "@/components/ui/form"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
-import { shippingFormSchema, type ShippingFormValues } from "./shipping/types"
-import { Json } from "@/types/database/common"
-
-interface ShippingFormProps {
-  onSubmit: (values: ShippingFormValues) => void
-  onValidityChange?: (isValid: boolean) => void
-  email?: string
-  initialData?: ShippingFormValues
-}
+import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps } from "./shipping/types"
 
 export function ShippingForm({ 
   onSubmit, 
   onValidityChange, 
   email = '', 
-  initialData 
+  initialData,
+  isTestMode,
+  testData
 }: ShippingFormProps) {
   const [showLocationFields, setShowLocationFields] = useState(false)
   
@@ -36,6 +30,18 @@ export function ShippingForm({
     },
     mode: "onChange"
   })
+
+  // Si estamos en modo test y tenemos datos de prueba, los usamos
+  useEffect(() => {
+    if (isTestMode && testData) {
+      Object.entries(testData).forEach(([key, value]) => {
+        if (value) {
+          form.setValue(key as keyof ShippingFormValues, value);
+        }
+      });
+      setShowLocationFields(true);
+    }
+  }, [isTestMode, testData, form]);
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
