@@ -11,8 +11,6 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
-import { CheckoutLogger } from "@/components/checkout/CheckoutLogger"
-import { useCheckoutLogger } from "@/hooks/useCheckoutLogger"
 
 const testData = {
   shipping: {
@@ -43,13 +41,11 @@ export default function Checkout() {
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { addLog } = useCheckoutLogger()
   
   const hasPhysicalSim = items.some(item => item.type === "physical")
 
   useEffect(() => {
     if (items.length === 0) {
-      addLog('warning', 'Carrito vacío, redirigiendo al inicio')
       toast({
         title: "Carrito vacío",
         description: "Agrega productos a tu carrito para continuar con la compra",
@@ -57,69 +53,48 @@ export default function Checkout() {
       })
       navigate('/')
     }
-  }, [items, navigate, toast, addLog])
+  }, [items, navigate, toast])
 
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
       { ...testData.shipping, ...testData.documentation } :
-      testData.documentation
+      testData.documentation;
     
-    setFormData(data)
-    setIsFormValid(true)
-    setIsTestMode(true)
+    setFormData(data);
+    setIsFormValid(true);
+    setIsTestMode(true);
     
-    addLog('info', 'Datos de prueba cargados', data)
     toast({
       title: "Modo de prueba activado",
       description: "Se han cargado datos de prueba para facilitar el testing",
-    })
-  }
+    });
+  };
 
   const handleFormValidityChange = (isValid: boolean) => {
     setIsFormValid(isValid)
-    addLog('info', `Validación del formulario: ${isValid ? 'correcta' : 'incorrecta'}`)
   }
 
   const handleFormSubmit = (values: any) => {
-    addLog('info', 'Datos del formulario enviados', values)
+    const formDataWithShippingAddress = {
+      ...values,
+      shipping_address: values.shippingAddress as unknown as Json
+    };
     
-    try {
-      const formDataWithShippingAddress = {
-        ...values,
-        shipping_address: values.shippingAddress as unknown as Json
-      }
-      
-      setFormData({ ...formData, ...formDataWithShippingAddress })
-      
-      // Guardar en localStorage
-      Object.entries(values).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          localStorage.setItem(`checkout_${key}`, 
-            typeof value === 'object' ? JSON.stringify(value) : String(value)
-          )
-        }
-      })
-      
-      if (step < 3) {
-        setStep(step + 1)
-        setIsFormValid(false)
-        addLog('success', `Avanzando al paso ${step + 1}`)
-      }
-    } catch (error) {
-      addLog('error', 'Error al procesar el formulario', error)
+    setFormData({ ...formData, ...formDataWithShippingAddress });
+    if (step < 3) {
+      setStep(step + 1);
+      setIsFormValid(false);
     }
   }
 
   const handleUpdateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
-    addLog('info', `Campo actualizado: ${field}`, { [field]: value })
   }
 
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1)
       setIsFormValid(true)
-      addLog('info', `Retrocediendo al paso ${step - 1}`)
     }
   }
 
@@ -130,7 +105,7 @@ export default function Checkout() {
   }, [step])
 
   if (items.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -191,8 +166,6 @@ export default function Checkout() {
           </div>
         </div>
       </main>
-      
-      <CheckoutLogger />
     </div>
-  )
+  );
 }
