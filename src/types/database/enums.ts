@@ -16,4 +16,9 @@ export type PaymentMethod = "stripe" | "paypal" | "test";
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
 export type ProductStatus = "active" | "inactive" | "out_of_stock";
 export type ProductType = "physical" | "esim";
-export type CustomerGender = "M" | "F";
+
+// Change from type to enum to use it as a value
+export enum CustomerGender {
+  M = "M",
+  F = "F"
+}
