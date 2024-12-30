@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
+import { OrderStatus } from "@/types/database/enums"
 
 export function TestPaymentButton() {
   const { items, clearCart } = useCart()
@@ -14,12 +15,12 @@ export function TestPaymentButton() {
       // Crear la orden primero
       const orderData = {
         product_id: items[0].product_id,
-        status: 'processing',
+        status: 'processing' as OrderStatus,
         type: items[0].metadata?.product_type || 'esim',
         total_amount: items.reduce((acc, item) => acc + item.total_price, 0),
         quantity: items.reduce((acc, item) => acc + item.quantity, 0),
-        payment_method: 'test' as const, // Especificamos el tipo literal
-        payment_status: 'completed' as const // Especificamos el tipo literal
+        payment_method: 'test' as const,
+        payment_status: 'completed' as const
       }
 
       const { data: order, error: orderError } = await supabase
