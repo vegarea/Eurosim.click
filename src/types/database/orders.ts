@@ -3,7 +3,7 @@ import { Json, OrderEvent, OrderNote } from "./common";
 
 export interface Order {
   id: string;
-  customer_id: string;
+  customer_id: string | null;
   product_id: string;
   status: OrderStatus;
   type: OrderType;
@@ -19,15 +19,10 @@ export interface Order {
   tracking_number: string | null;
   carrier: string | null;
   activation_date: string | null;
-  notes: OrderNote[] | null;
-  metadata: Record<string, any> | null;
+  notes: string[] | null;
+  metadata: Json | null;
   created_at: string | null;
   updated_at: string | null;
-  // UI specific fields
-  customer_name?: string;
-  customer_email?: string;
-  customer_phone?: string;
-  events?: OrderEvent[];
 }
 
 export type OrderInsert = Omit<Order, "id" | "created_at" | "updated_at">;

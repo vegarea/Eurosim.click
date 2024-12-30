@@ -1,8 +1,6 @@
-import { CustomerGender } from "./enums";
 import { Json } from "./common";
-import { Order } from "./orders";
+import { CustomerGender } from "./enums";
 
-// Tipo que coincide exactamente con la estructura de Supabase
 export interface Customer {
   id: string;
   name: string;
@@ -20,12 +18,6 @@ export interface Customer {
   metadata: Json | null;
   created_at: string | null;
   updated_at: string | null;
-}
-
-// Tipo extendido para incluir información calculada en el frontend
-export interface ExtendedCustomer extends Customer {
-  orders: Order[];
-  totalSpent: number;
 }
 
 export type CustomerInsert = Omit<Customer, "id" | "created_at" | "updated_at">;

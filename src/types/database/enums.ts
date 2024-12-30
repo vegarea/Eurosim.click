@@ -7,6 +7,8 @@ export type OrderStatus =
   | "cancelled";
 
 export type OrderType = "physical" | "esim";
-export type PaymentMethod = "stripe" | "paypal";
+export type PaymentMethod = "stripe" | "paypal" | "test";
 export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+export type ProductStatus = "active" | "inactive" | "out_of_stock";
+export type ProductType = "physical" | "esim";
 export type CustomerGender = "M" | "F";
