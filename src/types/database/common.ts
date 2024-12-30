@@ -3,6 +3,7 @@
  * This file contains types that match Supabase schema exactly.
  * DO NOT MODIFY without explicit user permission.
  */
+
 export type Json =
   | string
   | number
@@ -12,7 +13,10 @@ export type Json =
   | Json[]
 
 export interface OrderEvent {
-  type: string;
-  timestamp: string;
-  details?: Record<string, any>;
+  id: string
+  type: "created" | "status_changed" | "payment_processed" | "shipping_updated" | "note_added" | "document_validated"
+  description: string
+  user_id?: string
+  metadata?: Record<string, any>
+  created_at: string
 }
