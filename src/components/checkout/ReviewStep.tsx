@@ -4,6 +4,7 @@ import { useCart } from "@/contexts/CartContext"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
+import { Json } from "@/integrations/supabase/types"
 
 interface ReviewStepProps {
   formData: any
@@ -60,7 +61,7 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
           payment_status: 'completed',
           shipping_address: formData.shippingAddress || null,
           activation_date: formData.activationDate || null,
-          product_id: items[0].product_id, // Requerido por Supabase
+          product_id: items[0].product_id,
         })
         .select()
         .single()
@@ -74,7 +75,12 @@ export function ReviewStep({ formData, onUpdateField }: ReviewStepProps) {
         quantity: item.quantity,
         unit_price: item.unit_price,
         total_price: item.total_price,
-        metadata: item.metadata
+        metadata: {
+          product_title: item.metadata.product_title,
+          product_type: item.metadata.product_type,
+          data_eu_gb: item.metadata.data_eu_gb,
+          data_es_gb: item.metadata.data_es_gb
+        } as Json
       }))
 
       const { error: itemsError } = await supabase
