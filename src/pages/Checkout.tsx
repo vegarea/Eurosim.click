@@ -100,6 +100,10 @@ export default function Checkout() {
     }
   }
 
+  const handleCheckout = () => {
+    handleFormSubmit(formData);
+  }
+
   useEffect(() => {
     if (step === 3) {
       setIsFormValid(true)
@@ -158,7 +162,7 @@ export default function Checkout() {
                 <Cart 
                   showCheckoutButton={step === 3} 
                   isButtonEnabled={isFormValid}
-                  onCheckout={handleFormSubmit}
+                  onCheckout={handleCheckout}
                 />
                 <div className="mt-4">
                   <PaymentSecurity />
