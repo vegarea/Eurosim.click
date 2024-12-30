@@ -8,23 +8,39 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useCheckoutLogger } from "./CheckoutLogger";
 
 export function PaymentStep() {
   const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
   const [isProcessing, setIsProcessing] = useState(false);
   const { items, clearCart } = useCart();
   const { toast } = useToast();
+  const { logCheckoutEvent } = useCheckoutLogger();
 
   const handleTestPayment = async () => {
     try {
       setIsProcessing(true);
+      
+      const fullName = localStorage.getItem('checkout_fullName');
+      const email = localStorage.getItem('checkout_email');
+      
+      if (!fullName || !email) {
+        throw new Error('Faltan datos requeridos del cliente');
+      }
+
+      logCheckoutEvent({
+        step: 3,
+        action: 'Iniciando pago de prueba',
+        status: 'info',
+        data: { fullName, email }
+      });
 
       // 1. Crear el cliente
       const { data: customer, error: customerError } = await supabase
         .from('customers')
         .insert({
-          name: localStorage.getItem('checkout_fullName'),
-          email: localStorage.getItem('checkout_email'),
+          name: fullName,
+          email: email,
           phone: localStorage.getItem('checkout_phone'),
           passport_number: localStorage.getItem('checkout_passportNumber'),
           birth_date: localStorage.getItem('checkout_birthDate'),
@@ -35,7 +51,22 @@ export function PaymentStep() {
         .select()
         .single();
 
-      if (customerError) throw customerError;
+      if (customerError) {
+        logCheckoutEvent({
+          step: 3,
+          action: 'Error al crear cliente',
+          status: 'error',
+          data: customerError
+        });
+        throw customerError;
+      }
+
+      logCheckoutEvent({
+        step: 3,
+        action: 'Cliente creado exitosamente',
+        status: 'success',
+        data: customer
+      });
 
       // 2. Crear la orden
       const { data: order, error: orderError } = await supabase
@@ -57,7 +88,22 @@ export function PaymentStep() {
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        logCheckoutEvent({
+          step: 3,
+          action: 'Error al crear orden',
+          status: 'error',
+          data: orderError
+        });
+        throw orderError;
+      }
+
+      logCheckoutEvent({
+        step: 3,
+        action: 'Orden creada exitosamente',
+        status: 'success',
+        data: order
+      });
 
       // 3. Crear los items de la orden
       const orderItems = items.map(item => ({
@@ -72,13 +118,28 @@ export function PaymentStep() {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        logCheckoutEvent({
+          step: 3,
+          action: 'Error al crear items de la orden',
+          status: 'error',
+          data: itemsError
+        });
+        throw itemsError;
+      }
 
       // 4. Limpiar carrito y mostrar éxito
       clearCart();
       toast({
         title: "¡Compra de prueba exitosa!",
         description: `Orden creada con ID: ${order.id}`,
+      });
+
+      logCheckoutEvent({
+        step: 3,
+        action: 'Compra de prueba completada',
+        status: 'success',
+        data: { orderId: order.id }
       });
 
       // 5. Limpiar localStorage
