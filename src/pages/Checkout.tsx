@@ -42,7 +42,9 @@ export default function Checkout() {
   const { toast } = useToast()
   const navigate = useNavigate()
   
-  const hasPhysicalSim = items.some(item => item.type === "physical")
+  const hasPhysicalSim = items.some(item => 
+    item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
+  )
 
   useEffect(() => {
     if (items.length === 0) {
@@ -167,5 +169,5 @@ export default function Checkout() {
         </div>
       </main>
     </div>
-  );
+  )
 }

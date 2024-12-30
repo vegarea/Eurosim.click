@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Product } from "@/types/database/products";
 
 const Sims = () => {
   const isMobile = useIsMobile();
@@ -22,7 +23,13 @@ const Sims = () => {
         .eq('status', 'active');
       
       if (error) throw error;
-      return data;
+      
+      // Asegurarnos de que los datos coincidan con el tipo Product
+      return (data as Product[]).map(product => ({
+        ...product,
+        features: product.features || [],
+        metadata: product.metadata || {}
+      }));
     }
   });
 
