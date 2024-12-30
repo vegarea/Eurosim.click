@@ -1,19 +1,50 @@
-import { useState } from "react";
-import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
-import { formatCurrency } from "@/utils/currency";
+import { useState } from "react"
+import { PaymentMethodSelector } from "./payment/PaymentMethodSelector"
+import { Button } from "@/components/ui/button"
+import { useCart } from "@/contexts/CartContext"
+import { formatCurrency } from "@/utils/currency"
+import { CheckoutProcessor } from "./utils/checkoutProcessor"
+import { useNavigate } from "react-router-dom"
 
 interface PaymentStepProps {
-  onSubmit?: () => void;
+  formData: any
+  onSubmit?: () => void
 }
 
-export function PaymentStep({ onSubmit }: PaymentStepProps) {
-  const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
-  const { items } = useCart();
+export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
+  const [selectedMethod, setSelectedMethod] = useState<string>("stripe")
+  const [isProcessing, setIsProcessing] = useState(false)
+  const { items, clearCart } = useCart()
+  const navigate = useNavigate()
 
   // Calcular el total
-  const total = items.reduce((sum, item) => sum + item.total_price, 0);
+  const total = items.reduce((sum, item) => sum + item.total_price, 0)
+
+  const handleCompleteOrder = async () => {
+    try {
+      setIsProcessing(true)
+
+      const processor = new CheckoutProcessor(
+        formData,
+        items,
+        total
+      )
+
+      const result = await processor.process()
+
+      if (result.success) {
+        clearCart()
+        onSubmit?.()
+        // TODO: Redireccionar a página de éxito cuando esté implementada
+        navigate("/")
+      }
+
+    } catch (error) {
+      console.error("Error processing checkout:", error)
+    } finally {
+      setIsProcessing(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -39,11 +70,12 @@ export function PaymentStep({ onSubmit }: PaymentStepProps) {
         <Button 
           className="w-full"
           size="lg"
-          onClick={onSubmit}
+          onClick={handleCompleteOrder}
+          disabled={isProcessing}
         >
-          Completar Orden
+          {isProcessing ? "Procesando..." : "Completar Orden"}
         </Button>
       </div>
     </div>
-  );
+  )
 }
