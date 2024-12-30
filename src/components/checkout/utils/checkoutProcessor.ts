@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
-import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
+import { OrderItem } from "@/types/database/orderItems";
 import { CustomerGender, OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
@@ -84,15 +84,15 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
-    const customerData = {
+    const customerData: Omit<Customer, 'id' | 'created_at' | 'updated_at'> = {
       name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone || null,
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
       gender: this.formData.gender as CustomerGender | null,
-      default_shipping_address: this.formData.shippingAddress as Json || null,
-      billing_address: null as Json | null,
+      default_shipping_address: this.formData.shippingAddress as Json,
+      billing_address: null,
       preferred_language: 'es',
       marketing_preferences: {
         email_marketing: false,
@@ -116,16 +116,16 @@ export class CheckoutProcessor {
 
   private async createOrder(customerId: string): Promise<Order> {
     const firstItem = this.cartItems[0];
-    const orderData = {
+    const orderData: Omit<Order, 'id' | 'created_at' | 'updated_at'> = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending" as OrderStatus,
+      status: 'payment_pending' as OrderStatus,
       type: firstItem.type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test" as PaymentMethod,
-      payment_status: "pending" as PaymentStatus,
-      shipping_address: this.formData.shippingAddress as Json || null,
+      payment_method: 'test' as PaymentMethod,
+      payment_status: 'pending' as PaymentStatus,
+      shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
       activation_date: null,
@@ -148,7 +148,7 @@ export class CheckoutProcessor {
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItemsData = this.cartItems.map(item => ({
+    const orderItemsData: Omit<OrderItem, 'id' | 'created_at' | 'updated_at'>[] = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       quantity: item.quantity,
@@ -157,7 +157,7 @@ export class CheckoutProcessor {
       metadata: {
         product_title: item.title,
         product_type: item.type
-      } as Json
+      } as unknown as OrderItem['metadata']
     }));
 
     const { data, error } = await supabase
