@@ -4,9 +4,106 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 export function PaymentStep() {
   const [selectedMethod, setSelectedMethod] = useState<string>("stripe");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { items, clearCart } = useCart();
+  const { toast } = useToast();
+
+  const handleTestPayment = async () => {
+    try {
+      setIsProcessing(true);
+
+      // 1. Crear el cliente
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .insert({
+          name: localStorage.getItem('checkout_fullName'),
+          email: localStorage.getItem('checkout_email'),
+          phone: localStorage.getItem('checkout_phone'),
+          passport_number: localStorage.getItem('checkout_passportNumber'),
+          birth_date: localStorage.getItem('checkout_birthDate'),
+          default_shipping_address: localStorage.getItem('checkout_shippingAddress') ? 
+            JSON.parse(localStorage.getItem('checkout_shippingAddress') || '{}') : 
+            null
+        })
+        .select()
+        .single();
+
+      if (customerError) throw customerError;
+
+      // 2. Crear la orden
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_id: customer.id,
+          product_id: items[0].id,
+          status: 'processing',
+          type: items[0].type,
+          total_amount: items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+          quantity: items[0].quantity,
+          payment_method: 'test',
+          payment_status: 'completed',
+          shipping_address: localStorage.getItem('checkout_shippingAddress') ? 
+            JSON.parse(localStorage.getItem('checkout_shippingAddress') || '{}') : 
+            null,
+          activation_date: localStorage.getItem('checkout_activationDate')
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // 3. Crear los items de la orden
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        quantity: item.quantity,
+        unit_price: item.price,
+        total_price: item.price * item.quantity
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // 4. Limpiar carrito y mostrar éxito
+      clearCart();
+      toast({
+        title: "¡Compra de prueba exitosa!",
+        description: `Orden creada con ID: ${order.id}`,
+      });
+
+      // 5. Limpiar localStorage
+      const checkoutKeys = [
+        'checkout_fullName',
+        'checkout_email',
+        'checkout_phone',
+        'checkout_passportNumber',
+        'checkout_birthDate',
+        'checkout_shippingAddress',
+        'checkout_activationDate'
+      ];
+      checkoutKeys.forEach(key => localStorage.removeItem(key));
+
+    } catch (error) {
+      console.error('Error en pago de prueba:', error);
+      toast({
+        title: "Error en la compra de prueba",
+        description: "Hubo un error al procesar la compra de prueba.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -92,6 +189,20 @@ export function PaymentStep() {
             </AlertDescription>
           </Alert>
         )}
+
+        {/* Botón de prueba */}
+        <div className="mt-6">
+          <Button
+            onClick={handleTestPayment}
+            disabled={isProcessing}
+            className="w-full bg-yellow-500 hover:bg-yellow-600"
+          >
+            {isProcessing ? "Procesando..." : "Pagar con Test (Simulación)"}
+          </Button>
+          <p className="text-sm text-gray-500 mt-2 text-center">
+            Este botón simula un pago exitoso para pruebas
+          </p>
+        </div>
 
         {selectedMethod === "stripe" && (
           <div className="mt-6 space-y-4">
