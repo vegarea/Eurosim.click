@@ -3,7 +3,7 @@ import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
 import { OrderItem, OrderItemMetadata } from "@/types/database/orderItems";
 import { CustomerGender } from "@/types/database/enums";
-import { Json } from "@/types/database/common";
+import { checkoutLogger } from "./checkoutLogger";
 
 interface CartItem extends OrderItem {
   title: string;
@@ -79,13 +79,13 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
-    const customerData: Omit<Customer, 'id' | 'created_at' | 'updated_at'> = {
+    const customerData = {
       name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone,
       passport_number: this.formData.passportNumber,
       birth_date: this.formData.birthDate,
-      gender: this.formData.gender as CustomerGender,
+      gender: this.formData.gender as CustomerGender | null,
       default_shipping_address: this.formData.shippingAddress || null,
       billing_address: null,
       preferred_language: 'es',
@@ -111,7 +111,7 @@ export class CheckoutProcessor {
 
   private async createOrder(customerId: string): Promise<Order> {
     const firstItem = this.cartItems[0];
-    const orderData: Omit<Order, 'id' | 'created_at' | 'updated_at'> = {
+    const orderData = {
       customer_id: customerId,
       product_id: firstItem.product_id,
       status: "payment_pending",
@@ -125,11 +125,7 @@ export class CheckoutProcessor {
       carrier: null,
       activation_date: null,
       notes: [],
-      metadata: {},
-      stripe_payment_intent_id: null,
-      stripe_receipt_url: null,
-      paypal_order_id: null,
-      paypal_receipt_url: null
+      metadata: {}
     };
 
     const { data, error } = await supabase
@@ -143,7 +139,7 @@ export class CheckoutProcessor {
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItems: Omit<OrderItem, 'id' | 'created_at' | 'updated_at'>[] = this.cartItems.map(item => ({
+    const orderItemsData = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       quantity: item.quantity,
@@ -157,7 +153,7 @@ export class CheckoutProcessor {
 
     const { data, error } = await supabase
       .from("order_items")
-      .insert(orderItems)
+      .insert(orderItemsData)
       .select();
 
     if (error) throw error;

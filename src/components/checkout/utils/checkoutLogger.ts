@@ -30,29 +30,13 @@ class CheckoutLogger {
     };
 
     this.logs.push(logEntry);
-
-    // Console log con formato
-    const logStyle = this.getLogStyle(status);
     console.group(`[Checkout: ${step}]`);
-    console.log('%cStatus:', logStyle, status.toUpperCase());
+    console.log(`Status: ${status.toUpperCase()}`);
     console.log('Message:', message);
-    if (data) {
-      console.log('Data:', data);
-    }
-    if (error) {
-      console.error('Error:', error);
-    }
+    if (data) console.log('Data:', data);
+    if (error) console.error('Error:', error);
     console.log('Timestamp:', logEntry.timestamp);
     console.groupEnd();
-  }
-
-  private getLogStyle(status: CheckoutLog["status"]) {
-    const styles = {
-      success: 'color: #10b981; font-weight: bold;',
-      error: 'color: #ef4444; font-weight: bold;',
-      info: 'color: #3b82f6; font-weight: bold;'
-    };
-    return styles[status];
   }
 
   getLogs() {
