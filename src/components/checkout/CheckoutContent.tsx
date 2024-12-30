@@ -3,28 +3,27 @@ import { ShippingForm } from "./ShippingForm"
 import { ReviewStep } from "./ReviewStep"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
-import { Json } from "@/types/database/common"
 
 interface CheckoutContentProps {
-  step: number
-  hasPhysicalSim: boolean
-  isTestMode: boolean
+  step: number;
+  hasPhysicalSim: boolean;
+  isTestMode: boolean;
   testData: {
-    shipping: ShippingFormValues
+    shipping: ShippingFormValues;
     documentation: {
-      fullName: string
-      birthDate: Date
-      gender: string
-      passportNumber: string
-      activationDate: Date
-      email: string
-      phone: string
-    }
-  }
-  onFormSubmit: (values: any) => void
-  onFormValidityChange: (isValid: boolean) => void
-  formData: Record<string, any>
-  onUpdateField: (field: string, value: any) => void
+      fullName: string;
+      birthDate: Date;
+      gender: string;
+      passportNumber: string;
+      activationDate: Date;
+      email: string;
+      phone: string;
+    };
+  };
+  onFormSubmit: (values: any) => void;
+  onFormValidityChange: (isValid: boolean) => void;
+  formData: Record<string, any>;
+  onUpdateField: (field: string, value: any) => void;
 }
 
 export function CheckoutContent({
