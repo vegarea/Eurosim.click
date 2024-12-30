@@ -6,6 +6,7 @@ import { formatCurrency } from "@/utils/currency";
 import { CheckoutProcessor } from "./utils/checkoutProcessor";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { OrderItem } from "@/types/database/orderItems";
 
 interface PaymentStepProps {
   formData: Record<string, any>;
@@ -26,9 +27,22 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       setIsProcessing(true);
       console.log("Iniciando procesamiento de orden...", { formData, items, total });
 
+      // Convert cart items to order items format
+      const orderItems = items.map(item => ({
+        id: item.id,
+        order_id: item.order_id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price,
+        metadata: item.metadata,
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      })) as OrderItem[];
+
       const processor = new CheckoutProcessor(
         formData,
-        items,
+        orderItems,
         total
       );
 
