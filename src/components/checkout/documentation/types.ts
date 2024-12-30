@@ -10,6 +10,8 @@ export const documentationFormSchema = z.object({
   activationDate: z.date({
     required_error: "La fecha de activación es requerida",
   }).min(new Date(), "La fecha debe ser futura"),
+  email: z.string().email("Email inválido").optional(),
+  phone: z.string().optional()
 })
 
 export type DocumentationFormValues = z.infer<typeof documentationFormSchema>

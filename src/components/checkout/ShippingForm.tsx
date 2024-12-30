@@ -6,6 +6,7 @@ import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
 import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps } from "./shipping/types"
+import { Json } from "@/types/database/common"
 
 export function ShippingForm({ 
   onSubmit, 
