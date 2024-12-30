@@ -29,7 +29,6 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
-  // Cuando estamos en el paso de pago, automáticamente marcamos el formulario como válido
   React.useEffect(() => {
     if (step === 3) {
       onFormValidityChange(true);
@@ -71,6 +70,7 @@ export function CheckoutContent({
     case 3:
       return (
         <PaymentStep 
+          formData={formData}
           onSubmit={() => onFormSubmit(formData)}
         />
       )

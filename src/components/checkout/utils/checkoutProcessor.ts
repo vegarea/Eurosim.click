@@ -4,6 +4,7 @@ import { Customer } from "@/types/database/customers";
 import { Order } from "@/types/database/orders";
 import { OrderItem } from "@/types/database/orderItems";
 import { OrderItemMetadata } from "@/types/database/orderItems";
+import { CustomerGender } from "@/types/database/enums";
 
 interface CartItem {
   id: string;
@@ -12,7 +13,7 @@ interface CartItem {
   unit_price: number;
   total_price: number;
   title: string;
-  type: string;
+  type: "physical" | "esim";
   metadata?: OrderItemMetadata;
 }
 
@@ -96,17 +97,19 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
+    const customerData = {
+      name: this.formData.fullName,
+      email: this.formData.email,
+      phone: this.formData.phone,
+      passport_number: this.formData.passportNumber,
+      birth_date: this.formData.birthDate,
+      gender: this.formData.gender as CustomerGender,
+      default_shipping_address: this.formData.shippingAddress || null
+    };
+
     const { data, error } = await supabase
       .from("customers")
-      .insert({
-        name: this.formData.fullName,
-        email: this.formData.email,
-        phone: this.formData.phone,
-        passport_number: this.formData.passportNumber,
-        birth_date: this.formData.birthDate,
-        gender: this.formData.gender,
-        default_shipping_address: this.formData.shippingAddress
-      })
+      .insert(customerData)
       .select()
       .single();
 
@@ -115,19 +118,22 @@ export class CheckoutProcessor {
   }
 
   private async createOrder(customerId: string): Promise<Order> {
+    const firstItem = this.cartItems[0];
+    const orderData = {
+      customer_id: customerId,
+      product_id: firstItem.product_id,
+      status: "payment_pending",
+      type: firstItem.type,
+      total_amount: this.totalAmount,
+      quantity: firstItem.quantity,
+      payment_method: "test",
+      payment_status: "completed",
+      shipping_address: this.formData.shippingAddress || null
+    };
+
     const { data, error } = await supabase
       .from("orders")
-      .insert({
-        customer_id: customerId,
-        product_id: this.cartItems[0].product_id,
-        status: "processing",
-        type: this.cartItems[0].type,
-        total_amount: this.totalAmount,
-        quantity: this.cartItems[0].quantity,
-        payment_method: "test",
-        payment_status: "completed",
-        shipping_address: this.formData.shippingAddress
-      })
+      .insert(orderData)
       .select()
       .single();
 
@@ -146,7 +152,7 @@ export class CheckoutProcessor {
         product_title: item.title,
         product_type: item.type,
         ...item.metadata
-      }
+      } as OrderItemMetadata
     }));
 
     const { data, error } = await supabase

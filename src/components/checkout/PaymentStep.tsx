@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface PaymentStepProps {
-  formData: any;
+  formData: Record<string, any>;
   onSubmit?: () => void;
 }
 
@@ -24,6 +24,7 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
   const handleCompleteOrder = async () => {
     try {
       setIsProcessing(true);
+      console.log("Iniciando procesamiento de orden...", { formData, items, total });
 
       const processor = new CheckoutProcessor(
         formData,
@@ -34,10 +35,10 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       const result = await processor.process();
 
       if (result.success) {
+        console.log("Orden completada exitosamente", result);
         toast.success("¡Orden completada exitosamente!");
         clearCart();
         onSubmit?.();
-        // TODO: Redireccionar a página de éxito cuando esté implementada
         navigate("/");
       }
 
