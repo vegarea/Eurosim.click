@@ -1,7 +1,13 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
   console.log('Creating order for customer:', customer.id)
+  console.log('Session data:', JSON.stringify(session, null, 2))
 
   try {
+    // Validate required data
+    if (!session || !customer) {
+      throw new Error('Missing required session or customer data')
+    }
+
     const orderData = {
       customer_id: customer.id,
       product_id: session.metadata.product_id,
@@ -20,18 +26,27 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       }
     }
 
+    console.log('Attempting to create order with data:', JSON.stringify(orderData, null, 2))
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert(orderData)
       .select()
       .single()
 
-    if (orderError) throw orderError
+    if (orderError) {
+      console.error('Error creating order:', orderError)
+      throw orderError
+    }
 
     console.log('Order created successfully:', order)
     return order
   } catch (error) {
     console.error('Error in order creation:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack
+    })
     throw error
   }
 }
