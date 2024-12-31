@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import Stripe from 'https://esm.sh/stripe@14.21.0'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,7 +16,7 @@ serve(async (req) => {
     
     console.log('Received checkout request:', { cartItems, customerInfo, orderInfo })
 
-    // Validar datos requeridos
+    // Validar datos requeridos del cliente
     const requiredFields = ['name', 'email', 'phone', 'passport_number', 'birth_date', 'gender'];
     const missingFields = requiredFields.filter(field => !customerInfo[field]);
 
@@ -48,6 +47,22 @@ serve(async (req) => {
 
     console.log('Creating checkout session with items:', line_items)
 
+    // Preparar los metadatos completos para la sesión
+    const metadata = {
+      customer_name: customerInfo.name,
+      customer_email: customerInfo.email,
+      customer_phone: customerInfo.phone,
+      customer_passport: customerInfo.passport_number,
+      customer_birth_date: customerInfo.birth_date,
+      customer_gender: customerInfo.gender,
+      order_type: cartItems[0].metadata.product_type,
+      product_id: cartItems[0].product_id,
+      shipping_address: JSON.stringify(customerInfo.shipping_address || {}),
+      total_amount: cartItems.reduce((sum: number, item: any) => sum + (item.unit_price * item.quantity), 0),
+    }
+
+    console.log('Session metadata:', metadata)
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items,
@@ -55,14 +70,7 @@ serve(async (req) => {
       customer_email: customerInfo.email,
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
-      metadata: {
-        customer_name: customerInfo.name,
-        customer_phone: customerInfo.phone,
-        customer_passport: customerInfo.passport_number,
-        customer_birth_date: customerInfo.birth_date,
-        customer_gender: customerInfo.gender,
-        order_type: cartItems[0].metadata.product_type
-      },
+      metadata,
     })
 
     console.log('Checkout session created:', session.id)
