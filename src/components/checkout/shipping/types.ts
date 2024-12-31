@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const shippingFormSchema = z.object({
   fullName: z.string().min(1, "El nombre es requerido"),
-  email: z.string().min(1, "El email es requerido"),
+  email: z.string().email("Email inválido"),
   phone: z.string().min(1, "El teléfono es requerido"),
   address: z.string().min(1, "La dirección es requerida"),
   city: z.string().min(1, "La ciudad es requerida"),
@@ -16,5 +16,5 @@ export interface ShippingFormProps {
   onSubmit: (values: ShippingFormValues) => void
   onValidityChange?: (isValid: boolean) => void
   email?: string
-  initialData?: ShippingFormValues
+  initialData?: Partial<ShippingFormValues>
 }

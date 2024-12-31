@@ -4,6 +4,7 @@ import { ShippingForm } from "./ShippingForm"
 import { PaymentStep } from "./PaymentStep"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
+import { toast } from "sonner"
 
 interface CheckoutContentProps {
   step: number;
@@ -30,33 +31,36 @@ export function CheckoutContent({
   }, [step, onFormValidityChange, formData]);
 
   const handleShippingSubmit = (values: ShippingFormValues) => {
-    // Asegurarnos de que todos los campos necesarios estén presentes
+    console.log("Recibiendo datos del formulario de envío:", values);
+    
+    // Crear el objeto shipping_address con la estructura correcta
     const shipping_address = {
-      street: values.address || "",
-      city: values.city || "",
-      state: values.state || "",
-      postal_code: values.zipCode || "",
-      phone: values.phone || ""
+      street: values.address,
+      city: values.city,
+      state: values.state,
+      postal_code: values.zipCode,
+      phone: values.phone
     };
 
-    console.log("Dirección de envío estructurada:", shipping_address);
+    console.log("Estructura de shipping_address creada:", shipping_address);
 
     const combinedData = {
       ...formData,
       email: values.email,
       fullName: values.fullName,
       phone: values.phone,
-      shipping_address
+      shipping_address // Usar el nombre correcto del campo
     };
     
-    console.log("Datos de envío guardados:", combinedData);
+    console.log("Datos combinados después de shipping:", combinedData);
     onFormSubmit(combinedData);
   };
 
   const handleDocumentationSubmit = (values: DocumentationFormValues) => {
-    // Asegurarnos de mantener la dirección de envío existente
-    const shipping_address = formData.shipping_address || {};
+    console.log("Recibiendo datos del formulario de documentación:", values);
+    console.log("Estado actual de formData:", formData);
     
+    // Asegurarnos de mantener shipping_address existente
     const combinedData = {
       ...formData,
       fullName: values.fullName,
@@ -64,11 +68,31 @@ export function CheckoutContent({
       gender: values.gender,
       passportNumber: values.passportNumber,
       activationDate: values.activationDate,
-      shipping_address
+      // Mantener explícitamente shipping_address
+      shipping_address: formData.shipping_address
     };
     
-    console.log("Datos de documentación guardados:", combinedData);
+    console.log("Datos combinados después de documentación:", combinedData);
     onFormSubmit(combinedData);
+  };
+
+  const validateFormData = (data: Record<string, any>): boolean => {
+    if (!data.shipping_address) {
+      console.error("Error: shipping_address es undefined");
+      toast.error("Error: Faltan datos de envío");
+      return false;
+    }
+    
+    const requiredFields = ['street', 'city', 'state', 'postal_code'];
+    for (const field of requiredFields) {
+      if (!data.shipping_address[field]) {
+        console.error(`Error: Falta el campo ${field} en shipping_address`);
+        toast.error(`Error: Falta información de envío (${field})`);
+        return false;
+      }
+    }
+    
+    return true;
   };
 
   switch (step) {
@@ -105,9 +129,8 @@ export function CheckoutContent({
         <PaymentStep 
           formData={formData}
           onSubmit={() => {
-            console.log("Datos finales antes del pago:", formData);
-            if (!formData.shipping_address) {
-              console.error("Error: shipping_address es undefined");
+            console.log("Validando datos finales antes del pago:", formData);
+            if (!validateFormData(formData)) {
               return;
             }
             onFormSubmit(formData);
