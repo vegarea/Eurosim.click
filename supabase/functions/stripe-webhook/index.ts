@@ -11,31 +11,52 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
 }
 
 const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
-  // Log para debug
   console.log('🔔 Webhook request received');
+  console.log('Headers:', Object.fromEntries(req.headers.entries()));
   
+  // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      }
+    });
+  }
+
+  if (req.method !== 'POST') {
+    console.error('❌ Method not allowed:', req.method);
+    return new Response('Method not allowed', { 
+      status: 405,
+      headers: corsHeaders
+    });
   }
 
   const signature = req.headers.get('stripe-signature');
 
   if (!signature) {
-    console.error('❌ No signature found in webhook request');
-    return new Response('No signature', { status: 400 });
+    console.error('❌ No stripe-signature header found');
+    return new Response('No stripe-signature header', { 
+      status: 400,
+      headers: corsHeaders
+    });
   }
 
   try {
     const payload = await req.text();
-    console.log('📦 Webhook payload received:', payload);
+    console.log('📦 Webhook payload received');
     
-    const event = stripe.webhooks.constructEvent(payload, signature, endpointSecret);
+    const event = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      endpointSecret
+    );
     
     console.log('🔔 Webhook event constructed:', event.type);
 
