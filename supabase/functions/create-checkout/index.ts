@@ -8,34 +8,32 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { cartItems, customerInfo } = await req.json()
+    const { cartItems, customerInfo, orderInfo } = await req.json()
     
-    console.log('Received checkout request:', { cartItems, customerInfo })
+    console.log('Received checkout request:', { cartItems, customerInfo, orderInfo })
 
     // Validar datos requeridos
-    if (!customerInfo.email) {
-      throw new Error('El email es requerido')
-    }
+    const requiredFields = ['name', 'email', 'phone', 'passport_number', 'birth_date', 'gender'];
+    const missingFields = requiredFields.filter(field => !customerInfo[field]);
 
-    if (!customerInfo.name) {
-      throw new Error('El nombre es requerido')
+    if (missingFields.length > 0) {
+      throw new Error(`Campos requeridos faltantes: ${missingFields.join(', ')}`);
     }
 
     if (cartItems.length === 0) {
-      throw new Error('El carrito está vacío')
+      throw new Error('El carrito está vacío');
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    // Create line items from cart
+    // Crear line items desde el carrito
     const line_items = cartItems.map((item: any) => ({
       price_data: {
         currency: 'eur',
@@ -59,7 +57,11 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata: {
         customer_name: customerInfo.name,
-        customer_phone: customerInfo.phone || '',
+        customer_phone: customerInfo.phone,
+        customer_passport: customerInfo.passport_number,
+        customer_birth_date: customerInfo.birth_date,
+        customer_gender: customerInfo.gender,
+        order_type: orderInfo.type
       },
     })
 
