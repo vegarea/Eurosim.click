@@ -31,6 +31,9 @@ export function CheckoutContent({
 }: CheckoutContentProps) {
   React.useEffect(() => {
     if (step === 3) {
+      // Recuperar datos al llegar al paso final
+      const savedData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
+      console.log("Datos recuperados del sessionStorage:", savedData);
       onFormValidityChange(true);
     }
   }, [step, onFormValidityChange]);
@@ -39,6 +42,7 @@ export function CheckoutContent({
     // Guardar en sessionStorage
     const currentData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
     const updatedData = { ...currentData, ...values };
+    console.log("Guardando en sessionStorage:", updatedData);
     sessionStorage.setItem('checkoutData', JSON.stringify(updatedData));
     
     // Actualizar formData con todos los datos acumulados
@@ -87,6 +91,12 @@ export function CheckoutContent({
     case 3:
       // Recuperar todos los datos almacenados
       const savedData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
+      console.log("Datos finales recuperados:", savedData);
+      
+      if (!savedData.email) {
+        console.error("Error: No se encontró el email en los datos guardados");
+      }
+      
       return (
         <PaymentStep 
           formData={savedData}
