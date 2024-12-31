@@ -20,7 +20,7 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
       >
         <FormField
           control={form.control}
-          name="fullName"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2">

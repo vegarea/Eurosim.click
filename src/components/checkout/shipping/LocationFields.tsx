@@ -28,7 +28,7 @@ export function LocationFields({ form, show }: LocationFieldsProps) {
           >
             <FormField
               control={form.control}
-              name="city"
+              name="default_shipping_address.city"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export function LocationFields({ form, show }: LocationFieldsProps) {
           >
             <FormField
               control={form.control}
-              name="state"
+              name="default_shipping_address.state"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export function LocationFields({ form, show }: LocationFieldsProps) {
           >
             <FormField
               control={form.control}
-              name="zipCode"
+              name="default_shipping_address.postal_code"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-2">
