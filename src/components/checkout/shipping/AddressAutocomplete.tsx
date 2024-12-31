@@ -18,10 +18,16 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
   const { toast } = useToast()
 
   useEffect(() => {
-    if (scriptLoadedRef.current) return;
+    let scriptElement: HTMLScriptElement | null = null;
 
     const loadGoogleMapsScript = async () => {
       try {
+        // Evitar cargar el script múltiples veces
+        if (window.google?.maps || scriptLoadedRef.current) {
+          initializeAutocomplete();
+          return;
+        }
+
         console.log("Fetching Google Maps API key...")
         const { data, error } = await supabase.functions.invoke('get-google-maps-key')
         
@@ -41,33 +47,26 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           return
         }
 
-        if (!window.google) {
-          console.log("Loading Google Maps script...")
-          const script = document.createElement('script')
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`
-          script.async = true
-          script.defer = true
-          
-          window.initGoogleMaps = () => {
+        console.log("Loading Google Maps script...")
+        scriptElement = document.createElement('script')
+        scriptElement.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`
+        scriptElement.async = true
+        
+        // Usar Promise para manejar la carga del script
+        await new Promise<void>((resolve, reject) => {
+          scriptElement!.onload = () => {
             console.log('Google Maps API loaded successfully')
             scriptLoadedRef.current = true
-            initializeAutocomplete()
+            resolve()
           }
-
-          script.onerror = () => {
+          scriptElement!.onerror = () => {
             console.error('Error loading Google Maps script')
-            toast({
-              title: "Error",
-              description: "No se pudo cargar el mapa de Google",
-              variant: "destructive",
-            })
+            reject(new Error('Failed to load Google Maps script'))
           }
+          document.head.appendChild(scriptElement!)
+        })
 
-          document.head.appendChild(script)
-        } else {
-          scriptLoadedRef.current = true
-          initializeAutocomplete()
-        }
+        initializeAutocomplete()
       } catch (error) {
         console.error('Error in Google Maps initialization:', error)
         toast({
@@ -79,7 +78,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     const initializeAutocomplete = () => {
-      if (!inputRef.current || !window.google || autocompleteRef.current) return;
+      if (!inputRef.current || !window.google?.maps || autocompleteRef.current) return;
       
       console.log("Initializing autocomplete...")
       autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
@@ -102,6 +101,10 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     return () => {
       if (autocompleteRef.current) {
         google.maps.event.clearInstanceListeners(autocompleteRef.current)
+      }
+      // Limpiar el script si existe
+      if (scriptElement && document.head.contains(scriptElement)) {
+        document.head.removeChild(scriptElement)
       }
     }
   }, [onAddressSelect, onChange, toast])
