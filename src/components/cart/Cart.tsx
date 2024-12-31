@@ -1,8 +1,8 @@
 import { useCart } from "@/contexts/CartContext"
 import { CartItem } from "./CartItem"
-import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/utils/currency"
 import { ShoppingCart } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface CartProps {
   showCheckoutButton?: boolean
@@ -33,7 +33,7 @@ export function Cart({
       </div>
 
       <div className="pt-4 border-t">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center">
           <span className="font-medium">Total:</span>
           <span className="text-xl font-bold">
             {formatCurrency(total)}
@@ -44,11 +44,11 @@ export function Cart({
           <Button
             onClick={onCheckout}
             disabled={!isButtonEnabled || items.length === 0}
-            className="w-full"
+            className="w-full mt-4"
             size="lg"
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
-            Continuar al pago
+            Ir al checkout
           </Button>
         )}
       </div>

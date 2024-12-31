@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useState } from "react"
+import { CreditCard } from "lucide-react"
 
 export function StripeCheckout() {
   const { items: cartItems } = useCart()
@@ -54,7 +55,8 @@ export function StripeCheckout() {
       size="lg"
       disabled={isLoading}
     >
-      {isLoading ? 'Procesando...' : 'Continuar al pago'}
+      <CreditCard className="mr-2 h-4 w-4" />
+      {isLoading ? 'Procesando...' : 'Realizar pago'}
     </Button>
   )
 }

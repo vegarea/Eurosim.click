@@ -3,6 +3,7 @@ import { PaymentMethodSelector } from "./payment/PaymentMethodSelector"
 import { useCart } from "@/contexts/CartContext"
 import { formatCurrency } from "@/utils/currency"
 import { StripeCheckout } from "./payment/StripeCheckout"
+import { Card } from "@/components/ui/card"
 
 interface PaymentStepProps {
   formData: Record<string, any>
@@ -12,7 +13,6 @@ export function PaymentStep({ formData }: PaymentStepProps) {
   const [selectedMethod] = useState<string>("stripe")
   const { items } = useCart()
 
-  // Calcular el total
   const total = items.reduce((sum, item) => sum + item.total_price, 0)
 
   return (
@@ -26,7 +26,7 @@ export function PaymentStep({ formData }: PaymentStepProps) {
         onMethodChange={() => {}}
       />
 
-      <div className="mt-8">
+      <Card className="p-6">
         <div className="bg-gray-50 p-4 rounded-lg mb-4">
           <div className="flex justify-between items-center">
             <span className="font-medium">Total a pagar:</span>
@@ -37,7 +37,7 @@ export function PaymentStep({ formData }: PaymentStepProps) {
         </div>
 
         <StripeCheckout />
-      </div>
+      </Card>
     </div>
   )
 }
