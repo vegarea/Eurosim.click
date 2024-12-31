@@ -22,9 +22,16 @@ export function PhoneField({ form }: PhoneFieldProps) {
               value={field.value}
               onChange={(phone) => {
                 field.onChange("+" + phone)
+                // Trigger validation immediately after value change
+                form.trigger("phone")
               }}
               inputClass="w-full p-2 border rounded-md"
               containerClass="w-full"
+              specialLabel=""
+              disableCountryCode={false}
+              countryCodeEditable={false}
+              enableSearch={false}
+              preferredCountries={['mx']}
             />
           </FormControl>
           <FormMessage />
