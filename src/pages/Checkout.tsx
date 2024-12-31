@@ -152,11 +152,7 @@ function CheckoutContent() {
                   {showStripeCheckout ? (
                     <StripeCheckout />
                   ) : (
-                    <Cart 
-                      showCheckoutButton={true}
-                      isButtonEnabled={isFormValid}
-                      onCheckout={handleCheckout}
-                    />
+                    <Cart />
                   )}
                 </Card>
                 

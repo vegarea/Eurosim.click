@@ -2,12 +2,6 @@ import { useCart } from "@/contexts/CartContext"
 import { formatCurrency } from "@/utils/currency"
 import { CartItem } from "./CartItem"
 
-interface CartProps {
-  showCheckoutButton?: boolean
-  isButtonEnabled?: boolean
-  onCheckout?: () => void
-}
-
 export function Cart() {
   const { items, updateQuantity, removeItem } = useCart()
   const total = items.reduce((sum, item) => sum + item.total_price, 0)
