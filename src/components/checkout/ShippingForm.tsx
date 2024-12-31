@@ -32,19 +32,6 @@ export function ShippingForm({
     mode: "onChange"
   })
 
-  // Simplificamos la validación para que sea más permisiva
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      const values = form.getValues();
-      const hasBasicInfo = Boolean(values.fullName && values.email && values.phone);
-      if (onValidityChange) {
-        onValidityChange(hasBasicInfo);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, onValidityChange]);
-
   // Si estamos en modo test y tenemos datos de prueba, los usamos
   useEffect(() => {
     if (isTestMode && testData) {

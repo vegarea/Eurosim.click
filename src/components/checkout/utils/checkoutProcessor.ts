@@ -1,9 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Customer } from "@/types/database/customers";
-import { Order } from "@/types/database/orders";
-import { OrderItem } from "@/types/database/orderItems";
-import { Json } from "@/types/database/common";
+import { Customer, CustomerInsert } from "@/types/database/customers";
+import { Order, OrderInsert } from "@/types/database/orders";
+import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
+import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
+import { Json } from "@/types/database/common";
 
 export class CheckoutProcessor {
   constructor(
@@ -32,19 +33,14 @@ export class CheckoutProcessor {
         { items: this.cartItems }
       );
 
-      // Aseguramos que el email no sea undefined
-      const email = this.formData.email || '';
-      console.log("Buscando cliente con email:", email);
-
       // Primero buscamos si el cliente ya existe
       const { data: existingCustomer, error: searchError } = await supabase
         .from("customers")
         .select()
-        .eq('email', email)
-        .maybeSingle();
+        .eq('email', this.formData.email)
+        .single();
 
-      if (searchError) {
-        console.error("Error buscando cliente:", searchError);
+      if (searchError && searchError.code !== 'PGRST116') {
         throw searchError;
       }
 
@@ -90,7 +86,6 @@ export class CheckoutProcessor {
       };
 
     } catch (error) {
-      console.error("Error en proceso de checkout:", error);
       checkoutLogger.log(
         "checkout_failed",
         "error",
@@ -103,9 +98,9 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
-    const customerData = {
-      name: this.formData.fullName || '',
-      email: this.formData.email || '',
+    const customerData: CustomerInsert = {
+      name: this.formData.fullName,
+      email: this.formData.email,
       phone: this.formData.phone || null,
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
@@ -123,18 +118,13 @@ export class CheckoutProcessor {
       metadata: {} as Json
     };
 
-    console.log("Creando nuevo cliente:", customerData);
-
     const { data, error } = await supabase
       .from("customers")
       .insert(customerData)
       .select()
       .single();
 
-    if (error) {
-      console.error("Error creando cliente:", error);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   }
 
@@ -142,32 +132,26 @@ export class CheckoutProcessor {
     const firstItem = this.cartItems[0];
     const metadata = firstItem.metadata as Record<string, any>;
     
-    const orderData = {
+    const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: 'payment_pending',
-      type: metadata.product_type || 'esim',
+      status: "payment_pending",
+      type: metadata.product_type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: 'stripe',
-      payment_status: 'pending',
+      payment_method: "test",
+      payment_status: "pending",
       shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
-      activation_date: this.formData.activationDate || null,
+      activation_date: null,
       notes: [],
-      metadata: {
-        passportNumber: this.formData.passportNumber,
-        birthDate: this.formData.birthDate,
-        gender: this.formData.gender
-      } as Json,
+      metadata: {} as Json,
       stripe_payment_intent_id: null,
       stripe_receipt_url: null,
       paypal_order_id: null,
       paypal_receipt_url: null
     };
-
-    console.log("Creando nueva orden:", orderData);
 
     const { data, error } = await supabase
       .from("orders")
@@ -175,15 +159,12 @@ export class CheckoutProcessor {
       .select()
       .single();
 
-    if (error) {
-      console.error("Error creando orden:", error);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItemsData = this.cartItems.map(item => ({
+    const orderItemsData: OrderItemInsert[] = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       quantity: item.quantity,
@@ -192,17 +173,12 @@ export class CheckoutProcessor {
       metadata: item.metadata
     }));
 
-    console.log("Creando items de orden:", orderItemsData);
-
     const { data, error } = await supabase
       .from("order_items")
       .insert(orderItemsData)
       .select();
 
-    if (error) {
-      console.error("Error creando items de orden:", error);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   }
 }
