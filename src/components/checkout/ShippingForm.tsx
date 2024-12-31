@@ -30,20 +30,11 @@ export function ShippingForm({
     mode: "onChange"
   })
 
-  // Observar cambios en la validación del formulario
   useEffect(() => {
     const subscription = form.watch(() => {
-      if (onValidityChange) {
-        const formValues = form.getValues();
-        const formErrors = form.formState.errors;
-        
-        console.log("Current form values:", formValues);
-        console.log("Current form errors:", formErrors);
-        
-        const isValid = form.formState.isValid;
-        console.log("Form validity changed:", isValid, formErrors);
-        onValidityChange(isValid);
-      }
+      const values = form.getValues();
+      const isValid = Object.values(values).every(value => value && value.length > 0);
+      onValidityChange?.(isValid);
     });
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);

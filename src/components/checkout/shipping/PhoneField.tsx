@@ -22,7 +22,6 @@ export function PhoneField({ form }: PhoneFieldProps) {
               value={field.value?.replace("+", "") || ""}
               onChange={(phone) => {
                 field.onChange("+" + phone)
-                form.trigger("phone")
               }}
               inputClass="w-full p-2 border rounded-md"
               containerClass="w-full"

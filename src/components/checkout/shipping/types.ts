@@ -1,13 +1,13 @@
 import { z } from "zod"
 
 export const shippingFormSchema = z.object({
-  fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Email inválido"),
-  phone: z.string().min(12, "Teléfono inválido"),
-  address: z.string().min(5, "Dirección inválida"),
-  city: z.string().min(2, "Ciudad inválida"),
-  state: z.string().min(2, "Estado inválido"),
-  zipCode: z.string().min(5, "Código postal inválido"),
+  fullName: z.string().min(1, "El nombre es requerido"),
+  email: z.string().min(1, "El email es requerido"),
+  phone: z.string().min(1, "El teléfono es requerido"),
+  address: z.string().min(1, "La dirección es requerida"),
+  city: z.string().min(1, "La ciudad es requerida"),
+  state: z.string().min(1, "El estado es requerido"),
+  zipCode: z.string().min(1, "El código postal es requerido"),
 })
 
 export type ShippingFormValues = z.infer<typeof shippingFormSchema>
