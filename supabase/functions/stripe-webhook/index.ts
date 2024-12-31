@@ -17,6 +17,9 @@ const corsHeaders = {
 const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
+  // Log para debug
+  console.log('🔔 Webhook request received');
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -24,14 +27,17 @@ serve(async (req) => {
   const signature = req.headers.get('stripe-signature');
 
   if (!signature) {
+    console.error('❌ No signature found in webhook request');
     return new Response('No signature', { status: 400 });
   }
 
   try {
     const payload = await req.text();
+    console.log('📦 Webhook payload received:', payload);
+    
     const event = stripe.webhooks.constructEvent(payload, signature, endpointSecret);
     
-    console.log('🔔 Webhook received:', event.type);
+    console.log('🔔 Webhook event constructed:', event.type);
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -43,20 +49,27 @@ serve(async (req) => {
         const session = event.data.object;
         
         try {
+          console.log('💳 Processing completed checkout session:', session.id);
+          
           const customer = await handleCustomerCreation(session, supabase);
+          console.log('👤 Customer created/updated:', customer.id);
+          
           const order = await handleOrderCreation(session, customer, supabase);
+          console.log('📦 Order created:', order.id);
+          
           await handleOrderItemCreation(session, order, supabase);
+          console.log('✅ Order items created for order:', order.id);
 
-          console.log('Checkout completed successfully');
+          console.log('✨ Checkout completed successfully');
         } catch (error) {
-          console.error('Error processing successful checkout:', error);
+          console.error('❌ Error processing successful checkout:', error);
           throw error;
         }
         break;
       }
 
       case 'checkout.session.expired':
-        console.log('Checkout session expired:', event.data.object);
+        console.log('⏰ Checkout session expired:', event.data.object);
         break;
 
       case 'payment_intent.payment_failed':
@@ -65,7 +78,7 @@ serve(async (req) => {
         break;
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        console.log(`⚠️ Unhandled event type ${event.type}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -74,7 +87,7 @@ serve(async (req) => {
     });
 
   } catch (err) {
-    console.error('Error:', err);
+    console.error('❌ Error processing webhook:', err);
     return new Response(
       JSON.stringify({ error: err.message }), 
       { 
@@ -107,9 +120,9 @@ async function handleFailedPayment(paymentIntent: any, supabase: any) {
       .eq('stripe_payment_intent_id', paymentIntent.id);
 
     if (error) throw error;
-    console.log(`Order status updated to ${status}`);
+    console.log(`📝 Order status updated to ${status}`);
   } catch (error) {
-    console.error(`Error processing payment ${status}:`, error);
+    console.error(`❌ Error processing payment ${status}:`, error);
     throw error;
   }
 }
