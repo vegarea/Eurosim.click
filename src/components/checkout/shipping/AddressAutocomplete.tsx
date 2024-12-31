@@ -91,7 +91,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           const place = autocompleteRef.current?.getPlace()
           if (place) {
             console.log("Place selected:", place)
-            // Asegurarse de que el valor no sea undefined
             onChange(place.formatted_address || "")
             onAddressSelect(place)
           }
@@ -111,7 +110,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
       <FormControl>
         <Input
           ref={inputRef}
-          value={value || ""} // Asegurarse de que el valor no sea undefined
+          value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Comienza a escribir tu dirección"
           className="transition-all duration-200 focus:scale-[1.01] pl-10"

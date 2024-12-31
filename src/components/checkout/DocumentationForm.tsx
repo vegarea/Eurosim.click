@@ -17,12 +17,11 @@ import { documentationFormSchema, type DocumentationFormValues } from "./documen
 import { CustomerGender } from "@/types/database/enums"
 
 interface DocumentationFormProps {
-  onSubmit: (values: DocumentationFormValues) => void
-  onValidityChange?: (isValid: boolean) => void
-  initialData?: Partial<DocumentationFormValues>
-  isTestMode?: boolean
-  testData?: Partial<DocumentationFormValues>
-  shipping_address?: Record<string, any>
+  onSubmit: (values: DocumentationFormValues) => void;
+  onValidityChange?: (isValid: boolean) => void;
+  initialData?: Partial<DocumentationFormValues>;
+  isTestMode?: boolean;
+  testData?: Partial<DocumentationFormValues>;
 }
 
 export function DocumentationForm({ 
@@ -30,8 +29,7 @@ export function DocumentationForm({
   onValidityChange, 
   initialData,
   isTestMode,
-  testData,
-  shipping_address 
+  testData 
 }: DocumentationFormProps) {
   const form = useForm<DocumentationFormValues>({
     resolver: zodResolver(documentationFormSchema),
@@ -45,56 +43,50 @@ export function DocumentationForm({
     mode: "onChange"
   })
 
+  // Define years and months arrays for the date selectors
+  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
+  const months = Array.from({ length: 12 }, (_, i) => i);
+
+  // Watch all form fields for changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      const isValid = form.formState.isValid
-      console.log("DocumentationForm - Form state changed:", { 
+      // Check if all required fields are filled and valid
+      const isValid = form.formState.isValid;
+      console.log("Form state changed:", { 
         isValid, 
         errors: form.formState.errors,
-        values: value,
-        shipping_address 
-      })
+        values: value 
+      });
       
       if (onValidityChange) {
-        onValidityChange(isValid)
+        onValidityChange(isValid);
       }
-    })
+    });
 
-    return () => subscription.unsubscribe()
-  }, [form, onValidityChange, shipping_address])
+    return () => subscription.unsubscribe();
+  }, [form, onValidityChange]);
 
+  // If initialData is provided, update form values
   useEffect(() => {
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
-        form.setValue(key as keyof typeof initialData, value)
-      })
+        form.setValue(key as keyof typeof initialData, value);
+      });
       
+      // Trigger validation after setting values
       form.trigger().then((isValid) => {
         if (onValidityChange) {
-          onValidityChange(isValid)
+          onValidityChange(isValid);
         }
-      })
+      });
     }
-  }, [initialData, form, onValidityChange])
+  }, [initialData, form, onValidityChange]);
 
   const handleSubmit = form.handleSubmit((data) => {
-    console.log("DocumentationForm - Submitting with data:", {
-      formData: data,
-      existingShippingAddress: shipping_address
-    })
-
-    // Mantener shipping_address existente si existe
-    const combinedData = {
-      ...data,
-      shipping_address: shipping_address
-    }
-
-    console.log("DocumentationForm - Combined data:", combinedData)
-    
     if (onSubmit) {
-      onSubmit(combinedData)
+      onSubmit(data);
     }
-  })
+  });
 
   return (
     <Form {...form}>

@@ -5,14 +5,16 @@ import { useState, useEffect } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
-import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps, type ShippingAddress } from "./shipping/types"
+import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps } from "./shipping/types"
 import { Json } from "@/types/database/common"
 
 export function ShippingForm({ 
   onSubmit, 
   onValidityChange, 
   email = '', 
-  initialData
+  initialData,
+  isTestMode,
+  testData
 }: ShippingFormProps) {
   const [showLocationFields, setShowLocationFields] = useState(false)
   
@@ -30,14 +32,17 @@ export function ShippingForm({
     mode: "onChange"
   })
 
+  // Si estamos en modo test y tenemos datos de prueba, los usamos
   useEffect(() => {
-    const subscription = form.watch(() => {
-      const values = form.getValues();
-      const isValid = Object.values(values).every(value => value && value.length > 0);
-      onValidityChange?.(isValid);
-    });
-    return () => subscription.unsubscribe();
-  }, [form, onValidityChange]);
+    if (isTestMode && testData) {
+      Object.entries(testData).forEach(([key, value]) => {
+        if (value) {
+          form.setValue(key as keyof ShippingFormValues, value);
+        }
+      });
+      setShowLocationFields(true);
+    }
+  }, [isTestMode, testData, form]);
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
@@ -76,10 +81,7 @@ export function ShippingForm({
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
-    console.log("Form submitted with values:", values);
-    
-    // Crear el objeto shipping_address con la estructura correcta
-    const shipping_address: ShippingAddress = {
+    const shippingAddress: Json = {
       street: values.address,
       city: values.city,
       state: values.state,
@@ -87,12 +89,10 @@ export function ShippingForm({
       phone: values.phone
     }
 
-    console.log("Estructura de shipping_address creada:", shipping_address);
-
     onSubmit({
       ...values,
-      shipping_address: shipping_address as Json
-    })
+      shippingAddress
+    } as unknown as ShippingFormValues)
   }
 
   return (
