@@ -7,12 +7,12 @@ import { DocumentationFormValues } from "./documentation/types"
 import { toast } from "sonner"
 
 interface CheckoutContentProps {
-  step: number;
-  hasPhysicalSim: boolean;
-  onFormSubmit: (values: any) => void;
-  onFormValidityChange: (isValid: boolean) => void;
-  formData: Record<string, any>;
-  onUpdateField: (field: string, value: any) => void;
+  step: number
+  hasPhysicalSim: boolean
+  onFormSubmit: (values: any) => void
+  onFormValidityChange: (isValid: boolean) => void
+  formData: Record<string, any>
+  onUpdateField: (field: string, value: any) => void
 }
 
 export function CheckoutContent({
@@ -25,75 +25,47 @@ export function CheckoutContent({
 }: CheckoutContentProps) {
   React.useEffect(() => {
     if (step === 3) {
-      console.log("Datos acumulados antes del pago:", formData);
-      onFormValidityChange(true);
+      console.log("CheckoutContent - Datos acumulados antes del pago:", formData)
+      onFormValidityChange(true)
     }
-  }, [step, onFormValidityChange, formData]);
+  }, [step, onFormValidityChange, formData])
 
   const handleShippingSubmit = (values: ShippingFormValues) => {
-    console.log("Recibiendo datos del formulario de envío:", values);
+    console.log("CheckoutContent - Recibiendo datos del formulario de envío:", values)
     
-    // Crear el objeto shipping_address con la estructura correcta
-    const shipping_address = {
-      street: values.address,
-      city: values.city,
-      state: values.state,
-      postal_code: values.zipCode,
-      phone: values.phone
-    };
-
-    console.log("Estructura de shipping_address creada:", shipping_address);
+    // Asegurarnos de que shipping_address tenga la estructura correcta
+    if (!values.shipping_address) {
+      console.error("Error: shipping_address es undefined")
+      toast.error("Error: Faltan datos de envío")
+      return
+    }
 
     const combinedData = {
       ...formData,
       email: values.email,
       fullName: values.fullName,
       phone: values.phone,
-      shipping_address // Usar el nombre correcto del campo
-    };
+      shipping_address: values.shipping_address
+    }
     
-    console.log("Datos combinados después de shipping:", combinedData);
-    onFormSubmit(combinedData);
-  };
+    console.log("CheckoutContent - Datos combinados después de shipping:", combinedData)
+    onFormSubmit(combinedData)
+  }
 
   const handleDocumentationSubmit = (values: DocumentationFormValues) => {
-    console.log("Recibiendo datos del formulario de documentación:", values);
-    console.log("Estado actual de formData:", formData);
+    console.log("CheckoutContent - Recibiendo datos del formulario de documentación:", values)
+    console.log("CheckoutContent - Estado actual de formData:", formData)
     
     // Asegurarnos de mantener shipping_address existente
     const combinedData = {
       ...formData,
-      fullName: values.fullName,
-      birthDate: values.birthDate,
-      gender: values.gender,
-      passportNumber: values.passportNumber,
-      activationDate: values.activationDate,
-      // Mantener explícitamente shipping_address
-      shipping_address: formData.shipping_address
-    };
-    
-    console.log("Datos combinados después de documentación:", combinedData);
-    onFormSubmit(combinedData);
-  };
-
-  const validateFormData = (data: Record<string, any>): boolean => {
-    if (!data.shipping_address) {
-      console.error("Error: shipping_address es undefined");
-      toast.error("Error: Faltan datos de envío");
-      return false;
+      ...values,
+      shipping_address: formData.shipping_address // Mantener explícitamente shipping_address
     }
     
-    const requiredFields = ['street', 'city', 'state', 'postal_code'];
-    for (const field of requiredFields) {
-      if (!data.shipping_address[field]) {
-        console.error(`Error: Falta el campo ${field} en shipping_address`);
-        toast.error(`Error: Falta información de envío (${field})`);
-        return false;
-      }
-    }
-    
-    return true;
-  };
+    console.log("CheckoutContent - Datos combinados después de documentación:", combinedData)
+    onFormSubmit(combinedData)
+  }
 
   switch (step) {
     case 1:
@@ -104,15 +76,16 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             initialData={formData}
           />
-        );
+        )
       }
       return (
         <DocumentationForm
           onSubmit={handleDocumentationSubmit}
           onValidityChange={onFormValidityChange}
           initialData={formData}
+          shipping_address={formData.shipping_address}
         />
-      );
+      )
     case 2:
       if (hasPhysicalSim) {
         return (
@@ -120,24 +93,26 @@ export function CheckoutContent({
             onSubmit={handleDocumentationSubmit}
             onValidityChange={onFormValidityChange}
             initialData={formData}
+            shipping_address={formData.shipping_address}
           />
-        );
+        )
       }
-      return null;
+      return null
     case 3:
       return (
         <PaymentStep 
           formData={formData}
           onSubmit={() => {
-            console.log("Validando datos finales antes del pago:", formData);
-            if (!validateFormData(formData)) {
-              return;
+            console.log("CheckoutContent - Validando datos finales antes del pago:", formData)
+            if (!formData.shipping_address) {
+              toast.error("Error: Faltan datos de envío")
+              return
             }
-            onFormSubmit(formData);
+            onFormSubmit(formData)
           }}
         />
-      );
+      )
     default:
-      return null;
+      return null
   }
 }
