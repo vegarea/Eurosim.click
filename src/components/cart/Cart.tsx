@@ -3,6 +3,7 @@ import { formatCurrency } from "@/utils/currency"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { OrderItemMetadata } from "@/types/database/common"
 
 interface CartProps {
   showCheckoutButton?: boolean
@@ -18,14 +19,14 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = true }: Cart
       const { data: { url }, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           items: items.map(item => ({
-            title: item.metadata?.product_title,
-            description: item.metadata?.product_description,
+            title: (item.metadata as OrderItemMetadata)?.product_title,
+            description: (item.metadata as OrderItemMetadata)?.product_description,
             unit_price: item.unit_price,
             quantity: item.quantity,
           })),
           metadata: {
             requiresShipping: items.some(item => 
-              item.metadata && (item.metadata as any).product_type === "physical"
+              item.metadata && (item.metadata as OrderItemMetadata)?.product_type === "physical"
             ),
           }
         }
@@ -50,8 +51,8 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = true }: Cart
       {items.map(item => (
         <div key={item.id} className="flex justify-between items-center">
           <div>
-            <h3 className="font-medium">{item.metadata?.product_title}</h3>
-            <p className="text-sm text-gray-500">{item.metadata?.product_description}</p>
+            <h3 className="font-medium">{(item.metadata as OrderItemMetadata)?.product_title}</h3>
+            <p className="text-sm text-gray-500">{(item.metadata as OrderItemMetadata)?.product_description}</p>
           </div>
           <div>
             <span className="font-bold">{formatCurrency(item.total_price)}</span>
