@@ -37,10 +37,10 @@ export class CheckoutProcessor {
       const { data: existingCustomer, error: searchError } = await supabase
         .from("customers")
         .select()
-        .eq('email', this.formData.email)
-        .single();
+        .eq('email', this.formData.email || '')
+        .maybeSingle();
 
-      if (searchError && searchError.code !== 'PGRST116') {
+      if (searchError) {
         throw searchError;
       }
 
@@ -100,7 +100,7 @@ export class CheckoutProcessor {
   private async createCustomer(): Promise<Customer> {
     const customerData: CustomerInsert = {
       name: this.formData.fullName,
-      email: this.formData.email,
+      email: this.formData.email || '',
       phone: this.formData.phone || null,
       passport_number: this.formData.passportNumber || null,
       birth_date: this.formData.birthDate || null,
@@ -135,12 +135,12 @@ export class CheckoutProcessor {
     const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
-      status: "payment_pending",
-      type: metadata.product_type,
+      status: OrderStatus.PAYMENT_PENDING,
+      type: metadata.product_type as OrderType,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test",
-      payment_status: "pending",
+      payment_method: PaymentMethod.STRIPE,
+      payment_status: PaymentStatus.PENDING,
       shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
