@@ -6,21 +6,21 @@ import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
 import { z } from "zod"
-import { Json } from "@/types/database/common"
+import { ShippingFormValues } from "./shipping/types"
 
 const shippingFormSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
   email: z.string().email("Email inválido"),
   phone: z.string().min(1, "El teléfono es requerido"),
-  default_shipping_address: z.object({
+  shipping_address: z.object({
     street: z.string().min(1, "La dirección es requerida"),
     city: z.string().min(1, "La ciudad es requerida"),
     state: z.string().min(1, "El estado es requerido"),
-    postal_code: z.string().min(1, "El código postal es requerido")
+    country: z.string().min(1, "El país es requerido"),
+    postal_code: z.string().min(1, "El código postal es requerido"),
+    phone: z.string().min(1, "El teléfono es requerido")
   }).nullable()
 })
-
-type ShippingFormValues = z.infer<typeof shippingFormSchema>
 
 interface ShippingFormProps {
   onSubmit: (values: ShippingFormValues) => void;
@@ -30,7 +30,7 @@ interface ShippingFormProps {
     name?: string;
     email?: string;
     phone?: string;
-    default_shipping_address?: Json;
+    shipping_address?: any;
   };
   isTestMode?: boolean;
   testData?: Partial<ShippingFormValues>;
@@ -52,7 +52,7 @@ export function ShippingForm({
       email: email || initialData?.email || "",
       name: initialData?.name || "",
       phone: initialData?.phone || "",
-      default_shipping_address: initialData?.default_shipping_address as any || null,
+      shipping_address: initialData?.shipping_address || null,
     },
     mode: "onChange"
   })
@@ -111,19 +111,15 @@ export function ShippingForm({
     })
 
     const fullAddress = `${streetNumber} ${route}`.trim()
+    const phone = form.getValues('phone')
     
-    console.log("Extracted address components:", {
-      street: fullAddress,
-      city,
-      state,
-      postalCode
-    })
-
-    form.setValue('default_shipping_address', {
+    form.setValue('shipping_address', {
       street: fullAddress || place.formatted_address || '',
       city,
       state,
-      postal_code: postalCode
+      country: 'Mexico',
+      postal_code: postalCode,
+      phone: phone
     }, { shouldValidate: true })
     
     setShowLocationFields(true)
@@ -144,9 +140,9 @@ export function ShippingForm({
         <PersonalInfoFields form={form} />
         
         <AddressAutocomplete
-          value={form.watch('default_shipping_address.street') || ''}
+          value={form.watch('shipping_address.street') || ''}
           onChange={(value) => 
-            form.setValue('default_shipping_address.street', value, { 
+            form.setValue('shipping_address.street', value, { 
               shouldValidate: true 
             })
           }
