@@ -2,7 +2,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Customer, CustomerInsert } from "@/types/database/customers";
 import { Order, OrderInsert } from "@/types/database/orders";
 import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
-import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
 
@@ -26,6 +25,10 @@ export class CheckoutProcessor {
         throw new Error("El carrito está vacío");
       }
 
+      if (!this.formData.email) {
+        throw new Error("El email es requerido");
+      }
+
       checkoutLogger.log(
         "validating_cart",
         "success",
@@ -38,9 +41,9 @@ export class CheckoutProcessor {
         .from("customers")
         .select()
         .eq('email', this.formData.email)
-        .single();
+        .maybeSingle();
 
-      if (searchError && searchError.code !== 'PGRST116') {
+      if (searchError) {
         throw searchError;
       }
 
