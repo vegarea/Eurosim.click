@@ -18,6 +18,8 @@ export function ShippingForm({
 }: ShippingFormProps) {
   const [showLocationFields, setShowLocationFields] = useState(false)
   
+  console.log('ShippingForm - Initial Data:', initialData)
+  
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -32,9 +34,12 @@ export function ShippingForm({
     mode: "onChange"
   })
 
+  console.log('ShippingForm - Form Values:', form.watch())
+
   // Observar cambios en los campos requeridos para validación
   useEffect(() => {
     const subscription = form.watch((value) => {
+      console.log('ShippingForm - Form Changed:', value)
       const hasRequiredFields = !!(
         value.fullName && 
         value.email && 
@@ -43,6 +48,7 @@ export function ShippingForm({
         form.formState.errors.email === undefined &&
         form.formState.errors.phone === undefined
       );
+      console.log('ShippingForm - Form Valid:', hasRequiredFields)
       onValidityChange?.(hasRequiredFields);
     });
     return () => subscription.unsubscribe();
@@ -51,6 +57,7 @@ export function ShippingForm({
   // Si estamos en modo test y tenemos datos de prueba, los usamos
   useEffect(() => {
     if (isTestMode && testData) {
+      console.log('ShippingForm - Setting Test Data:', testData)
       Object.entries(testData).forEach(([key, value]) => {
         if (value) {
           form.setValue(key as keyof ShippingFormValues, value);
@@ -97,6 +104,7 @@ export function ShippingForm({
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
+    console.log('ShippingForm - Submitting Values:', values)
     const shippingAddress: Json = values.address ? {
       street: values.address,
       city: values.city,
@@ -105,6 +113,7 @@ export function ShippingForm({
       phone: values.phone
     } : null;
 
+    console.log('ShippingForm - Formatted Shipping Address:', shippingAddress)
     onSubmit({
       ...values,
       shippingAddress

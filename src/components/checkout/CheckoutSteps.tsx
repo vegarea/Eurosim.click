@@ -26,9 +26,11 @@ export function CheckoutSteps({
 }: CheckoutStepsProps) {
   const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
 
+  console.log('CheckoutSteps - Current Step:', step)
+  console.log('CheckoutSteps - Current State:', state)
+
   React.useEffect(() => {
     if (step === 3) {
-      // Validar que tengamos el email antes de permitir el pago
       const isValid = !!state.customerInfo.email;
       console.log("Payment step validation:", { isValid, email: state.customerInfo.email });
       onFormValidityChange(isValid);
@@ -36,6 +38,8 @@ export function CheckoutSteps({
   }, [step, state.customerInfo.email, onFormValidityChange]);
 
   const handleFormSubmit = (values: any) => {
+    console.log('CheckoutSteps - Form Submit Values:', values)
+    
     if (values.shippingAddress) {
       updateOrderInfo({
         shipping_address: values.shippingAddress,
@@ -52,6 +56,8 @@ export function CheckoutSteps({
       gender: values.gender,
       default_shipping_address: values.shippingAddress
     })
+
+    console.log('CheckoutSteps - After Update State:', state)
   }
 
   switch (step) {

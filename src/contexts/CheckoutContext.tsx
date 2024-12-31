@@ -51,26 +51,37 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CheckoutState>(initialState)
 
   const updateCustomerInfo = (info: Partial<CheckoutState['customerInfo']>) => {
-    setState(prev => ({
-      ...prev,
-      customerInfo: {
-        ...prev.customerInfo,
-        ...info
-      }
-    }))
+    console.log('CheckoutContext - Updating Customer Info:', info)
+    setState(prev => {
+      const newState = {
+        ...prev,
+        customerInfo: {
+          ...prev.customerInfo,
+          ...info
+        }
+      };
+      console.log('CheckoutContext - New State:', newState)
+      return newState;
+    })
   }
 
   const updateOrderInfo = (info: Partial<CheckoutState['orderInfo']>) => {
-    setState(prev => ({
-      ...prev,
-      orderInfo: {
-        ...prev.orderInfo,
-        ...info
-      }
-    }))
+    console.log('CheckoutContext - Updating Order Info:', info)
+    setState(prev => {
+      const newState = {
+        ...prev,
+        orderInfo: {
+          ...prev.orderInfo,
+          ...info
+        }
+      };
+      console.log('CheckoutContext - New State:', newState)
+      return newState;
+    })
   }
 
   const clearCheckout = () => {
+    console.log('CheckoutContext - Clearing State')
     setState(initialState)
   }
 
