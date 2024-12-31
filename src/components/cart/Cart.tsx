@@ -17,7 +17,8 @@ export function Cart({
 }: CartProps) {
   const { items, updateQuantity, removeItem } = useCart()
 
-  const total = items.reduce((sum, item) => sum + item.total_price, 0)
+  // Asegurarnos de que el total sea un número
+  const total = items.reduce((sum, item) => sum + (item.total_price || 0), 0)
 
   return (
     <div className="space-y-4">
@@ -26,7 +27,7 @@ export function Cart({
           <CartItem 
             key={item.id} 
             item={item}
-            onUpdateQuantity={(quantity) => updateQuantity(item.id, quantity)}
+            onUpdateQuantity={(quantity: number) => updateQuantity(item.id, quantity)}
             onRemove={() => removeItem(item.id)}
           />
         ))}
