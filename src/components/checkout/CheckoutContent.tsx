@@ -33,7 +33,8 @@ export function CheckoutContent({
       console.log("Payment step validation:", { 
         isValid, 
         email: state.customerInfo.email,
-        name: state.customerInfo.name 
+        name: state.customerInfo.name,
+        state: state 
       });
       onFormValidityChange(isValid);
     }
@@ -59,7 +60,7 @@ export function CheckoutContent({
       new Date(values.activationDate).toISOString() : 
       null;
 
-    updateCustomerInfo({
+    const customerInfo = {
       name: values.fullName || values.name, // Soporte para ambos campos
       email: values.email,
       phone: values.phone,
@@ -67,44 +68,32 @@ export function CheckoutContent({
       birth_date: formattedBirthDate,
       gender: values.gender,
       default_shipping_address: values.shippingAddress
-    })
+    };
+
+    console.log("Updating customer info with:", customerInfo);
+    updateCustomerInfo(customerInfo);
 
     if (formattedActivationDate) {
       updateOrderInfo({
         activation_date: formattedActivationDate
       })
     }
-
-    console.log("Updated customer info:", {
-      name: values.fullName || values.name,
-      email: values.email
-    });
   }
 
-  switch (step) {
-    case 1:
-      if (hasPhysicalSim) {
-        return (
-          <ShippingForm
-            onSubmit={handleFormSubmit}
-            onValidityChange={onFormValidityChange}
-            isTestMode={isTestMode}
-            testData={testData.shipping}
-            initialData={state.customerInfo}
-          />
-        )
-      }
-      return (
-        <DocumentationForm
-          onSubmit={handleFormSubmit}
-          onValidityChange={onFormValidityChange}
-          isTestMode={isTestMode}
-          testData={testData.documentation}
-          initialData={state.customerInfo}
-        />
-      )
-    case 2:
-      if (hasPhysicalSim) {
+  const getCurrentStep = () => {
+    switch (step) {
+      case 1:
+        if (hasPhysicalSim) {
+          return (
+            <ShippingForm
+              onSubmit={handleFormSubmit}
+              onValidityChange={onFormValidityChange}
+              isTestMode={isTestMode}
+              testData={testData.shipping}
+              initialData={state.customerInfo}
+            />
+          )
+        }
         return (
           <DocumentationForm
             onSubmit={handleFormSubmit}
@@ -114,15 +103,33 @@ export function CheckoutContent({
             initialData={state.customerInfo}
           />
         )
-      }
-      return null
-    case 3:
-      return (
-        <PaymentStep 
-          formData={state}
-        />
-      )
-    default:
-      return null
+      case 2:
+        if (hasPhysicalSim) {
+          return (
+            <DocumentationForm
+              onSubmit={handleFormSubmit}
+              onValidityChange={onFormValidityChange}
+              isTestMode={isTestMode}
+              testData={testData.documentation}
+              initialData={state.customerInfo}
+            />
+          )
+        }
+        return null
+      case 3:
+        return (
+          <PaymentStep 
+            formData={state}
+          />
+        )
+      default:
+        return null
+    }
   }
+
+  return (
+    <div className="space-y-6">
+      {getCurrentStep()}
+    </div>
+  )
 }
