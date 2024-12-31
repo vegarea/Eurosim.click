@@ -18,10 +18,15 @@ const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
   console.log('🔔 Webhook request received');
-  console.log('Headers:', Object.fromEntries(req.headers.entries()));
+  
+  // Log all headers for debugging
+  const headers = Object.fromEntries(req.headers.entries());
+  console.log('📝 Request Headers:', headers);
+  console.log('🔑 Webhook Secret:', endpointSecret ? 'Configured' : 'Missing');
   
   // Handle CORS
   if (req.method === 'OPTIONS') {
+    console.log('👌 Handling CORS preflight request');
     return new Response(null, { 
       headers: {
         ...corsHeaders,
@@ -51,14 +56,17 @@ serve(async (req) => {
   try {
     const payload = await req.text();
     console.log('📦 Webhook payload received');
+    console.log('📝 Payload:', payload);
     
+    console.log('🔍 Attempting to verify webhook signature');
     const event = stripe.webhooks.constructEvent(
       payload,
       signature,
       endpointSecret
     );
     
-    console.log('🔔 Webhook event constructed:', event.type);
+    console.log('✅ Webhook signature verified');
+    console.log('🔔 Processing webhook event:', event.type);
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -71,6 +79,7 @@ serve(async (req) => {
         
         try {
           console.log('💳 Processing completed checkout session:', session.id);
+          console.log('📝 Session data:', JSON.stringify(session, null, 2));
           
           const customer = await handleCustomerCreation(session, supabase);
           console.log('👤 Customer created/updated:', customer.id);
@@ -84,6 +93,10 @@ serve(async (req) => {
           console.log('✨ Checkout completed successfully');
         } catch (error) {
           console.error('❌ Error processing successful checkout:', error);
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack
+          });
           throw error;
         }
         break;
@@ -109,6 +122,10 @@ serve(async (req) => {
 
   } catch (err) {
     console.error('❌ Error processing webhook:', err);
+    console.error('Error details:', {
+      message: err.message,
+      stack: err.stack
+    });
     return new Response(
       JSON.stringify({ error: err.message }), 
       { 
