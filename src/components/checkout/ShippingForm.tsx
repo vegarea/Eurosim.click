@@ -34,8 +34,14 @@ export function ShippingForm({
   useEffect(() => {
     const subscription = form.watch(() => {
       if (onValidityChange) {
+        const formValues = form.getValues();
+        const formErrors = form.formState.errors;
+        
+        console.log("Current form values:", formValues);
+        console.log("Current form errors:", formErrors);
+        
         const isValid = form.formState.isValid;
-        console.log('Form validity changed:', isValid, form.formState.errors);
+        console.log("Form validity changed:", isValid, formErrors);
         onValidityChange(isValid);
       }
     });
@@ -79,6 +85,7 @@ export function ShippingForm({
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
+    console.log("Form submitted with values:", values);
     const shippingAddress: Json = {
       street: values.address,
       city: values.city,
