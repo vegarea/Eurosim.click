@@ -1,15 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Customer, CustomerInsert } from "@/types/database/customers";
-import { Order, OrderInsert } from "@/types/database/orders";
-import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
-import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "@/types/database/enums";
-import { checkoutLogger } from "./checkoutLogger";
+import { OrderInsert } from "@/types/database/orders";
+import { OrderItemInsert } from "@/types/database/orderItems";
 import { Json } from "@/types/database/common";
+import { checkoutLogger } from "./checkoutLogger";
 
 export class CheckoutProcessor {
   constructor(
     private formData: Record<string, any>,
-    private cartItems: OrderItem[],
+    private cartItems: any[],
     private totalAmount: number
   ) {}
 
@@ -33,14 +32,14 @@ export class CheckoutProcessor {
         { items: this.cartItems }
       );
 
-      // Primero buscamos si el cliente ya existe
+      // Buscar cliente existente
       const { data: existingCustomer, error: searchError } = await supabase
         .from("customers")
         .select()
         .eq('email', this.formData.email)
-        .single();
+        .maybeSingle();
 
-      if (searchError && searchError.code !== 'PGRST116') {
+      if (searchError) {
         throw searchError;
       }
 
@@ -55,7 +54,16 @@ export class CheckoutProcessor {
           { customerId: customer.id }
         );
       } else {
-        customer = await this.createCustomer();
+        const { data: newCustomer, error: createError } = await supabase
+          .from("customers")
+          .insert(this.createCustomerData())
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        if (!newCustomer) throw new Error("Error al crear el cliente");
+        
+        customer = newCustomer;
         checkoutLogger.log(
           "creating_customer",
           "success",
@@ -97,14 +105,14 @@ export class CheckoutProcessor {
     }
   }
 
-  private async createCustomer(): Promise<Customer> {
-    const customerData: CustomerInsert = {
+  private createCustomerData(): CustomerInsert {
+    return {
       name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone || null,
-      passport_number: this.formData.passportNumber || null,
-      birth_date: this.formData.birthDate || null,
-      gender: this.formData.gender || null,
+      passport_number: null,
+      birth_date: null,
+      gender: null,
       default_shipping_address: this.formData.shippingAddress as Json,
       billing_address: null,
       preferred_language: 'es',
@@ -117,26 +125,15 @@ export class CheckoutProcessor {
       paypal_customer_id: null,
       metadata: {} as Json
     };
-
-    const { data, error } = await supabase
-      .from("customers")
-      .insert(customerData)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
   }
 
-  private async createOrder(customerId: string): Promise<Order> {
+  private async createOrder(customerId: string) {
     const firstItem = this.cartItems[0];
-    const metadata = firstItem.metadata as Record<string, any>;
-    
     const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
       status: "payment_pending",
-      type: metadata.product_type,
+      type: firstItem.metadata?.product_type || "physical",
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
       payment_method: "test",
@@ -160,10 +157,12 @@ export class CheckoutProcessor {
       .single();
 
     if (error) throw error;
+    if (!data) throw new Error("Error al crear la orden");
+    
     return data;
   }
 
-  private async createOrderItems(orderId: string): Promise<OrderItem[]> {
+  private async createOrderItems(orderId: string) {
     const orderItemsData: OrderItemInsert[] = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
@@ -179,6 +178,8 @@ export class CheckoutProcessor {
       .select();
 
     if (error) throw error;
+    if (!data) throw new Error("Error al crear los items de la orden");
+    
     return data;
   }
 }

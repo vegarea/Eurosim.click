@@ -6,7 +6,6 @@ import { formatCurrency } from "@/utils/currency";
 import { CheckoutProcessor } from "./utils/checkoutProcessor";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { OrderItem } from "@/types/database/orderItems";
 
 interface PaymentStepProps {
   formData: Record<string, any>;
@@ -19,13 +18,17 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
   const { items, clearCart } = useCart();
   const navigate = useNavigate();
 
-  // Calcular el total
   const total = items.reduce((sum, item) => sum + item.total_price, 0);
 
   const handleCompleteOrder = async () => {
     try {
       setIsProcessing(true);
-      console.log("Iniciando procesamiento de orden...", { formData, items, total });
+      
+      // Verificar que tengamos todos los datos necesarios
+      if (!formData.email || !formData.fullName) {
+        toast.error("Faltan datos del formulario");
+        return;
+      }
 
       const processor = new CheckoutProcessor(
         formData,
@@ -36,7 +39,6 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       const result = await processor.process();
 
       if (result.success) {
-        console.log("Orden completada exitosamente", result);
         toast.success("¡Orden completada exitosamente!");
         clearCart();
         onSubmit?.();
