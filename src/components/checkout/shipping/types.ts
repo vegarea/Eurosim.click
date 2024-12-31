@@ -9,10 +9,10 @@ export const shippingFormSchema = z.object({
     .refine((value) => isValidPhoneNumber(value), {
       message: "Número de teléfono inválido"
     }),
-  address: z.string().min(5, "Dirección inválida"),
-  city: z.string().min(2, "Ciudad inválida"),
-  state: z.string().min(2, "Estado inválido"),
-  zipCode: z.string().min(5, "Código postal inválido"),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zipCode: z.string().optional(),
 })
 
 export type ShippingFormValues = z.infer<typeof shippingFormSchema>

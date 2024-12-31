@@ -32,6 +32,22 @@ export function ShippingForm({
     mode: "onChange"
   })
 
+  // Observar cambios en los campos requeridos para validación
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      const hasRequiredFields = !!(
+        value.fullName && 
+        value.email && 
+        value.phone && 
+        form.formState.errors.fullName === undefined &&
+        form.formState.errors.email === undefined &&
+        form.formState.errors.phone === undefined
+      );
+      onValidityChange?.(hasRequiredFields);
+    });
+    return () => subscription.unsubscribe();
+  }, [form, onValidityChange]);
+
   // Si estamos en modo test y tenemos datos de prueba, los usamos
   useEffect(() => {
     if (isTestMode && testData) {
@@ -81,13 +97,13 @@ export function ShippingForm({
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
-    const shippingAddress: Json = {
+    const shippingAddress: Json = values.address ? {
       street: values.address,
       city: values.city,
       state: values.state,
       postal_code: values.zipCode,
       phone: values.phone
-    }
+    } : null;
 
     onSubmit({
       ...values,
