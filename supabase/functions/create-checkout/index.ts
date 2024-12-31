@@ -36,7 +36,7 @@ serve(async (req) => {
     // Crear line items desde el carrito
     const line_items = cartItems.map((item: any) => ({
       price_data: {
-        currency: 'mxn', // Cambiado a MXN
+        currency: 'mxn',
         product_data: {
           name: item.metadata?.product_title || 'Producto',
           description: item.metadata?.description,
@@ -53,7 +53,7 @@ serve(async (req) => {
       line_items,
       mode: 'payment',
       customer_email: customerInfo.email,
-      success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata: {
         customer_name: customerInfo.name,
@@ -61,7 +61,7 @@ serve(async (req) => {
         customer_passport: customerInfo.passport_number,
         customer_birth_date: customerInfo.birth_date,
         customer_gender: customerInfo.gender,
-        order_type: cartItems[0].metadata.product_type // Usamos el tipo del producto desde los metadatos
+        order_type: cartItems[0].metadata.product_type
       },
     })
 
