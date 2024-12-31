@@ -101,7 +101,7 @@ export function ShippingForm({
         streetNumber = component.long_name
       } else if (types.includes('route')) {
         route = component.long_name
-      } else if (types.includes('locality')) {
+      } else if (types.includes('locality') || types.includes('sublocality')) {
         city = component.long_name
       } else if (types.includes('administrative_area_level_1')) {
         state = component.long_name
@@ -119,13 +119,12 @@ export function ShippingForm({
       postalCode
     })
 
-    // Actualizar todos los campos de dirección de una vez
     form.setValue('default_shipping_address', {
       street: fullAddress || place.formatted_address || '',
       city,
       state,
       postal_code: postalCode
-    })
+    }, { shouldValidate: true })
     
     setShowLocationFields(true)
   }

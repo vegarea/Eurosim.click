@@ -84,13 +84,17 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
       console.log("Initializing autocomplete...")
       autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
         componentRestrictions: { country: "mx" },
-        fields: ["address_components", "formatted_address"],
+        fields: ["address_components", "formatted_address", "geometry"],
       })
 
       autocompleteRef.current.addListener("place_changed", () => {
         const place = autocompleteRef.current?.getPlace()
         if (place) {
           console.log("Place selected:", place)
+          if (!place.address_components) {
+            console.error("No address components found")
+            return
+          }
           onChange(place.formatted_address || "")
           onAddressSelect(place)
         }
