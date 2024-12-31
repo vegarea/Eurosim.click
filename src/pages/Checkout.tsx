@@ -11,26 +11,33 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
-import { CustomerGender } from "@/types/database/enums"
 
 const testData = {
   shipping: {
     fullName: "Juan Pérez",
     email: "juan@ejemplo.com",
-    phone: "5512345678",
+    phone: "+525512345678",
     address: "Calle Principal 123",
     city: "Ciudad de México",
     state: "CDMX",
-    zipCode: "11111"
+    zipCode: "11111",
+    shippingAddress: {
+      street: "Calle Principal 123",
+      city: "Ciudad de México",
+      state: "CDMX",
+      country: "México",
+      postal_code: "11111",
+      phone: "+525512345678"
+    }
   },
   documentation: {
     fullName: "Juan Pérez",
-    birthDate: new Date(),
-    gender: "M" as CustomerGender,
+    birthDate: new Date().toISOString().split('T')[0],
+    gender: "M",
     passportNumber: "AB123456",
-    activationDate: new Date(),
+    activationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     email: "juan@ejemplo.com",
-    phone: "5512345678"
+    phone: "+525512345678"
   }
 }
 
@@ -71,6 +78,8 @@ export default function Checkout() {
       title: "Modo de prueba activado",
       description: "Se han cargado datos de prueba para facilitar el testing",
     });
+
+    console.log("Datos de prueba cargados:", data);
   };
 
   const handleFormValidityChange = (isValid: boolean) => {
