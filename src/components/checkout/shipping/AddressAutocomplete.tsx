@@ -89,7 +89,8 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           const place = autocompleteRef.current?.getPlace()
           if (place) {
             console.log("Place selected:", place)
-            onChange(place.formatted_address || "")
+            const formattedAddress = place.formatted_address || ""
+            onChange(formattedAddress)
             onAddressSelect(place)
           }
         })
@@ -99,7 +100,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     loadGoogleMapsScript()
 
     return () => {
-      // Cleanup listener if component unmounts
       if (autocompleteRef.current) {
         google.maps.event.clearInstanceListeners(autocompleteRef.current)
       }
