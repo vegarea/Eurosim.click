@@ -10,9 +10,9 @@ import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
 import { ShippingForm } from "@/components/checkout/ShippingForm"
 import { CustomerGender } from "@/types/database/enums"
-import { CheckoutProvider } from "@/contexts/CheckoutContext"
+import { CheckoutProvider, useCheckout } from "@/contexts/CheckoutContext"
 import { Card } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { StripeCheckout } from "@/components/checkout/payment/StripeCheckout"
 
 const testData = {
   shipping: {
@@ -41,6 +41,8 @@ function CheckoutContent() {
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
+  const { state } = useCheckout()
+  const [showStripeCheckout, setShowStripeCheckout] = useState(false)
   
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
@@ -72,7 +74,21 @@ function CheckoutContent() {
   };
 
   const handleFormValidityChange = (isValid: boolean) => {
+    console.log('Form validity changed:', isValid)
     setIsFormValid(isValid)
+  }
+
+  const handleCheckout = () => {
+    console.log('Handling checkout with state:', state)
+    if (!isFormValid) {
+      toast({
+        title: "Formulario incompleto",
+        description: "Por favor completa todos los campos requeridos",
+        variant: "destructive"
+      })
+      return
+    }
+    setShowStripeCheckout(true)
   }
 
   if (items.length === 0) {
@@ -133,10 +149,15 @@ function CheckoutContent() {
             >
               <div className="lg:sticky lg:top-4 space-y-4">
                 <Card className="p-6">
-                  <Cart 
-                    showCheckoutButton={true}
-                    isButtonEnabled={isFormValid}
-                  />
+                  {showStripeCheckout ? (
+                    <StripeCheckout />
+                  ) : (
+                    <Cart 
+                      showCheckoutButton={true}
+                      isButtonEnabled={isFormValid}
+                      onCheckout={handleCheckout}
+                    />
+                  )}
                 </Card>
                 
                 <Card className="p-6">
