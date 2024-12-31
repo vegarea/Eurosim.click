@@ -43,16 +43,17 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
 
         if (!window.google) {
           console.log("Loading Google Maps script...")
+          const script = document.createElement('script')
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`
+          script.async = true
+          script.defer = true
+          
           window.initGoogleMaps = () => {
             console.log('Google Maps API loaded successfully')
             scriptLoadedRef.current = true
             initializeAutocomplete()
           }
 
-          const script = document.createElement('script')
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`
-          script.async = true
-          script.defer = true
           document.head.appendChild(script)
 
           script.onerror = () => {
@@ -89,8 +90,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           const place = autocompleteRef.current?.getPlace()
           if (place) {
             console.log("Place selected:", place)
-            const formattedAddress = place.formatted_address || ""
-            onChange(formattedAddress)
+            onChange(place.formatted_address || "")
             onAddressSelect(place)
           }
         })

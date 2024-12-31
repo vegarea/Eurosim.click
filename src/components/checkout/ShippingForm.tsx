@@ -82,15 +82,19 @@ export function ShippingForm({
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
-    const addressComponents = place.address_components || []
     
+    if (!place.address_components) {
+      console.error("No address components found in place result")
+      return
+    }
+
     let streetNumber = ''
     let route = ''
     let city = ''
     let state = ''
     let postalCode = ''
 
-    addressComponents.forEach(component => {
+    place.address_components.forEach(component => {
       const types = component.types
 
       if (types.includes('street_number')) {
@@ -108,8 +112,15 @@ export function ShippingForm({
 
     const fullAddress = `${streetNumber} ${route}`.trim()
     
-    form.setValue('default_shipping_address', {
+    console.log("Extracted address components:", {
       street: fullAddress,
+      city,
+      state,
+      postalCode
+    })
+
+    form.setValue('default_shipping_address', {
+      street: fullAddress || place.formatted_address || '',
       city,
       state,
       postal_code: postalCode
