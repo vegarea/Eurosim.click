@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { BrowserRouter } from 'react-router-dom'
 import Checkout from '@/pages/Checkout'
-import { CartProvider } from '@/contexts/CartContext'
+import { CartProvider, useCart } from '@/contexts/CartContext'
 import { Product } from '@/types/database/products'
 
 // Mock de producto para pruebas
@@ -126,10 +126,11 @@ describe('Checkout Process', () => {
 
   it('should handle physical SIM checkout flow correctly', async () => {
     // Mock del producto físico
-    vi.mocked(useCart).mockReturnValue({
-      ...vi.mocked(useCart)(),
+    const mockUseCart = vi.mocked(useCart)
+    mockUseCart.mockReturnValue({
+      ...mockUseCart(),
       items: [{
-        ...vi.mocked(useCart)().items[0],
+        ...mockUseCart().items[0],
         metadata: { product_type: 'physical' }
       }]
     })
