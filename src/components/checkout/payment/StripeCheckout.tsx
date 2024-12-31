@@ -12,21 +12,18 @@ export function StripeCheckout() {
 
   const handleCheckout = async () => {
     try {
+      // Validar datos requeridos
+      if (!customerInfo.email || !customerInfo.name) {
+        toast.error('Por favor completa tu información personal antes de continuar')
+        return
+      }
+
       setIsLoading(true)
       console.log('Starting checkout with:', { cartItems, customerInfo })
 
-      // Transformar los items para Stripe
-      const lineItems = cartItems.map(item => ({
-        ...item,
-        title: item.metadata && typeof item.metadata === 'object' ? 
-          (item.metadata as Record<string, any>).product_title || 'Product' : 'Product',
-        description: item.metadata && typeof item.metadata === 'object' ? 
-          (item.metadata as Record<string, any>).description || undefined : undefined
-      }))
-
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          cartItems: lineItems,
+          cartItems,
           customerInfo,
         },
       })

@@ -15,7 +15,7 @@ export function Cart({
   isButtonEnabled = true,
   onCheckout
 }: CartProps) {
-  const { items } = useCart()
+  const { items, updateQuantity, removeItem } = useCart()
 
   const total = items.reduce((sum, item) => sum + item.total_price, 0)
 
@@ -23,7 +23,12 @@ export function Cart({
     <div className="space-y-4">
       <div className="space-y-2">
         {items.map((item) => (
-          <CartItem key={item.id} item={item} />
+          <CartItem 
+            key={item.id} 
+            item={item}
+            onUpdateQuantity={(quantity) => updateQuantity(item.id, quantity)}
+            onRemove={() => removeItem(item.id)}
+          />
         ))}
       </div>
 

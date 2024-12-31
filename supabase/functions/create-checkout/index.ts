@@ -18,6 +18,19 @@ serve(async (req) => {
     
     console.log('Received checkout request:', { cartItems, customerInfo })
 
+    // Validar datos requeridos
+    if (!customerInfo.email) {
+      throw new Error('El email es requerido')
+    }
+
+    if (!customerInfo.name) {
+      throw new Error('El nombre es requerido')
+    }
+
+    if (cartItems.length === 0) {
+      throw new Error('El carrito está vacío')
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
@@ -27,10 +40,10 @@ serve(async (req) => {
       price_data: {
         currency: 'eur',
         product_data: {
-          name: item.title,
-          description: item.description || undefined,
+          name: item.metadata?.product_title || 'Producto',
+          description: item.metadata?.description,
         },
-        unit_amount: item.unit_price, // Precio en centavos
+        unit_amount: item.unit_price,
       },
       quantity: item.quantity,
     }))
