@@ -1,7 +1,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar as CalendarIcon, CreditCard } from "lucide-react"
+import { CalendarIcon, CreditCard } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -64,48 +64,67 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  disabled={(date) =>
-                    date > new Date() || date < new Date("1900-01-01")
-                  }
-                  initialFocus
-                  captionLayout="dropdown-buttons"
-                  fromYear={1940}
-                  toYear={new Date().getFullYear()}
-                  defaultMonth={new Date(1990, 0)}
-                  classNames={{
-                    months: "space-y-4",
-                    month: "space-y-4",
-                    caption: "flex justify-center pt-1 relative items-center",
-                    caption_label: "text-sm font-medium",
-                    nav: "space-x-1 flex items-center",
-                    nav_button: cn(
-                      "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                    ),
-                    nav_button_previous: "absolute left-1",
-                    nav_button_next: "absolute right-1",
-                    table: "w-full border-collapse space-y-1",
-                    head_row: "flex",
-                    head_cell: "text-slate-500 rounded-md w-9 font-normal text-[0.8rem] dark:text-slate-400",
-                    row: "flex w-full mt-2",
-                    cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-slate-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 dark:[&:has([aria-selected])]:bg-slate-800",
-                    day: cn(
-                      "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
-                    ),
-                    day_selected:
-                      "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                    day_today: "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-slate-50",
-                    day_outside: "text-slate-500 opacity-50 dark:text-slate-400",
-                    day_disabled: "text-slate-500 opacity-50 dark:text-slate-400",
-                    day_range_middle:
-                      "aria-selected:bg-slate-100 aria-selected:text-slate-900 dark:aria-selected:bg-slate-800 dark:aria-selected:text-slate-50",
-                    day_hidden: "invisible",
-                  }}
-                  className="rounded-md border shadow-md bg-white p-3"
-                />
+                <div className="p-3 bg-white rounded-md border shadow-md">
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Año</label>
+                      <Select
+                        value={field.value ? field.value.getFullYear().toString() : "1990"}
+                        onValueChange={(year) => {
+                          const newDate = new Date(field.value || new Date())
+                          newDate.setFullYear(parseInt(year))
+                          field.onChange(newDate)
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 84 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">Mes</label>
+                      <Select
+                        value={field.value ? (field.value.getMonth() + 1).toString() : "1"}
+                        onValueChange={(month) => {
+                          const newDate = new Date(field.value || new Date())
+                          newDate.setMonth(parseInt(month) - 1)
+                          field.onChange(newDate)
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 12 }, (_, i) => {
+                            const date = new Date(2000, i, 1)
+                            return (
+                              <SelectItem key={i + 1} value={(i + 1).toString()}>
+                                {format(date, "MMMM", { locale: es })}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1940-01-01")
+                    }
+                    defaultMonth={field.value || new Date(1990, 0)}
+                    className="rounded-md"
+                  />
+                </div>
               </PopoverContent>
             </Popover>
             <FormMessage />
@@ -174,7 +193,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                     date < new Date()
                   }
                   initialFocus
-                  className="rounded-md border"
+                  className="rounded-md border p-3"
                 />
               </PopoverContent>
             </Popover>
