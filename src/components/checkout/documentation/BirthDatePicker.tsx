@@ -12,16 +12,15 @@ interface BirthDatePickerProps {
 export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
   const [selectedYear, setSelectedYear] = useState<number>(value?.getFullYear() || 1990)
   const [selectedMonth, setSelectedMonth] = useState<number>(value?.getMonth() || 0)
-  const [selectedDay, setSelectedDay] = useState<Date | undefined>(value)
+  const [selectedDate, setSelectedDate] = useState<Date>(value || new Date())
 
   const handleYearChange = (year: string) => {
     const yearNum = parseInt(year)
     setSelectedYear(yearNum)
     
-    const newDate = new Date(selectedDay || value || new Date())
+    const newDate = new Date(selectedDate)
     newDate.setFullYear(yearNum)
-    newDate.setMonth(selectedMonth)
-    setSelectedDay(newDate)
+    setSelectedDate(newDate)
     onChange(newDate)
   }
 
@@ -29,10 +28,9 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
     const monthNum = parseInt(month)
     setSelectedMonth(monthNum)
     
-    const newDate = new Date(selectedDay || value || new Date())
-    newDate.setFullYear(selectedYear)
+    const newDate = new Date(selectedDate)
     newDate.setMonth(monthNum)
-    setSelectedDay(newDate)
+    setSelectedDate(newDate)
     onChange(newDate)
   }
 
@@ -41,7 +39,7 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       const newDate = new Date(date)
       newDate.setFullYear(selectedYear)
       newDate.setMonth(selectedMonth)
-      setSelectedDay(newDate)
+      setSelectedDate(newDate)
       onChange(newDate)
     }
   }
@@ -91,12 +89,12 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       </div>
       <Calendar
         mode="single"
-        selected={selectedDay}
+        selected={selectedDate}
         onSelect={handleDaySelect}
         disabled={(date) =>
           date > new Date() || date < new Date("1940-01-01")
         }
-        defaultMonth={new Date(selectedYear, selectedMonth)}
+        defaultMonth={selectedDate}
         className="rounded-md"
       />
     </div>
