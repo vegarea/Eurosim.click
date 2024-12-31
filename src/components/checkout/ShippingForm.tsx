@@ -44,8 +44,6 @@ export function ShippingForm({
   isTestMode,
   testData
 }: ShippingFormProps) {
-  const [showLocationFields, setShowLocationFields] = useState(false)
-  
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -83,7 +81,6 @@ export function ShippingForm({
           form.setValue(key as keyof ShippingFormValues, value as any)
         }
       })
-      setShowLocationFields(true)
     }
   }, [isTestMode, testData, form])
 
@@ -128,8 +125,6 @@ export function ShippingForm({
       postal_code: postalCode,
       phone: phone
     }, { shouldValidate: true })
-    
-    setShowLocationFields(true)
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
@@ -156,7 +151,7 @@ export function ShippingForm({
           onAddressSelect={handleAddressSelect}
         />
 
-        <LocationFields form={form} show={showLocationFields} />
+        <LocationFields form={form} />
       </form>
     </Form>
   )
