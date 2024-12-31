@@ -10,37 +10,28 @@ interface BirthDatePickerProps {
 }
 
 export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
-  const [selectedYear, setSelectedYear] = useState<number>(value?.getFullYear() || 1990)
-  const [selectedMonth, setSelectedMonth] = useState<number>(value?.getMonth() || 0)
-  const [selectedDate, setSelectedDate] = useState<Date>(value || new Date())
+  const [currentDate, setCurrentDate] = useState<Date>(value || new Date())
 
   const handleYearChange = (year: string) => {
     const yearNum = parseInt(year)
-    setSelectedYear(yearNum)
-    
-    const newDate = new Date(selectedDate)
+    const newDate = new Date(currentDate)
     newDate.setFullYear(yearNum)
-    setSelectedDate(newDate)
+    setCurrentDate(newDate)
     onChange(newDate)
   }
 
   const handleMonthChange = (month: string) => {
     const monthNum = parseInt(month)
-    setSelectedMonth(monthNum)
-    
-    const newDate = new Date(selectedDate)
+    const newDate = new Date(currentDate)
     newDate.setMonth(monthNum)
-    setSelectedDate(newDate)
+    setCurrentDate(newDate)
     onChange(newDate)
   }
 
   const handleDaySelect = (date: Date | undefined) => {
     if (date) {
-      const newDate = new Date(date)
-      newDate.setFullYear(selectedYear)
-      newDate.setMonth(selectedMonth)
-      setSelectedDate(newDate)
-      onChange(newDate)
+      setCurrentDate(date)
+      onChange(date)
     }
   }
 
@@ -50,7 +41,7 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
         <div>
           <label className="text-sm font-medium mb-1 block">Año</label>
           <Select
-            value={selectedYear.toString()}
+            value={currentDate.getFullYear().toString()}
             onValueChange={handleYearChange}
           >
             <SelectTrigger>
@@ -68,7 +59,7 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
         <div>
           <label className="text-sm font-medium mb-1 block">Mes</label>
           <Select
-            value={selectedMonth.toString()}
+            value={currentDate.getMonth().toString()}
             onValueChange={handleMonthChange}
           >
             <SelectTrigger>
@@ -89,12 +80,12 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       </div>
       <Calendar
         mode="single"
-        selected={selectedDate}
+        selected={currentDate}
         onSelect={handleDaySelect}
+        defaultMonth={currentDate}
         disabled={(date) =>
           date > new Date() || date < new Date("1940-01-01")
         }
-        defaultMonth={selectedDate}
         className="rounded-md"
       />
     </div>
