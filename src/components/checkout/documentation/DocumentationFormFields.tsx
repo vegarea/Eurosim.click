@@ -75,7 +75,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                   captionLayout="dropdown-buttons"
                   fromYear={1940}
                   toYear={new Date().getFullYear()}
-                  className="rounded-md border bg-white"
+                  className="rounded-md border shadow-md bg-white"
                 />
               </PopoverContent>
             </Popover>
@@ -136,7 +136,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-white" align="start">
+              <PopoverContent className="w-auto p-0 bg-white shadow-md" align="start">
                 <Calendar
                   mode="single"
                   selected={field.value}
