@@ -5,6 +5,7 @@ import { PaymentStep } from "./PaymentStep"
 import { useCheckout } from "@/contexts/CheckoutContext"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
+import { format } from "date-fns"
 
 interface CheckoutContentProps {
   step: number;
@@ -28,7 +29,6 @@ export function CheckoutContent({
 
   React.useEffect(() => {
     if (step === 3) {
-      // Validar que tengamos el email antes de permitir el pago
       const isValid = !!state.customerInfo.email;
       console.log("Payment step validation:", { isValid, email: state.customerInfo.email });
       onFormValidityChange(isValid);
@@ -43,15 +43,31 @@ export function CheckoutContent({
       })
     }
 
+    // Formatear las fechas al formato que espera Supabase (YYYY-MM-DD)
+    const formattedBirthDate = values.birthDate ? 
+      format(new Date(values.birthDate), 'yyyy-MM-dd') : 
+      null;
+
+    // Para activation_date mantenemos el timestamp completo que requiere Supabase
+    const formattedActivationDate = values.activationDate ? 
+      new Date(values.activationDate).toISOString() : 
+      null;
+
     updateCustomerInfo({
       name: values.fullName,
       email: values.email,
       phone: values.phone,
       passport_number: values.passportNumber,
-      birth_date: values.birthDate,
+      birth_date: formattedBirthDate,
       gender: values.gender,
       default_shipping_address: values.shippingAddress
     })
+
+    if (formattedActivationDate) {
+      updateOrderInfo({
+        activation_date: formattedActivationDate
+      })
+    }
   }
 
   switch (step) {
