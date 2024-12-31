@@ -42,7 +42,6 @@ function CheckoutContent() {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { state } = useCheckout()
-  const [showStripeCheckout, setShowStripeCheckout] = useState(false)
   
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
@@ -76,19 +75,6 @@ function CheckoutContent() {
   const handleFormValidityChange = (isValid: boolean) => {
     console.log('Form validity changed:', isValid)
     setIsFormValid(isValid)
-  }
-
-  const handleCheckout = () => {
-    console.log('Handling checkout with state:', state)
-    if (!isFormValid) {
-      toast({
-        title: "Formulario incompleto",
-        description: "Por favor completa todos los campos requeridos",
-        variant: "destructive"
-      })
-      return
-    }
-    setShowStripeCheckout(true)
   }
 
   if (items.length === 0) {
@@ -149,11 +135,10 @@ function CheckoutContent() {
             >
               <div className="lg:sticky lg:top-4 space-y-4">
                 <Card className="p-6">
-                  {showStripeCheckout ? (
+                  <Cart />
+                  <div className="mt-4">
                     <StripeCheckout />
-                  ) : (
-                    <Cart />
-                  )}
+                  </div>
                 </Card>
                 
                 <Card className="p-6">
