@@ -12,6 +12,7 @@ import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutContent } from "@/components/checkout/CheckoutContent"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
 import { CustomerGender } from "@/types/database/enums"
+import { CheckoutProvider } from "@/contexts/CheckoutContext"
 
 const testData = {
   shipping: {
@@ -38,7 +39,6 @@ export default function Checkout() {
   const { items } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
-  const [formData, setFormData] = useState<Record<string, any>>({})
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
@@ -63,9 +63,8 @@ export default function Checkout() {
       { ...testData.shipping, ...testData.documentation } :
       testData.documentation;
     
-    setFormData(data);
-    setIsFormValid(true);
     setIsTestMode(true);
+    setIsFormValid(true);
     
     toast({
       title: "Modo de prueba activado",
@@ -77,38 +76,11 @@ export default function Checkout() {
     setIsFormValid(isValid)
   }
 
-  const handleFormSubmit = (values: any) => {
-    const formDataWithShippingAddress = {
-      ...values,
-      shipping_address: values.shippingAddress as unknown as Json
-    };
-    
-    // Asegurarnos que el email se mantenga en el formData
-    setFormData(prev => ({ 
-      ...prev, 
-      ...formDataWithShippingAddress,
-      email: values.email || prev.email // Mantener el email existente si no viene en values
-    }));
-
-    if (step < 3) {
-      setStep(step + 1);
-      setIsFormValid(false);
-    }
-  }
-
-  const handleUpdateField = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
-
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1)
       setIsFormValid(true)
     }
-  }
-
-  const handleCheckout = () => {
-    handleFormSubmit(formData);
   }
 
   useEffect(() => {
@@ -122,63 +94,60 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
-      <Header />
-      
-      <main className="container mx-auto py-8 px-4 max-w-5xl">
-        <div className="max-w-5xl mx-auto">
-          <CheckoutHeader onLoadTestData={loadTestData} />
-          <CheckoutProgress step={step} />
+    <CheckoutProvider>
+      <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
+        <Header />
+        
+        <main className="container mx-auto py-8 px-4 max-w-5xl">
+          <div className="max-w-5xl mx-auto">
+            <CheckoutHeader onLoadTestData={loadTestData} />
+            <CheckoutProgress step={step} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <motion.div 
-              className="lg:col-span-8"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
-                <CheckoutContent
-                  step={step}
-                  hasPhysicalSim={hasPhysicalSim}
-                  isTestMode={isTestMode}
-                  testData={testData}
-                  onFormSubmit={handleFormSubmit}
-                  onFormValidityChange={handleFormValidityChange}
-                  formData={formData}
-                  onUpdateField={handleUpdateField}
-                />
-                
-                <CheckoutNavigation
-                  step={step}
-                  isFormValid={isFormValid}
-                  onBack={handleBack}
-                  onSubmit={handleFormSubmit}
-                  formData={formData}
-                />
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="lg:col-span-4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
-                <Cart 
-                  showCheckoutButton={step === 3} 
-                  isButtonEnabled={isFormValid}
-                  onCheckout={handleCheckout}
-                />
-                <div className="mt-4">
-                  <PaymentSecurity />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <motion.div 
+                className="lg:col-span-8"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
+                  <CheckoutContent
+                    step={step}
+                    hasPhysicalSim={hasPhysicalSim}
+                    isTestMode={isTestMode}
+                    testData={testData}
+                    onFormValidityChange={handleFormValidityChange}
+                  />
+                  
+                  <CheckoutNavigation
+                    step={step}
+                    isFormValid={isFormValid}
+                    onBack={handleBack}
+                    onNext={() => setStep(prev => prev + 1)}
+                  />
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+
+              <motion.div 
+                className="lg:col-span-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="bg-white rounded-xl shadow-sm p-6 lg:sticky lg:top-4">
+                  <Cart 
+                    showCheckoutButton={step === 3} 
+                    isButtonEnabled={isFormValid}
+                  />
+                  <div className="mt-4">
+                    <PaymentSecurity />
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </CheckoutProvider>
   )
 }

@@ -2,6 +2,7 @@ import React from "react"
 import { DocumentationForm } from "./DocumentationForm"
 import { ShippingForm } from "./ShippingForm"
 import { PaymentStep } from "./PaymentStep"
+import { useCheckout } from "@/contexts/CheckoutContext"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
 
@@ -13,10 +14,7 @@ interface CheckoutContentProps {
     shipping: ShippingFormValues;
     documentation: DocumentationFormValues;
   };
-  onFormSubmit: (values: any) => void;
   onFormValidityChange: (isValid: boolean) => void;
-  formData: Record<string, any>;
-  onUpdateField: (field: string, value: any) => void;
 }
 
 export function CheckoutContent({
@@ -24,31 +22,37 @@ export function CheckoutContent({
   hasPhysicalSim,
   isTestMode,
   testData,
-  onFormSubmit,
   onFormValidityChange,
-  formData,
-  onUpdateField
 }: CheckoutContentProps) {
-  // Asegurarnos que el email se mantenga entre pasos
-  const handleFormSubmit = (values: any) => {
-    console.log("Form submitted with values:", values);
-    // Preservar el email si existe
-    const updatedValues = {
-      ...values,
-      email: values.email || formData.email // Mantener el email existente si no viene en values
-    };
-    console.log("Updated values with preserved email:", updatedValues);
-    onFormSubmit(updatedValues);
-  };
+  const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
 
   React.useEffect(() => {
     if (step === 3) {
       // Validar que tengamos el email antes de permitir el pago
-      const isValid = !!formData.email;
-      console.log("Payment step validation:", { isValid, email: formData.email });
+      const isValid = !!state.customerInfo.email;
+      console.log("Payment step validation:", { isValid, email: state.customerInfo.email });
       onFormValidityChange(isValid);
     }
-  }, [step, formData.email, onFormValidityChange]);
+  }, [step, state.customerInfo.email, onFormValidityChange]);
+
+  const handleFormSubmit = (values: any) => {
+    if (values.shippingAddress) {
+      updateOrderInfo({
+        shipping_address: values.shippingAddress,
+        type: hasPhysicalSim ? "physical" : "esim"
+      })
+    }
+
+    updateCustomerInfo({
+      name: values.fullName,
+      email: values.email,
+      phone: values.phone,
+      passport_number: values.passportNumber,
+      birth_date: values.birthDate,
+      gender: values.gender,
+      default_shipping_address: values.shippingAddress
+    })
+  }
 
   switch (step) {
     case 1:
@@ -59,7 +63,7 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.shipping}
-            initialData={formData} // Pasar datos existentes
+            initialData={state.customerInfo}
           />
         )
       }
@@ -69,7 +73,7 @@ export function CheckoutContent({
           onValidityChange={onFormValidityChange}
           isTestMode={isTestMode}
           testData={testData.documentation}
-          initialData={formData} // Pasar datos existentes
+          initialData={state.customerInfo}
         />
       )
     case 2:
@@ -80,7 +84,7 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.documentation}
-            initialData={formData} // Pasar datos existentes
+            initialData={state.customerInfo}
           />
         )
       }
@@ -88,8 +92,7 @@ export function CheckoutContent({
     case 3:
       return (
         <PaymentStep 
-          formData={formData}
-          onSubmit={() => handleFormSubmit(formData)}
+          formData={state}
         />
       )
     default:
