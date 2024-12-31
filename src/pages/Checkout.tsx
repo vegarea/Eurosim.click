@@ -83,7 +83,13 @@ export default function Checkout() {
       shipping_address: values.shippingAddress as unknown as Json
     };
     
-    setFormData({ ...formData, ...formDataWithShippingAddress });
+    // Asegurarnos que el email se mantenga en el formData
+    setFormData(prev => ({ 
+      ...prev, 
+      ...formDataWithShippingAddress,
+      email: values.email || prev.email // Mantener el email existente si no viene en values
+    }));
+
     if (step < 3) {
       setStep(step + 1);
       setIsFormValid(false);

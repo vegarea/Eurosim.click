@@ -6,7 +6,6 @@ import { formatCurrency } from "@/utils/currency";
 import { CheckoutProcessor } from "./utils/checkoutProcessor";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { OrderItem } from "@/types/database/orderItems";
 
 interface PaymentStepProps {
   formData: Record<string, any>;
@@ -25,7 +24,13 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
   const handleCompleteOrder = async () => {
     try {
       setIsProcessing(true);
-      console.log("Iniciando procesamiento de orden...", { formData, items, total });
+      console.log("Iniciando procesamiento de orden con datos:", { formData, items, total });
+
+      // Validar que tengamos el email antes de procesar
+      if (!formData.email) {
+        toast.error("El email es requerido para completar la orden");
+        return;
+      }
 
       const processor = new CheckoutProcessor(
         formData,
@@ -45,7 +50,7 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
 
     } catch (error) {
       console.error("Error processing checkout:", error);
-      toast.error("Error al procesar la orden");
+      toast.error(error instanceof Error ? error.message : "Error al procesar la orden");
     } finally {
       setIsProcessing(false);
     }
