@@ -45,8 +45,6 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
         toast.success("¡Orden completada exitosamente!");
         clearCart();
         onSubmit?.();
-        // Limpiar sessionStorage después de una orden exitosa
-        sessionStorage.removeItem('checkoutData');
         navigate("/");
       }
 

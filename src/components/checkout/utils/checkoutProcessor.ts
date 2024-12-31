@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import { Customer } from "@/types/database/customers";
-import { Order } from "@/types/database/orders";
-import { OrderItem } from "@/types/database/orderItems";
+import { Customer, CustomerInsert } from "@/types/database/customers";
+import { Order, OrderInsert } from "@/types/database/orders";
+import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
 
@@ -101,14 +101,14 @@ export class CheckoutProcessor {
   }
 
   private async createCustomer(): Promise<Customer> {
-    const customerData = {
-      name: this.formData.name,
+    const customerData: CustomerInsert = {
+      name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone || null,
-      passport_number: this.formData.passport_number || null,
-      birth_date: this.formData.birth_date || null,
+      passport_number: this.formData.passportNumber || null,
+      birth_date: this.formData.birthDate || null,
       gender: this.formData.gender || null,
-      default_shipping_address: this.formData.shipping_address as Json,
+      default_shipping_address: this.formData.shippingAddress as Json,
       billing_address: null,
       preferred_language: 'es',
       marketing_preferences: {
@@ -135,7 +135,7 @@ export class CheckoutProcessor {
     const firstItem = this.cartItems[0];
     const metadata = firstItem.metadata as Record<string, any>;
     
-    const orderData = {
+    const orderData: OrderInsert = {
       customer_id: customerId,
       product_id: firstItem.product_id,
       status: "payment_pending",
@@ -144,10 +144,10 @@ export class CheckoutProcessor {
       quantity: firstItem.quantity,
       payment_method: "test",
       payment_status: "pending",
-      shipping_address: this.formData.shipping_address as Json,
+      shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,
       carrier: null,
-      activation_date: this.formData.activation_date || null,
+      activation_date: null,
       notes: [],
       metadata: {} as Json,
       stripe_payment_intent_id: null,
@@ -167,7 +167,7 @@ export class CheckoutProcessor {
   }
 
   private async createOrderItems(orderId: string): Promise<OrderItem[]> {
-    const orderItemsData = this.cartItems.map(item => ({
+    const orderItemsData: OrderItemInsert[] = this.cartItems.map(item => ({
       order_id: orderId,
       product_id: item.product_id,
       quantity: item.quantity,
