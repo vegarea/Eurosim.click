@@ -5,8 +5,8 @@ import { OrderItem } from "@/types/database/orderItems";
 
 interface CartItemProps {
   item: OrderItem;
-  onUpdateQuantity: (id: string, quantity: number) => void;
-  onRemove: (id: string) => void;
+  onUpdateQuantity: (quantity: number) => void;
+  onRemove: () => void;
 }
 
 export function CartItem({ 
@@ -37,7 +37,7 @@ export function CartItem({
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+          onClick={() => onUpdateQuantity(item.quantity - 1)}
           disabled={item.quantity <= 1}
         >
           <Minus className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function CartItem({
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+          onClick={() => onUpdateQuantity(item.quantity + 1)}
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -55,7 +55,7 @@ export function CartItem({
           variant="ghost"
           size="icon"
           className="h-8 w-8 text-destructive hover:text-destructive/90"
-          onClick={() => onRemove(item.id)}
+          onClick={() => onRemove()}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
