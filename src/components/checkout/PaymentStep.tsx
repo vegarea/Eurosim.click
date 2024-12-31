@@ -23,14 +23,19 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
 
   const handleCompleteOrder = async () => {
     try {
-      setIsProcessing(true);
-      console.log("Iniciando procesamiento de orden con datos:", { formData, items, total });
-
       // Validar que tengamos el email antes de procesar
       if (!formData.email) {
         toast.error("El email es requerido para completar la orden");
         return;
       }
+
+      console.log("Starting checkout process with data:", { 
+        email: formData.email,
+        items,
+        total 
+      });
+
+      setIsProcessing(true);
 
       const processor = new CheckoutProcessor(
         formData,
@@ -41,7 +46,7 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       const result = await processor.process();
 
       if (result.success) {
-        console.log("Orden completada exitosamente", result);
+        console.log("Order completed successfully:", result);
         toast.success("¡Orden completada exitosamente!");
         clearCart();
         onSubmit?.();
@@ -81,7 +86,7 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
           className="w-full"
           size="lg"
           onClick={handleCompleteOrder}
-          disabled={isProcessing}
+          disabled={isProcessing || !formData.email}
         >
           {isProcessing ? "Procesando..." : "Completar Orden"}
         </Button>

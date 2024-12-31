@@ -29,40 +29,58 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
+  // Asegurarnos que el email se mantenga entre pasos
+  const handleFormSubmit = (values: any) => {
+    console.log("Form submitted with values:", values);
+    // Preservar el email si existe
+    const updatedValues = {
+      ...values,
+      email: values.email || formData.email // Mantener el email existente si no viene en values
+    };
+    console.log("Updated values with preserved email:", updatedValues);
+    onFormSubmit(updatedValues);
+  };
+
   React.useEffect(() => {
     if (step === 3) {
-      onFormValidityChange(true);
+      // Validar que tengamos el email antes de permitir el pago
+      const isValid = !!formData.email;
+      console.log("Payment step validation:", { isValid, email: formData.email });
+      onFormValidityChange(isValid);
     }
-  }, [step, onFormValidityChange]);
+  }, [step, formData.email, onFormValidityChange]);
 
   switch (step) {
     case 1:
       if (hasPhysicalSim) {
         return (
           <ShippingForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleFormSubmit}
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.shipping}
+            initialData={formData} // Pasar datos existentes
           />
         )
       }
       return (
         <DocumentationForm
-          onSubmit={onFormSubmit}
+          onSubmit={handleFormSubmit}
           onValidityChange={onFormValidityChange}
           isTestMode={isTestMode}
           testData={testData.documentation}
+          initialData={formData} // Pasar datos existentes
         />
       )
     case 2:
       if (hasPhysicalSim) {
         return (
           <DocumentationForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleFormSubmit}
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.documentation}
+            initialData={formData} // Pasar datos existentes
           />
         )
       }
@@ -71,7 +89,7 @@ export function CheckoutContent({
       return (
         <PaymentStep 
           formData={formData}
-          onSubmit={() => onFormSubmit(formData)}
+          onSubmit={() => handleFormSubmit(formData)}
         />
       )
     default:
