@@ -30,8 +30,12 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
 
   const handleDaySelect = (date: Date | undefined) => {
     if (date) {
-      setCurrentDate(date)
-      onChange(date)
+      // Mantener el año y mes seleccionados
+      const newDate = new Date(date)
+      newDate.setFullYear(currentDate.getFullYear())
+      newDate.setMonth(currentDate.getMonth())
+      setCurrentDate(newDate)
+      onChange(newDate)
     }
   }
 
