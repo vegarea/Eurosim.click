@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useEffect } from "react"
 import { motion } from "framer-motion"
-import { User, Calendar, CreditCard } from "lucide-react"
+import { User, Calendar, CreditCard, Mail, Phone } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -14,7 +14,6 @@ import { Calendar as CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { documentationFormSchema, type DocumentationFormValues } from "./documentation/types"
-import { CustomerGender } from "@/types/database/enums"
 
 interface DocumentationFormProps {
   onSubmit: (values: DocumentationFormValues) => void;
@@ -35,6 +34,8 @@ export function DocumentationForm({
     resolver: zodResolver(documentationFormSchema),
     defaultValues: {
       fullName: initialData?.fullName || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
       birthDate: initialData?.birthDate || new Date(),
       gender: initialData?.gender || undefined,
       passportNumber: initialData?.passportNumber || "",
@@ -43,14 +44,9 @@ export function DocumentationForm({
     mode: "onChange"
   })
 
-  // Define years and months arrays for the date selectors
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
-  const months = Array.from({ length: 12 }, (_, i) => i);
-
   // Watch all form fields for changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      // Check if all required fields are filled and valid
       const isValid = form.formState.isValid;
       console.log("Form state changed:", { 
         isValid, 
@@ -70,10 +66,9 @@ export function DocumentationForm({
   useEffect(() => {
     if (initialData) {
       Object.entries(initialData).forEach(([key, value]) => {
-        form.setValue(key as keyof typeof initialData, value);
+        form.setValue(key as keyof DocumentationFormValues, value);
       });
       
-      // Trigger validation after setting values
       form.trigger().then((isValid) => {
         if (onValidityChange) {
           onValidityChange(isValid);
@@ -102,6 +97,7 @@ export function DocumentationForm({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="space-y-4"
         >
           <FormField
             control={form.control}
@@ -116,144 +112,127 @@ export function DocumentationForm({
                   <Input 
                     placeholder="Como aparece en tu pasaporte" 
                     {...field} 
-                    className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                    className="transition-all duration-200 focus:scale-[1.01]"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="birthDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Fecha de nacimiento
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-10 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: es })
-                          ) : (
-                            <span>Selecciona una fecha</span>
-                          )}
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <div className="p-3 space-y-3 bg-white">
-                        <div className="grid grid-cols-2 gap-2">
-                          <Select
-                            value={field.value ? field.value.getFullYear().toString() : ""}
-                            onValueChange={(year) => {
-                              const newDate = new Date(field.value || new Date());
-                              newDate.setFullYear(parseInt(year));
-                              field.onChange(newDate);
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Año" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {years.map((year) => (
-                                <SelectItem key={year} value={year.toString()}>
-                                  {year}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select
-                            value={field.value ? field.value.getMonth().toString() : ""}
-                            onValueChange={(month) => {
-                              const newDate = new Date(field.value || new Date());
-                              newDate.setMonth(parseInt(month));
-                              field.onChange(newDate);
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Mes" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {months.map((month) => (
-                                <SelectItem key={month} value={month.toString()}>
-                                  {new Date(2000, month).toLocaleString('es', { month: 'long' })}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <CalendarComponent
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
-                          }
-                          initialFocus
-                          captionLayout="buttons"
-                          className="bg-white"
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-          >
-            <FormField
-              control={form.control}
-              name="gender"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Género</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona tu género" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="M">Masculino</SelectItem>
-                      <SelectItem value="F">Femenino</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormLabel className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="email"
+                      placeholder="tu@email.com" 
+                      {...field} 
+                      className="transition-all duration-200 focus:scale-[1.01]"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </motion.div>
-        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Phone className="w-4 h-4" />
+                    Teléfono
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="tel"
+                      placeholder="+52 55 1234 5678" 
+                      {...field} 
+                      className="transition-all duration-200 focus:scale-[1.01]"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Fecha de nacimiento
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-10 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP", { locale: es })
+                        ) : (
+                          <span>Selecciona una fecha</span>
+                        )}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                      className="bg-white"
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Género</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona tu género" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="M">Masculino</SelectItem>
+                    <SelectItem value="F">Femenino</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="passportNumber"
@@ -267,20 +246,14 @@ export function DocumentationForm({
                   <Input 
                     placeholder="Como aparece en tu pasaporte" 
                     {...field} 
-                    className="transition-all duration-200 focus:scale-[1.01] pl-10"
+                    className="transition-all duration-200 focus:scale-[1.01]"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.4 }}
-        >
           <FormField
             control={form.control}
             name="activationDate"

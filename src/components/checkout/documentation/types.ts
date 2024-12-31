@@ -1,12 +1,10 @@
-/**
- * @lovable-protected
- * This file contains types that match Supabase schema exactly.
- * DO NOT MODIFY without explicit user permission.
- */
 import { z } from "zod"
+import { CustomerGender } from "@/types/database/enums"
 
 export const documentationFormSchema = z.object({
   fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(1, "El teléfono es requerido"),
   birthDate: z.date({
     required_error: "La fecha de nacimiento es requerida",
   }),
@@ -17,8 +15,6 @@ export const documentationFormSchema = z.object({
   activationDate: z.date({
     required_error: "La fecha de activación es requerida",
   }).min(new Date(), "La fecha debe ser futura"),
-  email: z.string().email("Email inválido").optional(),
-  phone: z.string().optional()
 })
 
 export type DocumentationFormValues = z.infer<typeof documentationFormSchema>
