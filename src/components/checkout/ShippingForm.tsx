@@ -22,12 +22,9 @@ export function ShippingForm({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
       email: email || initialData?.email || "",
-      fullName: initialData?.fullName || "",
+      name: initialData?.name || "",
       phone: initialData?.phone || "",
-      address: initialData?.address || "",
-      city: initialData?.city || "",
-      state: initialData?.state || "",
-      zipCode: initialData?.zipCode || "",
+      default_shipping_address: initialData?.default_shipping_address || null,
     },
     mode: "onChange"
   })
@@ -36,10 +33,10 @@ export function ShippingForm({
     const subscription = form.watch((value) => {
       console.log('ShippingForm - Form Changed:', value)
       const hasRequiredFields = !!(
-        value.fullName && 
+        value.name && 
         value.email && 
         value.phone && 
-        form.formState.errors.fullName === undefined &&
+        form.formState.errors.name === undefined &&
         form.formState.errors.email === undefined &&
         form.formState.errors.phone === undefined
       );
@@ -89,27 +86,24 @@ export function ShippingForm({
 
     const fullAddress = `${streetNumber} ${route}`.trim()
     
-    form.setValue('address', fullAddress, { shouldValidate: true })
-    if (city) form.setValue('city', city, { shouldValidate: true })
-    if (state) form.setValue('state', state, { shouldValidate: true })
-    if (postalCode) form.setValue('zipCode', postalCode, { shouldValidate: true })
+    const shippingAddress: Json = {
+      street: fullAddress,
+      city,
+      state,
+      postal_code: postalCode
+    }
     
+    form.setValue('default_shipping_address', shippingAddress, { shouldValidate: true })
     setShowLocationFields(true)
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
     console.log('ShippingForm - Submitting Values:', values)
-    const shippingAddress: Json = values.address ? {
-      street: values.address,
-      city: values.city,
-      state: values.state,
-      postal_code: values.zipCode,
-      phone: values.phone
-    } : null;
-
     onSubmit({
-      ...values,
-      shippingAddress
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      default_shipping_address: values.default_shipping_address
     })
   }
 
@@ -124,11 +118,11 @@ export function ShippingForm({
         
         <FormField
           control={form.control}
-          name="address"
+          name="default_shipping_address"
           render={({ field }) => (
             <AddressAutocomplete
-              value={field.value}
-              onChange={field.onChange}
+              value={field.value?.street || ''}
+              onChange={(value) => field.onChange({ ...field.value, street: value })}
               onAddressSelect={handleAddressSelect}
             />
           )}
