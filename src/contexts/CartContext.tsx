@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product } from "@/types/database/products";
 import { OrderItem } from "@/types/database/orderItems";
+import { Json } from "@/types/database/common";
 
 interface CartContextType {
   items: OrderItem[];
-  total: number;
   addItem: (product: Product) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -17,10 +17,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<OrderItem[]>([]);
   const { toast } = useToast();
-
-  const total = useMemo(() => {
-    return items.reduce((sum, item) => sum + item.total_price, 0);
-  }, [items]);
 
   const addItem = (product: Product) => {
     setItems(currentItems => {
@@ -38,18 +34,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
+      const tempOrderId = crypto.randomUUID();
+      
+      const metadata: Json = {
+        product_title: product.title,
+        product_type: product.type,
+        data_eu_gb: product.data_eu_gb,
+        data_es_gb: product.data_es_gb
+      };
+
       const newItem: OrderItem = {
         id: crypto.randomUUID(),
-        order_id: crypto.randomUUID(),
+        order_id: tempOrderId,
         product_id: product.id,
         quantity: 1,
         unit_price: product.price,
         total_price: product.price,
-        metadata: {
-          product_title: product.title,
-          product_description: product.description,
-          product_type: product.type
-        },
+        metadata,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -89,7 +90,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <CartContext.Provider value={{ items, total, addItem, removeItem, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart }}>
       {children}
     </CartContext.Provider>
   );
