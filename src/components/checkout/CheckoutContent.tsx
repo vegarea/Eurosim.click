@@ -35,12 +35,26 @@ export function CheckoutContent({
     }
   }, [step, onFormValidityChange]);
 
+  const handleFormSubmit = (values: any) => {
+    // Guardar en sessionStorage
+    const currentData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
+    const updatedData = { ...currentData, ...values };
+    sessionStorage.setItem('checkoutData', JSON.stringify(updatedData));
+    
+    // Actualizar formData con todos los datos acumulados
+    Object.entries(updatedData).forEach(([key, value]) => {
+      onUpdateField(key, value);
+    });
+
+    onFormSubmit(updatedData);
+  };
+
   switch (step) {
     case 1:
       if (hasPhysicalSim) {
         return (
           <ShippingForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleFormSubmit}
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.shipping}
@@ -49,7 +63,7 @@ export function CheckoutContent({
       }
       return (
         <DocumentationForm
-          onSubmit={onFormSubmit}
+          onSubmit={handleFormSubmit}
           onValidityChange={onFormValidityChange}
           isTestMode={isTestMode}
           testData={testData.documentation}
@@ -59,7 +73,7 @@ export function CheckoutContent({
       if (hasPhysicalSim) {
         return (
           <DocumentationForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleFormSubmit}
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.documentation}
@@ -68,10 +82,16 @@ export function CheckoutContent({
       }
       return null
     case 3:
+      // Recuperar todos los datos almacenados
+      const savedData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
       return (
         <PaymentStep 
-          formData={formData}
-          onSubmit={() => onFormSubmit(formData)}
+          formData={savedData}
+          onSubmit={() => {
+            onFormSubmit(savedData);
+            // Limpiar storage después de procesar el pago
+            sessionStorage.removeItem('checkoutData');
+          }}
         />
       )
     default:
