@@ -30,110 +30,112 @@ export function CheckoutContent({
   formData,
   onUpdateField
 }: CheckoutContentProps) {
-  // Cargar datos guardados al montar el componente
-  React.useEffect(() => {
-    console.group('Inicialización del Componente');
-    const savedData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
-    console.log("🔄 Datos iniciales cargados desde sessionStorage:", savedData);
-    
-    if (Object.keys(savedData).length > 0) {
-      console.log("📝 Actualizando estado con datos guardados");
-      Object.entries(savedData).forEach(([key, value]) => {
-        onUpdateField(key, value);
-      });
-    } else {
-      console.warn("⚠️ No se encontraron datos guardados en sessionStorage");
-    }
-    console.groupEnd();
-  }, []); 
 
-  const persistFormData = (values: any) => {
-    console.group('Persistencia de Datos');
+  // Función para guardar datos en sessionStorage de forma segura
+  const saveToSessionStorage = (data: Record<string, any>) => {
     try {
-      console.log("📥 Valores recibidos para guardar:", values);
-      const currentData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
-      console.log("🔄 Datos actuales en sessionStorage:", currentData);
-      
-      const updatedData = {
-        ...currentData,
-        ...values,
-        email: values.email || currentData.email,
-        fullName: values.fullName || currentData.fullName,
-        phone: values.phone || currentData.phone
-      };
+      const sanitizedData = Object.entries(data).reduce((acc, [key, value]) => {
+        // Asegurarse de que solo guardamos valores primitivos o objetos simples
+        if (value !== null && value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
 
-      console.log("📝 Guardando datos actualizados en sessionStorage:", updatedData);
-      sessionStorage.setItem('checkoutData', JSON.stringify(updatedData));
-      
-      Object.entries(updatedData).forEach(([key, value]) => {
-        onUpdateField(key, value);
-      });
-
-      console.log("✅ Datos guardados exitosamente");
-      console.groupEnd();
-      return updatedData;
+      console.log("🔄 Guardando en sessionStorage:", sanitizedData);
+      sessionStorage.setItem('checkoutData', JSON.stringify(sanitizedData));
+      return true;
     } catch (error) {
-      console.error("❌ Error al persistir datos:", error);
-      console.groupEnd();
-      toast.error("Error al guardar los datos del formulario");
-      return null;
+      console.error("❌ Error al guardar en sessionStorage:", error);
+      return false;
     }
   };
 
-  const handleFormSubmit = (values: any) => {
-    console.group(`Manejo de Submit - Paso ${step}`);
-    console.log("📥 Valores recibidos del formulario:", values);
-    
+  // Función para cargar datos de sessionStorage de forma segura
+  const loadFromSessionStorage = () => {
+    try {
+      const savedData = sessionStorage.getItem('checkoutData');
+      if (!savedData) {
+        console.log("ℹ️ No hay datos guardados en sessionStorage");
+        return {};
+      }
+      const parsedData = JSON.parse(savedData);
+      console.log("📤 Datos cargados de sessionStorage:", parsedData);
+      return parsedData;
+    } catch (error) {
+      console.error("❌ Error al cargar de sessionStorage:", error);
+      return {};
+    }
+  };
+
+  // Cargar datos guardados al montar el componente
+  React.useEffect(() => {
+    const savedData = loadFromSessionStorage();
+    if (Object.keys(savedData).length > 0) {
+      Object.entries(savedData).forEach(([key, value]) => {
+        onUpdateField(key, value);
+      });
+      console.log("✅ Datos restaurados al estado:", savedData);
+    }
+  }, []);
+
+  const persistFormData = (values: Record<string, any>) => {
+    // Combinar datos existentes con nuevos valores
+    const currentData = loadFromSessionStorage();
+    const updatedData = {
+      ...currentData,
+      ...values,
+      // Asegurar que estos campos críticos se mantengan
+      email: values.email || currentData.email,
+      fullName: values.fullName || currentData.fullName,
+      phone: values.phone || currentData.phone
+    };
+
+    // Guardar datos actualizados
+    if (saveToSessionStorage(updatedData)) {
+      // Actualizar estado global
+      Object.entries(updatedData).forEach(([key, value]) => {
+        onUpdateField(key, value);
+      });
+      return updatedData;
+    }
+    return null;
+  };
+
+  const handleFormSubmit = (values: Record<string, any>) => {
+    console.group(`Procesando submit - Paso ${step}`);
+    console.log("📥 Valores recibidos:", values);
+
     const persistedData = persistFormData(values);
     if (!persistedData) {
-      console.error("❌ Error al persistir datos");
+      toast.error("Error al guardar los datos del formulario");
       console.groupEnd();
       return;
     }
-
-    console.log("✅ Datos persistidos exitosamente:", persistedData);
 
     if (step < 3) {
       console.log("➡️ Avanzando al siguiente paso");
       onFormSubmit(persistedData);
     } else {
-      console.log("🔍 Validación final antes de procesar pago");
-      if (!persistedData.email) {
-        console.error("❌ Email requerido no encontrado en los datos");
+      console.log("🔍 Validación final");
+      const allData = loadFromSessionStorage();
+      console.log("📋 Datos completos para procesar:", allData);
+      
+      if (!allData.email) {
         toast.error("El email es requerido para completar la orden");
+        console.error("❌ Email no encontrado en datos guardados");
         console.groupEnd();
         return;
       }
-      console.log("✅ Validación final exitosa, procesando pago");
-      onFormSubmit(persistedData);
-      console.log("🗑️ Limpiando sessionStorage después del pago");
+
+      onFormSubmit(allData);
       sessionStorage.removeItem('checkoutData');
+      console.log("🗑️ Datos de sessionStorage limpiados después del pago");
     }
     console.groupEnd();
   };
 
-  const getSavedFormData = () => {
-    console.group('Recuperación de Datos Guardados');
-    try {
-      const savedData = JSON.parse(sessionStorage.getItem('checkoutData') || '{}');
-      console.log("📤 Datos recuperados:", savedData);
-      console.groupEnd();
-      return savedData;
-    } catch (error) {
-      console.error("❌ Error al recuperar datos:", error);
-      console.groupEnd();
-      return {};
-    }
-  };
-
-  // Log al cambiar de paso
-  React.useEffect(() => {
-    console.group(`Cambio de Paso - ${step}`);
-    console.log("📊 Estado actual del formData:", formData);
-    console.log("💾 Datos en sessionStorage:", JSON.parse(sessionStorage.getItem('checkoutData') || '{}'));
-    console.groupEnd();
-  }, [step, formData]);
-
+  // Switch para renderizar el paso actual
   switch (step) {
     case 1:
       if (hasPhysicalSim) {
@@ -143,9 +145,9 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.shipping}
-            initialData={getSavedFormData()}
+            initialData={loadFromSessionStorage()}
           />
-        )
+        );
       }
       return (
         <DocumentationForm
@@ -153,9 +155,9 @@ export function CheckoutContent({
           onValidityChange={onFormValidityChange}
           isTestMode={isTestMode}
           testData={testData.documentation}
-          initialData={getSavedFormData()}
+          initialData={loadFromSessionStorage()}
         />
-      )
+      );
     case 2:
       if (hasPhysicalSim) {
         return (
@@ -164,35 +166,24 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.documentation}
-            initialData={getSavedFormData()}
+            initialData={loadFromSessionStorage()}
           />
-        )
+        );
       }
-      return null
+      return null;
     case 3:
-      const savedData = getSavedFormData();
-      console.group('Paso Final - Verificación de Datos');
-      console.log("📋 Datos para paso final:", savedData);
-      
+      const savedData = loadFromSessionStorage();
       if (!savedData.email) {
-        console.error("❌ Email no encontrado en datos guardados");
         toast.error("Información incompleta. Por favor, revise los pasos anteriores.");
-        console.groupEnd();
         return null;
       }
-      
-      console.log("✅ Datos completos para procesar pago");
-      console.groupEnd();
-      
       return (
-        <PaymentStep 
+        <PaymentStep
           formData={savedData}
-          onSubmit={() => {
-            handleFormSubmit(savedData);
-          }}
+          onSubmit={() => handleFormSubmit(savedData)}
         />
-      )
+      );
     default:
-      return null
+      return null;
   }
 }
