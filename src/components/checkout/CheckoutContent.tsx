@@ -29,13 +29,19 @@ export function CheckoutContent({
 
   React.useEffect(() => {
     if (step === 3) {
-      const isValid = !!state.customerInfo.email;
-      console.log("Payment step validation:", { isValid, email: state.customerInfo.email });
+      const isValid = !!state.customerInfo.email && !!state.customerInfo.name;
+      console.log("Payment step validation:", { 
+        isValid, 
+        email: state.customerInfo.email,
+        name: state.customerInfo.name 
+      });
       onFormValidityChange(isValid);
     }
-  }, [step, state.customerInfo.email, onFormValidityChange]);
+  }, [step, state.customerInfo.email, state.customerInfo.name, onFormValidityChange]);
 
   const handleFormSubmit = (values: any) => {
+    console.log("Form submitted with values:", values);
+
     if (values.shippingAddress) {
       updateOrderInfo({
         shipping_address: values.shippingAddress,
@@ -54,7 +60,7 @@ export function CheckoutContent({
       null;
 
     updateCustomerInfo({
-      name: values.fullName,
+      name: values.fullName || values.name, // Soporte para ambos campos
       email: values.email,
       phone: values.phone,
       passport_number: values.passportNumber,
@@ -68,6 +74,11 @@ export function CheckoutContent({
         activation_date: formattedActivationDate
       })
     }
+
+    console.log("Updated customer info:", {
+      name: values.fullName || values.name,
+      email: values.email
+    });
   }
 
   switch (step) {
