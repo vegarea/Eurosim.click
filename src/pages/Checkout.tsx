@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
-import { CheckoutContent } from "@/components/checkout/CheckoutContent"
+import { CheckoutSteps } from "@/components/checkout/CheckoutSteps"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
 import { CustomerGender } from "@/types/database/enums"
 import { CheckoutProvider, useCheckout } from "@/contexts/CheckoutContext"
@@ -34,7 +34,7 @@ const testData = {
   }
 }
 
-function CheckoutContent() {
+function CheckoutContainer() {
   const { items } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
@@ -116,7 +116,7 @@ function CheckoutContent() {
               transition={{ duration: 0.3 }}
             >
               <div className="bg-white rounded-xl shadow-sm p-6 max-w-2xl mx-auto">
-                <CheckoutContent
+                <CheckoutSteps
                   step={step}
                   hasPhysicalSim={hasPhysicalSim}
                   isTestMode={isTestMode}
@@ -160,7 +160,7 @@ function CheckoutContent() {
 export default function Checkout() {
   return (
     <CheckoutProvider>
-      <CheckoutContent />
+      <CheckoutContainer />
     </CheckoutProvider>
   )
 }
