@@ -30,7 +30,7 @@ export function CheckoutContent({
   }, [step, onFormValidityChange, formData]);
 
   const handleShippingSubmit = (values: ShippingFormValues) => {
-    const shippingAddress = {
+    const shipping_address = {
       street: values.address,
       city: values.city,
       state: values.state,
@@ -43,7 +43,7 @@ export function CheckoutContent({
       email: values.email,
       fullName: values.fullName,
       phone: values.phone,
-      shippingAddress: shippingAddress
+      shipping_address
     };
     
     console.log("Datos de envío guardados:", combinedData);
@@ -52,7 +52,7 @@ export function CheckoutContent({
 
   const handleDocumentationSubmit = (values: DocumentationFormValues) => {
     // Mantener los datos de envío si existen
-    const shippingAddress = formData.shippingAddress || {};
+    const shipping_address = formData.shipping_address || {};
     
     const combinedData = {
       ...formData,
@@ -61,7 +61,7 @@ export function CheckoutContent({
       gender: values.gender,
       passportNumber: values.passportNumber,
       activationDate: values.activationDate,
-      shippingAddress: shippingAddress // Mantener la dirección de envío
+      shipping_address // Mantener la dirección de envío
     };
     
     console.log("Datos de documentación guardados:", combinedData);
