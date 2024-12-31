@@ -10,12 +10,16 @@ import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { UseFormReturn } from "react-hook-form"
 import { DocumentationFormValues } from "./types"
+import { useState } from "react"
 
 interface DocumentationFormFieldsProps {
   form: UseFormReturn<DocumentationFormValues>
 }
 
 export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) {
+  const [selectedYear, setSelectedYear] = useState<number>(1990)
+  const [selectedMonth, setSelectedMonth] = useState<number>(0)
+
   return (
     <>
       <FormField
@@ -69,10 +73,13 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                     <div>
                       <label className="text-sm font-medium mb-1 block">Año</label>
                       <Select
-                        value={field.value ? field.value.getFullYear().toString() : "1990"}
+                        value={selectedYear.toString()}
                         onValueChange={(year) => {
+                          const yearNum = parseInt(year)
+                          setSelectedYear(yearNum)
                           const newDate = new Date(field.value || new Date())
-                          newDate.setFullYear(parseInt(year))
+                          newDate.setFullYear(yearNum)
+                          newDate.setMonth(selectedMonth)
                           field.onChange(newDate)
                         }}
                       >
@@ -91,10 +98,13 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                     <div>
                       <label className="text-sm font-medium mb-1 block">Mes</label>
                       <Select
-                        value={field.value ? (field.value.getMonth() + 1).toString() : "1"}
+                        value={selectedMonth.toString()}
                         onValueChange={(month) => {
+                          const monthNum = parseInt(month)
+                          setSelectedMonth(monthNum)
                           const newDate = new Date(field.value || new Date())
-                          newDate.setMonth(parseInt(month) - 1)
+                          newDate.setFullYear(selectedYear)
+                          newDate.setMonth(monthNum)
                           field.onChange(newDate)
                         }}
                       >
@@ -105,7 +115,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                           {Array.from({ length: 12 }, (_, i) => {
                             const date = new Date(2000, i, 1)
                             return (
-                              <SelectItem key={i + 1} value={(i + 1).toString()}>
+                              <SelectItem key={i} value={i.toString()}>
                                 {format(date, "MMMM", { locale: es })}
                               </SelectItem>
                             )
@@ -117,11 +127,18 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                   <Calendar
                     mode="single"
                     selected={field.value}
-                    onSelect={field.onChange}
+                    onSelect={(date) => {
+                      if (date) {
+                        const newDate = new Date(date)
+                        newDate.setFullYear(selectedYear)
+                        newDate.setMonth(selectedMonth)
+                        field.onChange(newDate)
+                      }
+                    }}
                     disabled={(date) =>
                       date > new Date() || date < new Date("1940-01-01")
                     }
-                    defaultMonth={field.value || new Date(1990, 0)}
+                    defaultMonth={new Date(selectedYear, selectedMonth)}
                     className="rounded-md"
                   />
                 </div>
