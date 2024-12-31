@@ -3,11 +3,10 @@ import { Input } from "@/components/ui/input"
 import { Building, Map, MapPin } from "lucide-react"
 import { UseFormReturn } from "react-hook-form"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShippingFormValues } from "./types"
 
 interface LocationFieldsProps {
-  form: UseFormReturn<ShippingFormValues>
-  show: boolean
+  form: UseFormReturn<any>;
+  show: boolean;
 }
 
 export function LocationFields({ form, show }: LocationFieldsProps) {

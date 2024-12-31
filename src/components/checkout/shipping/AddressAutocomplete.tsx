@@ -5,13 +5,6 @@ import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 
-declare global {
-  interface Window {
-    google: typeof google;
-    initGoogleMaps: () => void;
-  }
-}
-
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
@@ -21,9 +14,12 @@ interface AddressAutocompleteProps {
 export function AddressAutocomplete({ value, onChange, onAddressSelect }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const scriptLoadedRef = useRef(false)
   const { toast } = useToast()
 
   useEffect(() => {
+    if (scriptLoadedRef.current) return;
+
     const loadGoogleMapsScript = async () => {
       try {
         console.log("Fetching Google Maps API key...")
@@ -49,6 +45,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           console.log("Loading Google Maps script...")
           window.initGoogleMaps = () => {
             console.log('Google Maps API loaded successfully')
+            scriptLoadedRef.current = true
             initializeAutocomplete()
           }
 
@@ -67,6 +64,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
             })
           }
         } else {
+          scriptLoadedRef.current = true
           initializeAutocomplete()
         }
       } catch (error) {
@@ -80,7 +78,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     const initializeAutocomplete = () => {
-      if (inputRef.current && window.google) {
+      if (inputRef.current && window.google && !autocompleteRef.current) {
         console.log("Initializing autocomplete...")
         autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
           componentRestrictions: { country: "mx" },
@@ -99,6 +97,13 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     loadGoogleMapsScript()
+
+    return () => {
+      // Cleanup listener if component unmounts
+      if (autocompleteRef.current) {
+        google.maps.event.clearInstanceListeners(autocompleteRef.current)
+      }
+    }
   }, [onAddressSelect, onChange, toast])
 
   return (

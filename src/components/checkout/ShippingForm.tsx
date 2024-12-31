@@ -1,12 +1,40 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormField } from "@/components/ui/form"
+import { Form } from "@/components/ui/form"
 import { useState, useEffect } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
-import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps } from "./shipping/types"
+import { z } from "zod"
 import { Json } from "@/types/database/common"
+
+const shippingFormSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(1, "El teléfono es requerido"),
+  default_shipping_address: z.object({
+    street: z.string().min(1, "La dirección es requerida"),
+    city: z.string().min(1, "La ciudad es requerida"),
+    state: z.string().min(1, "El estado es requerido"),
+    postal_code: z.string().min(1, "El código postal es requerido")
+  }).nullable()
+})
+
+type ShippingFormValues = z.infer<typeof shippingFormSchema>
+
+interface ShippingFormProps {
+  onSubmit: (values: ShippingFormValues) => void;
+  onValidityChange?: (isValid: boolean) => void;
+  email?: string;
+  initialData?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    default_shipping_address?: Json;
+  };
+  isTestMode?: boolean;
+  testData?: Partial<ShippingFormValues>;
+}
 
 export function ShippingForm({ 
   onSubmit, 
@@ -24,39 +52,33 @@ export function ShippingForm({
       email: email || initialData?.email || "",
       name: initialData?.name || "",
       phone: initialData?.phone || "",
-      default_shipping_address: initialData?.default_shipping_address || null,
+      default_shipping_address: initialData?.default_shipping_address as any || null,
     },
     mode: "onChange"
   })
 
   useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log('ShippingForm - Form Changed:', value)
-      const hasRequiredFields = !!(
-        value.name && 
-        value.email && 
-        value.phone && 
-        form.formState.errors.name === undefined &&
-        form.formState.errors.email === undefined &&
-        form.formState.errors.phone === undefined
-      );
-      console.log('ShippingForm - Form Valid:', hasRequiredFields)
-      onValidityChange?.(hasRequiredFields);
-    });
-    return () => subscription.unsubscribe();
-  }, [form, onValidityChange]);
+    const subscription = form.watch((value, { name, type }) => {
+      console.log('ShippingForm - Form Changed:', { value, name, type })
+      const formState = form.formState
+      const isValid = formState.isValid && !formState.isSubmitting
+      console.log('ShippingForm - Form Valid:', isValid)
+      onValidityChange?.(isValid)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, onValidityChange])
 
   useEffect(() => {
     if (isTestMode && testData) {
       console.log('ShippingForm - Setting Test Data:', testData)
       Object.entries(testData).forEach(([key, value]) => {
         if (value) {
-          form.setValue(key as keyof ShippingFormValues, value);
+          form.setValue(key as keyof ShippingFormValues, value as any)
         }
-      });
-      setShowLocationFields(true);
+      })
+      setShowLocationFields(true)
     }
-  }, [isTestMode, testData, form]);
+  }, [isTestMode, testData, form])
 
   const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
     console.log("Address selected:", place)
@@ -86,25 +108,19 @@ export function ShippingForm({
 
     const fullAddress = `${streetNumber} ${route}`.trim()
     
-    const shippingAddress: Json = {
+    form.setValue('default_shipping_address', {
       street: fullAddress,
       city,
       state,
       postal_code: postalCode
-    }
+    }, { shouldValidate: true })
     
-    form.setValue('default_shipping_address', shippingAddress, { shouldValidate: true })
     setShowLocationFields(true)
   }
 
   const handleSubmit = (values: ShippingFormValues) => {
     console.log('ShippingForm - Submitting Values:', values)
-    onSubmit({
-      name: values.name,
-      email: values.email,
-      phone: values.phone,
-      default_shipping_address: values.default_shipping_address
-    })
+    onSubmit(values)
   }
 
   return (
@@ -116,16 +132,14 @@ export function ShippingForm({
       >
         <PersonalInfoFields form={form} />
         
-        <FormField
-          control={form.control}
-          name="default_shipping_address"
-          render={({ field }) => (
-            <AddressAutocomplete
-              value={field.value?.street || ''}
-              onChange={(value) => field.onChange({ ...field.value, street: value })}
-              onAddressSelect={handleAddressSelect}
-            />
-          )}
+        <AddressAutocomplete
+          value={form.watch('default_shipping_address.street') || ''}
+          onChange={(value) => 
+            form.setValue('default_shipping_address.street', value, { 
+              shouldValidate: true 
+            })
+          }
+          onAddressSelect={handleAddressSelect}
         />
 
         <LocationFields form={form} show={showLocationFields} />
