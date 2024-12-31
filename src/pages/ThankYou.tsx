@@ -29,6 +29,7 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
+        // Modificamos la consulta para buscar por el ID de sesión de Stripe
         const { data, error } = await supabase
           .from('orders')
           .select(`
@@ -41,7 +42,7 @@ export default function ThankYou() {
               metadata
             )
           `)
-          .eq('stripe_payment_intent_id', sessionId)
+          .eq('metadata->stripe_session_id', sessionId)
           .maybeSingle()
 
         if (error) {

@@ -14,6 +14,10 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: session.receipt_url,
       shipping_address: session.metadata.shipping_address ? JSON.parse(session.metadata.shipping_address) : null,
+      metadata: {
+        stripe_session_id: session.id,
+        ...session.metadata
+      }
     }
 
     const { data: order, error: orderError } = await supabase
