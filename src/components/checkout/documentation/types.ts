@@ -1,28 +1,16 @@
 import { z } from "zod"
-import { CustomerGender } from "@/types/database/enums"
 
 export const documentationFormSchema = z.object({
-  fullName: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Email inválido"),
-  phone: z.string().min(1, "El teléfono es requerido"),
+  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
   birthDate: z.date({
     required_error: "La fecha de nacimiento es requerida",
   }),
   gender: z.enum(["M", "F"], {
     required_error: "El género es requerido"
   }),
-  passportNumber: z.string().min(1, "El número de pasaporte es requerido"),
   activationDate: z.date({
     required_error: "La fecha de activación es requerida",
   }).min(new Date(), "La fecha debe ser futura"),
 })
 
 export type DocumentationFormValues = z.infer<typeof documentationFormSchema>
-
-export interface DocumentationFormProps {
-  onSubmit: (values: DocumentationFormValues) => void;
-  onValidityChange?: (isValid: boolean) => void;
-  initialData?: Partial<DocumentationFormValues>;
-  isTestMode?: boolean;
-  testData?: Partial<DocumentationFormValues>;
-}
