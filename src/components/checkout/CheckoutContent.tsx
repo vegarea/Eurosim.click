@@ -30,13 +30,16 @@ export function CheckoutContent({
   }, [step, onFormValidityChange, formData]);
 
   const handleShippingSubmit = (values: ShippingFormValues) => {
+    // Asegurarnos de que todos los campos necesarios estén presentes
     const shipping_address = {
-      street: values.address,
-      city: values.city,
-      state: values.state,
-      postal_code: values.zipCode,
-      phone: values.phone
+      street: values.address || "",
+      city: values.city || "",
+      state: values.state || "",
+      postal_code: values.zipCode || "",
+      phone: values.phone || ""
     };
+
+    console.log("Dirección de envío estructurada:", shipping_address);
 
     const combinedData = {
       ...formData,
@@ -51,7 +54,7 @@ export function CheckoutContent({
   };
 
   const handleDocumentationSubmit = (values: DocumentationFormValues) => {
-    // Mantener los datos de envío si existen
+    // Asegurarnos de mantener la dirección de envío existente
     const shipping_address = formData.shipping_address || {};
     
     const combinedData = {
@@ -61,7 +64,7 @@ export function CheckoutContent({
       gender: values.gender,
       passportNumber: values.passportNumber,
       activationDate: values.activationDate,
-      shipping_address // Mantener la dirección de envío
+      shipping_address
     };
     
     console.log("Datos de documentación guardados:", combinedData);
@@ -101,7 +104,14 @@ export function CheckoutContent({
       return (
         <PaymentStep 
           formData={formData}
-          onSubmit={() => onFormSubmit(formData)}
+          onSubmit={() => {
+            console.log("Datos finales antes del pago:", formData);
+            if (!formData.shipping_address) {
+              console.error("Error: shipping_address es undefined");
+              return;
+            }
+            onFormSubmit(formData);
+          }}
         />
       );
     default:
