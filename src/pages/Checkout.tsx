@@ -11,7 +11,7 @@ import { CheckoutProgress } from "@/components/checkout/CheckoutProgress"
 import { CheckoutSteps } from "@/components/checkout/CheckoutSteps"
 import { CheckoutNavigation } from "@/components/checkout/CheckoutNavigation"
 import { CustomerGender } from "@/types/database/enums"
-import { CheckoutProvider, useCheckout } from "@/contexts/CheckoutContext"
+import { CheckoutProvider } from "@/contexts/CheckoutContext"
 
 const testData = {
   shipping: {
@@ -34,14 +34,13 @@ const testData = {
   }
 }
 
-function CheckoutContainer() {
+function CheckoutContent() {
   const { items } = useCart()
   const [step, setStep] = useState(1)
   const [isFormValid, setIsFormValid] = useState(false)
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { state } = useCheckout()
   
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
@@ -129,7 +128,7 @@ function CheckoutContainer() {
                   isFormValid={isFormValid}
                   onBack={handleBack}
                   onSubmit={handleSubmit}
-                  formData={state}
+                  formData={{}}
                 />
               </div>
             </motion.div>
@@ -160,7 +159,7 @@ function CheckoutContainer() {
 export default function Checkout() {
   return (
     <CheckoutProvider>
-      <CheckoutContainer />
+      <CheckoutContent />
     </CheckoutProvider>
   )
 }
