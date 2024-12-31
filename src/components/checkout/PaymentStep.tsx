@@ -26,9 +26,12 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       
       // Verificar que tengamos todos los datos necesarios
       if (!formData.email || !formData.fullName) {
+        console.log("Datos del formulario incompletos:", formData);
         toast.error("Faltan datos del formulario");
         return;
       }
+
+      console.log("Procesando orden con datos:", formData);
 
       const processor = new CheckoutProcessor(
         formData,

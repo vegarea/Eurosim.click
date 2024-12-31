@@ -25,6 +25,11 @@ export class CheckoutProcessor {
         throw new Error("El carrito está vacío");
       }
 
+      // Validación de datos requeridos
+      if (!this.formData.email || !this.formData.fullName) {
+        throw new Error("Faltan datos requeridos del cliente");
+      }
+
       checkoutLogger.log(
         "validating_cart",
         "success",
@@ -54,9 +59,12 @@ export class CheckoutProcessor {
           { customerId: customer.id }
         );
       } else {
+        const customerData = this.createCustomerData();
+        console.log("Creando nuevo cliente con datos:", customerData);
+
         const { data: newCustomer, error: createError } = await supabase
           .from("customers")
-          .insert(this.createCustomerData())
+          .insert(customerData)
           .select()
           .single();
 
@@ -106,14 +114,15 @@ export class CheckoutProcessor {
   }
 
   private createCustomerData(): CustomerInsert {
-    return {
+    const shippingAddress = this.formData.shippingAddress || {};
+    const customerData: CustomerInsert = {
       name: this.formData.fullName,
       email: this.formData.email,
       phone: this.formData.phone || null,
-      passport_number: null,
-      birth_date: null,
-      gender: null,
-      default_shipping_address: this.formData.shippingAddress as Json,
+      passport_number: this.formData.passportNumber || null,
+      birth_date: this.formData.birthDate || null,
+      gender: this.formData.gender || null,
+      default_shipping_address: shippingAddress as Json,
       billing_address: null,
       preferred_language: 'es',
       marketing_preferences: {
@@ -125,6 +134,9 @@ export class CheckoutProcessor {
       paypal_customer_id: null,
       metadata: {} as Json
     };
+
+    console.log("Datos del cliente preparados:", customerData);
+    return customerData;
   }
 
   private async createOrder(customerId: string) {
@@ -150,6 +162,8 @@ export class CheckoutProcessor {
       paypal_receipt_url: null
     };
 
+    console.log("Creando orden con datos:", orderData);
+
     const { data, error } = await supabase
       .from("orders")
       .insert(orderData)
@@ -171,6 +185,8 @@ export class CheckoutProcessor {
       total_price: item.total_price,
       metadata: item.metadata
     }));
+
+    console.log("Creando items de orden:", orderItemsData);
 
     const { data, error } = await supabase
       .from("order_items")
