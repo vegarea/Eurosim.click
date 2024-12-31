@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
 
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [retryCount, setRetryCount] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
   
@@ -26,56 +27,55 @@ export default function ThankYou() {
 
     const fetchOrderDetails = async () => {
       try {
-        console.log('Fetching order details for session:', sessionId)
+        console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Intentamos hasta 3 veces con un intervalo de 2 segundos
-        for (let i = 0; i < 3; i++) {
-          const { data, error } = await supabase
-            .from('orders')
-            .select(`
-              *,
-              customer:customers(name, email, phone),
-              items:order_items(
-                quantity,
-                unit_price,
-                total_price,
-                metadata
-              )
-            `)
-            .eq('stripe_payment_intent_id', sessionId)
-            .single()
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            customer:customers(name, email, phone),
+            items:order_items(
+              quantity,
+              unit_price,
+              total_price,
+              metadata
+            )
+          `)
+          .eq('stripe_payment_intent_id', sessionId)
+          .maybeSingle()
 
-          if (error) {
-            console.error('Error fetching order details:', error)
-            if (i === 2) { // Si es el último intento
-              throw error
-            }
-          } else if (data) {
-            console.log("Order details found:", data)
-            setOrderDetails(data)
-            setIsLoading(false)
-            return
-          }
-
-          // Si no hay datos pero no es el último intento, esperamos 2 segundos
-          if (i < 2) {
-            console.log('Waiting before retry...')
-            await new Promise(resolve => setTimeout(resolve, 2000))
-          }
+        if (error) {
+          console.error('Error al buscar la orden:', error)
+          throw error
         }
 
-        // Si llegamos aquí sin datos después de todos los intentos
-        throw new Error('No se encontró la orden después de varios intentos')
+        if (!data && retryCount < 3) {
+          console.log('Orden no encontrada, reintentando en 2 segundos...')
+          setRetryCount(prev => prev + 1)
+          setTimeout(() => {
+            setIsLoading(true)
+          }, 2000)
+          return
+        }
 
+        if (!data) {
+          throw new Error('No se encontró la orden después de varios intentos')
+        }
+
+        console.log("Orden encontrada:", data)
+        setOrderDetails(data)
+        setIsLoading(false)
       } catch (error) {
-        console.error('Error final fetching order details:', error)
+        console.error('Error final al obtener detalles de la orden:', error)
         toast.error("Error al obtener los detalles de tu orden")
         setIsLoading(false)
       }
     }
 
-    fetchOrderDetails()
-  }, [location.search, navigate])
+    if (isLoading) {
+      fetchOrderDetails()
+    }
+  }, [location.search, navigate, retryCount, isLoading])
 
   if (isLoading) {
     return (
@@ -84,8 +84,12 @@ export default function ThankYou() {
         <main className="container mx-auto py-8 px-4">
           <Card className="max-w-2xl mx-auto p-8">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Procesando tu orden...</p>
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <p className="mt-4 text-gray-600">
+                {retryCount > 0 
+                  ? `Procesando tu orden... (intento ${retryCount + 1} de 4)`
+                  : 'Procesando tu orden...'}
+              </p>
             </div>
           </Card>
         </main>
