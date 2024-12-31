@@ -54,15 +54,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
             initializeAutocomplete()
           }
 
-          script.onerror = () => {
-            console.error('Error loading Google Maps script')
-            toast({
-              title: "Error",
-              description: "No se pudo cargar el mapa de Google",
-              variant: "destructive",
-            })
-          }
-
           document.head.appendChild(script)
         } else {
           scriptLoadedRef.current = true

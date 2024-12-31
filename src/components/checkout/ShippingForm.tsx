@@ -19,7 +19,7 @@ const shippingFormSchema = z.object({
     country: z.string().min(1, "El país es requerido"),
     postal_code: z.string().min(1, "El código postal es requerido"),
     phone: z.string().min(1, "El teléfono es requerido")
-  }).nullable()
+  })
 })
 
 interface ShippingFormProps {
@@ -52,7 +52,14 @@ export function ShippingForm({
       email: email || initialData?.email || "",
       name: initialData?.name || "",
       phone: initialData?.phone || "",
-      shipping_address: initialData?.shipping_address || null,
+      shipping_address: initialData?.shipping_address || {
+        street: "",
+        city: "",
+        state: "",
+        country: "Mexico",
+        postal_code: "",
+        phone: ""
+      }
     },
     mode: "onChange"
   })

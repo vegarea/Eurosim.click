@@ -9,5 +9,5 @@ export interface ShippingFormValues {
     country: string;
     postal_code: string;
     phone: string;
-  } | null;
+  };
 }
