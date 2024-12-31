@@ -7,6 +7,7 @@ import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
 import { z } from "zod"
 import { ShippingFormValues } from "./shipping/types"
+import { useCheckout } from "@/contexts/CheckoutContext"
 
 const shippingFormSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
@@ -44,6 +45,7 @@ export function ShippingForm({
   isTestMode,
   testData
 }: ShippingFormProps) {
+  const { updateCustomerInfo } = useCheckout()
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -69,9 +71,19 @@ export function ShippingForm({
       const isValid = formState.isValid && !formState.isSubmitting
       console.log('ShippingForm - Form Valid:', isValid)
       onValidityChange?.(isValid)
+
+      // Actualizar el contexto con los valores del formulario
+      const formValues = form.getValues()
+      console.log('Form values after update:', formValues)
+      updateCustomerInfo({
+        name: formValues.name,
+        email: formValues.email,
+        phone: formValues.phone,
+        default_shipping_address: formValues.shipping_address
+      })
     })
     return () => subscription.unsubscribe()
-  }, [form, onValidityChange])
+  }, [form, onValidityChange, updateCustomerInfo])
 
   useEffect(() => {
     if (isTestMode && testData) {

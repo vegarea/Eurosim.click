@@ -5,6 +5,7 @@ import { useEffect } from "react"
 import { motion } from "framer-motion"
 import { documentationFormSchema, type DocumentationFormValues } from "./documentation/types"
 import { DocumentationFormFields } from "./documentation/DocumentationFormFields"
+import { useCheckout } from "@/contexts/CheckoutContext"
 
 interface DocumentationFormProps {
   onSubmit: (values: DocumentationFormValues) => void
@@ -21,6 +22,8 @@ export function DocumentationForm({
   isTestMode,
   testData 
 }: DocumentationFormProps) {
+  const { updateCustomerInfo, updateOrderInfo } = useCheckout()
+  
   const form = useForm<DocumentationFormValues>({
     resolver: zodResolver(documentationFormSchema),
     defaultValues: {
@@ -44,10 +47,21 @@ export function DocumentationForm({
       if (onValidityChange) {
         onValidityChange(isValid)
       }
+
+      // Actualizar el contexto con los valores del formulario
+      const formValues = form.getValues()
+      updateCustomerInfo({
+        passport_number: formValues.passportNumber,
+        birth_date: formValues.birthDate?.toISOString(),
+        gender: formValues.gender
+      })
+      updateOrderInfo({
+        activation_date: formValues.activationDate?.toISOString()
+      })
     })
 
     return () => subscription.unsubscribe()
-  }, [form, onValidityChange])
+  }, [form, onValidityChange, updateCustomerInfo, updateOrderInfo])
 
   useEffect(() => {
     if (isTestMode && testData) {
