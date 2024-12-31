@@ -4,14 +4,14 @@ import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/f
 import { MapPin } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { UseFormReturn } from "react-hook-form"
+import { ShippingFormValues } from "./types"
 
 interface AddressAutocompleteProps {
-  value: string;
-  onChange: (value: string) => void;
-  onAddressSelect: (address: google.maps.places.PlaceResult) => void;
+  form: UseFormReturn<ShippingFormValues>;
 }
 
-export function AddressAutocomplete({ value, onChange, onAddressSelect }: AddressAutocompleteProps) {
+export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
   const scriptLoadedRef = useRef(false)
@@ -85,15 +85,45 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
         console.log("Place selected:", place)
         
         if (place && place.address_components) {
-          onChange(place.formatted_address || "")
-          onAddressSelect(place)
-        } else {
-          console.error("No address components found")
-          toast({
-            title: "Error",
-            description: "No se pudo obtener los detalles de la dirección",
-            variant: "destructive",
+          let address = {
+            street: '',
+            city: '',
+            state: '',
+            country: 'Mexico',
+            postal_code: '',
+            phone: form.getValues('shipping_address.phone') || ''
+          }
+
+          place.address_components.forEach(component => {
+            const types = component.types
+
+            if (types.includes('street_number')) {
+              address.street = component.long_name + ' ' + address.street
+            } else if (types.includes('route')) {
+              address.street = address.street + ' ' + component.long_name
+            } else if (types.includes('locality') || types.includes('sublocality')) {
+              address.city = component.long_name
+            } else if (types.includes('administrative_area_level_1')) {
+              address.state = component.long_name
+            } else if (types.includes('postal_code')) {
+              address.postal_code = component.long_name
+            }
           })
+
+          // Limpiar la dirección
+          address.street = address.street.trim()
+          
+          console.log("Setting address:", address)
+          
+          // Actualizar todo el objeto shipping_address de una vez
+          form.setValue('shipping_address', address, { 
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true
+          })
+          
+          // Verificar que se actualizó correctamente
+          console.log("Form values after update:", form.getValues())
         }
       })
     }
@@ -105,7 +135,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
         google.maps.event.clearInstanceListeners(autocompleteRef.current)
       }
     }
-  }, [onAddressSelect, onChange, toast])
+  }, [form, toast])
 
   return (
     <FormItem>
@@ -116,8 +146,8 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
       <FormControl>
         <Input
           ref={inputRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={form.watch('shipping_address.street')}
+          onChange={(e) => form.setValue('shipping_address.street', e.target.value, { shouldValidate: true })}
           placeholder="Comienza a escribir tu dirección"
           className="transition-all duration-200 focus:scale-[1.01] pl-10"
         />

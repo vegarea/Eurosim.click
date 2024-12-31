@@ -84,64 +84,6 @@ export function ShippingForm({
     }
   }, [isTestMode, testData, form])
 
-  const handleAddressSelect = (place: google.maps.places.PlaceResult) => {
-    console.log("Address selected:", place);
-    
-    if (!place.address_components) {
-      console.error("No address components found in place result");
-      return;
-    }
-
-    let streetNumber = '';
-    let route = '';
-    let city = '';
-    let state = '';
-    let postalCode = '';
-
-    // Log cada componente de dirección para debugging
-    place.address_components.forEach(component => {
-      console.log("Address component:", {
-        types: component.types,
-        long_name: component.long_name,
-        short_name: component.short_name
-      });
-
-      const types = component.types;
-
-      if (types.includes('street_number')) {
-        streetNumber = component.long_name;
-      } else if (types.includes('route')) {
-        route = component.long_name;
-      } else if (types.includes('locality') || types.includes('sublocality')) {
-        city = component.long_name;
-      } else if (types.includes('administrative_area_level_1')) {
-        state = component.long_name;
-      } else if (types.includes('postal_code')) {
-        postalCode = component.long_name;
-      }
-    });
-
-    const fullAddress = `${streetNumber} ${route}`.trim();
-    
-    // Log los valores extraídos antes de actualizar el formulario
-    console.log("Extracted address values:", {
-      fullAddress,
-      city,
-      state,
-      postalCode
-    });
-
-    // Actualizar cada campo individualmente para mejor control
-    form.setValue('shipping_address.street', fullAddress || place.formatted_address || '', { shouldValidate: true });
-    form.setValue('shipping_address.city', city, { shouldValidate: true });
-    form.setValue('shipping_address.state', state, { shouldValidate: true });
-    form.setValue('shipping_address.postal_code', postalCode, { shouldValidate: true });
-    form.setValue('shipping_address.country', 'Mexico', { shouldValidate: true });
-    
-    // Log el estado del formulario después de la actualización
-    console.log("Form values after update:", form.getValues());
-  }
-
   const handleSubmit = (values: ShippingFormValues) => {
     console.log('ShippingForm - Submitting Values:', values)
     onSubmit(values)
@@ -155,17 +97,7 @@ export function ShippingForm({
         className="space-y-6"
       >
         <PersonalInfoFields form={form} />
-        
-        <AddressAutocomplete
-          value={form.watch('shipping_address.street') || ''}
-          onChange={(value) => 
-            form.setValue('shipping_address.street', value, { 
-              shouldValidate: true 
-            })
-          }
-          onAddressSelect={handleAddressSelect}
-        />
-
+        <AddressAutocomplete form={form} />
         <LocationFields form={form} />
       </form>
     </Form>

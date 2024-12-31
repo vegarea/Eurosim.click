@@ -2,9 +2,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input"
 import { Building, Map, MapPin } from "lucide-react"
 import { UseFormReturn } from "react-hook-form"
+import { ShippingFormValues } from "./types"
 
 interface LocationFieldsProps {
-  form: UseFormReturn<any>;
+  form: UseFormReturn<ShippingFormValues>;
 }
 
 export function LocationFields({ form }: LocationFieldsProps) {
@@ -21,8 +22,8 @@ export function LocationFields({ form }: LocationFieldsProps) {
             </FormLabel>
             <FormControl>
               <Input 
+                {...field}
                 placeholder="Ciudad" 
-                {...field} 
                 className="transition-all duration-200 focus:scale-[1.01] pl-10"
               />
             </FormControl>
@@ -42,8 +43,8 @@ export function LocationFields({ form }: LocationFieldsProps) {
             </FormLabel>
             <FormControl>
               <Input 
+                {...field}
                 placeholder="Estado" 
-                {...field} 
                 className="transition-all duration-200 focus:scale-[1.01] pl-10"
               />
             </FormControl>
@@ -63,8 +64,8 @@ export function LocationFields({ form }: LocationFieldsProps) {
             </FormLabel>
             <FormControl>
               <Input 
+                {...field}
                 placeholder="12345" 
-                {...field} 
                 className="transition-all duration-200 focus:scale-[1.01] pl-10"
               />
             </FormControl>
