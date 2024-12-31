@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
-import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps } from "./shipping/types"
+import { shippingFormSchema, type ShippingFormValues, type ShippingFormProps, type ShippingAddress } from "./shipping/types"
 import { Json } from "@/types/database/common"
 
 export function ShippingForm({ 
@@ -77,7 +77,9 @@ export function ShippingForm({
 
   const handleSubmit = (values: ShippingFormValues) => {
     console.log("Form submitted with values:", values);
-    const shippingAddress: Json = {
+    
+    // Crear el objeto shipping_address con la estructura correcta
+    const shipping_address: ShippingAddress = {
       street: values.address,
       city: values.city,
       state: values.state,
@@ -85,10 +87,12 @@ export function ShippingForm({
       phone: values.phone
     }
 
+    console.log("Estructura de shipping_address creada:", shipping_address);
+
     onSubmit({
       ...values,
-      shippingAddress
-    } as unknown as ShippingFormValues)
+      shipping_address: shipping_address as Json
+    })
   }
 
   return (
