@@ -59,14 +59,24 @@ export function SimCard({
   };
 
   const handleAddToCart = () => {
-    addItem(product);
+    const cartItem = {
+      ...product,
+      metadata: {
+        product_title: product.title,
+        product_type: product.type, // Usamos el tipo directamente del producto
+        description: product.description,
+        data_eu_gb: product.data_eu_gb,
+        data_es_gb: product.data_es_gb
+      }
+    };
+    
+    addItem(cartItem);
     navigate('/checkout');
   };
 
   const colorScheme = getColorScheme(product.title);
   const [amount, currency] = formatCurrency(product.price).split(' ');
   
-  // Obtener las características del producto
   const features = product.features as string[] || [];
 
   return (
