@@ -30,34 +30,40 @@ export function CheckoutContent({
   }, [step, onFormValidityChange, formData]);
 
   const handleShippingSubmit = (values: ShippingFormValues) => {
+    const shippingAddress = {
+      street: values.address,
+      city: values.city,
+      state: values.state,
+      postal_code: values.zipCode,
+      phone: values.phone
+    };
+
     const combinedData = {
       ...formData,
-      ...values,
       email: values.email,
       fullName: values.fullName,
       phone: values.phone,
-      shippingAddress: {
-        street: values.address,
-        city: values.city,
-        state: values.state,
-        postal_code: values.zipCode,
-        phone: values.phone
-      }
+      shippingAddress: shippingAddress
     };
+    
     console.log("Datos de envío guardados:", combinedData);
     onFormSubmit(combinedData);
   };
 
   const handleDocumentationSubmit = (values: DocumentationFormValues) => {
+    // Mantener los datos de envío si existen
+    const shippingAddress = formData.shippingAddress || {};
+    
     const combinedData = {
       ...formData,
-      ...values,
       fullName: values.fullName,
       birthDate: values.birthDate,
       gender: values.gender,
       passportNumber: values.passportNumber,
-      activationDate: values.activationDate
+      activationDate: values.activationDate,
+      shippingAddress: shippingAddress // Mantener la dirección de envío
     };
+    
     console.log("Datos de documentación guardados:", combinedData);
     onFormSubmit(combinedData);
   };
