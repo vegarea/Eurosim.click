@@ -55,15 +55,6 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
           }
 
           document.head.appendChild(script)
-
-          script.onerror = () => {
-            console.error('Error loading Google Maps script')
-            toast({
-              title: "Error",
-              description: "No se pudo cargar el mapa de Google",
-              variant: "destructive",
-            })
-          }
         } else {
           scriptLoadedRef.current = true
           initializeAutocomplete()
@@ -79,22 +70,22 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     const initializeAutocomplete = () => {
-      if (inputRef.current && window.google && !autocompleteRef.current) {
-        console.log("Initializing autocomplete...")
-        autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
-          componentRestrictions: { country: "mx" },
-          fields: ["address_components", "formatted_address"],
-        })
+      if (!inputRef.current || !window.google) return;
+      
+      console.log("Initializing autocomplete...")
+      autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
+        componentRestrictions: { country: "mx" },
+        fields: ["address_components", "formatted_address"],
+      })
 
-        autocompleteRef.current.addListener("place_changed", () => {
-          const place = autocompleteRef.current?.getPlace()
-          if (place) {
-            console.log("Place selected:", place)
-            onChange(place.formatted_address || "")
-            onAddressSelect(place)
-          }
-        })
-      }
+      autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current?.getPlace()
+        if (place) {
+          console.log("Place selected:", place)
+          onChange(place.formatted_address || "")
+          onAddressSelect(place)
+        }
+      })
     }
 
     loadGoogleMapsScript()
