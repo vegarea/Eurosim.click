@@ -58,6 +58,7 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.shipping}
+            initialData={JSON.parse(sessionStorage.getItem('checkoutData') || '{}')}
           />
         )
       }
@@ -67,6 +68,7 @@ export function CheckoutContent({
           onValidityChange={onFormValidityChange}
           isTestMode={isTestMode}
           testData={testData.documentation}
+          initialData={JSON.parse(sessionStorage.getItem('checkoutData') || '{}')}
         />
       )
     case 2:
@@ -77,6 +79,7 @@ export function CheckoutContent({
             onValidityChange={onFormValidityChange}
             isTestMode={isTestMode}
             testData={testData.documentation}
+            initialData={JSON.parse(sessionStorage.getItem('checkoutData') || '{}')}
           />
         )
       }
