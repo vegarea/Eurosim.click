@@ -24,18 +24,12 @@ const Sims = () => {
       
       if (error) throw error;
       
-      // Asegurarnos de que los datos coincidan con el tipo Product
-      return (data as Product[]).map(product => ({
-        ...product,
-        features: product.features || [],
-        metadata: product.metadata || {}
-      }));
+      return data as Product[];
     }
   });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
-      <Header />
       <SimHero />
       
       <div id="products-section" className="container mx-auto px-4 py-8 lg:py-12 relative scroll-mt-16">
