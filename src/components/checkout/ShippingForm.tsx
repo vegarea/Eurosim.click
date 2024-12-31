@@ -36,7 +36,7 @@ export function ShippingForm({
   useEffect(() => {
     const subscription = form.watch(() => {
       const values = form.getValues();
-      const hasBasicInfo = values.fullName && values.email && values.phone;
+      const hasBasicInfo = Boolean(values.fullName && values.email && values.phone);
       if (onValidityChange) {
         onValidityChange(hasBasicInfo);
       }
