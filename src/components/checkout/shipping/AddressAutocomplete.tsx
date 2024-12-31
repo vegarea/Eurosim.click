@@ -22,6 +22,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
   const { toast } = useToast()
+  const isInitializedRef = useRef(false)
 
   useEffect(() => {
     const loadGoogleMapsScript = async () => {
@@ -66,7 +67,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
               variant: "destructive",
             })
           }
-        } else {
+        } else if (!isInitializedRef.current) {
           initializeAutocomplete()
         }
       } catch (error) {
@@ -80,8 +81,10 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     const initializeAutocomplete = () => {
-      if (inputRef.current && window.google) {
-        console.log("Initializing autocomplete...")
+      if (!inputRef.current || !window.google || isInitializedRef.current) return
+      
+      console.log("Initializing autocomplete...")
+      try {
         autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
           componentRestrictions: { country: "mx" },
           fields: ["address_components", "formatted_address"],
@@ -95,10 +98,18 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
             onAddressSelect(place)
           }
         })
+
+        isInitializedRef.current = true
+      } catch (error) {
+        console.error('Error initializing autocomplete:', error)
       }
     }
 
     loadGoogleMapsScript()
+
+    return () => {
+      isInitializedRef.current = false
+    }
   }, [onAddressSelect, onChange, toast])
 
   return (
