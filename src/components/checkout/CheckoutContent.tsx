@@ -24,44 +24,81 @@ export function CheckoutContent({
 }: CheckoutContentProps) {
   React.useEffect(() => {
     if (step === 3) {
+      console.log("Datos acumulados antes del pago:", formData);
       onFormValidityChange(true);
     }
-  }, [step, onFormValidityChange]);
+  }, [step, onFormValidityChange, formData]);
+
+  const handleShippingSubmit = (values: ShippingFormValues) => {
+    const combinedData = {
+      ...formData,
+      ...values,
+      email: values.email,
+      fullName: values.fullName,
+      phone: values.phone,
+      shippingAddress: {
+        street: values.address,
+        city: values.city,
+        state: values.state,
+        postal_code: values.zipCode,
+        phone: values.phone
+      }
+    };
+    console.log("Datos de envío guardados:", combinedData);
+    onFormSubmit(combinedData);
+  };
+
+  const handleDocumentationSubmit = (values: DocumentationFormValues) => {
+    const combinedData = {
+      ...formData,
+      ...values,
+      fullName: values.fullName,
+      birthDate: values.birthDate,
+      gender: values.gender,
+      passportNumber: values.passportNumber,
+      activationDate: values.activationDate
+    };
+    console.log("Datos de documentación guardados:", combinedData);
+    onFormSubmit(combinedData);
+  };
 
   switch (step) {
     case 1:
       if (hasPhysicalSim) {
         return (
           <ShippingForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleShippingSubmit}
             onValidityChange={onFormValidityChange}
+            initialData={formData}
           />
-        )
+        );
       }
       return (
         <DocumentationForm
-          onSubmit={onFormSubmit}
+          onSubmit={handleDocumentationSubmit}
           onValidityChange={onFormValidityChange}
+          initialData={formData}
         />
-      )
+      );
     case 2:
       if (hasPhysicalSim) {
         return (
           <DocumentationForm
-            onSubmit={onFormSubmit}
+            onSubmit={handleDocumentationSubmit}
             onValidityChange={onFormValidityChange}
+            initialData={formData}
           />
-        )
+        );
       }
-      return null
+      return null;
     case 3:
       return (
         <PaymentStep 
           formData={formData}
           onSubmit={() => onFormSubmit(formData)}
         />
-      )
+      );
     default:
-      return null
+      return null;
   }
 }
