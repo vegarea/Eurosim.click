@@ -10,13 +10,18 @@ export function StripeCheckout() {
 
   const handleCheckout = async () => {
     try {
+      // Transformar los items para Stripe
+      const lineItems = cartItems.map(item => ({
+        ...item,
+        title: item.metadata && typeof item.metadata === 'object' ? 
+          (item.metadata as Record<string, any>).product_title || 'Product' : 'Product',
+        description: item.metadata && typeof item.metadata === 'object' ? 
+          (item.metadata as Record<string, any>).description || undefined : undefined
+      }))
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          cartItems: cartItems.map(item => ({
-            ...item,
-            title: item.metadata?.title || 'Product',
-            description: item.metadata?.description,
-          })),
+          cartItems: lineItems,
           customerInfo,
         },
       })
@@ -26,10 +31,10 @@ export function StripeCheckout() {
       if (data?.url) {
         window.location.href = data.url
       } else {
-        throw new Error('No checkout URL received')
+        throw new Error('No se recibió la URL de checkout')
       }
     } catch (error) {
-      console.error('Error initiating checkout:', error)
+      console.error('Error al iniciar el checkout:', error)
       toast.error('Error al procesar el pago. Por favor intenta de nuevo.')
     }
   }
