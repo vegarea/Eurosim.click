@@ -69,13 +69,6 @@ export function DocumentationForm({
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <p className="text-blue-700 text-sm">
-            Para cumplir con las regulaciones de la Unión Europea y poder asignarte un número local europeo,
-            necesitamos algunos datos adicionales. Esta información es requerida por las autoridades de telecomunicaciones.
-          </p>
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
