@@ -1,65 +1,19 @@
-import { useState } from "react";
-import { PaymentMethodSelector } from "./payment/PaymentMethodSelector";
-import { Button } from "@/components/ui/button";
-import { useCart } from "@/contexts/CartContext";
-import { formatCurrency } from "@/utils/currency";
-import { CheckoutProcessor } from "./utils/checkoutProcessor";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useState } from "react"
+import { PaymentMethodSelector } from "./payment/PaymentMethodSelector"
+import { useCart } from "@/contexts/CartContext"
+import { formatCurrency } from "@/utils/currency"
+import { StripeCheckout } from "./payment/StripeCheckout"
 
 interface PaymentStepProps {
-  formData: Record<string, any>;
-  onSubmit?: () => void;
+  formData: Record<string, any>
 }
 
-export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
-  const [selectedMethod, setSelectedMethod] = useState<string>("test");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { items, clearCart } = useCart();
-  const navigate = useNavigate();
+export function PaymentStep({ formData }: PaymentStepProps) {
+  const [selectedMethod] = useState<string>("stripe")
+  const { items } = useCart()
 
   // Calcular el total
-  const total = items.reduce((sum, item) => sum + item.total_price, 0);
-
-  const handleCompleteOrder = async () => {
-    try {
-      // Validar que tengamos el email antes de procesar
-      if (!formData.email) {
-        toast.error("El email es requerido para completar la orden");
-        return;
-      }
-
-      console.log("Starting checkout process with data:", { 
-        email: formData.email,
-        items,
-        total 
-      });
-
-      setIsProcessing(true);
-
-      const processor = new CheckoutProcessor(
-        formData,
-        items,
-        total
-      );
-
-      const result = await processor.process();
-
-      if (result.success) {
-        console.log("Order completed successfully:", result);
-        toast.success("¡Orden completada exitosamente!");
-        clearCart();
-        onSubmit?.();
-        navigate("/");
-      }
-
-    } catch (error) {
-      console.error("Error processing checkout:", error);
-      toast.error(error instanceof Error ? error.message : "Error al procesar la orden");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const total = items.reduce((sum, item) => sum + item.total_price, 0)
 
   return (
     <div className="space-y-6">
@@ -69,7 +23,7 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
       
       <PaymentMethodSelector 
         selectedMethod={selectedMethod}
-        onMethodChange={setSelectedMethod}
+        onMethodChange={() => {}}
       />
 
       <div className="mt-8">
@@ -82,15 +36,8 @@ export function PaymentStep({ formData, onSubmit }: PaymentStepProps) {
           </div>
         </div>
 
-        <Button 
-          className="w-full"
-          size="lg"
-          onClick={handleCompleteOrder}
-          disabled={isProcessing || !formData.email}
-        >
-          {isProcessing ? "Procesando..." : "Completar Orden"}
-        </Button>
+        <StripeCheckout />
       </div>
     </div>
-  );
+  )
 }
