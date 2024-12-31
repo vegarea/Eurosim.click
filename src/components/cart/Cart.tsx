@@ -18,8 +18,8 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = true }: Cart
       const { data: { url }, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           items: items.map(item => ({
-            title: item.title,
-            description: item.description,
+            title: item.metadata?.product_title,
+            description: item.metadata?.product_description,
             unit_price: item.unit_price,
             quantity: item.quantity,
           })),
@@ -34,7 +34,6 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = true }: Cart
       if (error) throw error
       if (!url) throw new Error('No se recibió URL de checkout')
 
-      // Redirigir a Stripe Checkout
       window.location.href = url
     } catch (error) {
       console.error('Error iniciando checkout:', error)
@@ -51,11 +50,11 @@ export function Cart({ showCheckoutButton = true, isButtonEnabled = true }: Cart
       {items.map(item => (
         <div key={item.id} className="flex justify-between items-center">
           <div>
-            <h3 className="font-medium">{item.title}</h3>
-            <p className="text-sm text-gray-500">{item.description}</p>
+            <h3 className="font-medium">{item.metadata?.product_title}</h3>
+            <p className="text-sm text-gray-500">{item.metadata?.product_description}</p>
           </div>
           <div>
-            <span className="font-bold">{formatCurrency(item.unit_price * item.quantity)}</span>
+            <span className="font-bold">{formatCurrency(item.total_price)}</span>
           </div>
         </div>
       ))}
