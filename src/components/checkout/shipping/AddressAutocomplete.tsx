@@ -54,6 +54,15 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
             initializeAutocomplete()
           }
 
+          script.onerror = () => {
+            console.error('Error loading Google Maps script')
+            toast({
+              title: "Error",
+              description: "No se pudo cargar el mapa de Google",
+              variant: "destructive",
+            })
+          }
+
           document.head.appendChild(script)
         } else {
           scriptLoadedRef.current = true
@@ -70,7 +79,7 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
     }
 
     const initializeAutocomplete = () => {
-      if (!inputRef.current || !window.google) return;
+      if (!inputRef.current || !window.google || autocompleteRef.current) return;
       
       console.log("Initializing autocomplete...")
       autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
