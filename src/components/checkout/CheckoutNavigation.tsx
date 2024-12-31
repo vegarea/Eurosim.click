@@ -5,8 +5,8 @@ interface CheckoutNavigationProps {
   step: number
   isFormValid: boolean
   onBack: () => void
-  onSubmit: (data: any) => void
-  formData: any
+  onSubmit: () => void
+  formId: string
 }
 
 export function CheckoutNavigation({
@@ -14,9 +14,9 @@ export function CheckoutNavigation({
   isFormValid,
   onBack,
   onSubmit,
-  formData
+  formId
 }: CheckoutNavigationProps) {
-  if (step === 3) return null; // No mostrar navegación en el paso de revisión
+  if (step === 3) return null;
 
   return (
     <div className="flex justify-between mt-6">
@@ -36,8 +36,8 @@ export function CheckoutNavigation({
       
       <Button
         type="submit"
+        form={formId}
         disabled={!isFormValid}
-        onClick={() => onSubmit(formData)}
       >
         Continuar
       </Button>

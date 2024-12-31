@@ -56,9 +56,18 @@ export function CheckoutSteps({
       gender: values.gender,
       default_shipping_address: values.shippingAddress
     })
-
-    console.log('CheckoutSteps - After Update State:', state)
   }
+
+  const getCurrentFormId = () => {
+    switch (step) {
+      case 1:
+        return hasPhysicalSim ? "shipping-form" : "documentation-form";
+      case 2:
+        return hasPhysicalSim ? "documentation-form" : null;
+      default:
+        return null;
+    }
+  };
 
   switch (step) {
     case 1:

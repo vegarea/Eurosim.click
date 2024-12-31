@@ -82,17 +82,22 @@ function CheckoutContent() {
     }
   }
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = () => {
     if (step < 3) {
       setStep(prev => prev + 1)
     }
   }
 
-  useEffect(() => {
-    if (step === 3) {
-      setIsFormValid(true)
+  const getCurrentFormId = () => {
+    switch (step) {
+      case 1:
+        return hasPhysicalSim ? "shipping-form" : "documentation-form";
+      case 2:
+        return hasPhysicalSim ? "documentation-form" : null;
+      default:
+        return null;
     }
-  }, [step])
+  };
 
   if (items.length === 0) {
     return null;
@@ -128,7 +133,7 @@ function CheckoutContent() {
                   isFormValid={isFormValid}
                   onBack={handleBack}
                   onSubmit={handleSubmit}
-                  formData={{}}
+                  formId={getCurrentFormId()}
                 />
               </div>
             </motion.div>

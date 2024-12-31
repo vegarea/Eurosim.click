@@ -18,8 +18,6 @@ export function ShippingForm({
 }: ShippingFormProps) {
   const [showLocationFields, setShowLocationFields] = useState(false)
   
-  console.log('ShippingForm - Initial Data:', initialData)
-  
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -34,9 +32,6 @@ export function ShippingForm({
     mode: "onChange"
   })
 
-  console.log('ShippingForm - Form Values:', form.watch())
-
-  // Observar cambios en los campos requeridos para validación
   useEffect(() => {
     const subscription = form.watch((value) => {
       console.log('ShippingForm - Form Changed:', value)
@@ -54,7 +49,6 @@ export function ShippingForm({
     return () => subscription.unsubscribe();
   }, [form, onValidityChange]);
 
-  // Si estamos en modo test y tenemos datos de prueba, los usamos
   useEffect(() => {
     if (isTestMode && testData) {
       console.log('ShippingForm - Setting Test Data:', testData)
@@ -113,16 +107,19 @@ export function ShippingForm({
       phone: values.phone
     } : null;
 
-    console.log('ShippingForm - Formatted Shipping Address:', shippingAddress)
     onSubmit({
       ...values,
       shippingAddress
-    } as unknown as ShippingFormValues)
+    })
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form 
+        id="shipping-form"
+        onSubmit={form.handleSubmit(handleSubmit)} 
+        className="space-y-6"
+      >
         <PersonalInfoFields form={form} />
         
         <FormField
