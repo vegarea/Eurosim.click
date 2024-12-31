@@ -1,8 +1,8 @@
-import { useCart } from "@/contexts/CartContext"
-import { CartItem } from "./CartItem"
-import { formatCurrency } from "@/utils/currency"
-import { ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useCart } from "@/contexts/CartContext"
+import { formatCurrency } from "@/utils/currency"
+import { CartItem } from "./CartItem"
+import { useLocation } from "react-router-dom"
 
 interface CartProps {
   showCheckoutButton?: boolean
@@ -13,46 +13,38 @@ interface CartProps {
 export function Cart({ 
   showCheckoutButton = false, 
   isButtonEnabled = true,
-  onCheckout
+  onCheckout 
 }: CartProps) {
-  const { items, updateQuantity, removeItem } = useCart()
+  const { items } = useCart()
+  const location = useLocation()
+  const isCheckoutPage = location.pathname === '/checkout'
 
-  // Asegurarnos de que el total sea un número
-  const total = items.reduce((sum, item) => sum + (item.total_price || 0), 0)
+  const total = items.reduce((sum, item) => sum + item.total_price, 0)
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
+      <div className="space-y-3">
         {items.map((item) => (
-          <CartItem 
-            key={item.id} 
-            item={item}
-            onUpdateQuantity={(quantity) => updateQuantity(item.id, quantity)}
-            onRemove={() => removeItem(item.id)}
-          />
+          <CartItem key={item.id} item={item} />
         ))}
       </div>
 
-      <div className="pt-4 border-t">
-        <div className="flex justify-between items-center">
-          <span className="font-medium">Total:</span>
-          <span className="text-xl font-bold">
-            {formatCurrency(total)}
-          </span>
+      <div className="border-t pt-4">
+        <div className="flex justify-between text-lg font-semibold">
+          <span>Total:</span>
+          <span>{formatCurrency(total)}</span>
         </div>
-
-        {showCheckoutButton && (
-          <Button
-            onClick={onCheckout}
-            disabled={!isButtonEnabled || items.length === 0}
-            className="w-full mt-4"
-            size="lg"
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Ir al checkout
-          </Button>
-        )}
       </div>
+
+      {showCheckoutButton && !isCheckoutPage && (
+        <Button
+          onClick={onCheckout}
+          disabled={!isButtonEnabled || items.length === 0}
+          className="w-full mt-4"
+        >
+          Ir al checkout
+        </Button>
+      )}
     </div>
   )
 }
