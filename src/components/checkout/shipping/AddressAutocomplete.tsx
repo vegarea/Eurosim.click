@@ -88,15 +88,21 @@ export function AddressAutocomplete({ value, onChange, onAddressSelect }: Addres
       })
 
       autocompleteRef.current.addListener("place_changed", () => {
-        const place = autocompleteRef.current?.getPlace()
-        if (place) {
-          console.log("Place selected:", place)
-          if (!place.address_components) {
-            console.error("No address components found")
-            return
-          }
+        if (!autocompleteRef.current) return;
+        
+        const place = autocompleteRef.current.getPlace()
+        console.log("Place selected:", place)
+        
+        if (place && place.address_components) {
           onChange(place.formatted_address || "")
           onAddressSelect(place)
+        } else {
+          console.error("No address components found")
+          toast({
+            title: "Error",
+            description: "No se pudo obtener los detalles de la dirección",
+            variant: "destructive",
+          })
         }
       })
     }
