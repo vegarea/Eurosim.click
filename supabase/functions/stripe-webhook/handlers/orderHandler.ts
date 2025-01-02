@@ -23,10 +23,11 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: session.receipt_url,
       shipping_address: session.metadata.shipping_address ? JSON.parse(session.metadata.shipping_address) : null,
-      activation_date: session.metadata.activation_date || null,
+      activation_date: session.metadata.activation_date ? new Date(session.metadata.activation_date).toISOString() : null,
       metadata: {
         stripe_session_id: session.id,
-        original_metadata: session.metadata
+        original_metadata: session.metadata,
+        product_details: session.metadata.product_details ? JSON.parse(session.metadata.product_details) : null
       }
     }
 

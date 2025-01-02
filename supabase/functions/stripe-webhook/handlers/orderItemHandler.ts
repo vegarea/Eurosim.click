@@ -11,6 +11,7 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       total_price: parseInt(session.metadata.total_amount),
       metadata: {
         product_type: session.metadata.order_type,
+        product_details: session.metadata.product_details ? JSON.parse(session.metadata.product_details) : null,
         stripe_session_id: session.id,
         original_metadata: session.metadata
       }
