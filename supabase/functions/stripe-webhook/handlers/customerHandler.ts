@@ -24,17 +24,25 @@ function formatDate(dateString: string | null): string | null {
 }
 
 function formatShippingAddress(session: any): any {
-  if (!session.shipping_details?.address) return null;
+  console.log('📦 Formatting shipping address from session:', session.shipping_details)
+  
+  if (!session.shipping_details?.address) {
+    console.log('⚠️ No shipping details found in session')
+    return null
+  }
 
-  const address = session.shipping_details.address;
-  return {
-    street: `${address.line1}${address.line2 ? ` ${address.line2}` : ''}`,
+  const address = session.shipping_details.address
+  const formattedAddress = {
+    street: address.line1 + (address.line2 ? ` ${address.line2}` : ''),
     city: address.city,
     state: address.state,
     country: address.country,
     postal_code: address.postal_code,
     phone: session.customer_details?.phone || null
-  };
+  }
+
+  console.log('📦 Formatted address:', formattedAddress)
+  return formattedAddress
 }
 
 export async function handleCustomerCreation(session: any, supabase: any) {
@@ -54,13 +62,15 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       throw searchError
     }
 
+    const shippingAddress = formatShippingAddress(session)
+    console.log('📦 Shipping address for customer:', shippingAddress)
+
     if (existingCustomer) {
       console.log('✅ Customer already exists:', existingCustomer)
       
-      // Si el cliente existe y hay una nueva dirección, actualizarla
-      if (session.shipping_details) {
-        const shippingAddress = formatShippingAddress(session)
-        console.log('📦 Updating shipping address for existing customer:', shippingAddress)
+      // Actualizar dirección si existe
+      if (shippingAddress) {
+        console.log('📦 Updating shipping address for existing customer')
         
         const { error: updateError } = await supabase
           .from('customers')
@@ -75,10 +85,6 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       
       return existingCustomer
     }
-
-    // Formatear la dirección de envío
-    const shippingAddress = formatShippingAddress(session)
-    console.log('📦 Formatted shipping address:', shippingAddress)
 
     // Preparar datos del cliente
     const customerData = {
@@ -98,7 +104,7 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       }
     }
 
-    console.log('📝 Attempting to create new customer with data:', customerData)
+    console.log('📝 Creating new customer with data:', customerData)
 
     const { data: customer, error: insertError } = await supabase
       .from('customers')
@@ -108,12 +114,6 @@ export async function handleCustomerCreation(session: any, supabase: any) {
 
     if (insertError) {
       console.error('❌ Error inserting customer:', insertError)
-      console.error('Insert error details:', {
-        code: insertError.code,
-        message: insertError.message,
-        details: insertError.details,
-        hint: insertError.hint
-      })
       throw insertError
     }
 
@@ -121,12 +121,6 @@ export async function handleCustomerCreation(session: any, supabase: any) {
     return customer
   } catch (error) {
     console.error('❌ Error in customer creation:', error)
-    console.error('Error details:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-      details: error.details || 'No additional details'
-    })
     throw error
   }
 }

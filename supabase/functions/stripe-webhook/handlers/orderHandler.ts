@@ -14,9 +14,8 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
 
     // Formatear la dirección de envío desde Stripe
     const shippingAddress = session.shipping_details ? {
-      street: `${session.shipping_details.address.line1}${
-        session.shipping_details.address.line2 ? ` ${session.shipping_details.address.line2}` : ''
-      }`,
+      street: session.shipping_details.address.line1 + 
+        (session.shipping_details.address.line2 ? ` ${session.shipping_details.address.line2}` : ''),
       city: session.shipping_details.address.city,
       state: session.shipping_details.address.state,
       country: session.shipping_details.address.country,
@@ -24,7 +23,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       phone: session.customer_details?.phone || null
     } : null;
 
-    console.log('📦 Formatted shipping address:', shippingAddress)
+    console.log('📦 Formatted shipping address for order:', shippingAddress)
 
     const orderData = {
       customer_id: customer.id,
@@ -48,7 +47,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       }
     }
 
-    console.log('📝 Attempting to create order with data:', orderData)
+    console.log('📝 Creating order with data:', orderData)
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -58,12 +57,6 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
 
     if (orderError) {
       console.error('❌ Error creating order:', orderError)
-      console.error('Order error details:', {
-        code: orderError.code,
-        message: orderError.message,
-        details: orderError.details,
-        hint: orderError.hint
-      })
       throw orderError
     }
 
@@ -71,12 +64,6 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
     return order
   } catch (error) {
     console.error('❌ Error in order creation:', error)
-    console.error('Error details:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-      details: error.details || 'No additional details'
-    })
     throw error
   }
 }
