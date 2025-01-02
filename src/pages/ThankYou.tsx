@@ -29,6 +29,7 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
+        // Modificamos la consulta para buscar por el ID de sesión de Stripe
         const { data, error } = await supabase
           .from('orders')
           .select(`
@@ -49,7 +50,6 @@ export default function ThankYou() {
           throw error
         }
 
-        // Si no hay datos y aún no hemos intentado 3 veces, reintentamos
         if (!data && retryCount < 3) {
           console.log('Orden no encontrada, reintentando en 2 segundos...')
           setRetryCount(prev => prev + 1)
