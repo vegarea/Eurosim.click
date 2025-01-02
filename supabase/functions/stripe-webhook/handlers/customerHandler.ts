@@ -21,7 +21,7 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       return existingCustomer
     }
 
-    // Crear nuevo cliente
+    // Crear nuevo cliente con los nombres de campos actualizados
     const customerData = {
       name: session.metadata.customer_name,
       email: session.customer_email,
@@ -33,15 +33,20 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       stripe_customer_id: session.customer,
     }
 
+    console.log('Attempting to create new customer with data:', customerData)
+
     const { data: customer, error: insertError } = await supabase
       .from('customers')
       .insert(customerData)
       .select()
       .single()
 
-    if (insertError) throw insertError
+    if (insertError) {
+      console.error('Error inserting customer:', insertError)
+      throw insertError
+    }
 
-    console.log('New customer created:', customer)
+    console.log('New customer created successfully:', customer)
     return customer
   } catch (error) {
     console.error('Error in customer creation:', error)

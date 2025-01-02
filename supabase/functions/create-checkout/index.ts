@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('Creating checkout session with items:', line_items)
 
-    // Preparar los metadatos completos para la sesión
+    // Preparar los metadatos con nombres consistentes
     const metadata = {
       customer_name: customerInfo.name,
       customer_email: customerInfo.email,
