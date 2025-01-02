@@ -28,8 +28,7 @@ function formatShippingAddress(session: any): any {
 
   const address = session.shipping_details.address;
   return {
-    street: address.line1,
-    street2: address.line2,
+    street: `${address.line1}${address.line2 ? ` ${address.line2}` : ''}`,
     city: address.city,
     state: address.state,
     country: address.country,
@@ -40,6 +39,7 @@ function formatShippingAddress(session: any): any {
 
 export async function handleCustomerCreation(session: any, supabase: any) {
   console.log('👤 Starting customer creation with metadata:', session.metadata)
+  console.log('Shipping details:', session.shipping_details)
 
   try {
     // Buscar cliente existente
@@ -56,6 +56,23 @@ export async function handleCustomerCreation(session: any, supabase: any) {
 
     if (existingCustomer) {
       console.log('✅ Customer already exists:', existingCustomer)
+      
+      // Si el cliente existe y hay una nueva dirección, actualizarla
+      if (session.shipping_details) {
+        const shippingAddress = formatShippingAddress(session)
+        console.log('📦 Updating shipping address for existing customer:', shippingAddress)
+        
+        const { error: updateError } = await supabase
+          .from('customers')
+          .update({ default_shipping_address: shippingAddress })
+          .eq('id', existingCustomer.id)
+
+        if (updateError) {
+          console.error('❌ Error updating customer shipping address:', updateError)
+          throw updateError
+        }
+      }
+      
       return existingCustomer
     }
 

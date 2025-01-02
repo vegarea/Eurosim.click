@@ -48,11 +48,11 @@ serve(async (req) => {
     console.log('Creating checkout session with items:', line_items)
 
     // Formatear fechas a ISO 8601
-    const formattedBirthDate = new Date(customerInfo.birth_date).toISOString();
+    const formattedBirthDate = new Date(customerInfo.birth_date).toISOString().split('T')[0];
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos asegurando compatibilidad con Supabase
+    // Preparar los metadatos para Stripe
     const metadata = {
       customer_name: customerInfo.name,
       customer_email: customerInfo.email,
@@ -63,7 +63,9 @@ serve(async (req) => {
       order_type: cartItems[0].metadata.product_type,
       product_id: cartItems[0].product_id,
       activation_date: formattedActivationDate,
-      total_amount: cartItems.reduce((sum: number, item: any) => sum + (item.unit_price * item.quantity), 0).toString(),
+      total_amount: cartItems.reduce((sum: number, item: any) => 
+        sum + (item.unit_price * item.quantity), 0
+      ).toString(),
     }
 
     console.log('Session metadata:', metadata)
@@ -76,14 +78,10 @@ serve(async (req) => {
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata,
-    }
-
-    // Configurar recolección de dirección para productos físicos
-    if (orderInfo.type === 'physical') {
-      sessionConfig.shipping_address_collection = {
+      shipping_address_collection: orderInfo.type === 'physical' ? {
         allowed_countries: ['MX']
-      }
-      sessionConfig.shipping_options = [
+      } : undefined,
+      shipping_options: orderInfo.type === 'physical' ? [
         {
           shipping_rate_data: {
             type: 'fixed_amount',
@@ -104,8 +102,10 @@ serve(async (req) => {
             },
           },
         },
-      ]
+      ] : undefined
     }
+
+    console.log('Creating session with config:', sessionConfig)
 
     const session = await stripe.checkout.sessions.create(sessionConfig)
 

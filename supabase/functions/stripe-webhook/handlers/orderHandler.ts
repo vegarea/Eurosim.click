@@ -1,6 +1,7 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
   console.log('📦 Starting order creation for customer:', customer.id)
   console.log('Session metadata:', session.metadata)
+  console.log('Shipping details:', session.shipping_details)
 
   try {
     if (!session || !customer) {
@@ -12,15 +13,18 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
     }
 
     // Formatear la dirección de envío desde Stripe
-    const shippingAddress = session.shipping_details?.address ? {
-      street: session.shipping_details.address.line1,
-      street2: session.shipping_details.address.line2,
+    const shippingAddress = session.shipping_details ? {
+      street: `${session.shipping_details.address.line1}${
+        session.shipping_details.address.line2 ? ` ${session.shipping_details.address.line2}` : ''
+      }`,
       city: session.shipping_details.address.city,
       state: session.shipping_details.address.state,
       country: session.shipping_details.address.country,
       postal_code: session.shipping_details.address.postal_code,
       phone: session.customer_details?.phone || null
     } : null;
+
+    console.log('📦 Formatted shipping address:', shippingAddress)
 
     const orderData = {
       customer_id: customer.id,
@@ -34,7 +38,8 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: session.receipt_url,
       shipping_address: shippingAddress,
-      activation_date: session.metadata.activation_date ? new Date(session.metadata.activation_date).toISOString() : null,
+      activation_date: session.metadata.activation_date ? 
+        new Date(session.metadata.activation_date).toISOString() : null,
       metadata: {
         stripe_session_id: session.id,
         original_metadata: session.metadata,
