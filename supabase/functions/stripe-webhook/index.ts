@@ -12,7 +12,7 @@ serve(async (req) => {
   const requestId = crypto.randomUUID()
   const logger = new Logger(requestId)
   
-  // Log request details for debugging
+  // Log detailed request information
   const headers = Object.fromEntries(req.headers.entries())
   logger.info('Webhook request received', {
     method: req.method,
@@ -24,11 +24,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     logger.info('Handling CORS preflight request')
     return new Response(null, { 
-      headers: {
-        ...corsHeaders,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Max-Age': '86400',
-      }
+      headers: corsHeaders
     })
   }
 
@@ -36,34 +32,47 @@ serve(async (req) => {
     // Validate environment variables
     validateEnvVars(logger)
 
+    // Log Stripe secret format validation
+    logger.info('Validating Stripe webhook secret format', {
+      hasSecret: !!requiredEnvVars.STRIPE_WEBHOOK_SECRET,
+      secretFormat: requiredEnvVars.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_') ? 'valid' : 'invalid'
+    })
+
     // Initialize Stripe with explicit API version
     const stripe = new Stripe(requiredEnvVars.STRIPE_SECRET_KEY!, {
       apiVersion: '2023-10-16',
     })
     logger.success('Stripe initialized')
 
-    // Get and validate Stripe signature
+    // Get and validate Stripe signature with detailed logging
     const signature = req.headers.get('stripe-signature')
+    logger.info('Checking Stripe signature', {
+      hasSignature: !!signature,
+      signatureValue: signature ? signature.substring(0, 20) + '...' : 'missing',
+      allHeaders: Object.keys(headers)
+    })
+
     if (!signature) {
       logger.error('No stripe-signature header found', {
         allHeaders: Object.fromEntries(req.headers.entries())
       })
       return handleError(logger, requestId, new Error('Missing stripe-signature header'), 401)
     }
-    logger.info('Stripe signature found', { signature })
 
-    // Get request payload as text
+    // Get request payload as text with validation
     const payload = await req.text()
+    logger.info('Request payload received', { 
+      payloadLength: payload.length,
+      payloadPreview: payload.substring(0, 100) + '...',
+      contentType: req.headers.get('content-type')
+    })
+
     if (!payload) {
       logger.error('Empty request payload')
       return handleError(logger, requestId, new Error('Empty request payload'), 400)
     }
-    logger.info('Request payload received', { 
-      payloadLength: payload.length,
-      firstChars: payload.substring(0, 100) // Log start of payload for debugging
-    })
 
-    // Verify webhook signature
+    // Verify webhook signature with detailed error handling
     let event;
     try {
       event = stripe.webhooks.constructEvent(
@@ -78,9 +87,10 @@ serve(async (req) => {
     } catch (err) {
       logger.error('Error verifying webhook signature', {
         error: err,
-        signature,
+        signature: signature,
         payloadLength: payload.length,
-        webhookSecret: requiredEnvVars.STRIPE_WEBHOOK_SECRET ? 'Present' : 'Missing'
+        webhookSecret: requiredEnvVars.STRIPE_WEBHOOK_SECRET ? 'Present' : 'Missing',
+        secretFormat: requiredEnvVars.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_') ? 'valid' : 'invalid'
       })
       return handleError(logger, requestId, err, 401)
     }
@@ -104,7 +114,8 @@ serve(async (req) => {
       logger.info('Processing completed checkout session', { 
         sessionId: session.id,
         customerId: session.customer,
-        paymentStatus: session.payment_status
+        paymentStatus: session.payment_status,
+        sessionData: JSON.stringify(session, null, 2)
       })
 
       try {
@@ -129,7 +140,8 @@ serve(async (req) => {
       } catch (error) {
         logger.error('Error processing checkout session', {
           error,
-          sessionId: session.id
+          sessionId: session.id,
+          errorDetails: error.stack
         })
         return handleError(logger, requestId, error)
       }
@@ -145,7 +157,8 @@ serve(async (req) => {
   } catch (err) {
     logger.error('Unexpected error in webhook handler', {
       error: err,
-      stack: err.stack
+      stack: err.stack,
+      details: err.message
     })
     return handleError(logger, requestId, err)
   }

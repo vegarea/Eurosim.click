@@ -18,15 +18,17 @@ export function validateEnvVars(logger: any) {
       throw new Error(`${key} is required`);
     }
     
-    // Validate Stripe keys format
+    if (key === 'STRIPE_WEBHOOK_SECRET' && !value.startsWith('whsec_')) {
+      logger.error('Invalid Stripe webhook secret format', {
+        secretStart: value.substring(0, 5),
+        expectedStart: 'whsec_'
+      });
+      throw new Error('Invalid Stripe webhook secret format');
+    }
+    
     if (key === 'STRIPE_SECRET_KEY' && !value.startsWith('sk_')) {
       logger.error('Invalid Stripe secret key format');
       throw new Error('Invalid Stripe secret key format');
-    }
-    
-    if (key === 'STRIPE_WEBHOOK_SECRET' && !value.startsWith('whsec_')) {
-      logger.error('Invalid Stripe webhook secret format');
-      throw new Error('Invalid Stripe webhook secret format');
     }
   }
   logger.success('All required environment variables are present and valid');
