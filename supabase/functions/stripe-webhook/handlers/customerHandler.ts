@@ -3,61 +3,61 @@ import { CustomerGender } from '../types/enums.ts'
 
 function validateGender(gender: string | null): CustomerGender | null {
   if (!gender) return null
-  console.log('🔍 Validando género:', gender)
+  console.log('🔍 Validating gender:', gender)
   const validGender = gender.toUpperCase() as CustomerGender
   const isValid = validGender === 'M' || validGender === 'F'
-  console.log('Resultado validación género:', isValid ? 'válido' : 'inválido')
+  console.log('Gender validation result:', isValid ? 'valid' : 'invalid')
   return isValid ? validGender : null
 }
 
 function formatDate(dateString: string | null): string | null {
   if (!dateString) return null
-  console.log('🔍 Formateando fecha:', dateString)
+  console.log('🔍 Formatting date:', dateString)
   try {
     const date = new Date(dateString)
     const formattedDate = date.toISOString().split('T')[0]
-    console.log('Fecha formateada:', formattedDate)
+    console.log('Formatted date:', formattedDate)
     return formattedDate
   } catch (error) {
-    console.error('❌ Error parseando fecha:', dateString, error)
+    console.error('❌ Error parsing date:', dateString, error)
     return null
   }
 }
 
 function parseShippingAddress(addressString: string | null): any {
-  console.log('🔍 Parseando dirección de envío:', addressString)
+  console.log('🔍 Parsing shipping address input:', addressString)
   if (!addressString) {
-    console.log('No se proporcionó dirección')
+    console.log('No shipping address provided')
     return null
   }
   try {
     if (typeof addressString === 'object') {
-      console.log('La dirección ya es un objeto:', addressString)
+      console.log('Address is already an object:', addressString)
       return Object.keys(addressString).length === 0 ? null : addressString
     }
     if (addressString === '{}' || addressString === '') {
-      console.log('String de dirección vacío detectado')
+      console.log('Empty address string detected')
       return null
     }
     const address = JSON.parse(addressString)
-    console.log('Resultado del parseo de dirección:', address)
+    console.log('Parsed address result:', address)
     return Object.keys(address).length === 0 ? null : address
   } catch (error) {
-    console.error('❌ Error parseando dirección:', error)
-    console.error('String de dirección original:', addressString)
+    console.error('❌ Error parsing shipping address:', error)
+    console.error('Raw address string:', addressString)
     return null
   }
 }
 
 export async function handleCustomerCreation(session: any, supabase: any) {
-  console.log('👤 Iniciando creación de cliente con datos:', {
+  console.log('👤 Starting customer creation with data:', {
     email: session.customer_email,
     metadata: session.metadata
   })
 
   try {
     // Buscar cliente existente
-    console.log('🔍 Buscando cliente existente con email:', session.customer_email)
+    console.log('🔍 Searching for existing customer with email:', session.customer_email)
     const { data: existingCustomer, error: searchError } = await supabase
       .from('customers')
       .select()
@@ -65,12 +65,12 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       .maybeSingle()
 
     if (searchError) {
-      console.error('❌ Error buscando cliente existente:', searchError)
+      console.error('❌ Error searching for existing customer:', searchError)
       throw searchError
     }
 
     if (existingCustomer) {
-      console.log('✅ Cliente ya existe:', existingCustomer)
+      console.log('✅ Customer already exists:', existingCustomer)
       return existingCustomer
     }
 
@@ -91,7 +91,7 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       }
     }
 
-    console.log('📝 Intentando crear nuevo cliente con datos:', customerData)
+    console.log('📝 Attempting to create new customer with data:', customerData)
 
     const { data: customer, error: insertError } = await supabase
       .from('customers')
@@ -100,8 +100,8 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       .single()
 
     if (insertError) {
-      console.error('❌ Error insertando cliente:', insertError)
-      console.error('Detalles del error de inserción:', {
+      console.error('❌ Error inserting customer:', insertError)
+      console.error('Insert error details:', {
         code: insertError.code,
         message: insertError.message,
         details: insertError.details,
@@ -110,15 +110,15 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       throw insertError
     }
 
-    console.log('✅ Nuevo cliente creado exitosamente:', customer)
+    console.log('✅ New customer created successfully:', customer)
     return customer
   } catch (error) {
-    console.error('❌ Error en creación de cliente:', error)
-    console.error('Detalles del error:', {
+    console.error('❌ Error in customer creation:', error)
+    console.error('Error details:', {
       name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'Sin detalles adicionales'
+      details: error.details || 'No additional details'
     })
     throw error
   }

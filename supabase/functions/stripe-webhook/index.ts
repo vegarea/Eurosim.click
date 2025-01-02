@@ -18,12 +18,11 @@ const corsHeaders = {
 const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
-  console.log('🔍 DEBUG: Iniciando procesamiento de webhook')
-  console.log('Método:', req.method)
-  console.log('Headers:', Object.fromEntries(req.headers.entries()))
+  console.log('🔔 Webhook request received')
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
   if (req.method === 'OPTIONS') {
-    console.log('👋 Manejando preflight CORS')
+    console.log('👋 Handling CORS preflight request')
     return new Response(null, { 
       headers: corsHeaders,
       status: 200
@@ -34,7 +33,7 @@ serve(async (req) => {
     const signature = req.headers.get('stripe-signature')
     
     if (!signature) {
-      console.error('❌ ERROR: No se encontró stripe-signature en headers')
+      console.error('❌ No stripe-signature header found')
       return new Response(
         JSON.stringify({ error: 'No stripe-signature header' }), 
         { 
@@ -45,7 +44,7 @@ serve(async (req) => {
     }
 
     const payload = await req.text()
-    console.log('📦 Payload recibido:', payload)
+    console.log('📦 Raw webhook payload:', payload)
     
     let event;
     try {
@@ -54,12 +53,12 @@ serve(async (req) => {
         signature,
         endpointSecret
       )
-      console.log('✅ Firma del webhook verificada')
-      console.log('🎯 Tipo de evento:', event.type)
-      console.log('📝 Datos del evento:', JSON.stringify(event.data, null, 2))
+      console.log('✅ Webhook signature verified')
+      console.log('🎯 Event type:', event.type)
+      console.log('📝 Event data:', JSON.stringify(event.data, null, 2))
     } catch (err) {
-      console.error('❌ ERROR: Verificación de firma fallida:', err)
-      console.error('Firma:', signature)
+      console.error('❌ Error verifying webhook signature:', err)
+      console.error('Signature:', signature)
       console.error('Payload:', payload)
       return new Response(
         JSON.stringify({ 
@@ -73,49 +72,39 @@ serve(async (req) => {
       )
     }
 
-    // Verificar variables de entorno de Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    console.log('🔑 Variables de entorno Supabase:')
-    console.log('URL presente:', !!supabaseUrl)
-    console.log('Key presente:', !!supabaseKey)
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Configuración de Supabase incompleta')
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
+    // Inicializar el cliente de Supabase con la configuración correcta
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
-    })
+    )
 
-    console.log('🔌 Cliente Supabase inicializado')
+    console.log('🔌 Supabase client initialized with service role')
 
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object
-        console.log('💳 Procesando sesión de checkout completada:')
-        console.log('ID de sesión:', session.id)
-        console.log('Email del cliente:', session.customer_email)
-        console.log('Metadata:', session.metadata)
+        console.log('💳 Processing completed checkout session:', JSON.stringify(session, null, 2))
+        console.log('🔍 Session metadata:', session.metadata)
         
         try {
-          console.log('👤 Iniciando creación/actualización de cliente...')
+          console.log('👤 Starting customer creation/update...')
           const customer = await handleCustomerCreation(session, supabase)
-          console.log('✅ Cliente procesado:', customer)
+          console.log('✅ Customer processed:', customer)
           
-          console.log('📦 Iniciando creación de orden...')
+          console.log('📦 Starting order creation...')
           const order = await handleOrderCreation(session, customer, supabase)
-          console.log('✅ Orden creada:', order)
+          console.log('✅ Order created:', order)
           
-          console.log('🛍️ Iniciando creación de items de orden...')
+          console.log('🛍️ Starting order items creation...')
           const orderItems = await handleOrderItemCreation(session, order, supabase)
-          console.log('✅ Items de orden creados:', orderItems)
+          console.log('✅ Order items created:', orderItems)
 
-          console.log('🎉 Procesamiento completado exitosamente')
           return new Response(
             JSON.stringify({ 
               received: true,
@@ -130,18 +119,18 @@ serve(async (req) => {
             }
           )
         } catch (error) {
-          console.error('❌ ERROR en el procesamiento:', error)
-          console.error('Detalles del error:', {
+          console.error('❌ Error processing checkout:', error)
+          console.error('Error details:', {
             name: error.name,
             message: error.message,
             stack: error.stack,
-            details: error.details || 'Sin detalles adicionales',
+            details: error.details || 'No additional details',
             code: error.code,
             hint: error.hint
           })
           
           if (error.message.includes('Database error')) {
-            console.error('Detalles del error de base de datos:', {
+            console.error('Database error details:', {
               code: error.code,
               message: error.message,
               details: error.details,
@@ -153,7 +142,7 @@ serve(async (req) => {
             JSON.stringify({ 
               error: error.message,
               details: error.stack,
-              data: error.details || 'Sin detalles adicionales'
+              data: error.details || 'No additional details'
             }), 
             { 
               status: 500,
@@ -163,7 +152,7 @@ serve(async (req) => {
         }
       }
       default: {
-        console.log('⚠️ Tipo de evento no manejado:', event.type)
+        console.log('⚠️ Unhandled event type:', event.type)
         return new Response(
           JSON.stringify({ 
             received: true,
@@ -177,18 +166,18 @@ serve(async (req) => {
       }
     }
   } catch (err) {
-    console.error('❌ ERROR FATAL en el webhook:', err)
-    console.error('Detalles del error:', {
+    console.error('❌ Fatal error processing webhook:', err)
+    console.error('Error details:', {
       name: err.name,
       message: err.message,
       stack: err.stack,
-      details: err.details || 'Sin detalles adicionales'
+      details: err.details || 'No additional details'
     })
     return new Response(
       JSON.stringify({ 
         error: err.message,
         details: err.stack,
-        data: err.details || 'Sin detalles adicionales'
+        data: err.details || 'No additional details'
       }), 
       { 
         status: 400,
