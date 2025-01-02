@@ -1,7 +1,6 @@
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Content-Type': 'application/json'
 }
 
 export const requiredEnvVars = {
@@ -17,19 +16,6 @@ export function validateEnvVars(logger: any) {
       logger.error(`Missing required environment variable: ${key}`);
       throw new Error(`${key} is required`);
     }
-    
-    if (key === 'STRIPE_WEBHOOK_SECRET' && !value.startsWith('whsec_')) {
-      logger.error('Invalid Stripe webhook secret format', {
-        secretStart: value.substring(0, 5),
-        expectedStart: 'whsec_'
-      });
-      throw new Error('Invalid Stripe webhook secret format');
-    }
-    
-    if (key === 'STRIPE_SECRET_KEY' && !value.startsWith('sk_')) {
-      logger.error('Invalid Stripe secret key format');
-      throw new Error('Invalid Stripe secret key format');
-    }
   }
-  logger.success('All required environment variables are present and valid');
+  logger.success('All required environment variables are present');
 }
