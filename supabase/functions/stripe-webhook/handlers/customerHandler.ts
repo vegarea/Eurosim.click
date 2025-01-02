@@ -23,6 +23,22 @@ function formatDate(dateString: string | null): string | null {
   }
 }
 
+function parseShippingAddress(addressString: string | null): any {
+  if (!addressString) return null
+  console.log('🔍 Parsing shipping address:', addressString)
+  try {
+    // Si ya es un objeto, lo retornamos directamente
+    if (typeof addressString === 'object') return addressString
+    // Si es un string, intentamos parsearlo
+    const parsedAddress = JSON.parse(addressString)
+    console.log('✅ Successfully parsed shipping address:', parsedAddress)
+    return parsedAddress
+  } catch (error) {
+    console.error('❌ Error parsing shipping address:', error)
+    return null
+  }
+}
+
 function parseJsonMetadata(jsonString: string | null): any {
   if (!jsonString) return null
   try {
@@ -54,6 +70,10 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       return existingCustomer
     }
 
+    // Parsear la dirección de envío de la metadata
+    const shippingAddress = parseShippingAddress(session.metadata.shipping_address)
+    console.log('📦 Parsed shipping address:', shippingAddress)
+
     // Preparar datos del cliente
     const customerData = {
       name: session.metadata.customer_name,
@@ -62,7 +82,7 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       passport_number: session.metadata.customer_passport || null,
       birth_date: formatDate(session.metadata.customer_birth_date),
       gender: validateGender(session.metadata.customer_gender),
-      default_shipping_address: parseJsonMetadata(session.metadata.shipping_address),
+      default_shipping_address: shippingAddress,
       stripe_customer_id: session.customer,
       metadata: {
         stripe_session_id: session.id,
