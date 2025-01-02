@@ -9,13 +9,13 @@ function validateGender(gender: string | null): CustomerGender | null {
   return validGender === 'M' || validGender === 'F' ? validGender : null
 }
 
-// Función auxiliar para convertir fecha al formato exacto de PostgreSQL
+// Función auxiliar para convertir fecha al formato exacto que espera PostgreSQL
 function formatDate(dateString: string | null): string | null {
   if (!dateString) return null
   try {
     const date = new Date(dateString)
-    // Formato YYYY-MM-DD que espera PostgreSQL
-    return date.toISOString().slice(0, 10)
+    // Formato YYYY-MM-DD que espera PostgreSQL para tipo date
+    return date.toISOString().split('T')[0]
   } catch (error) {
     console.error('Error parsing date:', dateString, error)
     return null
@@ -31,7 +31,9 @@ function parseShippingAddress(addressString: string | null): any {
     // Si es string vacío o {}, retornamos null
     if (addressString === '{}' || addressString === '') return null
     // Intentamos parsear el string
-    return JSON.parse(addressString)
+    const address = JSON.parse(addressString)
+    // Si el objeto está vacío, retornamos null
+    return Object.keys(address).length === 0 ? null : address
   } catch (error) {
     console.error('Error parsing shipping address:', addressString, error)
     return null
