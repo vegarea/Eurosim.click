@@ -1,165 +1,70 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import Stripe from 'https://esm.sh/stripe@14.21.0'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import { handleCustomerCreation } from './handlers/customerHandler.ts'
-import { handleOrderCreation } from './handlers/orderHandler.ts'
-import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
-import { Logger } from './logger.ts'
-import { corsHeaders, requiredEnvVars, validateEnvVars } from './config.ts'
-import { handleSuccess, handleError } from './responseHandler.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+}
+
+console.log('Webhook function loaded')
 
 serve(async (req) => {
-  const requestId = crypto.randomUUID()
-  const logger = new Logger(requestId)
-  
-  // Log detailed request information
-  const headers = Object.fromEntries(req.headers.entries())
-  logger.info('Webhook request received', {
+  // Log every incoming request
+  console.log('Request received:', {
     method: req.method,
     url: req.url,
-    headers: headers
+    headers: Object.fromEntries(req.headers.entries())
   })
 
-  // Handle CORS preflight
+  // Handle CORS
   if (req.method === 'OPTIONS') {
-    logger.info('Handling CORS preflight request')
-    return new Response(null, { 
-      headers: corsHeaders
-    })
+    console.log('Handling OPTIONS request')
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Validate environment variables
-    validateEnvVars(logger)
-
-    // Log Stripe secret format validation
-    logger.info('Validating Stripe webhook secret format', {
-      hasSecret: !!requiredEnvVars.STRIPE_WEBHOOK_SECRET,
-      secretFormat: requiredEnvVars.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_') ? 'valid' : 'invalid'
+    // Log all environment variables (except sensitive values)
+    console.log('Environment check:', {
+      hasStripeSecret: !!Deno.env.get('STRIPE_SECRET_KEY'),
+      hasWebhookSecret: !!Deno.env.get('STRIPE_WEBHOOK_SECRET'),
+      hasSupabaseUrl: !!Deno.env.get('SUPABASE_URL'),
+      hasSupabaseKey: !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     })
 
-    // Initialize Stripe with explicit API version
-    const stripe = new Stripe(requiredEnvVars.STRIPE_SECRET_KEY!, {
-      apiVersion: '2023-10-16',
-    })
-    logger.success('Stripe initialized')
-
-    // Get and validate Stripe signature with detailed logging
+    // Get the signature
     const signature = req.headers.get('stripe-signature')
-    logger.info('Checking Stripe signature', {
-      hasSignature: !!signature,
-      signatureValue: signature ? signature.substring(0, 20) + '...' : 'missing',
-      allHeaders: Object.keys(headers)
-    })
+    console.log('Stripe signature:', signature ? 'Present' : 'Missing')
 
-    if (!signature) {
-      logger.error('No stripe-signature header found', {
-        allHeaders: Object.fromEntries(req.headers.entries())
-      })
-      return handleError(logger, requestId, new Error('Missing stripe-signature header'), 401)
-    }
+    // Get raw body
+    const rawBody = await req.text()
+    console.log('Request body length:', rawBody.length)
+    console.log('Request body preview:', rawBody.substring(0, 100))
 
-    // Get request payload as text with validation
-    const payload = await req.text()
-    logger.info('Request payload received', { 
-      payloadLength: payload.length,
-      payloadPreview: payload.substring(0, 100) + '...',
-      contentType: req.headers.get('content-type')
-    })
-
-    if (!payload) {
-      logger.error('Empty request payload')
-      return handleError(logger, requestId, new Error('Empty request payload'), 400)
-    }
-
-    // Verify webhook signature with detailed error handling
-    let event;
-    try {
-      event = stripe.webhooks.constructEvent(
-        payload,
-        signature,
-        requiredEnvVars.STRIPE_WEBHOOK_SECRET!
-      )
-      logger.success('Webhook signature verified', { 
-        eventType: event.type,
-        eventId: event.id
-      })
-    } catch (err) {
-      logger.error('Error verifying webhook signature', {
-        error: err,
-        signature: signature,
-        payloadLength: payload.length,
-        webhookSecret: requiredEnvVars.STRIPE_WEBHOOK_SECRET ? 'Present' : 'Missing',
-        secretFormat: requiredEnvVars.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_') ? 'valid' : 'invalid'
-      })
-      return handleError(logger, requestId, err, 401)
-    }
-
-    // Initialize Supabase client
-    const supabase = createClient(
-      requiredEnvVars.SUPABASE_URL!,
-      requiredEnvVars.SUPABASE_SERVICE_ROLE_KEY!,
+    // Basic response for testing
+    return new Response(
+      JSON.stringify({
+        received: true,
+        message: 'Webhook received',
+        signaturePresent: !!signature,
+        bodyLength: rawBody.length
+      }),
       {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
       }
     )
-    logger.success('Supabase client initialized')
 
-    // Process webhook event
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object
-      logger.info('Processing completed checkout session', { 
-        sessionId: session.id,
-        customerId: session.customer,
-        paymentStatus: session.payment_status,
-        sessionData: JSON.stringify(session, null, 2)
-      })
-
-      try {
-        const customer = await handleCustomerCreation(session, supabase)
-        logger.success('Customer processed', { customerId: customer.id })
-        
-        const order = await handleOrderCreation(session, customer, supabase)
-        logger.success('Order created', { orderId: order.id })
-        
-        const orderItems = await handleOrderItemCreation(session, order, supabase)
-        logger.success('Order items created', { 
-          orderId: order.id,
-          itemCount: orderItems.length
-        })
-
-        return handleSuccess(logger, requestId, {
-          session_id: session.id,
-          customer_id: customer.id,
-          order_id: order.id,
-          order_items: orderItems
-        })
-      } catch (error) {
-        logger.error('Error processing checkout session', {
-          error,
-          sessionId: session.id,
-          errorDetails: error.stack
-        })
-        return handleError(logger, requestId, error)
+  } catch (error) {
+    console.error('Error in webhook:', error)
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+        stack: error.stack
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
       }
-    }
-
-    // Handle unprocessed event types
-    logger.warn('Unhandled event type', { eventType: event.type })
-    return handleSuccess(logger, requestId, { 
-      message: 'Unhandled event type',
-      event_type: event.type 
-    })
-
-  } catch (err) {
-    logger.error('Unexpected error in webhook handler', {
-      error: err,
-      stack: err.stack,
-      details: err.message
-    })
-    return handleError(logger, requestId, err)
+    )
   }
 })
