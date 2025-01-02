@@ -24,40 +24,21 @@ function formatDate(dateString: string | null): string | null {
   }
 }
 
-function parseShippingAddress(addressString: string | null): any {
-  console.log('🔍 Parsing shipping address input:', addressString)
-  if (!addressString) {
-    console.log('No shipping address provided')
-    return null
-  }
+function parseJsonMetadata(jsonString: string | null): any {
+  if (!jsonString) return null
   try {
-    if (typeof addressString === 'object') {
-      console.log('Address is already an object:', addressString)
-      return Object.keys(addressString).length === 0 ? null : addressString
-    }
-    if (addressString === '{}' || addressString === '') {
-      console.log('Empty address string detected')
-      return null
-    }
-    const address = JSON.parse(addressString)
-    console.log('Parsed address result:', address)
-    return Object.keys(address).length === 0 ? null : address
+    return typeof jsonString === 'object' ? jsonString : JSON.parse(jsonString)
   } catch (error) {
-    console.error('❌ Error parsing shipping address:', error)
-    console.error('Raw address string:', addressString)
+    console.error('❌ Error parsing JSON metadata:', error)
     return null
   }
 }
 
 export async function handleCustomerCreation(session: any, supabase: any) {
-  console.log('👤 Starting customer creation with data:', {
-    email: session.customer_email,
-    metadata: session.metadata
-  })
+  console.log('👤 Starting customer creation with metadata:', session.metadata)
 
   try {
     // Buscar cliente existente
-    console.log('🔍 Searching for existing customer with email:', session.customer_email)
     const { data: existingCustomer, error: searchError } = await supabase
       .from('customers')
       .select()
@@ -82,12 +63,13 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       passport_number: session.metadata.customer_passport || null,
       birth_date: formatDate(session.metadata.customer_birth_date),
       gender: validateGender(session.metadata.customer_gender),
-      default_shipping_address: parseShippingAddress(session.metadata.shipping_address),
+      default_shipping_address: parseJsonMetadata(session.metadata.shipping_address),
       stripe_customer_id: session.customer,
       metadata: {
         stripe_session_id: session.id,
         stripe_payment_intent: session.payment_intent,
-        created_from: 'stripe_webhook'
+        created_from: 'stripe_webhook',
+        original_metadata: session.metadata
       }
     }
 

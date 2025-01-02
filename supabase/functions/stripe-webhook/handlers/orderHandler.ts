@@ -1,14 +1,12 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
   console.log('📦 Starting order creation for customer:', customer.id)
-  console.log('Session data:', JSON.stringify(session, null, 2))
+  console.log('Session metadata:', session.metadata)
 
   try {
     if (!session || !customer) {
       console.error('❌ Missing required data:', { 
         session: !!session, 
-        customer: !!customer,
-        sessionDetails: session,
-        customerDetails: customer
+        customer: !!customer 
       })
       throw new Error('Missing required session or customer data')
     }
@@ -17,21 +15,22 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       customer_id: customer.id,
       product_id: session.metadata.product_id,
       status: 'processing',
-      type: session.metadata.order_type,
+      type: session.metadata.order_type || 'esim',
       total_amount: parseInt(session.metadata.total_amount),
-      quantity: 1,
+      quantity: parseInt(session.metadata.quantity) || 1,
       payment_method: 'stripe',
       payment_status: 'completed',
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: session.receipt_url,
       shipping_address: session.metadata.shipping_address ? JSON.parse(session.metadata.shipping_address) : null,
+      activation_date: session.metadata.activation_date || null,
       metadata: {
         stripe_session_id: session.id,
-        ...session.metadata
+        original_metadata: session.metadata
       }
     }
 
-    console.log('📝 Attempting to create order with data:', JSON.stringify(orderData, null, 2))
+    console.log('📝 Attempting to create order with data:', orderData)
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -58,8 +57,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details',
-      metadata: session?.metadata
+      details: error.details || 'No additional details'
     })
     throw error
   }

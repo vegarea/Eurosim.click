@@ -1,21 +1,22 @@
 export async function handleOrderItemCreation(session: any, order: any, supabase: any) {
   console.log('📦 Starting order item creation for order:', order.id)
-  console.log('Session data:', JSON.stringify(session, null, 2))
+  console.log('Session metadata:', session.metadata)
 
   try {
     const orderItemData = {
       order_id: order.id,
       product_id: session.metadata.product_id,
-      quantity: 1,
-      unit_price: parseInt(session.metadata.total_amount),
+      quantity: parseInt(session.metadata.quantity) || 1,
+      unit_price: parseInt(session.metadata.unit_price || session.metadata.total_amount),
       total_price: parseInt(session.metadata.total_amount),
       metadata: {
         product_type: session.metadata.order_type,
-        stripe_session_id: session.id
+        stripe_session_id: session.id,
+        original_metadata: session.metadata
       }
     }
 
-    console.log('📝 Attempting to create order item with data:', JSON.stringify(orderItemData, null, 2))
+    console.log('📝 Attempting to create order item with data:', orderItemData)
 
     const { data: orderItem, error: orderItemError } = await supabase
       .from('order_items')
@@ -42,8 +43,7 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details',
-      metadata: session?.metadata
+      details: error.details || 'No additional details'
     })
     throw error
   }
