@@ -1,5 +1,6 @@
 export async function handleOrderItemCreation(session: any, order: any, supabase: any) {
-  console.log('Creating order item for order:', order.id)
+  console.log('📦 Creating order item for order:', order.id)
+  console.log('Session data:', JSON.stringify(session, null, 2))
 
   try {
     const orderItemData = {
@@ -10,18 +11,38 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       total_price: parseInt(session.metadata.total_amount),
       metadata: {
         product_type: session.metadata.order_type,
+        stripe_session_id: session.id
       }
     }
 
-    const { error: orderItemError } = await supabase
+    console.log('📝 Attempting to create order item with data:', JSON.stringify(orderItemData, null, 2))
+
+    const { data: orderItem, error: orderItemError } = await supabase
       .from('order_items')
       .insert(orderItemData)
+      .select()
+      .single()
 
-    if (orderItemError) throw orderItemError
+    if (orderItemError) {
+      console.error('❌ Error creating order item:', orderItemError)
+      console.error('Error details:', {
+        message: orderItemError.message,
+        code: orderItemError.code,
+        details: orderItemError.details,
+        hint: orderItemError.hint
+      })
+      throw orderItemError
+    }
 
-    console.log('Order item created successfully')
+    console.log('✅ Order item created successfully:', orderItem)
+    return orderItem
   } catch (error) {
-    console.error('Error in order item creation:', error)
+    console.error('❌ Error in order item creation:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      details: error.details || 'No additional details'
+    })
     throw error
   }
 }

@@ -1,10 +1,10 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
-  console.log('Creating order for customer:', customer.id)
+  console.log('📦 Creating order for customer:', customer.id)
   console.log('Session data:', JSON.stringify(session, null, 2))
 
   try {
-    // Validate required data
     if (!session || !customer) {
+      console.error('❌ Missing required data:', { session: !!session, customer: !!customer })
       throw new Error('Missing required session or customer data')
     }
 
@@ -26,7 +26,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       }
     }
 
-    console.log('Attempting to create order with data:', JSON.stringify(orderData, null, 2))
+    console.log('📝 Attempting to create order with data:', JSON.stringify(orderData, null, 2))
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -35,17 +35,24 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       .single()
 
     if (orderError) {
-      console.error('Error creating order:', orderError)
+      console.error('❌ Error creating order:', orderError)
+      console.error('Error details:', {
+        message: orderError.message,
+        code: orderError.code,
+        details: orderError.details,
+        hint: orderError.hint
+      })
       throw orderError
     }
 
-    console.log('Order created successfully:', order)
+    console.log('✅ Order created successfully:', order)
     return order
   } catch (error) {
-    console.error('Error in order creation:', error)
+    console.error('❌ Error in order creation:', error)
     console.error('Error details:', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      details: error.details || 'No additional details'
     })
     throw error
   }

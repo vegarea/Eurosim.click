@@ -43,15 +43,27 @@ serve(async (req) => {
     }
 
     const payload = await req.text()
-    console.log('📦 Webhook payload received')
+    console.log('📦 Webhook payload received:', payload)
     
-    const event = stripe.webhooks.constructEvent(
-      payload,
-      signature,
-      endpointSecret
-    )
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        endpointSecret
+      )
+      console.log('✅ Webhook signature verified')
+    } catch (err) {
+      console.error('❌ Error verifying webhook signature:', err)
+      return new Response(
+        JSON.stringify({ error: 'Invalid signature' }), 
+        { 
+          status: 400,
+          headers: corsHeaders
+        }
+      )
+    }
     
-    console.log('✅ Webhook signature verified')
     console.log('🔔 Processing webhook event:', event.type)
 
     const supabase = createClient(
@@ -62,18 +74,23 @@ serve(async (req) => {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object
+        console.log('💳 Processing completed checkout session:', JSON.stringify(session, null, 2))
         
         try {
-          console.log('💳 Processing completed checkout session:', session.id)
+          console.log('🔍 Session metadata:', session.metadata)
+          console.log('👤 Customer data:', {
+            email: session.customer_email,
+            customer_id: session.customer,
+          })
           
           const customer = await handleCustomerCreation(session, supabase)
-          console.log('👤 Customer created/updated:', customer.id)
+          console.log('✅ Customer created/updated:', customer)
           
           const order = await handleOrderCreation(session, customer, supabase)
-          console.log('📦 Order created:', order.id)
+          console.log('✅ Order created:', order)
           
           await handleOrderItemCreation(session, order, supabase)
-          console.log('✅ Order items created for order:', order.id)
+          console.log('✅ Order items created')
 
           return new Response(
             JSON.stringify({ 
@@ -89,10 +106,16 @@ serve(async (req) => {
           )
         } catch (error) {
           console.error('❌ Error processing checkout:', error)
+          console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            details: error.details || 'No additional details'
+          })
           return new Response(
             JSON.stringify({ 
               error: error.message,
-              details: error.stack
+              details: error.stack,
+              data: error.details || 'No additional details'
             }), 
             { 
               status: 500,
@@ -117,10 +140,16 @@ serve(async (req) => {
     }
   } catch (err) {
     console.error('❌ Error processing webhook:', err)
+    console.error('Error details:', {
+      message: err.message,
+      stack: err.stack,
+      details: err.details || 'No additional details'
+    })
     return new Response(
       JSON.stringify({ 
         error: err.message,
-        details: err.stack
+        details: err.stack,
+        data: err.details || 'No additional details'
       }), 
       { 
         status: 400,
