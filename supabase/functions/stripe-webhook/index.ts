@@ -9,6 +9,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 })
 
+// Configuración actualizada de CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
@@ -21,6 +22,7 @@ serve(async (req) => {
   console.log('🔔 Webhook request received')
   console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
+  // Manejo de preflight CORS
   if (req.method === 'OPTIONS') {
     console.log('👋 Handling CORS preflight request')
     return new Response(null, { 
@@ -72,7 +74,6 @@ serve(async (req) => {
       )
     }
 
-    // Inicializar el cliente de Supabase con la configuración correcta
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -128,15 +129,6 @@ serve(async (req) => {
             code: error.code,
             hint: error.hint
           })
-          
-          if (error.message.includes('Database error')) {
-            console.error('Database error details:', {
-              code: error.code,
-              message: error.message,
-              details: error.details,
-              hint: error.hint
-            })
-          }
           
           return new Response(
             JSON.stringify({ 
