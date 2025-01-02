@@ -9,7 +9,6 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
 })
 
-// Configuración actualizada de CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
@@ -20,9 +19,12 @@ const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
   console.log('🔔 Webhook request received')
-  console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
-  // Manejo de preflight CORS
+  // Log all headers for debugging
+  const headers = Object.fromEntries(req.headers.entries())
+  console.log('Request headers:', headers)
+  console.log('Stripe signature:', headers['stripe-signature'])
+  
   if (req.method === 'OPTIONS') {
     console.log('👋 Handling CORS preflight request')
     return new Response(null, { 
@@ -37,9 +39,12 @@ serve(async (req) => {
     if (!signature) {
       console.error('❌ No stripe-signature header found')
       return new Response(
-        JSON.stringify({ error: 'No stripe-signature header' }), 
+        JSON.stringify({ 
+          error: 'Missing stripe-signature header',
+          receivedHeaders: headers
+        }), 
         { 
-          status: 400,
+          status: 401,
           headers: corsHeaders
         }
       )
@@ -65,10 +70,11 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Invalid signature',
-          details: err.message
+          details: err.message,
+          signature: signature
         }), 
         { 
-          status: 400,
+          status: 401,
           headers: corsHeaders
         }
       )
