@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import Stripe from 'https://esm.sh/stripe@12.18.0?dts'
+import { handleCustomerCreation } from './handlers/customerHandler.ts'
 import { handleOrderCreation } from './handlers/orderHandler.ts'
 import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
 
@@ -88,8 +89,12 @@ serve(async (req) => {
         const session = event.data.object
         console.log('Checkout session completed:', session.id)
         
-        // Create order
-        const order = await handleOrderCreation(session, session.customer_details, supabase)
+        // Create customer first
+        const customer = await handleCustomerCreation(session, supabase)
+        console.log('Customer processed:', customer)
+
+        // Create order with customer id
+        const order = await handleOrderCreation(session, customer, supabase)
         console.log('Order created:', order)
 
         // Create order items
