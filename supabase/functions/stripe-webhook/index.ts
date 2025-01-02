@@ -19,6 +19,7 @@ const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
   console.log('🔔 Webhook request received')
+  console.log('Request method:', req.method)
   console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
   if (req.method === 'OPTIONS') {
@@ -73,16 +74,21 @@ serve(async (req) => {
     }
 
     // Inicializar el cliente de Supabase con la configuración correcta
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    console.log('🔑 Initializing Supabase client with URL:', supabaseUrl)
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase configuration')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
       }
-    )
+    })
 
     console.log('🔌 Supabase client initialized with service role')
 
@@ -105,6 +111,7 @@ serve(async (req) => {
           const orderItems = await handleOrderItemCreation(session, order, supabase)
           console.log('✅ Order items created:', orderItems)
 
+          console.log('🎉 Webhook processing completed successfully')
           return new Response(
             JSON.stringify({ 
               received: true,
