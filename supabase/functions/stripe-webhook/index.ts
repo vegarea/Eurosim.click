@@ -4,120 +4,74 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
 import { handleCustomerCreation } from './handlers/customerHandler.ts'
 import { handleOrderCreation } from './handlers/orderHandler.ts'
 import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
-
-// Initialize Stripe with detailed logging
-console.log('🚀 Initializing Stripe webhook handler')
-const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
-if (!stripeKey) {
-  console.error('❌ STRIPE_SECRET_KEY not found in environment variables')
-  throw new Error('STRIPE_SECRET_KEY is required')
-}
-
-const stripe = new Stripe(stripeKey, {
-  apiVersion: '2023-10-16',
-})
-console.log('✅ Stripe initialized successfully')
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
-  'Content-Type': 'application/json'
-}
-
-const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
-if (!endpointSecret) {
-  console.error('❌ STRIPE_WEBHOOK_SECRET not found in environment variables')
-  throw new Error('STRIPE_WEBHOOK_SECRET is required')
-}
-console.log('✅ Webhook secret loaded')
+import { Logger } from './logger.ts'
+import { corsHeaders, requiredEnvVars, validateEnvVars } from './config.ts'
+import { handleSuccess, handleError } from './responseHandler.ts'
 
 serve(async (req) => {
   const requestId = crypto.randomUUID()
-  console.log(`🔔 [${requestId}] Webhook request received`)
+  const logger = new Logger(requestId)
   
-  // Log request details
-  const method = req.method
-  const url = req.url
-  console.log(`📝 [${requestId}] Request details:`)
-  console.log(`   Method: ${method}`)
-  console.log(`   URL: ${url}`)
-  
-  // Log all headers for debugging
-  const headers = Object.fromEntries(req.headers.entries())
-  console.log(`📋 [${requestId}] Request headers:`, JSON.stringify(headers, null, 2))
-  console.log(`🔑 [${requestId}] Stripe signature:`, headers['stripe-signature'])
-  
+  logger.info('New webhook request received', {
+    method: req.method,
+    url: req.url
+  })
+
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    console.log(`👋 [${requestId}] Handling CORS preflight request`)
-    return new Response(null, { 
-      headers: corsHeaders,
-      status: 200
-    })
+    logger.info('Handling CORS preflight request')
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const signature = req.headers.get('stripe-signature')
-    
-    if (!signature) {
-      console.error(`❌ [${requestId}] No stripe-signature header found`)
-      console.error(`   Headers received:`, JSON.stringify(headers, null, 2))
-      return new Response(
-        JSON.stringify({ 
-          error: 'Missing stripe-signature header',
-          requestId,
-          receivedHeaders: headers
-        }), 
-        { 
-          status: 401,
-          headers: corsHeaders
-        }
-      )
-    }
+    // Validate environment variables
+    validateEnvVars(logger)
 
+    // Initialize Stripe
+    const stripe = new Stripe(requiredEnvVars.STRIPE_SECRET_KEY!, {
+      apiVersion: '2023-10-16',
+    })
+    logger.success('Stripe initialized')
+
+    // Get and validate Stripe signature
+    const signature = req.headers.get('stripe-signature')
+    if (!signature) {
+      logger.error('No stripe-signature header found', {
+        headers: Object.fromEntries(req.headers.entries())
+      })
+      return handleError(logger, requestId, new Error('Missing stripe-signature header'), 401)
+    }
+    logger.info('Stripe signature found', { signature })
+
+    // Get request payload
     const payload = await req.text()
-    console.log(`📦 [${requestId}] Raw webhook payload:`, payload)
-    
+    logger.info('Request payload received')
+
+    // Verify webhook signature
     let event;
     try {
       event = stripe.webhooks.constructEvent(
         payload,
         signature,
-        endpointSecret
+        requiredEnvVars.STRIPE_WEBHOOK_SECRET!
       )
-      console.log(`✅ [${requestId}] Webhook signature verified`)
-      console.log(`🎯 [${requestId}] Event type:`, event.type)
-      console.log(`📝 [${requestId}] Event data:`, JSON.stringify(event.data, null, 2))
+      logger.success('Webhook signature verified', { 
+        eventType: event.type,
+        eventData: event.data 
+      })
     } catch (err) {
-      console.error(`❌ [${requestId}] Error verifying webhook signature:`, err)
-      console.error(`   Signature:`, signature)
-      console.error(`   Payload:`, payload)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Invalid signature',
-          requestId,
-          details: err.message,
-          signature: signature
-        }), 
-        { 
-          status: 401,
-          headers: corsHeaders
-        }
-      )
+      logger.error('Error verifying webhook signature', {
+        error: err,
+        signature,
+        payload
+      })
+      return handleError(logger, requestId, err, 401)
     }
 
-    // Initialize Supabase client with logging
-    console.log(`🔌 [${requestId}] Initializing Supabase client`)
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    
-    if (!supabaseUrl || !supabaseKey) {
-      console.error(`❌ [${requestId}] Missing Supabase credentials`)
-      throw new Error('Missing required Supabase environment variables')
-    }
-
+    // Initialize Supabase client
     const supabase = createClient(
-      supabaseUrl,
-      supabaseKey,
+      requiredEnvVars.SUPABASE_URL!,
+      requiredEnvVars.SUPABASE_SERVICE_ROLE_KEY!,
       {
         auth: {
           autoRefreshToken: false,
@@ -125,100 +79,39 @@ serve(async (req) => {
         }
       }
     )
-    console.log(`✅ [${requestId}] Supabase client initialized with service role`)
+    logger.success('Supabase client initialized')
 
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object
-        console.log(`💳 [${requestId}] Processing completed checkout session:`, JSON.stringify(session, null, 2))
-        console.log(`🔍 [${requestId}] Session metadata:`, session.metadata)
+    // Process webhook event
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      logger.info('Processing completed checkout session', { session })
+
+      try {
+        const customer = await handleCustomerCreation(session, supabase)
+        logger.success('Customer processed', { customer })
         
-        try {
-          console.log(`👤 [${requestId}] Starting customer creation/update...`)
-          const customer = await handleCustomerCreation(session, supabase)
-          console.log(`✅ [${requestId}] Customer processed:`, customer)
-          
-          console.log(`📦 [${requestId}] Starting order creation...`)
-          const order = await handleOrderCreation(session, customer, supabase)
-          console.log(`✅ [${requestId}] Order created:`, order)
-          
-          console.log(`🛍️ [${requestId}] Starting order items creation...`)
-          const orderItems = await handleOrderItemCreation(session, order, supabase)
-          console.log(`✅ [${requestId}] Order items created:`, orderItems)
+        const order = await handleOrderCreation(session, customer, supabase)
+        logger.success('Order created', { order })
+        
+        const orderItems = await handleOrderItemCreation(session, order, supabase)
+        logger.success('Order items created', { orderItems })
 
-          return new Response(
-            JSON.stringify({ 
-              received: true,
-              requestId,
-              session_id: session.id,
-              customer_id: customer.id,
-              order_id: order.id,
-              order_items: orderItems
-            }), 
-            { 
-              headers: corsHeaders,
-              status: 200
-            }
-          )
-        } catch (error) {
-          console.error(`❌ [${requestId}] Error processing checkout:`, error)
-          console.error(`   Error details:`, {
-            name: error.name,
-            message: error.message,
-            stack: error.stack,
-            details: error.details || 'No additional details',
-            code: error.code,
-            hint: error.hint
-          })
-          
-          return new Response(
-            JSON.stringify({ 
-              error: error.message,
-              requestId,
-              details: error.stack,
-              data: error.details || 'No additional details'
-            }), 
-            { 
-              status: 500,
-              headers: corsHeaders
-            }
-          )
-        }
-      }
-      default: {
-        console.log(`⚠️ [${requestId}] Unhandled event type:`, event.type)
-        return new Response(
-          JSON.stringify({ 
-            received: true,
-            requestId,
-            event_type: event.type
-          }), 
-          { 
-            headers: corsHeaders,
-            status: 200
-          }
-        )
+        return handleSuccess(logger, requestId, {
+          session_id: session.id,
+          customer_id: customer.id,
+          order_id: order.id,
+          order_items: orderItems
+        })
+      } catch (error) {
+        return handleError(logger, requestId, error)
       }
     }
+
+    // Handle unprocessed event types
+    logger.warn('Unhandled event type', { eventType: event.type })
+    return handleSuccess(logger, requestId, { event_type: event.type })
+
   } catch (err) {
-    console.error(`❌ [${requestId}] Fatal error processing webhook:`, err)
-    console.error(`   Error details:`, {
-      name: err.name,
-      message: err.message,
-      stack: err.stack,
-      details: err.details || 'No additional details'
-    })
-    return new Response(
-      JSON.stringify({ 
-        error: err.message,
-        requestId,
-        details: err.stack,
-        data: err.details || 'No additional details'
-      }), 
-      { 
-        status: 400,
-        headers: corsHeaders
-      }
-    )
+    return handleError(logger, requestId, err)
   }
 })
