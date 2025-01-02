@@ -19,9 +19,9 @@ export function validateEnvVars(logger: any) {
     }
     
     // Validate Stripe keys format
-    if (key === 'STRIPE_SECRET_KEY' && !value.startsWith('sk_test_')) {
-      logger.error('Invalid Stripe secret key format. Must use test key (sk_test_)');
-      throw new Error('Invalid Stripe secret key format. Must use test key in sandbox mode.');
+    if (key === 'STRIPE_SECRET_KEY' && !value.startsWith('sk_')) {
+      logger.error('Invalid Stripe secret key format');
+      throw new Error('Invalid Stripe secret key format');
     }
     
     if (key === 'STRIPE_WEBHOOK_SECRET' && !value.startsWith('whsec_')) {

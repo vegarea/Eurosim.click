@@ -12,7 +12,7 @@ serve(async (req) => {
   const requestId = crypto.randomUUID()
   const logger = new Logger(requestId)
   
-  // Log all request headers for debugging
+  // Log request details for debugging
   const headers = Object.fromEntries(req.headers.entries())
   logger.info('Webhook request received', {
     method: req.method,
@@ -45,19 +45,22 @@ serve(async (req) => {
     const signature = req.headers.get('stripe-signature')
     if (!signature) {
       logger.error('No stripe-signature header found', {
-        headers: headers
+        allHeaders: Object.fromEntries(req.headers.entries())
       })
       return handleError(logger, requestId, new Error('Missing stripe-signature header'), 401)
     }
     logger.info('Stripe signature found', { signature })
 
-    // Get request payload
+    // Get request payload as text
     const payload = await req.text()
     if (!payload) {
       logger.error('Empty request payload')
       return handleError(logger, requestId, new Error('Empty request payload'), 400)
     }
-    logger.info('Request payload received', { payloadLength: payload.length })
+    logger.info('Request payload received', { 
+      payloadLength: payload.length,
+      firstChars: payload.substring(0, 100) // Log start of payload for debugging
+    })
 
     // Verify webhook signature
     let event;
@@ -75,7 +78,8 @@ serve(async (req) => {
       logger.error('Error verifying webhook signature', {
         error: err,
         signature,
-        payloadLength: payload.length
+        payloadLength: payload.length,
+        webhookSecret: requiredEnvVars.STRIPE_WEBHOOK_SECRET ? 'Present' : 'Missing'
       })
       return handleError(logger, requestId, err, 401)
     }
