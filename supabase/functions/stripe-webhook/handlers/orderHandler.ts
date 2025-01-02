@@ -1,16 +1,16 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
-  console.log('📦 Starting order creation for customer:', customer.id)
-  console.log('Session data:', JSON.stringify(session, null, 2))
+  console.log('📦 Iniciando creación de orden para cliente:', customer.id)
+  console.log('Datos de sesión:', JSON.stringify(session, null, 2))
 
   try {
     if (!session || !customer) {
-      console.error('❌ Missing required data:', { 
+      console.error('❌ Faltan datos requeridos:', { 
         session: !!session, 
         customer: !!customer,
-        sessionDetails: session,
-        customerDetails: customer
+        detallesSesion: session,
+        detallesCliente: customer
       })
-      throw new Error('Missing required session or customer data')
+      throw new Error('Faltan datos requeridos de sesión o cliente')
     }
 
     const orderData = {
@@ -31,7 +31,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       }
     }
 
-    console.log('📝 Attempting to create order with data:', JSON.stringify(orderData, null, 2))
+    console.log('📝 Intentando crear orden con datos:', JSON.stringify(orderData, null, 2))
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -40,8 +40,8 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       .single()
 
     if (orderError) {
-      console.error('❌ Error creating order:', orderError)
-      console.error('Order error details:', {
+      console.error('❌ Error creando orden:', orderError)
+      console.error('Detalles del error de orden:', {
         code: orderError.code,
         message: orderError.message,
         details: orderError.details,
@@ -50,15 +50,15 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       throw orderError
     }
 
-    console.log('✅ Order created successfully:', order)
+    console.log('✅ Orden creada exitosamente:', order)
     return order
   } catch (error) {
-    console.error('❌ Error in order creation:', error)
-    console.error('Error details:', {
+    console.error('❌ Error en creación de orden:', error)
+    console.error('Detalles del error:', {
       name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details',
+      details: error.details || 'Sin detalles adicionales',
       metadata: session?.metadata
     })
     throw error

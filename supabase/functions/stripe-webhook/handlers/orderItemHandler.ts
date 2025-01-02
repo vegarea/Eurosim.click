@@ -1,6 +1,6 @@
 export async function handleOrderItemCreation(session: any, order: any, supabase: any) {
-  console.log('📦 Starting order item creation for order:', order.id)
-  console.log('Session data:', JSON.stringify(session, null, 2))
+  console.log('📦 Iniciando creación de item de orden para orden:', order.id)
+  console.log('Datos de sesión:', JSON.stringify(session, null, 2))
 
   try {
     const orderItemData = {
@@ -15,7 +15,7 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       }
     }
 
-    console.log('📝 Attempting to create order item with data:', JSON.stringify(orderItemData, null, 2))
+    console.log('📝 Intentando crear item de orden con datos:', JSON.stringify(orderItemData, null, 2))
 
     const { data: orderItem, error: orderItemError } = await supabase
       .from('order_items')
@@ -24,8 +24,8 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       .single()
 
     if (orderItemError) {
-      console.error('❌ Error creating order item:', orderItemError)
-      console.error('Order item error details:', {
+      console.error('❌ Error creando item de orden:', orderItemError)
+      console.error('Detalles del error de item:', {
         code: orderItemError.code,
         message: orderItemError.message,
         details: orderItemError.details,
@@ -34,15 +34,15 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
       throw orderItemError
     }
 
-    console.log('✅ Order item created successfully:', orderItem)
+    console.log('✅ Item de orden creado exitosamente:', orderItem)
     return orderItem
   } catch (error) {
-    console.error('❌ Error in order item creation:', error)
-    console.error('Error details:', {
+    console.error('❌ Error en creación de item de orden:', error)
+    console.error('Detalles del error:', {
       name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details',
+      details: error.details || 'Sin detalles adicionales',
       metadata: session?.metadata
     })
     throw error
