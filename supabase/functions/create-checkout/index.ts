@@ -47,17 +47,18 @@ serve(async (req) => {
 
     console.log('Creating checkout session with items:', line_items)
 
-    // Formatear la fecha de activación a ISO 8601
+    // Formatear fechas a ISO 8601
+    const formattedBirthDate = new Date(customerInfo.birth_date).toISOString();
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos con nombres consistentes y valores serializados
+    // Preparar los metadatos asegurando compatibilidad con Supabase
     const metadata = {
       customer_name: customerInfo.name,
       customer_email: customerInfo.email,
       customer_phone: customerInfo.phone,
       customer_passport: customerInfo.passport_number,
-      customer_birth_date: new Date(customerInfo.birth_date).toISOString(),
+      customer_birth_date: formattedBirthDate,
       customer_gender: customerInfo.gender,
       order_type: cartItems[0].metadata.product_type,
       product_id: cartItems[0].product_id,
@@ -77,7 +78,7 @@ serve(async (req) => {
       metadata,
     }
 
-    // Añadir configuración de dirección solo si es un producto físico
+    // Configurar recolección de dirección para productos físicos
     if (orderInfo.type === 'physical') {
       sessionConfig.shipping_address_collection = {
         allowed_countries: ['MX']

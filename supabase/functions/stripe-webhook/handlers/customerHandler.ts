@@ -23,30 +23,19 @@ function formatDate(dateString: string | null): string | null {
   }
 }
 
-function parseShippingAddress(addressString: string | null): any {
-  if (!addressString) return null
-  console.log('🔍 Parsing shipping address:', addressString)
-  try {
-    // Si ya es un objeto, lo retornamos directamente
-    if (typeof addressString === 'object') return addressString
-    // Si es un string, intentamos parsearlo
-    const parsedAddress = JSON.parse(addressString)
-    console.log('✅ Successfully parsed shipping address:', parsedAddress)
-    return parsedAddress
-  } catch (error) {
-    console.error('❌ Error parsing shipping address:', error)
-    return null
-  }
-}
+function formatShippingAddress(session: any): any {
+  if (!session.shipping_details?.address) return null;
 
-function parseJsonMetadata(jsonString: string | null): any {
-  if (!jsonString) return null
-  try {
-    return typeof jsonString === 'object' ? jsonString : JSON.parse(jsonString)
-  } catch (error) {
-    console.error('❌ Error parsing JSON metadata:', error)
-    return null
-  }
+  const address = session.shipping_details.address;
+  return {
+    street: address.line1,
+    street2: address.line2,
+    city: address.city,
+    state: address.state,
+    country: address.country,
+    postal_code: address.postal_code,
+    phone: session.customer_details?.phone || null
+  };
 }
 
 export async function handleCustomerCreation(session: any, supabase: any) {
@@ -70,9 +59,9 @@ export async function handleCustomerCreation(session: any, supabase: any) {
       return existingCustomer
     }
 
-    // Parsear la dirección de envío de la metadata
-    const shippingAddress = parseShippingAddress(session.metadata.shipping_address)
-    console.log('📦 Parsed shipping address:', shippingAddress)
+    // Formatear la dirección de envío
+    const shippingAddress = formatShippingAddress(session)
+    console.log('📦 Formatted shipping address:', shippingAddress)
 
     // Preparar datos del cliente
     const customerData = {

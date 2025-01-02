@@ -11,6 +11,17 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       throw new Error('Missing required session or customer data')
     }
 
+    // Formatear la dirección de envío desde Stripe
+    const shippingAddress = session.shipping_details?.address ? {
+      street: session.shipping_details.address.line1,
+      street2: session.shipping_details.address.line2,
+      city: session.shipping_details.address.city,
+      state: session.shipping_details.address.state,
+      country: session.shipping_details.address.country,
+      postal_code: session.shipping_details.address.postal_code,
+      phone: session.customer_details?.phone || null
+    } : null;
+
     const orderData = {
       customer_id: customer.id,
       product_id: session.metadata.product_id,
@@ -22,12 +33,13 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       payment_status: 'completed',
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: session.receipt_url,
-      shipping_address: session.metadata.shipping_address ? JSON.parse(session.metadata.shipping_address) : null,
+      shipping_address: shippingAddress,
       activation_date: session.metadata.activation_date ? new Date(session.metadata.activation_date).toISOString() : null,
       metadata: {
         stripe_session_id: session.id,
         original_metadata: session.metadata,
-        product_details: session.metadata.product_details ? JSON.parse(session.metadata.product_details) : null
+        shipping_details: session.shipping_details,
+        customer_details: session.customer_details
       }
     }
 
