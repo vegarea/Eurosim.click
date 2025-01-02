@@ -21,7 +21,6 @@ serve(async (req) => {
   console.log('🔔 Webhook request received')
   console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     console.log('👋 Handling CORS preflight request')
     return new Response(null, { 
@@ -73,12 +72,19 @@ serve(async (req) => {
       )
     }
 
+    // Inicializar el cliente de Supabase con la configuración correcta
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     )
 
-    console.log('🔌 Supabase client initialized')
+    console.log('🔌 Supabase client initialized with service role')
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -123,7 +129,6 @@ serve(async (req) => {
             hint: error.hint
           })
           
-          // Log database error details if available
           if (error.message.includes('Database error')) {
             console.error('Database error details:', {
               code: error.code,
