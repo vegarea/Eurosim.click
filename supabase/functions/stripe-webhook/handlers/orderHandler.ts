@@ -21,7 +21,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       stripe_receipt_url: session.receipt_url,
       shipping_address: session.metadata.shipping_address ? JSON.parse(session.metadata.shipping_address) : null,
       metadata: {
-        stripe_session_id: session.id,
+        stripe_session_id: session.id,  // Guardamos el session_id aquí
         ...session.metadata
       }
     }
