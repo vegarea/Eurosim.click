@@ -29,8 +29,8 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Modificamos la consulta para buscar por el ID de sesión de Stripe
-        const { data, error } = await supabase
+        // Primero intentamos con la ruta JSONB completa
+        let { data, error } = await supabase
           .from('orders')
           .select(`
             *,
@@ -42,20 +42,43 @@ export default function ThankYou() {
               metadata
             )
           `)
-          .eq('metadata->stripe_session_id', sessionId)
+          .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
+
+        // Si no encontramos nada, intentamos con la ruta anidada
+        if (!data && !error) {
+          console.log('Intentando búsqueda alternativa...')
+          const { data: altData, error: altError } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              customer:customers(name, email, phone),
+              items:order_items(
+                quantity,
+                unit_price,
+                total_price,
+                metadata
+              )
+            `)
+            .eq('metadata->stripe_session_id', sessionId)
+            .maybeSingle()
+
+          if (altError) throw altError
+          data = altData
+        }
 
         if (error) {
           console.error('Error al buscar la orden:', error)
           throw error
         }
 
-        if (!data && retryCount < 3) {
-          console.log('Orden no encontrada, reintentando en 2 segundos...')
+        if (!data && retryCount < 5) { // Aumentamos a 5 intentos
+          console.log('Orden no encontrada, reintentando en 3 segundos...')
           setRetryCount(prev => prev + 1)
+          // Aumentamos el tiempo entre intentos a 3 segundos
           setTimeout(() => {
             setIsLoading(true)
-          }, 2000)
+          }, 3000)
           return
         }
 
@@ -88,8 +111,11 @@ export default function ThankYou() {
               <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
               <p className="mt-4 text-gray-600">
                 {retryCount > 0 
-                  ? `Procesando tu orden... (intento ${retryCount + 1} de 4)`
+                  ? `Procesando tu orden... (intento ${retryCount + 1} de 6)`
                   : 'Procesando tu orden...'}
+              </p>
+              <p className="mt-2 text-sm text-gray-500">
+                Esto puede tomar unos segundos mientras confirmamos tu pago
               </p>
             </div>
           </Card>
