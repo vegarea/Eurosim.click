@@ -25,31 +25,32 @@ function formatDate(dateString: string | null): string | null {
 }
 
 function parseShippingAddress(addressString: string | null): any {
-  console.log('🔍 Parsing shipping address:', addressString)
+  console.log('🔍 Parsing shipping address input:', addressString)
   if (!addressString) {
     console.log('No shipping address provided')
     return null
   }
   try {
     if (typeof addressString === 'object') {
-      console.log('Address is already an object')
+      console.log('Address is already an object:', addressString)
       return Object.keys(addressString).length === 0 ? null : addressString
     }
     if (addressString === '{}' || addressString === '') {
-      console.log('Empty address string')
+      console.log('Empty address string detected')
       return null
     }
     const address = JSON.parse(addressString)
-    console.log('Parsed address:', address)
+    console.log('Parsed address result:', address)
     return Object.keys(address).length === 0 ? null : address
   } catch (error) {
     console.error('❌ Error parsing shipping address:', error)
+    console.error('Raw address string:', addressString)
     return null
   }
 }
 
 export async function handleCustomerCreation(session: any, supabase: any) {
-  console.log('👤 Creating/updating customer with data:', {
+  console.log('👤 Starting customer creation with data:', {
     email: session.customer_email,
     metadata: session.metadata
   })
@@ -65,6 +66,12 @@ export async function handleCustomerCreation(session: any, supabase: any) {
 
     if (searchError) {
       console.error('❌ Error searching for existing customer:', searchError)
+      console.error('Search error details:', {
+        code: searchError.code,
+        message: searchError.message,
+        details: searchError.details,
+        hint: searchError.hint
+      })
       throw searchError
     }
 
@@ -100,6 +107,12 @@ export async function handleCustomerCreation(session: any, supabase: any) {
 
     if (insertError) {
       console.error('❌ Error inserting customer:', insertError)
+      console.error('Insert error details:', {
+        code: insertError.code,
+        message: insertError.message,
+        details: insertError.details,
+        hint: insertError.hint
+      })
       throw insertError
     }
 
@@ -108,6 +121,7 @@ export async function handleCustomerCreation(session: any, supabase: any) {
   } catch (error) {
     console.error('❌ Error in customer creation:', error)
     console.error('Error details:', {
+      name: error.name,
       message: error.message,
       stack: error.stack,
       details: error.details || 'No additional details'

@@ -19,9 +19,11 @@ const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
 
 serve(async (req) => {
   console.log('🔔 Webhook request received')
+  console.log('Request headers:', Object.fromEntries(req.headers.entries()))
   
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
+    console.log('👋 Handling CORS preflight request')
     return new Response(null, { 
       headers: corsHeaders,
       status: 200
@@ -43,7 +45,7 @@ serve(async (req) => {
     }
 
     const payload = await req.text()
-    console.log('📦 Webhook payload received:', payload)
+    console.log('📦 Raw webhook payload:', payload)
     
     let event;
     try {
@@ -53,51 +55,57 @@ serve(async (req) => {
         endpointSecret
       )
       console.log('✅ Webhook signature verified')
+      console.log('🎯 Event type:', event.type)
+      console.log('📝 Event data:', JSON.stringify(event.data, null, 2))
     } catch (err) {
       console.error('❌ Error verifying webhook signature:', err)
+      console.error('Signature:', signature)
+      console.error('Payload:', payload)
       return new Response(
-        JSON.stringify({ error: 'Invalid signature' }), 
+        JSON.stringify({ 
+          error: 'Invalid signature',
+          details: err.message
+        }), 
         { 
           status: 400,
           headers: corsHeaders
         }
       )
     }
-    
-    console.log('🔔 Processing webhook event:', event.type)
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    console.log('🔌 Supabase client initialized')
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object
         console.log('💳 Processing completed checkout session:', JSON.stringify(session, null, 2))
+        console.log('🔍 Session metadata:', session.metadata)
         
         try {
-          console.log('🔍 Session metadata:', session.metadata)
-          console.log('👤 Customer data:', {
-            email: session.customer_email,
-            customer_id: session.customer,
-          })
-          
+          console.log('👤 Starting customer creation/update...')
           const customer = await handleCustomerCreation(session, supabase)
-          console.log('✅ Customer created/updated:', customer)
+          console.log('✅ Customer processed:', customer)
           
+          console.log('📦 Starting order creation...')
           const order = await handleOrderCreation(session, customer, supabase)
           console.log('✅ Order created:', order)
           
-          await handleOrderItemCreation(session, order, supabase)
-          console.log('✅ Order items created')
+          console.log('🛍️ Starting order items creation...')
+          const orderItems = await handleOrderItemCreation(session, order, supabase)
+          console.log('✅ Order items created:', orderItems)
 
           return new Response(
             JSON.stringify({ 
               received: true,
               session_id: session.id,
               customer_id: customer.id,
-              order_id: order.id
+              order_id: order.id,
+              order_items: orderItems
             }), 
             { 
               headers: corsHeaders,
@@ -107,10 +115,24 @@ serve(async (req) => {
         } catch (error) {
           console.error('❌ Error processing checkout:', error)
           console.error('Error details:', {
+            name: error.name,
             message: error.message,
             stack: error.stack,
-            details: error.details || 'No additional details'
+            details: error.details || 'No additional details',
+            code: error.code,
+            hint: error.hint
           })
+          
+          // Log database error details if available
+          if (error.message.includes('Database error')) {
+            console.error('Database error details:', {
+              code: error.code,
+              message: error.message,
+              details: error.details,
+              hint: error.hint
+            })
+          }
+          
           return new Response(
             JSON.stringify({ 
               error: error.message,
@@ -139,8 +161,9 @@ serve(async (req) => {
       }
     }
   } catch (err) {
-    console.error('❌ Error processing webhook:', err)
+    console.error('❌ Fatal error processing webhook:', err)
     console.error('Error details:', {
+      name: err.name,
       message: err.message,
       stack: err.stack,
       details: err.details || 'No additional details'

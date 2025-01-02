@@ -1,5 +1,5 @@
 export async function handleOrderItemCreation(session: any, order: any, supabase: any) {
-  console.log('📦 Creating order item for order:', order.id)
+  console.log('📦 Starting order item creation for order:', order.id)
   console.log('Session data:', JSON.stringify(session, null, 2))
 
   try {
@@ -25,9 +25,9 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
 
     if (orderItemError) {
       console.error('❌ Error creating order item:', orderItemError)
-      console.error('Error details:', {
-        message: orderItemError.message,
+      console.error('Order item error details:', {
         code: orderItemError.code,
+        message: orderItemError.message,
         details: orderItemError.details,
         hint: orderItemError.hint
       })
@@ -39,9 +39,11 @@ export async function handleOrderItemCreation(session: any, order: any, supabase
   } catch (error) {
     console.error('❌ Error in order item creation:', error)
     console.error('Error details:', {
+      name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details'
+      details: error.details || 'No additional details',
+      metadata: session?.metadata
     })
     throw error
   }

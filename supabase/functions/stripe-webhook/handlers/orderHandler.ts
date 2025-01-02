@@ -1,10 +1,15 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
-  console.log('📦 Creating order for customer:', customer.id)
+  console.log('📦 Starting order creation for customer:', customer.id)
   console.log('Session data:', JSON.stringify(session, null, 2))
 
   try {
     if (!session || !customer) {
-      console.error('❌ Missing required data:', { session: !!session, customer: !!customer })
+      console.error('❌ Missing required data:', { 
+        session: !!session, 
+        customer: !!customer,
+        sessionDetails: session,
+        customerDetails: customer
+      })
       throw new Error('Missing required session or customer data')
     }
 
@@ -36,9 +41,9 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
 
     if (orderError) {
       console.error('❌ Error creating order:', orderError)
-      console.error('Error details:', {
-        message: orderError.message,
+      console.error('Order error details:', {
         code: orderError.code,
+        message: orderError.message,
         details: orderError.details,
         hint: orderError.hint
       })
@@ -50,9 +55,11 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
   } catch (error) {
     console.error('❌ Error in order creation:', error)
     console.error('Error details:', {
+      name: error.name,
       message: error.message,
       stack: error.stack,
-      details: error.details || 'No additional details'
+      details: error.details || 'No additional details',
+      metadata: session?.metadata
     })
     throw error
   }
