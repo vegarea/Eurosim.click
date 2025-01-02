@@ -1,7 +1,9 @@
 export async function handleOrderCreation(session: any, customer: any, supabase: any) {
   console.log('📦 Starting order creation for customer:', customer.id)
-  console.log('Session metadata:', session.metadata)
-  console.log('Shipping details:', session.shipping_details)
+  console.log('Session data:', {
+    shipping: session.shipping,
+    metadata: session.metadata
+  })
 
   try {
     if (!session || !customer) {
@@ -13,17 +15,17 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
     }
 
     // Formatear la dirección de envío desde Stripe
-    const shippingAddress = session.shipping_details ? {
-      street: session.shipping_details.address.line1 + 
-        (session.shipping_details.address.line2 ? ` ${session.shipping_details.address.line2}` : ''),
-      city: session.shipping_details.address.city,
-      state: session.shipping_details.address.state,
-      country: session.shipping_details.address.country,
-      postal_code: session.shipping_details.address.postal_code,
+    const shippingAddress = session.shipping ? {
+      street: session.shipping.address.line1 + 
+        (session.shipping.address.line2 ? ` ${session.shipping.address.line2}` : ''),
+      city: session.shipping.address.city,
+      state: session.shipping.address.state,
+      country: session.shipping.address.country,
+      postal_code: session.shipping.address.postal_code,
       phone: session.customer_details?.phone || null
     } : null;
 
-    console.log('📦 Formatted shipping address for order:', shippingAddress)
+    console.log('📦 Formatted shipping address:', shippingAddress)
 
     const orderData = {
       customer_id: customer.id,
@@ -42,7 +44,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       metadata: {
         stripe_session_id: session.id,
         original_metadata: session.metadata,
-        shipping_details: session.shipping_details,
+        shipping_details: session.shipping,
         customer_details: session.customer_details
       }
     }
