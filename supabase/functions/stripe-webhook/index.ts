@@ -12,22 +12,30 @@ serve(async (req) => {
   const requestId = crypto.randomUUID()
   const logger = new Logger(requestId)
   
-  logger.info('New webhook request received', {
+  // Log all request headers for debugging
+  const headers = Object.fromEntries(req.headers.entries())
+  logger.info('Webhook request received', {
     method: req.method,
-    url: req.url
+    url: req.url,
+    headers: headers
   })
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     logger.info('Handling CORS preflight request')
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+      }
+    })
   }
 
   try {
     // Validate environment variables
     validateEnvVars(logger)
 
-    // Initialize Stripe
+    // Initialize Stripe with explicit API version
     const stripe = new Stripe(requiredEnvVars.STRIPE_SECRET_KEY!, {
       apiVersion: '2023-10-16',
     })
@@ -37,7 +45,7 @@ serve(async (req) => {
     const signature = req.headers.get('stripe-signature')
     if (!signature) {
       logger.error('No stripe-signature header found', {
-        headers: Object.fromEntries(req.headers.entries())
+        headers: headers
       })
       return handleError(logger, requestId, new Error('Missing stripe-signature header'), 401)
     }
@@ -45,7 +53,11 @@ serve(async (req) => {
 
     // Get request payload
     const payload = await req.text()
-    logger.info('Request payload received')
+    if (!payload) {
+      logger.error('Empty request payload')
+      return handleError(logger, requestId, new Error('Empty request payload'), 400)
+    }
+    logger.info('Request payload received', { payloadLength: payload.length })
 
     // Verify webhook signature
     let event;
@@ -57,13 +69,13 @@ serve(async (req) => {
       )
       logger.success('Webhook signature verified', { 
         eventType: event.type,
-        eventData: event.data 
+        eventId: event.id
       })
     } catch (err) {
       logger.error('Error verifying webhook signature', {
         error: err,
         signature,
-        payload
+        payloadLength: payload.length
       })
       return handleError(logger, requestId, err, 401)
     }
@@ -84,17 +96,24 @@ serve(async (req) => {
     // Process webhook event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-      logger.info('Processing completed checkout session', { session })
+      logger.info('Processing completed checkout session', { 
+        sessionId: session.id,
+        customerId: session.customer,
+        paymentStatus: session.payment_status
+      })
 
       try {
         const customer = await handleCustomerCreation(session, supabase)
-        logger.success('Customer processed', { customer })
+        logger.success('Customer processed', { customerId: customer.id })
         
         const order = await handleOrderCreation(session, customer, supabase)
-        logger.success('Order created', { order })
+        logger.success('Order created', { orderId: order.id })
         
         const orderItems = await handleOrderItemCreation(session, order, supabase)
-        logger.success('Order items created', { orderItems })
+        logger.success('Order items created', { 
+          orderId: order.id,
+          itemCount: orderItems.length
+        })
 
         return handleSuccess(logger, requestId, {
           session_id: session.id,
@@ -103,15 +122,26 @@ serve(async (req) => {
           order_items: orderItems
         })
       } catch (error) {
+        logger.error('Error processing checkout session', {
+          error,
+          sessionId: session.id
+        })
         return handleError(logger, requestId, error)
       }
     }
 
     // Handle unprocessed event types
     logger.warn('Unhandled event type', { eventType: event.type })
-    return handleSuccess(logger, requestId, { event_type: event.type })
+    return handleSuccess(logger, requestId, { 
+      message: 'Unhandled event type',
+      event_type: event.type 
+    })
 
   } catch (err) {
+    logger.error('Unexpected error in webhook handler', {
+      error: err,
+      stack: err.stack
+    })
     return handleError(logger, requestId, err)
   }
 })
