@@ -17,6 +17,17 @@ export function validateEnvVars(logger: any) {
       logger.error(`Missing required environment variable: ${key}`);
       throw new Error(`${key} is required`);
     }
+    
+    // Validate Stripe keys format
+    if (key === 'STRIPE_SECRET_KEY' && !value.startsWith('sk_test_')) {
+      logger.error('Invalid Stripe secret key format. Must use test key (sk_test_)');
+      throw new Error('Invalid Stripe secret key format. Must use test key in sandbox mode.');
+    }
+    
+    if (key === 'STRIPE_WEBHOOK_SECRET' && !value.startsWith('whsec_')) {
+      logger.error('Invalid Stripe webhook secret format');
+      throw new Error('Invalid Stripe webhook secret format');
+    }
   }
-  logger.success('All required environment variables are present');
+  logger.success('All required environment variables are present and valid');
 }
