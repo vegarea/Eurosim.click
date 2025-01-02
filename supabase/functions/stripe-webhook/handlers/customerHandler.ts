@@ -66,12 +66,6 @@ export async function handleCustomerCreation(session: any, supabase: any) {
 
     if (searchError) {
       console.error('❌ Error searching for existing customer:', searchError)
-      console.error('Search error details:', {
-        code: searchError.code,
-        message: searchError.message,
-        details: searchError.details,
-        hint: searchError.hint
-      })
       throw searchError
     }
 
