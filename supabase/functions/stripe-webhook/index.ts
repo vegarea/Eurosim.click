@@ -12,6 +12,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, stripe-signature',
+  'Content-Type': 'application/json'
 }
 
 const endpointSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') || '';
@@ -22,7 +23,8 @@ serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { 
-      headers: corsHeaders
+      headers: corsHeaders,
+      status: 200
     })
   }
 
@@ -35,7 +37,7 @@ serve(async (req) => {
         JSON.stringify({ error: 'No stripe-signature header' }), 
         { 
           status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          headers: corsHeaders
         }
       )
     }
@@ -72,35 +74,57 @@ serve(async (req) => {
           
           await handleOrderItemCreation(session, order, supabase)
           console.log('✅ Order items created for order:', order.id)
+
+          return new Response(
+            JSON.stringify({ 
+              received: true,
+              session_id: session.id,
+              customer_id: customer.id,
+              order_id: order.id
+            }), 
+            { 
+              headers: corsHeaders,
+              status: 200
+            }
+          )
         } catch (error) {
           console.error('❌ Error processing checkout:', error)
           return new Response(
-            JSON.stringify({ error: error.message }), 
+            JSON.stringify({ 
+              error: error.message,
+              details: error.stack
+            }), 
             { 
               status: 500,
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              headers: corsHeaders
             }
           )
         }
-        break
+      }
+      default: {
+        console.log('⚠️ Unhandled event type:', event.type)
+        return new Response(
+          JSON.stringify({ 
+            received: true,
+            event_type: event.type
+          }), 
+          { 
+            headers: corsHeaders,
+            status: 200
+          }
+        )
       }
     }
-
-    return new Response(
-      JSON.stringify({ received: true }), 
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
-      }
-    )
-
   } catch (err) {
     console.error('❌ Error processing webhook:', err)
     return new Response(
-      JSON.stringify({ error: err.message }), 
+      JSON.stringify({ 
+        error: err.message,
+        details: err.stack
+      }), 
       { 
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: corsHeaders
       }
     )
   }
