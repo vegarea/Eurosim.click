@@ -25,7 +25,6 @@ export function Header() {
     { label: "Inicio", href: "/" },
     { label: "eSIMs", href: "/e-sims", icon: <Wifi className="w-4 h-4" /> },
     { label: "SIM Card", href: "/sims", icon: <Signal className="w-4 h-4" /> },
-    { label: "Contacto", href: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -35,8 +34,10 @@ export function Header() {
       <div className="absolute inset-0 h-20 bg-white/80 backdrop-blur-md border-b border-slate-100/80" />
       
       <div className="container relative flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <LogoSite />
+        {/* Logo with Link */}
+        <Link to="/">
+          <LogoSite />
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-6">
@@ -78,18 +79,20 @@ export function Header() {
             </DialogContent>
           </Dialog>
 
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="relative text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            {cartItems > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand-600 text-[10px] font-medium text-white flex items-center justify-center">
-                {cartItems}
-              </span>
-            )}
-          </Button>
+          <Link to="/checkout">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="relative text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {cartItems > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand-600 text-[10px] font-medium text-white flex items-center justify-center">
+                  {cartItems}
+                </span>
+              )}
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Navigation */}
@@ -145,13 +148,15 @@ export function Header() {
                   </DialogContent>
                 </Dialog>
                 
-                <Button 
-                  variant="ghost"
-                  className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Carrito ({cartItems})
-                </Button>
+                <Link to="/checkout">
+                  <Button 
+                    variant="ghost"
+                    className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Carrito ({cartItems})
+                  </Button>
+                </Link>
               </div>
             </nav>
           </SheetContent>
