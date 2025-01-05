@@ -40,14 +40,23 @@ export function StripeCheckout() {
       }
 
       setIsLoading(true);
-      
-      // Log datos que se enviarán a create-checkout
-      console.group('Datos enviados a create-checkout');
-      console.log('Cart Items:', cartItems);
-      console.log('Customer Info:', customerInfo);
-      console.log('Order Info:', orderInfo);
+
+      // Log detallado de los datos antes de enviar
+      console.group('🚀 Iniciando checkout');
+      console.log('📦 Cart Items:', cartItems);
+      console.log('👤 Customer Info:', {
+        ...customerInfo,
+        default_shipping_address: customerInfo.default_shipping_address 
+          ? JSON.stringify(customerInfo.default_shipping_address, null, 2)
+          : null
+      });
+      console.log('📋 Order Info:', orderInfo);
       console.groupEnd();
 
+      // Pausa para asegurar que los logs sean visibles
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('⏳ Invocando create-checkout...');
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           cartItems,
@@ -57,20 +66,21 @@ export function StripeCheckout() {
       });
 
       if (error) {
-        console.error('Error from create-checkout:', error);
+        console.error('❌ Error from create-checkout:', error);
         throw error;
       }
 
       if (data?.url) {
-        console.log('URL de Stripe recibida:', data.url);
-        // Pequeña pausa para asegurar que los logs sean visibles
-        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('✅ URL de Stripe recibida:', data.url);
+        // Pausa adicional antes de redireccionar
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('🔄 Redirigiendo a Stripe...');
         window.location.href = data.url;
       } else {
         throw new Error('No se recibió la URL de checkout');
       }
     } catch (error) {
-      console.error('Error al iniciar el checkout:', error);
+      console.error('❌ Error al iniciar el checkout:', error);
       toast.error('Error al procesar el pago. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
