@@ -55,30 +55,30 @@ serve(async (req) => {
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos para Stripe
-    const metadata = {
-      customer_name: customerInfo.name,
-      customer_email: customerInfo.email,
-      customer_phone: customerInfo.phone,
-      customer_passport: customerInfo.passport_number,
-      customer_birth_date: formattedBirthDate,
-      customer_gender: customerInfo.gender,
-      order_type: cartItems[0].metadata.product_type,
-      product_id: cartItems[0].product_id,
-      activation_date: formattedActivationDate,
-      total_amount: cartItems.reduce((sum: number, item: any) => 
+    // Preparar los metadatos para Stripe asegurando que sean strings planos
+    const shippingAddress = customerInfo.default_shipping_address || {};
+    const metadata: Record<string, string> = {
+      customer_name: String(customerInfo.name || ''),
+      customer_email: String(customerInfo.email || ''),
+      customer_phone: String(customerInfo.phone || ''),
+      customer_passport: String(customerInfo.passport_number || ''),
+      customer_birth_date: String(formattedBirthDate || ''),
+      customer_gender: String(customerInfo.gender || ''),
+      order_type: String(cartItems[0]?.metadata?.product_type || ''),
+      product_id: String(cartItems[0]?.product_id || ''),
+      activation_date: String(formattedActivationDate || ''),
+      total_amount: String(cartItems.reduce((sum: number, item: any) => 
         sum + (item.unit_price * item.quantity), 0
-      ).toString(),
-      // Añadir dirección de envío a los metadatos
-      shipping_street: customerInfo.default_shipping_address?.street || '',
-      shipping_city: customerInfo.default_shipping_address?.city || '',
-      shipping_state: customerInfo.default_shipping_address?.state || '',
-      shipping_postal_code: customerInfo.default_shipping_address?.postal_code || '',
-      shipping_country: customerInfo.default_shipping_address?.country || '',
-      shipping_phone: customerInfo.default_shipping_address?.phone || customerInfo.phone || '',
-    }
+      )),
+      shipping_street: String(shippingAddress.street || ''),
+      shipping_city: String(shippingAddress.city || ''),
+      shipping_state: String(shippingAddress.state || ''),
+      shipping_postal_code: String(shippingAddress.postal_code || ''),
+      shipping_country: String(shippingAddress.country || ''),
+      shipping_phone: String(shippingAddress.phone || customerInfo.phone || '')
+    };
 
-    console.log('create-checkout - Session Metadata:', metadata)
+    console.log('create-checkout - Metadatos preparados:', metadata)
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -93,11 +93,14 @@ serve(async (req) => {
       } : undefined
     }
 
-    console.log('create-checkout - Session Config:', sessionConfig)
+    console.log('create-checkout - Configuración de sesión:', sessionConfig)
 
     const session = await stripe.checkout.sessions.create(sessionConfig)
 
-    console.log('create-checkout - Session Created:', session.id)
+    console.log('create-checkout - Sesión creada:', {
+      id: session.id,
+      metadata: session.metadata
+    })
 
     return new Response(
       JSON.stringify({ url: session.url }),
