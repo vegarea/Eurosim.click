@@ -10,7 +10,14 @@ interface CheckoutState {
     passport_number: string | null;
     birth_date: string | null;
     gender: CustomerGender | null;
-    default_shipping_address: Json | null;
+    default_shipping_address: {
+      street: string;
+      city: string;
+      state: string;
+      country: string;
+      postal_code: string;
+      phone: string;
+    } | null;
   };
   orderInfo: {
     type: "physical" | "esim";
@@ -57,7 +64,14 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         customerInfo: {
           ...prev.customerInfo,
-          ...info
+          ...info,
+          // Aseguramos que la dirección se actualice correctamente
+          default_shipping_address: info.default_shipping_address 
+            ? {
+                ...prev.customerInfo.default_shipping_address,
+                ...info.default_shipping_address
+              }
+            : prev.customerInfo.default_shipping_address
         }
       };
       console.log('CheckoutContext - New State:', newState)

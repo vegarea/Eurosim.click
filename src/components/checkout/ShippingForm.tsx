@@ -79,7 +79,14 @@ export function ShippingForm({
         name: formValues.name,
         email: formValues.email,
         phone: formValues.phone,
-        default_shipping_address: formValues.shipping_address
+        default_shipping_address: {
+          street: formValues.shipping_address.street,
+          city: formValues.shipping_address.city,
+          state: formValues.shipping_address.state,
+          country: formValues.shipping_address.country,
+          postal_code: formValues.shipping_address.postal_code,
+          phone: formValues.shipping_address.phone || formValues.phone
+        }
       })
     })
     return () => subscription.unsubscribe()
