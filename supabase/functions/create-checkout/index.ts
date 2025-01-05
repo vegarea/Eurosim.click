@@ -70,19 +70,20 @@ serve(async (req) => {
 
     console.log('Session metadata:', metadata)
 
-    // Preparar la configuración de envío si existe dirección
-    const shippingDetails = customerInfo.default_shipping_address ? {
-      name: customerInfo.name,
+    // Preparar la dirección de envío si existe
+    const shipping = customerInfo.default_shipping_address ? {
       address: {
         line1: customerInfo.default_shipping_address.street,
         city: customerInfo.default_shipping_address.city,
         state: customerInfo.default_shipping_address.state,
         postal_code: customerInfo.default_shipping_address.postal_code,
-        country: customerInfo.default_shipping_address.country
-      }
+        country: 'MX'
+      },
+      name: customerInfo.name,
+      phone: customerInfo.default_shipping_address.phone
     } : undefined;
 
-    console.log('Shipping details for Stripe:', shippingDetails);
+    console.log('Shipping details for session:', shipping);
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -95,33 +96,7 @@ serve(async (req) => {
       shipping_address_collection: orderInfo.type === 'physical' ? {
         allowed_countries: ['MX']
       } : undefined,
-      shipping_options: orderInfo.type === 'physical' ? [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: 0,
-              currency: 'mxn',
-            },
-            display_name: 'Envío Estándar',
-            delivery_estimate: {
-              minimum: {
-                unit: 'business_day',
-                value: 5,
-              },
-              maximum: {
-                unit: 'business_day',
-                value: 7,
-              },
-            },
-          },
-        },
-      ] : undefined
-    }
-
-    // Añadir shipping_details solo si existe
-    if (shippingDetails) {
-      sessionConfig.shipping_details = shippingDetails;
+      shipping: shipping // Añadimos la dirección pre-llenada aquí
     }
 
     console.log('Creating session with config:', sessionConfig)

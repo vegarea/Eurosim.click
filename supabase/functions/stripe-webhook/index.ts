@@ -11,54 +11,35 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Log request details
-    console.log('Webhook request received:', {
-      method: req.method,
-      url: req.url,
-      headers: Object.fromEntries(req.headers.entries())
-    })
+    console.log('Webhook request received')
 
-    // Validate environment variables
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
     if (!stripeSecretKey || !webhookSecret || !supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing required environment variables')
       throw new Error('Server configuration error')
     }
 
-    console.log('Environment variables validated')
-
-    // Initialize Stripe
-    const stripe = Stripe(stripeSecretKey, {
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),
     })
 
-    // Get the signature from headers
     const signature = req.headers.get('stripe-signature')
     if (!signature) {
-      console.error('No Stripe signature found in headers')
       throw new Error('No Stripe signature found')
     }
 
-    console.log('Stripe signature found:', signature)
-
-    // Get request body as ArrayBuffer and convert to text
     const bodyArray = await req.arrayBuffer()
     const body = new TextDecoder().decode(bodyArray)
     
-    console.log('Request body length:', body.length)
-
-    // Verify the event
     let event
     try {
       event = await stripe.webhooks.constructEventAsync(
@@ -68,61 +49,68 @@ serve(async (req) => {
         undefined,
         Stripe.createSubtleCryptoProvider()
       )
-      console.log('Event constructed successfully:', event.type)
     } catch (err) {
       console.error('Error verifying webhook signature:', err)
       return new Response(
-        JSON.stringify({ error: 'Webhook signature verification failed', details: err.message }), 
+        JSON.stringify({ error: 'Webhook signature verification failed' }), 
         { status: 400, headers: corsHeaders }
       )
     }
 
-    // Initialize Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
-    console.log('Supabase client initialized')
 
-    // Handle the event
     console.log('Processing event type:', event.type)
 
     switch (event.type) {
       case 'checkout.session.completed':
-        const session = event.data.object
-        console.log('Checkout session completed:', session.id)
-        
-        // Create customer first
+      case 'payment_intent.succeeded':
+        // Obtener la sesión de checkout relacionada
+        let session;
+        if (event.type === 'payment_intent.succeeded') {
+          const paymentIntent = event.data.object;
+          console.log('Payment Intent:', paymentIntent);
+          
+          // Buscar la sesión relacionada
+          const sessions = await stripe.checkout.sessions.list({
+            payment_intent: paymentIntent.id,
+            expand: ['data.shipping']
+          });
+          
+          session = sessions.data[0];
+          console.log('Related session found:', session);
+        } else {
+          session = event.data.object;
+        }
+
+        if (!session) {
+          throw new Error('No session found');
+        }
+
+        // Procesar la orden
         const customer = await handleCustomerCreation(session, supabase)
         console.log('Customer processed:', customer)
 
-        // Create order with customer id
         const order = await handleOrderCreation(session, customer, supabase)
         console.log('Order created:', order)
 
-        // Create order items
         const orderItems = await handleOrderItemCreation(session, order, supabase)
         console.log('Order items created:', orderItems)
-
-        break
+        break;
 
       default:
         console.log(`Unhandled event type: ${event.type}`)
     }
 
     return new Response(
-      JSON.stringify({ received: true, event: event.type }), 
+      JSON.stringify({ received: true }), 
       { headers: corsHeaders }
     )
 
   } catch (error) {
     console.error('Error processing webhook:', error)
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.stack 
-      }), 
-      { 
-        status: 500,
-        headers: corsHeaders 
-      }
+      JSON.stringify({ error: error.message }), 
+      { status: 500, headers: corsHeaders }
     )
   }
 })
