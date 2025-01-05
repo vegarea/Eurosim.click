@@ -66,7 +66,7 @@ serve(async (req) => {
       total_amount: cartItems.reduce((sum: number, item: any) => 
         sum + (item.unit_price * item.quantity), 0
       ).toString(),
-      // Incluir dirección de envío en metadata si existe
+      // Agregar dirección de envío a los metadatos
       shipping_street: customerInfo.default_shipping_address?.street || '',
       shipping_city: customerInfo.default_shipping_address?.city || '',
       shipping_state: customerInfo.default_shipping_address?.state || '',
