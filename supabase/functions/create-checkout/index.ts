@@ -70,6 +70,20 @@ serve(async (req) => {
 
     console.log('Session metadata:', metadata)
 
+    // Preparar la configuración de envío si existe dirección
+    const shippingDetails = customerInfo.default_shipping_address ? {
+      name: customerInfo.name,
+      address: {
+        line1: customerInfo.default_shipping_address.street,
+        city: customerInfo.default_shipping_address.city,
+        state: customerInfo.default_shipping_address.state,
+        postal_code: customerInfo.default_shipping_address.postal_code,
+        country: customerInfo.default_shipping_address.country
+      }
+    } : undefined;
+
+    console.log('Shipping details for Stripe:', shippingDetails);
+
     const sessionConfig: any = {
       payment_method_types: ['card'],
       line_items,
@@ -103,6 +117,11 @@ serve(async (req) => {
           },
         },
       ] : undefined
+    }
+
+    // Añadir shipping_details solo si existe
+    if (shippingDetails) {
+      sessionConfig.shipping_details = shippingDetails;
     }
 
     console.log('Creating session with config:', sessionConfig)
