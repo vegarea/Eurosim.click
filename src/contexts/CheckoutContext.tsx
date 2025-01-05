@@ -63,20 +63,32 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     console.log('Updating with:', info)
     
     setState(prev => {
+      const newCustomerInfo = {
+        ...prev.customerInfo,
+        ...info,
+        default_shipping_address: info.default_shipping_address 
+          ? {
+              ...prev.customerInfo.default_shipping_address,
+              ...info.default_shipping_address
+            }
+          : prev.customerInfo.default_shipping_address
+      };
+
+      // Sincronizar shipping_address con default_shipping_address
+      const newOrderInfo = {
+        ...prev.orderInfo,
+        shipping_address: info.default_shipping_address 
+          ? { ...info.default_shipping_address }
+          : prev.orderInfo.shipping_address
+      };
+
       const newState = {
         ...prev,
-        customerInfo: {
-          ...prev.customerInfo,
-          ...info,
-          default_shipping_address: info.default_shipping_address 
-            ? {
-                ...prev.customerInfo.default_shipping_address,
-                ...info.default_shipping_address
-              }
-            : prev.customerInfo.default_shipping_address
-        }
+        customerInfo: newCustomerInfo,
+        orderInfo: newOrderInfo
       };
-      console.log('New state:', newState.customerInfo)
+
+      console.log('New state:', newState)
       console.groupEnd()
       return newState;
     })
