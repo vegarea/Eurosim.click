@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
-import Stripe from 'https://esm.sh/stripe@12.18.0?dts'
+import Stripe from 'https://esm.sh/stripe@14.21.0'
 import { handleCustomerCreation } from './handlers/customerHandler.ts'
 import { handleOrderCreation } from './handlers/orderHandler.ts'
 import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
@@ -61,44 +61,22 @@ serve(async (req) => {
 
     console.log('Processing event type:', event.type)
 
-    switch (event.type) {
-      case 'checkout.session.completed':
-      case 'payment_intent.succeeded':
-        // Obtener la sesión de checkout relacionada
-        let session;
-        if (event.type === 'payment_intent.succeeded') {
-          const paymentIntent = event.data.object;
-          console.log('Payment Intent:', paymentIntent);
-          
-          // Buscar la sesión relacionada
-          const sessions = await stripe.checkout.sessions.list({
-            payment_intent: paymentIntent.id,
-            expand: ['data.shipping']
-          });
-          
-          session = sessions.data[0];
-          console.log('Related session found:', session);
-        } else {
-          session = event.data.object;
-        }
+    // Solo manejamos el evento checkout.session.completed
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      console.log('Processing completed checkout session:', session.id)
 
-        if (!session) {
-          throw new Error('No session found');
-        }
+      // Procesar la orden
+      const customer = await handleCustomerCreation(session, supabase)
+      console.log('Customer processed:', customer)
 
-        // Procesar la orden
-        const customer = await handleCustomerCreation(session, supabase)
-        console.log('Customer processed:', customer)
+      const order = await handleOrderCreation(session, customer, supabase)
+      console.log('Order created:', order)
 
-        const order = await handleOrderCreation(session, customer, supabase)
-        console.log('Order created:', order)
-
-        const orderItems = await handleOrderItemCreation(session, order, supabase)
-        console.log('Order items created:', orderItems)
-        break;
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`)
+      const orderItems = await handleOrderItemCreation(session, order, supabase)
+      console.log('Order items created:', orderItems)
+    } else {
+      console.log(`Ignoring unhandled event type: ${event.type}`)
     }
 
     return new Response(

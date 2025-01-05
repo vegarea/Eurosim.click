@@ -70,8 +70,8 @@ serve(async (req) => {
 
     console.log('Session metadata:', metadata)
 
-    // Preparar la dirección de envío si existe
-    const shipping = customerInfo.default_shipping_address ? {
+    // Preparar la dirección de envío si existe y es un pedido físico
+    const shipping = orderInfo.type === 'physical' && customerInfo.default_shipping_address ? {
       address: {
         line1: customerInfo.default_shipping_address.street,
         city: customerInfo.default_shipping_address.city,
@@ -80,7 +80,7 @@ serve(async (req) => {
         country: 'MX'
       },
       name: customerInfo.name,
-      phone: customerInfo.default_shipping_address.phone
+      phone: customerInfo.phone
     } : undefined;
 
     console.log('Shipping details for session:', shipping);
@@ -96,7 +96,7 @@ serve(async (req) => {
       shipping_address_collection: orderInfo.type === 'physical' ? {
         allowed_countries: ['MX']
       } : undefined,
-      shipping: shipping // Añadimos la dirección pre-llenada aquí
+      shipping: shipping
     }
 
     console.log('Creating session with config:', sessionConfig)
