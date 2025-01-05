@@ -14,7 +14,12 @@ serve(async (req) => {
   try {
     const { cartItems, customerInfo, orderInfo } = await req.json()
     
-    console.log('Received checkout request:', { cartItems, customerInfo, orderInfo })
+    console.group('create-checkout - Request Data')
+    console.log('Cart Items:', cartItems)
+    console.log('Customer Info:', customerInfo)
+    console.log('Order Info:', orderInfo)
+    console.log('Shipping Address:', customerInfo.default_shipping_address)
+    console.groupEnd()
 
     // Validar datos requeridos del cliente
     const requiredFields = ['name', 'email', 'phone', 'passport_number', 'birth_date', 'gender'];
@@ -45,14 +50,14 @@ serve(async (req) => {
       quantity: item.quantity,
     }))
 
-    console.log('Creating checkout session with items:', line_items)
+    console.log('create-checkout - Line Items:', line_items)
 
     // Formatear fechas a ISO 8601
     const formattedBirthDate = new Date(customerInfo.birth_date).toISOString().split('T')[0];
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos para Stripe, incluyendo la dirección de envío
+    // Preparar los metadatos para Stripe
     const metadata = {
       customer_name: customerInfo.name,
       customer_email: customerInfo.email,
@@ -71,11 +76,11 @@ serve(async (req) => {
       shipping_city: customerInfo.default_shipping_address?.city || '',
       shipping_state: customerInfo.default_shipping_address?.state || '',
       shipping_postal_code: customerInfo.default_shipping_address?.postal_code || '',
-      shipping_country: customerInfo.default_shipping_address?.country || 'MX',
+      shipping_country: customerInfo.default_shipping_address?.country || '',
       shipping_phone: customerInfo.default_shipping_address?.phone || customerInfo.phone || '',
     }
 
-    console.log('Session metadata:', metadata)
+    console.log('create-checkout - Session Metadata:', metadata)
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -90,11 +95,11 @@ serve(async (req) => {
       } : undefined
     }
 
-    console.log('Creating session with config:', sessionConfig)
+    console.log('create-checkout - Session Config:', sessionConfig)
 
     const session = await stripe.checkout.sessions.create(sessionConfig)
 
-    console.log('Checkout session created:', session.id)
+    console.log('create-checkout - Session Created:', session.id)
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -104,7 +109,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    console.error('create-checkout - Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

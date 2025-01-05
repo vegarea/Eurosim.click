@@ -22,11 +22,11 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
 
     const loadGoogleMapsScript = async () => {
       try {
-        console.log("Fetching Google Maps API key...")
+        console.log("AddressAutocomplete - Fetching Google Maps API key...")
         const { data, error } = await supabase.functions.invoke('get-google-maps-key')
         
         if (error) {
-          console.error('Error fetching Google Maps API key:', error)
+          console.error('AddressAutocomplete - Error fetching Google Maps API key:', error)
           toast({
             title: "Error",
             description: "No se pudo cargar el autocompletado de direcciones",
@@ -37,19 +37,19 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
 
         const GOOGLE_MAPS_API_KEY = data?.GOOGLE_MAPS_API_KEY
         if (!GOOGLE_MAPS_API_KEY) {
-          console.error('Google Maps API key not found in response')
+          console.error('AddressAutocomplete - Google Maps API key not found in response')
           return
         }
 
         if (!window.google) {
-          console.log("Loading Google Maps script...")
+          console.log("AddressAutocomplete - Loading Google Maps script...")
           const script = document.createElement('script')
           script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&callback=initGoogleMaps`
           script.async = true
           script.defer = true
           
           window.initGoogleMaps = () => {
-            console.log('Google Maps API loaded successfully')
+            console.log('AddressAutocomplete - Google Maps API loaded successfully')
             scriptLoadedRef.current = true
             initializeAutocomplete()
           }
@@ -60,7 +60,7 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
           initializeAutocomplete()
         }
       } catch (error) {
-        console.error('Error in Google Maps initialization:', error)
+        console.error('AddressAutocomplete - Error in Google Maps initialization:', error)
         toast({
           title: "Error",
           description: "Hubo un problema al inicializar el autocompletado",
@@ -72,7 +72,7 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
     const initializeAutocomplete = () => {
       if (!inputRef.current || !window.google || autocompleteRef.current) return;
       
-      console.log("Initializing autocomplete...")
+      console.log("AddressAutocomplete - Initializing autocomplete...")
       autocompleteRef.current = new google.maps.places.Autocomplete(inputRef.current, {
         componentRestrictions: { country: "mx" },
         fields: ["address_components", "formatted_address", "geometry"],
@@ -82,7 +82,7 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
         if (!autocompleteRef.current) return;
         
         const place = autocompleteRef.current.getPlace()
-        console.log("Place selected:", place)
+        console.log("AddressAutocomplete - Place selected:", place)
         
         if (place && place.address_components) {
           let address = {
@@ -113,7 +113,7 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
           // Limpiar la dirección
           address.street = address.street.trim()
           
-          console.log("Setting address:", address)
+          console.log("AddressAutocomplete - Setting address:", address)
           
           // Actualizar todo el objeto shipping_address de una vez
           form.setValue('shipping_address', address, { 
@@ -122,8 +122,7 @@ export function AddressAutocomplete({ form }: AddressAutocompleteProps) {
             shouldTouch: true
           })
           
-          // Verificar que se actualizó correctamente
-          console.log("Form values after update:", form.getValues())
+          console.log("AddressAutocomplete - Form values after update:", form.getValues())
         }
       })
     }

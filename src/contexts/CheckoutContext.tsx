@@ -58,14 +58,16 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CheckoutState>(initialState)
 
   const updateCustomerInfo = (info: Partial<CheckoutState['customerInfo']>) => {
-    console.log('CheckoutContext - Updating Customer Info:', info)
+    console.group('CheckoutContext - updateCustomerInfo')
+    console.log('Previous state:', state.customerInfo)
+    console.log('Updating with:', info)
+    
     setState(prev => {
       const newState = {
         ...prev,
         customerInfo: {
           ...prev.customerInfo,
           ...info,
-          // Aseguramos que la dirección se actualice correctamente
           default_shipping_address: info.default_shipping_address 
             ? {
                 ...prev.customerInfo.default_shipping_address,
@@ -74,13 +76,16 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
             : prev.customerInfo.default_shipping_address
         }
       };
-      console.log('CheckoutContext - New State:', newState)
+      console.log('New state:', newState.customerInfo)
+      console.groupEnd()
       return newState;
     })
   }
 
   const updateOrderInfo = (info: Partial<CheckoutState['orderInfo']>) => {
-    console.log('CheckoutContext - Updating Order Info:', info)
+    console.group('CheckoutContext - updateOrderInfo')
+    console.log('Previous state:', state.orderInfo)
+    console.log('Updating with:', info)
     setState(prev => {
       const newState = {
         ...prev,
@@ -89,7 +94,8 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
           ...info
         }
       };
-      console.log('CheckoutContext - New State:', newState)
+      console.log('New state:', newState.orderInfo)
+      console.groupEnd()
       return newState;
     })
   }
