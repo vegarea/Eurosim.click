@@ -37,7 +37,6 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    // Crear line items desde el carrito
     const line_items = cartItems.map((item: any) => ({
       price_data: {
         currency: 'mxn',
@@ -55,9 +54,9 @@ serve(async (req) => {
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Usar directamente customerInfo.default_shipping_address en lugar de orderInfo.shipping_address
     const shippingAddress = customerInfo.default_shipping_address || {};
     
+    // Incluir la dirección de envío en la metadata
     const metadata: Record<string, string> = {
       customer_name: String(customerInfo.name || ''),
       customer_email: String(customerInfo.email || ''),
@@ -91,7 +90,29 @@ serve(async (req) => {
       metadata,
       shipping_address_collection: cartItems[0]?.metadata?.product_type === 'physical' ? {
         allowed_countries: ['MX']
-      } : undefined
+      } : undefined,
+      shipping_options: cartItems[0]?.metadata?.product_type === 'physical' ? [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 0,
+              currency: 'mxn',
+            },
+            display_name: 'Envío Gratis',
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 3,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 5,
+              },
+            },
+          },
+        },
+      ] : undefined
     }
 
     console.log('create-checkout - Configuración de sesión:', sessionConfig)
