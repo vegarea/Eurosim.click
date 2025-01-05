@@ -55,8 +55,9 @@ serve(async (req) => {
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos para Stripe asegurando que sean strings planos
+    // Usar directamente customerInfo.default_shipping_address en lugar de orderInfo.shipping_address
     const shippingAddress = customerInfo.default_shipping_address || {};
+    
     const metadata: Record<string, string> = {
       customer_name: String(customerInfo.name || ''),
       customer_email: String(customerInfo.email || ''),
@@ -88,7 +89,7 @@ serve(async (req) => {
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata,
-      shipping_address_collection: orderInfo.type === 'physical' ? {
+      shipping_address_collection: cartItems[0]?.metadata?.product_type === 'physical' ? {
         allowed_countries: ['MX']
       } : undefined
     }
