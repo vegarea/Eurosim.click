@@ -14,13 +14,6 @@ serve(async (req) => {
   try {
     const { cartItems, customerInfo, orderInfo } = await req.json()
     
-    console.group('create-checkout - Request Data')
-    console.log('Cart Items:', cartItems)
-    console.log('Customer Info:', customerInfo)
-    console.log('Order Info:', orderInfo)
-    console.log('Shipping Address:', customerInfo.default_shipping_address)
-    console.groupEnd()
-
     // Validar datos requeridos del cliente
     const requiredFields = ['name', 'email', 'phone', 'passport_number', 'birth_date', 'gender'];
     const missingFields = requiredFields.filter(field => !customerInfo[field]);
@@ -54,9 +47,10 @@ serve(async (req) => {
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    const shippingAddress = customerInfo.default_shipping_address || {};
-    
-    // Incluir la dirección de envío en la metadata
+    // Usar el tipo de producto directamente desde cartItems.metadata
+    const productType = cartItems[0]?.metadata?.product_type;
+    const shippingAddress = productType === 'physical' ? orderInfo.shipping_address : null;
+
     const metadata: Record<string, string> = {
       customer_name: String(customerInfo.name || ''),
       customer_email: String(customerInfo.email || ''),
@@ -64,21 +58,25 @@ serve(async (req) => {
       customer_passport: String(customerInfo.passport_number || ''),
       customer_birth_date: String(formattedBirthDate || ''),
       customer_gender: String(customerInfo.gender || ''),
-      order_type: String(cartItems[0]?.metadata?.product_type || ''),
+      order_type: String(productType || ''),
       product_id: String(cartItems[0]?.product_id || ''),
       activation_date: String(formattedActivationDate || ''),
       total_amount: String(cartItems.reduce((sum: number, item: any) => 
         sum + (item.unit_price * item.quantity), 0
-      )),
-      shipping_street: String(shippingAddress.street || ''),
-      shipping_city: String(shippingAddress.city || ''),
-      shipping_state: String(shippingAddress.state || ''),
-      shipping_postal_code: String(shippingAddress.postal_code || ''),
-      shipping_country: String(shippingAddress.country || ''),
-      shipping_phone: String(shippingAddress.phone || customerInfo.phone || '')
+      ))
     };
 
-    console.log('create-checkout - Metadatos preparados:', metadata)
+    // Añadir información de envío solo si es producto físico
+    if (productType === 'physical' && shippingAddress) {
+      Object.assign(metadata, {
+        shipping_street: String(shippingAddress.street || ''),
+        shipping_city: String(shippingAddress.city || ''),
+        shipping_state: String(shippingAddress.state || ''),
+        shipping_postal_code: String(shippingAddress.postal_code || ''),
+        shipping_country: String(shippingAddress.country || ''),
+        shipping_phone: String(shippingAddress.phone || customerInfo.phone || '')
+      });
+    }
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -87,42 +85,38 @@ serve(async (req) => {
       customer_email: customerInfo.email,
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
-      metadata,
-      shipping_address_collection: cartItems[0]?.metadata?.product_type === 'physical' ? {
+      metadata
+    };
+
+    // Configurar opciones de envío solo si es producto físico
+    if (productType === 'physical') {
+      sessionConfig.shipping_address_collection = {
         allowed_countries: ['MX']
-      } : undefined,
-      shipping_options: cartItems[0]?.metadata?.product_type === 'physical' ? [
-        {
-          shipping_rate_data: {
-            type: 'fixed_amount',
-            fixed_amount: {
-              amount: 0,
-              currency: 'mxn',
+      };
+      
+      sessionConfig.shipping_options = [{
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: {
+            amount: 0,
+            currency: 'mxn',
+          },
+          display_name: 'Envío Gratis',
+          delivery_estimate: {
+            minimum: {
+              unit: 'business_day',
+              value: 3,
             },
-            display_name: 'Envío Gratis',
-            delivery_estimate: {
-              minimum: {
-                unit: 'business_day',
-                value: 3,
-              },
-              maximum: {
-                unit: 'business_day',
-                value: 5,
-              },
+            maximum: {
+              unit: 'business_day',
+              value: 5,
             },
           },
         },
-      ] : undefined
+      }];
     }
 
-    console.log('create-checkout - Configuración de sesión:', sessionConfig)
-
     const session = await stripe.checkout.sessions.create(sessionConfig)
-
-    console.log('create-checkout - Sesión creada:', {
-      id: session.id,
-      metadata: session.metadata
-    })
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -132,7 +126,6 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('create-checkout - Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
