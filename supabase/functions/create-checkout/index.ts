@@ -14,25 +14,19 @@ serve(async (req) => {
   try {
     const { cartItems, customerInfo, orderInfo } = await req.json()
     
-    // Validar datos requeridos del cliente
-    const requiredFields = ['name', 'email', 'phone', 'passport_number', 'birth_date', 'gender'];
-    const missingFields = requiredFields.filter(field => !customerInfo[field]);
-
-    if (missingFields.length > 0) {
-      throw new Error(`Campos requeridos faltantes: ${missingFields.join(', ')}`);
-    }
-
-    if (cartItems.length === 0) {
-      throw new Error('El carrito está vacío');
-    }
+    console.log('Received checkout request:', {
+      cartItems,
+      customerInfo,
+      orderInfo
+    })
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    const isPhysicalProduct = cartItems[0]?.metadata?.product_type === 'physical';
+    // Verificar si hay dirección de envío
+    console.log('Shipping address from orderInfo:', orderInfo.shipping_address)
 
-    // Construir metadata base
     const metadata: Record<string, string> = {
       customer_name: String(customerInfo.name),
       customer_email: String(customerInfo.email),
@@ -41,24 +35,26 @@ serve(async (req) => {
       customer_birth_date: String(customerInfo.birth_date),
       customer_gender: String(customerInfo.gender),
       product_id: String(cartItems[0].product_id),
-      product_type: String(cartItems[0].metadata.product_type),
       activation_date: String(orderInfo.activation_date),
-      total_amount: String(cartItems[0].total_price)
+      total_amount: String(cartItems[0].total_price),
+      shipping_street: String(orderInfo.shipping_address?.street || ''),
+      shipping_city: String(orderInfo.shipping_address?.city || ''),
+      shipping_state: String(orderInfo.shipping_address?.state || ''),
+      shipping_country: String(orderInfo.shipping_address?.country || ''),
+      shipping_postal_code: String(orderInfo.shipping_address?.postal_code || ''),
+      shipping_phone: String(orderInfo.shipping_address?.phone || '')
     }
 
-    // Si es producto físico, agregar información de envío
-    if (isPhysicalProduct && orderInfo.shipping_address) {
-      Object.assign(metadata, {
-        shipping_street: String(orderInfo.shipping_address.street),
-        shipping_city: String(orderInfo.shipping_address.city),
-        shipping_state: String(orderInfo.shipping_address.state),
-        shipping_country: String(orderInfo.shipping_address.country),
-        shipping_postal_code: String(orderInfo.shipping_address.postal_code),
-        shipping_phone: String(orderInfo.shipping_address.phone)
-      });
+    // Verificar el tamaño de la metadata
+    const metadataSize = JSON.stringify(metadata).length
+    console.log('Metadata size:', metadataSize)
+    console.log('Final metadata being sent to Stripe:', metadata)
+
+    if (metadataSize > 4096) {
+      throw new Error('Metadata exceeds Stripe limit of 4096 characters')
     }
 
-    const sessionConfig: any = {
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: cartItems.map(item => ({
         price_data: {
@@ -74,38 +70,16 @@ serve(async (req) => {
       customer_email: customerInfo.email,
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
-      metadata
-    }
+      metadata,
+      shipping_address_collection: cartItems[0].metadata.product_type === 'physical' ? {
+        allowed_countries: ['MX'],
+      } : undefined,
+    })
 
-    // Agregar configuración de envío solo si es producto físico
-    if (isPhysicalProduct) {
-      sessionConfig.shipping_address_collection = {
-        allowed_countries: ['MX']
-      };
-      
-      sessionConfig.shipping_options = [{
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: {
-            amount: 0,
-            currency: 'mxn',
-          },
-          display_name: 'Envío Gratis',
-          delivery_estimate: {
-            minimum: {
-              unit: 'business_day',
-              value: 3,
-            },
-            maximum: {
-              unit: 'business_day',
-              value: 5,
-            },
-          },
-        },
-      }];
-    }
-
-    const session = await stripe.checkout.sessions.create(sessionConfig)
+    console.log('Stripe session created:', {
+      sessionId: session.id,
+      metadata: session.metadata
+    })
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -115,6 +89,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error('Error creating checkout session:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
