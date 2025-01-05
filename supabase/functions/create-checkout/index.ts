@@ -30,66 +30,55 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    const line_items = cartItems.map((item: any) => ({
-      price_data: {
-        currency: 'mxn',
-        product_data: {
-          name: item.metadata?.product_title || 'Producto',
-          description: item.metadata?.description,
-        },
-        unit_amount: item.unit_price,
-      },
-      quantity: item.quantity,
-    }))
+    const isPhysicalProduct = cartItems[0]?.metadata?.product_type === 'physical';
 
-    // Formatear fechas a ISO 8601
-    const formattedBirthDate = new Date(customerInfo.birth_date).toISOString().split('T')[0];
-    const formattedActivationDate = orderInfo.activation_date ? 
-      new Date(orderInfo.activation_date).toISOString() : null;
-
-    // Usar el tipo de producto directamente desde cartItems.metadata
-    const productType = cartItems[0]?.metadata?.product_type;
-    const shippingAddress = productType === 'physical' ? orderInfo.shipping_address : null;
-
+    // Construir metadata base
     const metadata: Record<string, string> = {
-      customer_name: String(customerInfo.name || ''),
-      customer_email: String(customerInfo.email || ''),
-      customer_phone: String(customerInfo.phone || ''),
-      customer_passport: String(customerInfo.passport_number || ''),
-      customer_birth_date: String(formattedBirthDate || ''),
-      customer_gender: String(customerInfo.gender || ''),
-      order_type: String(productType || ''),
-      product_id: String(cartItems[0]?.product_id || ''),
-      activation_date: String(formattedActivationDate || ''),
-      total_amount: String(cartItems.reduce((sum: number, item: any) => 
-        sum + (item.unit_price * item.quantity), 0
-      ))
-    };
+      customer_name: String(customerInfo.name),
+      customer_email: String(customerInfo.email),
+      customer_phone: String(customerInfo.phone),
+      customer_passport: String(customerInfo.passport_number),
+      customer_birth_date: String(customerInfo.birth_date),
+      customer_gender: String(customerInfo.gender),
+      product_id: String(cartItems[0].product_id),
+      product_type: String(cartItems[0].metadata.product_type),
+      activation_date: String(orderInfo.activation_date),
+      total_amount: String(cartItems[0].total_price)
+    }
 
-    // Añadir información de envío solo si es producto físico
-    if (productType === 'physical' && shippingAddress) {
+    // Si es producto físico, agregar información de envío
+    if (isPhysicalProduct && orderInfo.shipping_address) {
       Object.assign(metadata, {
-        shipping_street: String(shippingAddress.street || ''),
-        shipping_city: String(shippingAddress.city || ''),
-        shipping_state: String(shippingAddress.state || ''),
-        shipping_postal_code: String(shippingAddress.postal_code || ''),
-        shipping_country: String(shippingAddress.country || ''),
-        shipping_phone: String(shippingAddress.phone || customerInfo.phone || '')
+        shipping_street: String(orderInfo.shipping_address.street),
+        shipping_city: String(orderInfo.shipping_address.city),
+        shipping_state: String(orderInfo.shipping_address.state),
+        shipping_country: String(orderInfo.shipping_address.country),
+        shipping_postal_code: String(orderInfo.shipping_address.postal_code),
+        shipping_phone: String(orderInfo.shipping_address.phone)
       });
     }
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
-      line_items,
+      line_items: cartItems.map(item => ({
+        price_data: {
+          currency: 'mxn',
+          product_data: {
+            name: item.metadata.product_title,
+          },
+          unit_amount: item.unit_price,
+        },
+        quantity: item.quantity,
+      })),
       mode: 'payment',
       customer_email: customerInfo.email,
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata
-    };
+    }
 
-    // Configurar opciones de envío solo si es producto físico
-    if (productType === 'physical') {
+    // Agregar configuración de envío solo si es producto físico
+    if (isPhysicalProduct) {
       sessionConfig.shipping_address_collection = {
         allowed_countries: ['MX']
       };
