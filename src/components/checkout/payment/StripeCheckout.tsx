@@ -40,7 +40,13 @@ export function StripeCheckout() {
       }
 
       setIsLoading(true);
-      console.log('Starting checkout with:', { cartItems, customerInfo, orderInfo });
+      
+      // Log datos que se enviarán a create-checkout
+      console.group('Datos enviados a create-checkout');
+      console.log('Cart Items:', cartItems);
+      console.log('Customer Info:', customerInfo);
+      console.log('Order Info:', orderInfo);
+      console.groupEnd();
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
@@ -56,7 +62,9 @@ export function StripeCheckout() {
       }
 
       if (data?.url) {
-        console.log('Redirecting to Stripe checkout:', data.url);
+        console.log('URL de Stripe recibida:', data.url);
+        // Pequeña pausa para asegurar que los logs sean visibles
+        await new Promise(resolve => setTimeout(resolve, 500));
         window.location.href = data.url;
       } else {
         throw new Error('No se recibió la URL de checkout');
