@@ -52,7 +52,7 @@ serve(async (req) => {
     const formattedActivationDate = orderInfo.activation_date ? 
       new Date(orderInfo.activation_date).toISOString() : null;
 
-    // Preparar los metadatos para Stripe
+    // Preparar los metadatos para Stripe, incluyendo la dirección de envío
     const metadata = {
       customer_name: customerInfo.name,
       customer_email: customerInfo.email,
@@ -66,24 +66,16 @@ serve(async (req) => {
       total_amount: cartItems.reduce((sum: number, item: any) => 
         sum + (item.unit_price * item.quantity), 0
       ).toString(),
+      // Incluir dirección de envío en metadata si existe
+      shipping_street: customerInfo.default_shipping_address?.street || '',
+      shipping_city: customerInfo.default_shipping_address?.city || '',
+      shipping_state: customerInfo.default_shipping_address?.state || '',
+      shipping_postal_code: customerInfo.default_shipping_address?.postal_code || '',
+      shipping_country: customerInfo.default_shipping_address?.country || 'MX',
+      shipping_phone: customerInfo.default_shipping_address?.phone || customerInfo.phone || '',
     }
 
     console.log('Session metadata:', metadata)
-
-    // Preparar la dirección de envío si existe y es un pedido físico
-    const shipping = orderInfo.type === 'physical' && customerInfo.default_shipping_address ? {
-      address: {
-        line1: customerInfo.default_shipping_address.street,
-        city: customerInfo.default_shipping_address.city,
-        state: customerInfo.default_shipping_address.state,
-        postal_code: customerInfo.default_shipping_address.postal_code,
-        country: 'MX'
-      },
-      name: customerInfo.name,
-      phone: customerInfo.phone
-    } : undefined;
-
-    console.log('Shipping details for session:', shipping);
 
     const sessionConfig: any = {
       payment_method_types: ['card'],
@@ -95,8 +87,7 @@ serve(async (req) => {
       metadata,
       shipping_address_collection: orderInfo.type === 'physical' ? {
         allowed_countries: ['MX']
-      } : undefined,
-      shipping: shipping
+      } : undefined
     }
 
     console.log('Creating session with config:', sessionConfig)
