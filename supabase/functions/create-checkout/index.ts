@@ -50,8 +50,6 @@ serve(async (req) => {
       quantity: item.quantity,
     }))
 
-    console.log('create-checkout - Line Items:', line_items)
-
     // Formatear fechas a ISO 8601
     const formattedBirthDate = new Date(customerInfo.birth_date).toISOString().split('T')[0];
     const formattedActivationDate = orderInfo.activation_date ? 
@@ -71,7 +69,7 @@ serve(async (req) => {
       total_amount: cartItems.reduce((sum: number, item: any) => 
         sum + (item.unit_price * item.quantity), 0
       ).toString(),
-      // Agregar dirección de envío a los metadatos
+      // Añadir dirección de envío a los metadatos
       shipping_street: customerInfo.default_shipping_address?.street || '',
       shipping_city: customerInfo.default_shipping_address?.city || '',
       shipping_state: customerInfo.default_shipping_address?.state || '',
