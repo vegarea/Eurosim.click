@@ -63,29 +63,30 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     console.log('Updating with:', info)
     
     setState(prev => {
+      // Primero, actualiza customerInfo
       const newCustomerInfo = {
         ...prev.customerInfo,
         ...info,
-        default_shipping_address: info.default_shipping_address 
-          ? {
-              ...prev.customerInfo.default_shipping_address,
-              ...info.default_shipping_address
-            }
-          : prev.customerInfo.default_shipping_address
       };
 
-      // Sincronizar shipping_address con default_shipping_address
-      const newOrderInfo = {
-        ...prev.orderInfo,
-        shipping_address: info.default_shipping_address 
-          ? { ...info.default_shipping_address }
-          : prev.orderInfo.shipping_address
-      };
+      // Si se proporciona una nueva dirección, actualízala
+      if (info.default_shipping_address) {
+        newCustomerInfo.default_shipping_address = {
+          ...prev.customerInfo.default_shipping_address,
+          ...info.default_shipping_address
+        };
+      }
+
+      // Siempre sincroniza shipping_address con default_shipping_address
+      const shippingAddress = newCustomerInfo.default_shipping_address || null;
 
       const newState = {
         ...prev,
         customerInfo: newCustomerInfo,
-        orderInfo: newOrderInfo
+        orderInfo: {
+          ...prev.orderInfo,
+          shipping_address: shippingAddress
+        }
       };
 
       console.log('New state:', newState)
@@ -99,13 +100,18 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     console.log('Previous state:', state.orderInfo)
     console.log('Updating with:', info)
     setState(prev => {
+      // Asegúrate de que shipping_address siempre esté sincronizado
+      const newOrderInfo = {
+        ...prev.orderInfo,
+        ...info,
+        shipping_address: prev.customerInfo.default_shipping_address
+      };
+
       const newState = {
         ...prev,
-        orderInfo: {
-          ...prev.orderInfo,
-          ...info
-        }
+        orderInfo: newOrderInfo
       };
+      
       console.log('New state:', newState.orderInfo)
       console.groupEnd()
       return newState;
