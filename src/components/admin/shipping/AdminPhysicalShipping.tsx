@@ -27,14 +27,16 @@ export function AdminPhysicalShipping() {
       accessorKey: "id",
       header: "ID Pedido",
       cell: ({ row }) => {
-        return <span className="font-medium">#{row.getValue("id").slice(0,8)}</span>
+        const id = row.getValue("id") as string
+        return <span className="font-medium">#{id.substring(0,8)}</span>
       }
     },
     {
       accessorKey: "created_at",
       header: "Fecha",
       cell: ({ row }) => {
-        return new Date(row.getValue("created_at")).toLocaleDateString()
+        const date = row.getValue("created_at") as string
+        return new Date(date).toLocaleDateString()
       }
     },
     {
