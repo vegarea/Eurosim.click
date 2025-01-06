@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -21,16 +20,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
-
-    // Get assistant configuration
-    const { data: settings } = await supabaseClient
-      .from('ai_assistant_settings')
-      .select('*')
-      .single()
-
-    if (!settings?.is_active) {
-      throw new Error('AI Assistant is currently disabled')
-    }
 
     // Get role configuration
     const { data: roleConfig } = await supabaseClient
@@ -56,8 +45,8 @@ serve(async (req) => {
           { role: 'system', content: roleConfig.system_prompt },
           { role: 'user', content: message }
         ],
-        temperature: settings.temperature,
-        max_tokens: settings.max_tokens,
+        temperature: 0.7,
+        max_tokens: 500,
       }),
     })
 

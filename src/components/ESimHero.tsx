@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Smartphone, HelpCircle, Flag } from "lucide-react";
+import { Smartphone, HelpCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,14 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { compatibleDevices } from "@/data/compatibleDevices";
 import { useSiteImages } from "@/hooks/useSiteImages";
+import { CompatibilityChat } from "./esim/CompatibilityChat";
 import EUFlag from "@/components/icons/EUFlag";
 
 export function ESimHero() {
@@ -97,43 +91,14 @@ export function ESimHero() {
                       Verifica la compatibilidad
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                  <DialogContent className="sm:max-w-[600px]">
                     <DialogHeader>
-                      <DialogTitle>Dispositivos Compatibles</DialogTitle>
+                      <DialogTitle>Verificar Compatibilidad</DialogTitle>
                       <DialogDescription>
-                        Verifica si tu dispositivo es compatible con eSIM
+                        Consulta si tu dispositivo es compatible con eSIM
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="mt-4">
-                      <Accordion type="single" collapsible className="w-full">
-                        {compatibleDevices.map((brand) => (
-                          <AccordionItem key={brand.name} value={brand.name}>
-                            <AccordionTrigger>{brand.name}</AccordionTrigger>
-                            <AccordionContent>
-                              <ul className="space-y-2">
-                                {brand.models.map((model) => (
-                                  <li
-                                    key={model.name}
-                                    className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50"
-                                  >
-                                    <span>{model.name}</span>
-                                    {model.compatible ? (
-                                      <span className="text-green-500 text-sm font-medium">
-                                        Compatible
-                                      </span>
-                                    ) : (
-                                      <span className="text-red-500 text-sm font-medium">
-                                        No compatible
-                                      </span>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    </div>
+                    <CompatibilityChat />
                   </DialogContent>
                 </Dialog>
               </div>
