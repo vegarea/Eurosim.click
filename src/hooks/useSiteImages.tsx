@@ -40,6 +40,13 @@ export function useSiteImages() {
           description: "Imagen de persona feliz usando su teléfono en la sección de SIM física",
           url: "https://images.unsplash.com/photo-1557180295-76eee20ae8aa",
           currentUrl: "https://images.unsplash.com/photo-1557180295-76eee20ae8aa",
+        },
+        {
+          id: 4,
+          location: "Llamadas Internacionales",
+          description: "Imagen de la sección de llamadas internacionales en la página de eSIM",
+          url: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d",
+          currentUrl: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d",
         }
       ];
 
