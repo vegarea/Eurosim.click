@@ -14,15 +14,15 @@ interface ProductButtonProps {
 const getButtonColor = (productTitle: string) => {
   switch (productTitle) {
     case 'E-sim S':
-      return 'bg-[#D3E4FD]'; // Azul suave
+      return 'bg-[#D3E4FD]';
     case 'E-sim M':
-      return 'bg-[#F2FCE2]'; // Verde suave
+      return 'bg-[#F2FCE2]';
     case 'E-sim L':
-      return 'bg-[#FEF7CD]'; // Amarillo suave
+      return 'bg-[#FEF7CD]';
     case 'E-sim XL':
-      return 'bg-[#FFDEE2]'; // Rosa suave
+      return 'bg-[#FFDEE2]';
     default:
-      return 'bg-white'; // Color por defecto
+      return 'bg-white';
   }
 };
 
@@ -45,9 +45,9 @@ export function ProductButton({
     <button
       onClick={handleClick}
       className={cn(
-        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl",
+        "w-full p-2 md:p-4 rounded-xl",
         buttonColor,
-        "hover:shadow-lg hover:-translate-y-1",
+        "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
         "flex items-center gap-2 md:gap-3",
         isSelected ? "shadow-lg" : "opacity-80 hover:opacity-100"
       )}
@@ -59,9 +59,7 @@ export function ProductButton({
         </div>
       )}
       
-      <div className={cn(
-        "p-2 rounded-lg bg-white/50"
-      )}>
+      <div className="p-2 rounded-lg bg-white/50">
         {product.type === 'physical' ? (
           <CreditCard className="h-4 w-4 text-gray-700" />
         ) : (
