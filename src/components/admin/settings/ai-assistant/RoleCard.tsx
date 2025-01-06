@@ -27,7 +27,6 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Inicializar el estado local
   useEffect(() => {
     setLocalPrompt(role.system_prompt)
   }, [role.system_prompt])
@@ -82,8 +81,8 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
 
   return (
     <Card>
-      <CardContent className="pt-6 space-y-4">
-        <div className="flex items-center justify-between">
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-medium">{role.name}</h3>
             <p className="text-sm text-muted-foreground">{role.description}</p>
@@ -100,20 +99,23 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
             value={localPrompt}
             onChange={handlePromptChange}
             rows={4}
+            className="resize-none"
           />
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Este prompt define la personalidad y comportamiento del asistente en este rol.
-            </p>
-            <Button
-              onClick={handleSave}
-              disabled={!hasChanges || isSaving}
-              size="sm"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {isSaving ? "Guardando..." : "Guardar Cambios"}
-            </Button>
-          </div>
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-muted-foreground">
+            Este prompt define la personalidad y comportamiento del asistente en este rol.
+          </p>
+          <Button
+            onClick={handleSave}
+            disabled={!hasChanges || isSaving}
+            size="sm"
+            className="z-10"
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {isSaving ? "Guardando..." : "Guardar Cambios"}
+          </Button>
         </div>
       </CardContent>
     </Card>
