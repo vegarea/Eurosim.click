@@ -17,8 +17,7 @@ import {
   AlertCircle
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Tooltip } from "@/components/ui/tooltip"
-import { TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface OrderHistoryProps {
   events?: OrderEvent[]

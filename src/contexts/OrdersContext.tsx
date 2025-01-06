@@ -33,13 +33,14 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         .from('orders')
         .select(`
           *,
-          customer:customers(*)
+          customer:customers(*),
+          events:order_events(*)
         `)
         .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      setOrders(data)
+      setOrders(data as Order[])
     } catch (err) {
       console.error('Error fetching orders:', err)
       setError(err as Error)

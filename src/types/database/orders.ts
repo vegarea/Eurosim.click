@@ -1,6 +1,7 @@
 import { OrderStatus, OrderType, PaymentMethod, PaymentStatus } from "./enums"
 import { Json } from "./common"
 import { Customer } from "./customers"
+import { OrderEvent } from "./common"
 
 export interface Order {
   id: string
@@ -26,6 +27,7 @@ export interface Order {
   updated_at: string | null
   // Relaciones
   customer?: Customer
+  events?: OrderEvent[]
 }
 
 export type OrderInsert = Omit<Order, "id" | "created_at" | "updated_at">

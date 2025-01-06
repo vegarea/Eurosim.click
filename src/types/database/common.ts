@@ -1,12 +1,20 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
+export interface OrderEventMetadata {
+  automated?: boolean
+  oldStatus?: string
+  newStatus?: string
+  details?: string
+  [key: string]: any
+}
+
 export interface OrderEvent {
   id: string
   order_id: string
   type: string
   description: string
   user_id?: string | null
-  metadata?: Json | null
+  metadata?: OrderEventMetadata | null
   created_at: string
 }
 
