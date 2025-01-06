@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { User, Mail, Phone, MapPin, CreditCard, Calendar, Flag } from "lucide-react"
+import { User, Mail, Phone, MapPin, CreditCard, Calendar, ArrowRight } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
   CardContent,
@@ -15,15 +14,20 @@ import {
 import { Customer } from "@/types/database/customers"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { Badge } from "@/components/ui/badge"
+import { Order } from "@/types/database/orders"
 
 interface CustomerDetailsModalProps {
-  customer: Customer | null
+  customer: (Customer & { orders: Order[] }) | null
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }
 
 export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: CustomerDetailsModalProps) {
   if (!customer) return null
+
+  // Obtener la última orden para mostrar la dirección de envío
+  const lastOrder = customer.orders?.[0]
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -71,62 +75,75 @@ export function CustomerDetailsModal({ customer, isOpen, onOpenChange }: Custome
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Preferencias</h3>
+                <h3 className="font-medium">Últimas Órdenes</h3>
                 <div className="grid gap-2">
-                  <div className="flex items-center gap-2">
-                    <Flag className="h-4 w-4 text-gray-500" />
-                    <span>Idioma preferido: {customer.preferred_language || "No especificado"}</span>
-                  </div>
+                  {customer.orders?.length > 0 ? (
+                    customer.orders.map((order) => (
+                      <Card key={order.id}>
+                        <CardContent className="pt-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                {format(new Date(order.created_at || ''), "PPP", { locale: es })}
+                              </p>
+                              <p className="font-medium">
+                                {order.type === 'physical' ? 'SIM Física' : 'eSIM'} - 
+                                {new Intl.NumberFormat('es-ES', { 
+                                  style: 'currency', 
+                                  currency: 'EUR' 
+                                }).format(order.total_amount / 100)}
+                              </p>
+                              <Badge variant={
+                                order.status === 'delivered' ? 'default' :
+                                order.status === 'cancelled' ? 'destructive' :
+                                'secondary'
+                              }>
+                                {order.status}
+                              </Badge>
+                            </div>
+                            <Link 
+                              to={`/admin/orders/${order.id}`}
+                              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                            >
+                              Ver orden
+                              <ArrowRight className="h-4 w-4" />
+                            </Link>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No hay órdenes registradas</p>
+                  )}
                 </div>
               </div>
-
-              {customer.marketing_preferences && (
-                <div className="space-y-2">
-                  <h3 className="font-medium">Preferencias de Marketing</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                      <CardContent className="pt-6">
-                        <Badge variant={customer.marketing_preferences.email_marketing ? "default" : "secondary"}>
-                          {customer.marketing_preferences.email_marketing ? "Activado" : "Desactivado"}
-                        </Badge>
-                        <p className="text-sm text-gray-500 mt-2">Email Marketing</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardContent className="pt-6">
-                        <Badge variant={customer.marketing_preferences.sms_marketing ? "default" : "secondary"}>
-                          {customer.marketing_preferences.sms_marketing ? "Activado" : "Desactivado"}
-                        </Badge>
-                        <p className="text-sm text-gray-500 mt-2">SMS Marketing</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              )}
             </div>
           </TabsContent>
 
           <TabsContent value="shipping" className="space-y-4">
-            {customer.default_shipping_address ? (
+            {lastOrder?.shipping_address ? (
               <div className="grid gap-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-gray-500" />
-                  <span>{(customer.default_shipping_address as any).street}</span>
+                  <span>{(lastOrder.shipping_address as any).street}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="text-sm text-gray-500">Ciudad</label>
-                    <p>{(customer.default_shipping_address as any).city || "No especificada"}</p>
+                    <p>{(lastOrder.shipping_address as any).city || "No especificada"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Estado</label>
-                    <p>{(customer.default_shipping_address as any).state || "No especificado"}</p>
+                    <p>{(lastOrder.shipping_address as any).state || "No especificado"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-500">Código Postal</label>
-                    <p>{(customer.default_shipping_address as any).postal_code || "No especificado"}</p>
+                    <p>{(lastOrder.shipping_address as any).postal_code || "No especificado"}</p>
                   </div>
                 </div>
+                <p className="text-sm text-gray-500 italic">
+                  * Dirección de la última orden
+                </p>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Customer } from "@/types/database/customers"
+import { Order } from "@/types/database/orders"
 import { toast } from "sonner"
 
 export function useCustomers() {
@@ -13,7 +14,14 @@ export function useCustomers() {
         .from('customers')
         .select(`
           *,
-          orders (*)
+          orders (
+            id,
+            status,
+            type,
+            total_amount,
+            created_at,
+            shipping_address
+          )
         `)
         .order('created_at', { ascending: false })
 
@@ -22,7 +30,7 @@ export function useCustomers() {
         throw error
       }
 
-      return data as (Customer & { orders: any[] })[]
+      return data as (Customer & { orders: Order[] })[]
     }
   })
 
