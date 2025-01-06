@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import Stripe from 'https://esm.sh/stripe@14.21.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,12 +21,35 @@ serve(async (req) => {
       orderInfo
     })
 
+    // Crear cliente de Supabase
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { auth: { persistSession: false } }
+    )
+
+    // Obtener costo de envío si hay productos físicos
+    let shippingCost = 0
+    const hasPhysicalProducts = cartItems.some((item: any) => 
+      item.metadata?.product_type === 'physical'
+    )
+
+    if (hasPhysicalProducts) {
+      const { data: shippingSettings } = await supabaseClient
+        .from('shipping_settings')
+        .select('shipping_cost')
+        .eq('is_active', true)
+        .single()
+
+      if (shippingSettings) {
+        shippingCost = shippingSettings.shipping_cost
+        console.log('Shipping cost applied:', shippingCost)
+      }
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
-
-    // Verificar si hay dirección de envío
-    console.log('Shipping address from orderInfo:', orderInfo.shipping_address)
 
     const metadata: Record<string, string> = {
       customer_name: String(customerInfo.name),
@@ -37,15 +61,19 @@ serve(async (req) => {
       product_id: String(cartItems[0].product_id),
       activation_date: String(orderInfo.activation_date),
       total_amount: String(cartItems[0].total_price),
-      shipping_street: String(orderInfo.shipping_address?.street || ''),
-      shipping_city: String(orderInfo.shipping_address?.city || ''),
-      shipping_state: String(orderInfo.shipping_address?.state || ''),
-      shipping_country: String(orderInfo.shipping_address?.country || ''),
-      shipping_postal_code: String(orderInfo.shipping_address?.postal_code || ''),
-      shipping_phone: String(orderInfo.shipping_address?.phone || '')
+      shipping_cost: String(shippingCost)
     }
 
-    // Verificar el tamaño de la metadata
+    // Añadir información de envío si existe
+    if (orderInfo.shipping_address) {
+      metadata.shipping_street = String(orderInfo.shipping_address.street || '')
+      metadata.shipping_city = String(orderInfo.shipping_address.city || '')
+      metadata.shipping_state = String(orderInfo.shipping_address.state || '')
+      metadata.shipping_country = String(orderInfo.shipping_address.country || '')
+      metadata.shipping_postal_code = String(orderInfo.shipping_address.postal_code || '')
+      metadata.shipping_phone = String(orderInfo.shipping_address.phone || '')
+    }
+
     const metadataSize = JSON.stringify(metadata).length
     console.log('Metadata size:', metadataSize)
     console.log('Final metadata being sent to Stripe:', metadata)
@@ -54,24 +82,40 @@ serve(async (req) => {
       throw new Error('Metadata exceeds Stripe limit of 4096 characters')
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: cartItems.map(item => ({
+    // Crear los line items incluyendo el costo de envío si aplica
+    const lineItems = cartItems.map((item: any) => ({
+      price_data: {
+        currency: 'mxn',
+        product_data: {
+          name: item.metadata.product_title,
+        },
+        unit_amount: item.unit_price,
+      },
+      quantity: item.quantity,
+    }))
+
+    // Añadir el costo de envío como un item separado si aplica
+    if (shippingCost > 0) {
+      lineItems.push({
         price_data: {
           currency: 'mxn',
           product_data: {
-            name: item.metadata.product_title,
+            name: 'Costo de envío',
           },
-          unit_amount: item.unit_price,
+          unit_amount: shippingCost,
         },
-        quantity: item.quantity,
-      })),
+        quantity: 1,
+      })
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
       mode: 'payment',
       customer_email: customerInfo.email,
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata,
-      // Removemos shipping_address_collection para que no solicite dirección
     })
 
     console.log('Stripe session created:', {
