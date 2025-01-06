@@ -19,6 +19,7 @@ import { Link } from "react-router-dom"
 import { Progress } from "@/components/ui/progress"
 import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
+import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
 
 const statusOrder = [
   "payment_pending",
@@ -196,29 +197,36 @@ export default function OrderDetails() {
           </div>
         </div>
 
+        {/* Información del Cliente y Control de Estado */}
         <div className="grid gap-6 md:grid-cols-2">
+          <OrderCustomerInfo order={order} />
           <OrderStatusControl
             currentStatus={order.status}
             orderType={order.type}
             onStatusChange={handleStatusChange}
           />
+        </div>
+
+        {/* Información Básica y del Producto */}
+        <div className="grid gap-6 md:grid-cols-2">
           <OrderBasicInfo order={order} />
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
           <OrderProductInfo order={order} />
-          <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
         </div>
 
+        {/* Información de Pago y Documentación */}
         <div className="grid gap-6 md:grid-cols-2">
+          <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
           <OrderDocumentation order={order} />
+        </div>
+
+        {/* Notas e Historial */}
+        <div className="grid gap-6 md:grid-cols-2">
           <OrderNotes 
             order={order} 
             onAddNote={handleAddNote}
           />
+          <OrderHistory events={order.events || []} />
         </div>
-
-        <OrderHistory events={order.events || []} />
       </div>
     </AdminLayout>
   )
