@@ -59,23 +59,19 @@ serve(async (req) => {
       })
     }
 
-    // Actualizar el secreto usando la API de Supabase Management
-    const managementApiUrl = `https://api.supabase.com/v1/projects/${Deno.env.get('SUPABASE_PROJECT_ID')}/secrets`
-    const response = await fetch(managementApiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ACCESS_TOKEN')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: 'OPENAI_API_KEY',
-        value: apiKey,
-      }),
-    })
+    // Actualizar o insertar la API key en site_settings
+    const { error: upsertError } = await supabaseClient
+      .from('site_settings')
+      .upsert({ 
+        openai_api_key: apiKey,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
+      })
 
-    if (!response.ok) {
-      console.error('Failed to update secret:', await response.text())
-      throw new Error('Failed to update secret')
+    if (upsertError) {
+      console.error('Error updating API key:', upsertError)
+      throw new Error('Failed to update API key')
     }
 
     return new Response(JSON.stringify({ success: true }), {

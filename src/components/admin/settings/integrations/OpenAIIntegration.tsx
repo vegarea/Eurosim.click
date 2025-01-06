@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/components/ui/use-toast"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 
@@ -12,6 +13,7 @@ interface OpenAIIntegrationProps {
 export function OpenAIIntegration({ onSave }: OpenAIIntegrationProps) {
   const [apiKey, setApiKey] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   const handleSave = async () => {
     try {
@@ -19,7 +21,12 @@ export function OpenAIIntegration({ onSave }: OpenAIIntegrationProps) {
       
       // Verificar que la API key tenga el formato correcto
       if (!apiKey.startsWith('sk-')) {
-        throw new Error('La API key debe comenzar con "sk-"')
+        toast({
+          title: "Error",
+          description: 'La API key debe comenzar con "sk-"',
+          variant: "destructive"
+        })
+        return
       }
 
       const { error } = await supabase.functions.invoke('update-openai-key', {
@@ -28,10 +35,20 @@ export function OpenAIIntegration({ onSave }: OpenAIIntegrationProps) {
 
       if (error) throw error
 
+      toast({
+        title: "API Key guardada",
+        description: "La API key de OpenAI ha sido guardada correctamente"
+      })
+      
       setApiKey("")
       onSave()
     } catch (error) {
       console.error('Error saving OpenAI key:', error)
+      toast({
+        title: "Error",
+        description: "No se pudo guardar la API key",
+        variant: "destructive"
+      })
     } finally {
       setIsLoading(false)
     }
