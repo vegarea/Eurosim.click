@@ -7,34 +7,18 @@ interface ProductButtonProps {
   product: Product;
   isSelected: boolean;
   onClick: () => void;
-  onSelect?: () => void;
+  onSelect?: () => void; // Añadimos esta prop para compatibilidad
   isPopular?: boolean;
 }
-
-const getButtonColor = (productTitle: string) => {
-  switch (productTitle) {
-    case 'E-sim S':
-      return 'bg-[#D3E4FD]';
-    case 'E-sim M':
-      return 'bg-[#F2FCE2]';
-    case 'E-sim L':
-      return 'bg-[#FEF7CD]';
-    case 'E-sim XL':
-      return 'bg-[#FFDEE2]';
-    default:
-      return 'bg-white';
-  }
-};
 
 export function ProductButton({ 
   product,
   isSelected, 
   onClick,
-  onSelect,
+  onSelect, // Añadimos esta prop
   isPopular = false
 }: ProductButtonProps) {
   const [amount, currency] = formatCurrency(product.price).split(' ');
-  const buttonColor = getButtonColor(product.title);
 
   const handleClick = () => {
     onClick();
@@ -45,11 +29,12 @@ export function ProductButton({
     <button
       onClick={handleClick}
       className={cn(
-        "w-full p-2 md:p-4 rounded-xl",
-        buttonColor,
-        "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
+        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm relative",
+        "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-3",
-        isSelected ? "shadow-lg" : "opacity-80 hover:opacity-100"
+        isSelected ? 
+          `bg-[#D3E4FD] shadow-lg` : 
+          `bg-[#D3E4FD] opacity-80 hover:opacity-100`
       )}
     >
       {isPopular && (
@@ -59,7 +44,9 @@ export function ProductButton({
         </div>
       )}
       
-      <div className="p-2 rounded-lg bg-white/50">
+      <div className={cn(
+        "p-2 rounded-lg bg-white/50 backdrop-blur-sm"
+      )}>
         {product.type === 'physical' ? (
           <CreditCard className="h-4 w-4 text-gray-700" />
         ) : (
