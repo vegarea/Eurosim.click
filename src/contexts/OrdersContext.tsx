@@ -59,8 +59,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
           schema: 'public',
           table: 'orders'
         },
-        () => {
-          console.log('Orden actualizada, refrescando datos...')
+        (payload) => {
+          console.log('Orden actualizada:', payload)
           fetchOrders()
         }
       )
@@ -85,7 +85,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error
 
-      // Actualizar el estado local
+      // Actualizar el estado local inmediatamente
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, ...updates } : order
       ))
