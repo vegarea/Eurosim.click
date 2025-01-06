@@ -20,7 +20,7 @@ export function CompatibilityChat() {
       setIsLoading(true)
       
       // Agregar mensaje del usuario al chat
-      const newMessages = [...messages, { role: 'user', content: message }]
+      const newMessages: Message[] = [...messages, { role: 'user' as const, content: message }]
       setMessages(newMessages)
       setInput("")
 
@@ -35,7 +35,7 @@ export function CompatibilityChat() {
       if (error) throw error
 
       // Agregar respuesta del asistente
-      setMessages([...newMessages, { role: 'assistant', content: data.response }])
+      setMessages([...newMessages, { role: 'assistant' as const, content: data.response }])
     } catch (error) {
       console.error('Error al enviar mensaje:', error)
     } finally {
