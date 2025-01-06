@@ -31,43 +31,52 @@ export default function Contact() {
           {/* Sección Pre-venta */}
           <div className="relative px-8 lg:px-12 py-12 bg-gradient-to-br from-brand-50/80 via-brand-100/50 to-brand-50/30 backdrop-blur-sm">
             <div className="max-w-xl mx-auto lg:mr-0">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-800">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-800">
                 ¿Tienes dudas? Estamos aquí para ayudarte
               </h2>
-              <p className="text-base text-gray-600 mb-6 animate-fade-in delay-100">
+              <p className="text-sm text-gray-600 mb-8 animate-fade-in delay-100">
                 Elige la forma que prefieras para resolver todas tus dudas sobre nuestros servicios
               </p>
 
-              <div className="space-y-2.5 mb-10">
-                <Button 
-                  variant="outline"
-                  className="w-full justify-start text-gray-700 bg-white/80 hover:bg-primary hover:text-white group transition-all duration-300 shadow-sm hover:shadow-md"
-                  onClick={() => navigate("/assistant")}
-                >
-                  <Bot className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className="flex-1 text-left text-sm">Asistente Virtual 24/7</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
-                </Button>
+              <div className="space-y-6 mb-10">
+                <div className="space-y-1.5">
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start text-gray-700 bg-white/80 hover:bg-[#E5DEFF] hover:text-primary group transition-all duration-300 shadow-sm hover:shadow-md"
+                    onClick={() => navigate("/assistant")}
+                  >
+                    <Bot className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
+                    <span className="flex-1 text-left text-sm">Asistente Virtual 24/7</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </Button>
+                  <p className="text-xs text-gray-500 ml-2">Respuestas instantáneas a tus preguntas más comunes</p>
+                </div>
 
-                <Button 
-                  variant="outline"
-                  className="w-full justify-start text-gray-700 bg-white/80 hover:bg-secondary hover:text-white group transition-all duration-300 shadow-sm hover:shadow-md"
-                  onClick={() => navigate("/#frequent-questions")}
-                >
-                  <HelpCircle className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                  <span className="flex-1 text-left text-sm">Preguntas Frecuentes</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
-                </Button>
+                <div className="space-y-1.5">
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start text-gray-700 bg-white/80 hover:bg-[#FFDEE2] hover:text-secondary group transition-all duration-300 shadow-sm hover:shadow-md"
+                    onClick={() => navigate("/#frequent-questions")}
+                  >
+                    <HelpCircle className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span className="flex-1 text-left text-sm">Preguntas Frecuentes</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </Button>
+                  <p className="text-xs text-gray-500 ml-2">Encuentra respuestas detalladas a las dudas más comunes</p>
+                </div>
 
-                <Button 
-                  variant="outline"
-                  className="w-full justify-start text-gray-700 bg-white/80 hover:bg-green-500 hover:text-white group transition-all duration-300 shadow-sm hover:shadow-md"
-                  onClick={() => window.open("https://wa.me/+34600000000", "_blank")}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4 group-hover:translate-y-[-2px] transition-transform duration-300" />
-                  <span className="flex-1 text-left text-sm">Escríbenos por WhatsApp</span>
-                  <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
-                </Button>
+                <div className="space-y-1.5">
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start text-gray-700 bg-white/80 hover:bg-[#F2FCE2] hover:text-green-600 group transition-all duration-300 shadow-sm hover:shadow-md"
+                    onClick={() => window.open("https://wa.me/+34600000000", "_blank")}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4 group-hover:translate-y-[-2px] transition-transform duration-300" />
+                    <span className="flex-1 text-left text-sm">Escríbenos por WhatsApp</span>
+                    <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
+                  </Button>
+                  <p className="text-xs text-gray-500 ml-2">Atención personalizada en tiempo real</p>
+                </div>
               </div>
 
               <form onSubmit={handlePreSaleSubmit} className="space-y-4 backdrop-blur-sm bg-white/40 p-6 rounded-xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
@@ -107,16 +116,16 @@ export default function Contact() {
           {/* Sección Post-venta */}
           <div className="relative px-8 lg:px-12 py-12 bg-gradient-to-bl from-white via-brand-50/30 to-brand-50/10">
             <div className="max-w-xl mx-auto lg:ml-0">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-brand-800 to-brand-600">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 animate-fade-in bg-clip-text text-transparent bg-gradient-to-r from-brand-800 to-brand-600">
                 Soporte y Atención a Clientes
               </h2>
-              <p className="text-base text-gray-600 mb-8 animate-fade-in delay-100">
+              <p className="text-sm text-gray-600 mb-8 animate-fade-in delay-100">
                 ¿Ya eres cliente? Aquí puedes verificar el estado de tu pedido y obtener soporte técnico
               </p>
 
               <form onSubmit={handleOrderSearch} className="space-y-6">
                 <div className="backdrop-blur-sm bg-white/40 p-6 rounded-xl shadow-lg border border-white/50 hover:shadow-xl transition-all duration-300">
-                  <label className="block text-base font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
                     Ingresa el email que usaste en tu compra para ver el estado de tu pedido
                   </label>
                   <div className="flex gap-2">
