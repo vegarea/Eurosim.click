@@ -5,7 +5,7 @@ import { RoleCard } from "./RoleCard"
 
 interface AssistantRole {
   id: string
-  role: 'sales' | 'support' | 'compatibility_checker'
+  role: 'sales' | 'support' | 'compatibility_checker' | 'blog_writer'
   name: string
   description: string | null
   system_prompt: string
@@ -45,7 +45,6 @@ export function RolesList() {
 
   const handleUpdateRole = async (roleId: string, updates: Partial<AssistantRole>) => {
     try {
-      setIsLoading(true)
       const { error } = await supabase
         .from('ai_assistant_roles')
         .update(updates)
@@ -69,8 +68,7 @@ export function RolesList() {
         description: "No se pudieron guardar los cambios. Por favor intenta de nuevo.",
         variant: "destructive"
       })
-    } finally {
-      setIsLoading(false)
+      throw error
     }
   }
 

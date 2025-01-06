@@ -452,7 +452,11 @@ export type Database = {
       }
     }
     Enums: {
-      assistant_role: "sales" | "support" | "compatibility_checker"
+      assistant_role:
+        | "sales"
+        | "support"
+        | "compatibility_checker"
+        | "blog_writer"
       customer_gender: "M" | "F"
       event_type:
         | "created"
