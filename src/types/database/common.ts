@@ -1,6 +1,4 @@
-import { Json } from "@/integrations/supabase/types"
-
-export type { Json }
+export type { Json } from "@/integrations/supabase/types"
 
 export interface ShippingAddress {
   street: string
@@ -29,10 +27,5 @@ export interface OrderEvent {
   created_at: string
 }
 
-export type EventType = 
-  | 'created'
-  | 'status_changed'
-  | 'payment_processed'
-  | 'shipping_updated'
-  | 'note_added'
-  | 'document_validated'
+// Re-export EventType to avoid ambiguity
+export { EventType } from "./enums"

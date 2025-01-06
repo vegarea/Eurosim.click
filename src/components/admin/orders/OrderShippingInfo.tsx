@@ -13,7 +13,7 @@ interface OrderShippingInfoProps {
 }
 
 export function OrderShippingInfo({ order }: OrderShippingInfoProps) {
-  const shippingAddress = order.shipping_address as ShippingAddress | null;
+  const shippingAddress = order.shipping_address as unknown as ShippingAddress | null;
 
   return (
     <Card>

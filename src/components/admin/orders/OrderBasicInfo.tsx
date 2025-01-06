@@ -11,7 +11,7 @@ interface OrderBasicInfoProps {
 }
 
 export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
-  const shippingAddress = order.shipping_address as ShippingAddress | null
+  const shippingAddress = order.shipping_address as unknown as ShippingAddress | null
   const shippingCost = (order.metadata as any)?.shipping_cost || 0
   const subtotal = order.total_amount - shippingCost
 
