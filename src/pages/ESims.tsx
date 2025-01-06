@@ -47,36 +47,42 @@ export default function ESims() {
       <main>
         <ESimHero />
 
-        <section className="py-16 px-4">
+        <section className="py-16 md:py-24 px-4">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">
+            <h2 className="text-3xl font-bold text-center mb-8 md:mb-12">
               Elige tu plan eSIM
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {products.map((product) => (
-                <ProductButton
-                  key={product.id}
-                  product={product}
-                  isSelected={selectedPlan?.id === product.id}
-                  onClick={() => setSelectedPlan(product)}
-                />
-              ))}
-            </div>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+                {products.map((product) => (
+                  <ProductButton
+                    key={product.id}
+                    product={product}
+                    isSelected={selectedPlan?.id === product.id}
+                    onClick={() => setSelectedPlan(product)}
+                  />
+                ))}
+              </div>
 
-            {selectedPlan && (
-              <PlanDetails
-                product={selectedPlan}
-              />
-            )}
+              {selectedPlan && (
+                <div className="max-w-3xl mx-auto">
+                  <PlanDetails
+                    product={selectedPlan}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
-        <CommonFeatures />
-        <TrustElements />
-        <HowItWorks />
-        <CountryCoverage />
-        <FrequentQuestions />
+        <div className="container mx-auto max-w-6xl px-4">
+          <CommonFeatures />
+          <TrustElements />
+          <HowItWorks />
+          <CountryCoverage />
+          <FrequentQuestions />
+        </div>
       </main>
     </div>
   )
