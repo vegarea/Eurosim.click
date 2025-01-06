@@ -8,14 +8,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ExtendedCustomer } from "@/types/ui/customers"
+import { Customer } from "@/types/database/customers"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface CustomersTableProps {
-  customers: ExtendedCustomer[]
-  onViewDetails: (customer: ExtendedCustomer) => void
+  customers: Customer[]
+  isLoading: boolean
+  onViewDetails: (customer: Customer) => void
 }
 
-export function CustomersTable({ customers, onViewDetails }: CustomersTableProps) {
+export function CustomersTable({ customers, isLoading, onViewDetails }: CustomersTableProps) {
+  if (isLoading) {
+    return <div className="text-center py-4">Cargando clientes...</div>
+  }
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -23,8 +30,7 @@ export function CustomersTable({ customers, onViewDetails }: CustomersTableProps
           <TableRow>
             <TableHead>Cliente</TableHead>
             <TableHead>Contacto</TableHead>
-            <TableHead>Pedidos</TableHead>
-            <TableHead>Total Gastado</TableHead>
+            <TableHead>Fecha de Registro</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -43,19 +49,16 @@ export function CustomersTable({ customers, onViewDetails }: CustomersTableProps
                     <Mail className="h-4 w-4 text-gray-500" />
                     {customer.email}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-gray-500" />
-                    {customer.phone}
-                  </div>
+                  {customer.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-gray-500" />
+                      {customer.phone}
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell>
-                <span className="font-medium">{customer.orders.length}</span> pedidos
-              </TableCell>
-              <TableCell>
-                <span className="font-medium">
-                  ${(customer.totalSpent / 100).toFixed(2)}
-                </span>
+                {customer.created_at && format(new Date(customer.created_at), "PPP", { locale: es })}
               </TableCell>
               <TableCell>
                 <Button 

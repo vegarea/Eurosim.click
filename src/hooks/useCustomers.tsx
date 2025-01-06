@@ -11,7 +11,10 @@ export function useCustomers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('customers')
-        .select('*')
+        .select(`
+          *,
+          orders (*)
+        `)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -19,7 +22,7 @@ export function useCustomers() {
         throw error
       }
 
-      return data as Customer[]
+      return data as (Customer & { orders: any[] })[]
     }
   })
 
