@@ -4,18 +4,10 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { formatCurrency } from "@/utils/currency"
-import { Json } from "@/types/database/common"
+import { ShippingAddress } from "@/types/database/common"
 
 interface OrderBasicInfoProps {
   order: Order
-}
-
-interface ShippingAddress {
-  street: string
-  city: string
-  state: string
-  country: string
-  postal_code: string
 }
 
 export function OrderBasicInfo({ order }: OrderBasicInfoProps) {

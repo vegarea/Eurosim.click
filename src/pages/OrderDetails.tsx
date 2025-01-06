@@ -1,166 +1,129 @@
 import { useState } from "react"
-import { Link, useParams } from "react-router-dom"
-import { useOrders } from "@/contexts/OrdersContext"
-import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
-import { Button } from "@/components/ui/button"
-import { AdminLayout } from "@/components/admin/AdminLayout"
-import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/components/admin/orders/types"
-import { toast } from "sonner"
-import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
-import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
-import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation"
-import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
-import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
-import { OrderNotes } from "@/components/admin/orders/OrderNotes"
-import { OrderHistory } from "@/components/admin/orders/OrderHistory"
-import { Progress } from "@/components/ui/progress"
-import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
+import { useParams } from "react-router-dom"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
+import { Order } from "@/types/database/orders"
 import { OrderEvent } from "@/types/database/common"
-
-const statusOrder = [
-  "payment_pending",
-  "processing",
-  "shipped",
-  "delivered",
-] as const
-
-// Mock payment data - In a real app, this would come from your payment provider's API
-const mockPaymentData = {
-  paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
-  logs: [
-    { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
-    { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
-  ]
-}
+import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
+import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
+import { OrderNotes } from "@/components/admin/orders/OrderNotes"
+import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation"
+import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
+import { OrderHistory } from "@/components/admin/orders/OrderHistory"
+import { OrderStatus } from "@/types/database/enums"
+import { toast } from "sonner"
 
 export default function OrderDetails() {
-  const { orderId } = useParams()
-  const { orders, updateOrder } = useOrders()
-  const order = orders.find(o => o.id === orderId)
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null)
+  const { orderId } = useParams<{ orderId: string }>()
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  if (!order) {
-    return (
-      <AdminLayout>
-        <div className="space-y-4">
-          <Link to="/admin/orders">
-            <Button variant="ghost" className="gap-2">
-              <ChevronLeft className="h-4 w-4" /> Volver a pedidos
-            </Button>
-          </Link>
-          <div className="text-center py-8">
-            <h2 className="text-2xl font-semibold">Pedido no encontrado</h2>
-          </div>
-        </div>
-      </AdminLayout>
-    )
-  }
+  const { data: order, isLoading, error } = useQuery({
+    queryKey: ['order', orderId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          customer:customers(*),
+          events:order_events(*)
+        `)
+        .eq('id', orderId)
+        .single()
 
-  const handleStatusChange = (newStatus: OrderStatus) => {
-    setPendingStatus(newStatus)
-    setShowConfirmDialog(true)
-  }
+      if (error) throw error
+      return data as Order & { events: OrderEvent[] }
+    }
+  })
 
-  const confirmStatusChange = () => {
-    if (pendingStatus) {
-      updateOrder(order.id, { status: pendingStatus })
-      toast.success("Estado actualizado correctamente")
-      setShowConfirmDialog(false)
+  const handleStatusChange = async (newStatus: OrderStatus) => {
+    if (!order || isUpdating) return
+
+    setIsUpdating(true)
+    try {
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', order.id)
+
+      if (updateError) throw updateError
+
+      // Registrar el evento de cambio de estado
+      const { error: eventError } = await supabase
+        .from('order_events')
+        .insert({
+          order_id: order.id,
+          type: 'status_changed',
+          description: `Estado actualizado a: ${newStatus}`,
+          metadata: {
+            old_status: order.status,
+            new_status: newStatus
+          }
+        })
+
+      if (eventError) throw eventError
+
+      toast.success('Estado actualizado correctamente')
+    } catch (error) {
+      console.error('Error al actualizar estado:', error)
+      toast.error('Error al actualizar el estado')
+    } finally {
+      setIsUpdating(false)
     }
   }
 
-  const handleAddNote = (text: string) => {
-    const newEvent: OrderEvent = {
-      id: crypto.randomUUID(),
-      order_id: order.id,
-      type: "note_added",
-      description: text,
-      created_at: new Date().toISOString(),
-      metadata: {
-        automated: false
-      }
-    }
+  const handleAddNote = async (text: string) => {
+    if (!order) return
 
-    const currentEvents = order.events || []
-    updateOrder(order.id, {
-      events: [newEvent, ...currentEvents]
-    })
+    try {
+      const { error } = await supabase
+        .from('order_events')
+        .insert({
+          order_id: order.id,
+          type: 'note_added',
+          description: text,
+          metadata: {
+            automated: false
+          }
+        })
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error al añadir nota:', error)
+      toast.error('Error al añadir la nota')
+    }
   }
 
-  const getProgressPercentage = () => {
-    const currentIndex = statusOrder.indexOf(order.status as any)
-    if (currentIndex === -1) return 0
-    return ((currentIndex + 1) / statusOrder.length) * 100
+  if (isLoading) {
+    return <div>Cargando...</div>
+  }
+
+  if (error || !order) {
+    return <div>Error al cargar el pedido</div>
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header y Navegación */}
-        <div className="flex items-center justify-between">
-          <Link to="/admin/orders">
-            <Button variant="ghost" className="gap-2">
-              <ChevronLeft className="h-4 w-4" /> Volver a pedidos
-            </Button>
-          </Link>
-        </div>
-
-        {/* Estado del Pedido y Progreso */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
-            <OrderStatusBadge status={order.status} />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm text-gray-500">
-              {statusOrder.map((status) => (
-                <span key={status} className="capitalize">
-                  {status.replace('_', ' ')}
-                </span>
-              ))}
-            </div>
-            <Progress value={getProgressPercentage()} className="h-2" />
-          </div>
-        </div>
-
-        {/* Control de Estado */}
-        <OrderCustomerInfo 
-          order={order} 
+    <div className="space-y-6 p-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <OrderStatusControl
+          currentStatus={order.status}
+          orderType={order.type}
           onStatusChange={handleStatusChange}
         />
-
-        {/* Grid de 2 columnas para información principal */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <OrderBasicInfo order={order} />
-            <OrderProductInfo order={order} />
-            {order.type === "physical" && <OrderShippingInfo order={order} />}
-          </div>
-          
-          <div className="space-y-6">
-            <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
-            <OrderDocumentation order={order} />
-            <OrderNotes 
-              order={order} 
-              onAddNote={handleAddNote}
-            />
-          </div>
-        </div>
-
-        {/* Historial completo */}
-        <OrderHistory events={order.events} />
-
-        <OrderStatusConfirmDialog
-          open={showConfirmDialog}
-          onOpenChange={setShowConfirmDialog}
-          pendingStatus={pendingStatus}
-          onConfirm={confirmStatusChange}
-          orderType={order.type}
-        />
+        <OrderBasicInfo order={order} />
       </div>
-    </AdminLayout>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <OrderProductInfo order={order} />
+        <OrderDocumentation order={order} />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <OrderNotes 
+          order={order} 
+          onAddNote={handleAddNote}
+        />
+        <OrderHistory events={order.events || []} />
+      </div>
+    </div>
   )
 }

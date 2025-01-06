@@ -69,6 +69,8 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
     )
   }
 
+  const features = Array.isArray(product.features) ? product.features : []
+
   return (
     <Card>
       <CardHeader>
@@ -129,7 +131,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
 
           <div>
             <h3 className="font-medium mb-1">Estado del Producto</h3>
-            <Badge variant={product.status === 'active' ? 'secondary' : 'destructive'}>
+            <Badge variant={product.status === 'active' ? 'default' : 'destructive'}>
               {product.status === 'active' ? 'Activo' : 'Inactivo'}
             </Badge>
           </div>
@@ -149,12 +151,12 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           </div>
         )}
 
-        {product.features && Array.isArray(product.features) && product.features.length > 0 && (
+        {features.length > 0 && (
           <div className="mt-6">
             <h3 className="font-medium mb-2">Características</h3>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-              {(product.features as string[]).map((feature, index) => (
-                <li key={index}>{feature}</li>
+              {features.map((feature, index) => (
+                <li key={index}>{String(feature)}</li>
               ))}
             </ul>
           </div>
