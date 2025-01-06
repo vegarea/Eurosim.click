@@ -25,15 +25,6 @@ export function ProductButton({
     if (onSelect) onSelect();
   };
 
-  // Función para determinar el color de fondo basado en el precio
-  const getBackgroundColor = (price: number) => {
-    // Ordenados de menor a mayor precio
-    if (price <= 50000) return "#D3E4FD"; // Azul suave para el plan más básico
-    if (price <= 70000) return "#F2FCE2"; // Verde suave para el plan medio-bajo
-    if (price <= 90000) return "#FEC6A1"; // Naranja suave para el plan medio-alto
-    return "#FFDEE2"; // Rosa suave para el plan premium
-  };
-
   return (
     <button
       onClick={handleClick}
@@ -42,7 +33,11 @@ export function ProductButton({
         "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
         "flex items-center gap-2 md:gap-3",
         isSelected ? "shadow-lg" : "",
-        `bg-[${getBackgroundColor(product.price)}]`
+        // Colores directos para cada plan
+        product.price <= 50000 && "bg-[#D3E4FD]", // Azul suave para el plan básico
+        product.price > 50000 && product.price <= 70000 && "bg-[#F2FCE2]", // Verde suave para el plan medio
+        product.price > 70000 && product.price <= 90000 && "bg-[#FEC6A1]", // Naranja suave para el plan L
+        product.price > 90000 && "bg-[#FFDEE2]" // Rosa suave para el plan premium
       )}
     >
       {isPopular && (
