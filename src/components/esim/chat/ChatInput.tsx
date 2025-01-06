@@ -29,17 +29,16 @@ export function ChatInput({
   }, [showChat])
 
   const handleClick = () => {
+    console.log("Intento de click - Estado del botón:", {
+      input: input,
+      inputTrimmed: input.trim(),
+      inputLength: input.length,
+      isButtonDisabled: !input.trim()
+    })
     if (input.trim()) {
       onSend()
     }
   }
-
-  console.log("ChatInput renderizado - Estado actual:", {
-    input,
-    isLoading,
-    showChat,
-    buttonDisabled: !input.trim()
-  })
 
   return (
     <div className="flex flex-col md:flex-row gap-2">
@@ -53,12 +52,14 @@ export function ChatInput({
           placeholder={placeholder}
           value={input}
           onChange={(e) => {
-            console.log("Input cambiado:", {
-              nuevoValor: e.target.value,
-              trimmed: e.target.value.trim(),
-              longitud: e.target.value.length
-            })
-            setInput(e.target.value)
+            const newValue = e.target.value;
+            console.log("Input actualizado:", {
+              valor: newValue,
+              trimmed: newValue.trim(),
+              longitud: newValue.length,
+              tieneContenido: Boolean(newValue.trim())
+            });
+            setInput(newValue)
           }}
           className={cn(
             "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
