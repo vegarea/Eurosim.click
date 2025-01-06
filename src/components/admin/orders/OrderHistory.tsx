@@ -1,4 +1,4 @@
-import { OrderEvent } from "@/types/database/common"
+import { OrderEvent, OrderEventMetadata } from "@/types/database/common"
 import {
   Card,
   CardContent,
@@ -91,24 +91,6 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
     }
   }
 
-  if (events.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-gray-500" />
-            Historial del Pedido
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-500 py-4">
-            No hay eventos registrados para este pedido
-          </p>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <TooltipProvider>
       <Card>
@@ -120,63 +102,66 @@ export function OrderHistory({ events = [] }: OrderHistoryProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {events.map((event) => (
-              <div 
-                key={event.id}
-                className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="mt-1">
-                  {event.metadata?.automated ? (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Bot className="h-4 w-4 text-gray-500" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Evento Automático</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <User className="h-4 w-4 text-gray-500" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Evento Manual</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant="secondary"
-                        className={getEventBadgeColor(event.type)}
-                      >
-                        <span className="flex items-center gap-1">
-                          {getEventIcon(event.type)}
-                          {getEventLabel(event.type)}
-                        </span>
-                      </Badge>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {formatDateTime(event.created_at)}
-                    </span>
+            {events.map((event) => {
+              const metadata = event.metadata as OrderEventMetadata
+              return (
+                <div 
+                  key={event.id}
+                  className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="mt-1">
+                    {metadata?.automated ? (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Bot className="h-4 w-4 text-gray-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Evento Automático</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <User className="h-4 w-4 text-gray-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Evento Manual</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
-                  <p className="text-gray-700">{event.description}</p>
-                  {event.metadata?.oldStatus && event.metadata?.newStatus && (
-                    <p className="text-sm text-gray-500">
-                      Cambio de estado: {event.metadata.oldStatus} → {event.metadata.newStatus}
-                    </p>
-                  )}
-                  {event.metadata?.details && (
-                    <p className="text-sm text-gray-500">
-                      {event.metadata.details}
-                    </p>
-                  )}
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant="secondary"
+                          className={getEventBadgeColor(event.type)}
+                        >
+                          <span className="flex items-center gap-1">
+                            {getEventIcon(event.type)}
+                            {getEventLabel(event.type)}
+                          </span>
+                        </Badge>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {formatDateTime(event.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{event.description}</p>
+                    {metadata?.oldStatus && metadata?.newStatus && (
+                      <p className="text-sm text-gray-500">
+                        Cambio de estado: {metadata.oldStatus} → {metadata.newStatus}
+                      </p>
+                    )}
+                    {metadata?.details && (
+                      <p className="text-sm text-gray-500">
+                        {metadata.details}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>

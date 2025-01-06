@@ -1,5 +1,7 @@
 import { Json } from "@/integrations/supabase/types"
 
+export type { Json }
+
 export interface ShippingAddress {
   street: string
   city: string
@@ -9,13 +11,21 @@ export interface ShippingAddress {
   phone?: string
 }
 
+export interface OrderEventMetadata {
+  automated?: boolean
+  oldStatus?: string
+  newStatus?: string
+  details?: string
+  [key: string]: any
+}
+
 export interface OrderEvent {
   id: string
   order_id: string
   type: EventType
   description: string
   user_id?: string | null
-  metadata?: Json
+  metadata?: OrderEventMetadata
   created_at: string
 }
 

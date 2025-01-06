@@ -12,11 +12,16 @@ import {
 import { CustomersTable } from "./customers/CustomersTable"
 import { CustomerDetailsModal } from "./customers/CustomerDetailsModal"
 import { Customer } from "@/types/database/customers"
+import { Order } from "@/types/database/orders"
+
+export interface CustomerWithOrders extends Customer {
+  orders: Order[]
+}
 
 export function AdminCustomers() {
   const { customers, isLoading } = useCustomers()
   const [search, setSearch] = useState("")
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithOrders | null>(null)
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   // Filtrar clientes basado en la búsqueda
@@ -50,7 +55,7 @@ export function AdminCustomers() {
             customers={filteredCustomers}
             isLoading={isLoading}
             onViewDetails={(customer) => {
-              setSelectedCustomer(customer)
+              setSelectedCustomer(customer as CustomerWithOrders)
               setIsDetailsOpen(true)
             }}
           />
