@@ -7,7 +7,7 @@ interface ProductButtonProps {
   product: Product;
   isSelected: boolean;
   onClick: () => void;
-  onSelect?: () => void; // Añadimos esta prop para compatibilidad
+  onSelect?: () => void;
   isPopular?: boolean;
 }
 
@@ -15,7 +15,7 @@ export function ProductButton({
   product,
   isSelected, 
   onClick,
-  onSelect, // Añadimos esta prop
+  onSelect,
   isPopular = false
 }: ProductButtonProps) {
   const [amount, currency] = formatCurrency(product.price).split(' ');
@@ -25,16 +25,24 @@ export function ProductButton({
     if (onSelect) onSelect();
   };
 
+  // Función para determinar el color de fondo basado en el precio
+  const getBackgroundColor = (price: number) => {
+    // Ordenados de menor a mayor precio
+    if (price <= 50000) return "#D3E4FD"; // Azul suave para el plan más básico
+    if (price <= 70000) return "#F2FCE2"; // Verde suave para el plan medio-bajo
+    if (price <= 90000) return "#FEF7CD"; // Amarillo suave para el plan medio-alto
+    return "#FFDEE2"; // Rosa suave para el plan premium
+  };
+
   return (
     <button
       onClick={handleClick}
       className={cn(
-        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm relative",
-        "hover:shadow-lg hover:-translate-y-1",
+        "w-full p-2 md:p-4 rounded-xl relative",
+        "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
         "flex items-center gap-2 md:gap-3",
-        isSelected ? 
-          `bg-[#D3E4FD] shadow-lg` : 
-          `bg-[#D3E4FD] opacity-80 hover:opacity-100`
+        isSelected ? "shadow-lg" : "",
+        `bg-[${getBackgroundColor(product.price)}]`
       )}
     >
       {isPopular && (
@@ -44,9 +52,7 @@ export function ProductButton({
         </div>
       )}
       
-      <div className={cn(
-        "p-2 rounded-lg bg-white/50 backdrop-blur-sm"
-      )}>
+      <div className="p-2 rounded-lg bg-white/50">
         {product.type === 'physical' ? (
           <CreditCard className="h-4 w-4 text-gray-700" />
         ) : (
