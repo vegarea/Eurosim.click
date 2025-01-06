@@ -16,7 +16,6 @@ import { OrderNotes } from "@/components/admin/orders/OrderNotes"
 import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
-import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
 import { OrderEvent } from "@/types/database/common"
 
 const statusOrder = [
@@ -75,6 +74,7 @@ export default function OrderDetails() {
   const handleAddNote = (text: string) => {
     const newEvent: OrderEvent = {
       id: crypto.randomUUID(),
+      order_id: order.id,
       type: "note_added",
       description: text,
       created_at: new Date().toISOString(),
@@ -143,7 +143,10 @@ export default function OrderDetails() {
           <div className="space-y-6">
             <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
             <OrderDocumentation order={order} />
-            <OrderNotes order={order} onAddNote={handleAddNote} />
+            <OrderNotes 
+              order={order} 
+              onAddNote={handleAddNote}
+            />
           </div>
         </div>
 

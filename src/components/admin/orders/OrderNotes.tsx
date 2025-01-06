@@ -13,10 +13,11 @@ import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
 
 interface OrderNotesProps {
-  order: UIOrder;
+  order: UIOrder
+  onAddNote?: (text: string) => void
 }
 
-export function OrderNotes({ order }: OrderNotesProps) {
+export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
   const [newNote, setNewNote] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -43,6 +44,7 @@ export function OrderNotes({ order }: OrderNotesProps) {
       if (error) throw error
 
       setNewNote("")
+      onAddNote?.(newNote.trim())
       toast.success("Nota añadida correctamente")
     } catch (error) {
       console.error('Error al añadir nota:', error)

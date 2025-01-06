@@ -129,7 +129,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
 
           <div>
             <h3 className="font-medium mb-1">Estado del Producto</h3>
-            <Badge variant={product.status === 'active' ? 'success' : 'destructive'}>
+            <Badge variant={product.status === 'active' ? 'secondary' : 'destructive'}>
               {product.status === 'active' ? 'Activo' : 'Inactivo'}
             </Badge>
           </div>
@@ -153,7 +153,7 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           <div className="mt-6">
             <h3 className="font-medium mb-2">Características</h3>
             <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-              {product.features.map((feature, index) => (
+              {(product.features as string[]).map((feature, index) => (
                 <li key={index}>{feature}</li>
               ))}
             </ul>

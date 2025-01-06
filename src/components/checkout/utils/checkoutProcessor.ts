@@ -142,7 +142,7 @@ export class CheckoutProcessor {
       type: metadata.product_type,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
-      payment_method: "test",
+      payment_method: "stripe", // Cambiado de "test" a "stripe"
       payment_status: "pending",
       shipping_address: this.formData.shippingAddress as Json,
       tracking_number: null,

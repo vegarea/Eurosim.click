@@ -1,22 +1,11 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Upload, Trash2 } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { supabase } from "@/integrations/supabase/client"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 interface SiteImage {
   id: number
-  location: string
-  description: string
-  currentUrl: string
+  url: string
 }
 
 interface ImageTableProps {
@@ -26,22 +15,14 @@ interface ImageTableProps {
 }
 
 export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTableProps) {
-  const { toast } = useToast()
   const [uploading, setUploading] = useState(false)
 
-  const handleImageChange = async (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (id: number, file: File) => {
     try {
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('Debes seleccionar una imagen para subir.')
-      }
-
-      const file = event.target.files[0]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${id}-${Math.random()}.${fileExt}`
-
       setUploading(true)
-
-      const { error: uploadError, data } = await supabase.storage
+      
+      const fileName = `${crypto.randomUUID()}-${file.name}`
+      const { error: uploadError } = await supabase.storage
         .from('site_images')
         .upload(fileName, file)
 
@@ -49,8 +30,8 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
         throw uploadError
       }
 
-      // Obtener la URL pública de la imagen
-      const { data: { publicUrl } } = supabase.storage
+      const { data: { publicUrl } } = supabase
+        .storage
         .from('site_images')
         .getPublicUrl(fileName)
 
@@ -65,9 +46,11 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
         throw fetchError
       }
 
+      const currentHeroImages = currentSettings?.hero_images || {}
+      
       // Combinar los valores existentes con el nuevo
       const updatedHeroImages = {
-        ...(currentSettings?.hero_images || {}),
+        ...currentHeroImages,
         [id]: {
           url: publicUrl
         }
@@ -85,99 +68,33 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
         throw updateError
       }
 
-      // Actualizar el estado local
       onImageUpdate(id, publicUrl)
-
-      toast({
-        title: "Imagen actualizada",
-        description: "La nueva imagen se ha guardado correctamente.",
-      })
-      
-      console.log("Imagen subida exitosamente:", publicUrl)
-      
+      toast.success('Imagen actualizada correctamente')
     } catch (error) {
-      console.error("Error al subir la imagen:", error)
-      toast({
-        title: "Error al subir la imagen",
-        description: error.message,
-        variant: "destructive",
-      })
+      console.error('Error al subir la imagen:', error)
+      toast.error('Error al subir la imagen')
     } finally {
       setUploading(false)
     }
   }
 
-  const handleDeleteImage = async (id: number) => {
-    try {
-      // Aquí implementarías la lógica para eliminar la imagen
-      toast({
-        title: "Imagen eliminada",
-        description: "La imagen se ha eliminado correctamente.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error al eliminar la imagen",
-        description: "No se pudo eliminar la imagen.",
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Ubicación</TableHead>
-          <TableHead>Descripción</TableHead>
-          <TableHead>Vista previa</TableHead>
-          <TableHead>Acciones</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {images.map((image) => (
-          <TableRow key={image.id}>
-            <TableCell className="font-medium">{image.location}</TableCell>
-            <TableCell>{image.description}</TableCell>
-            <TableCell>
-              <img 
-                src={image.currentUrl} 
-                alt={image.description}
-                className="w-20 h-20 object-cover rounded-lg"
-              />
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => document.getElementById(`image-upload-${image.id}`)?.click()}
-                  disabled={uploading}
-                >
-                  <Upload className="h-4 w-4 mr-1" />
-                  Subir
-                </Button>
-                <Button 
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDeleteImage(image.id)}
-                  disabled={uploading}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Eliminar
-                </Button>
-                <input
-                  id={`image-upload-${image.id}`}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageChange(image.id, e)}
-                  disabled={uploading}
-                />
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div>
+      {images.map(image => (
+        <div key={image.id} className="flex items-center justify-between">
+          <img src={image.url} alt={`Image ${image.id}`} className="w-32 h-32 object-cover" />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files) {
+                handleImageUpload(image.id, e.target.files[0])
+              }
+            }}
+            disabled={uploading}
+          />
+        </div>
+      ))}
+    </div>
   )
 }

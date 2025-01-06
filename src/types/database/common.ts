@@ -1,4 +1,4 @@
-export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
+import { Json } from "@/integrations/supabase/types"
 
 export interface ShippingAddress {
   street: string
@@ -14,12 +14,8 @@ export interface OrderEvent {
   order_id: string
   type: EventType
   description: string
-  metadata?: {
-    oldStatus?: string
-    newStatus?: string
-    automated?: boolean
-    [key: string]: any
-  } | null
+  user_id?: string | null
+  metadata?: Json
   created_at: string
 }
 
