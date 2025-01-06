@@ -29,12 +29,17 @@ export function ChatInput({
   }, [showChat])
 
   const handleClick = () => {
-    console.log("ChatInput - handleClick llamado")
-    console.log("Estado del botón - input:", input, "isLoading:", isLoading)
     if (input.trim()) {
       onSend()
     }
   }
+
+  console.log("ChatInput renderizado - Estado actual:", {
+    input,
+    isLoading,
+    showChat,
+    buttonDisabled: !input.trim()
+  })
 
   return (
     <div className="flex flex-col md:flex-row gap-2">
@@ -48,7 +53,11 @@ export function ChatInput({
           placeholder={placeholder}
           value={input}
           onChange={(e) => {
-            console.log("Input cambiado a:", e.target.value)
+            console.log("Input cambiado:", {
+              nuevoValor: e.target.value,
+              trimmed: e.target.value.trim(),
+              longitud: e.target.value.length
+            })
             setInput(e.target.value)
           }}
           className={cn(
