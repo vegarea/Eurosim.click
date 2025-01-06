@@ -53,6 +53,22 @@ export function ImageTable({ images, onImageUpdate }: ImageTableProps) {
         .from('site_images')
         .getPublicUrl(fileName)
 
+      // Actualizar site_settings con la nueva URL
+      const { error: updateError } = await supabase
+        .from('site_settings')
+        .update({
+          hero_images: {
+            [id]: {
+              url: publicUrl
+            }
+          }
+        })
+        .eq('id', 1)
+
+      if (updateError) {
+        throw updateError
+      }
+
       // Actualizar el estado local
       onImageUpdate(id, publicUrl)
 

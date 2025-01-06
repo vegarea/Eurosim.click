@@ -360,18 +360,21 @@ export type Database = {
       site_settings: {
         Row: {
           created_at: string | null
+          hero_images: Json | null
           id: string
           logo_url: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          hero_images?: Json | null
           id?: string
           logo_url?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          hero_images?: Json | null
           id?: string
           logo_url?: string | null
           updated_at?: string | null

@@ -5,35 +5,18 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Palette, Image as ImageIcon } from "lucide-react"
 import { ImageTable } from "./components/ImageTable"
+import { useSiteImages } from "@/hooks/useSiteImages"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function StyleSettings() {
-  const [currentImages, setCurrentImages] = useState([
-    {
-      id: 1,
-      location: "Hero Principal",
-      description: "Imagen principal del home, persona usando teléfono",
-      currentUrl: "https://images.unsplash.com/photo-1516321497487-e288fb19713f",
-    },
-    {
-      id: 2,
-      location: "Hero E-SIM",
-      description: "Imagen de persona feliz usando su teléfono en la sección de E-SIM",
-      currentUrl: "https://images.unsplash.com/photo-1517022812141-23620dba5c23",
-    },
-    {
-      id: 3,
-      location: "Hero SIM Física",
-      description: "Imagen de persona feliz usando su teléfono en la sección de SIM física",
-      currentUrl: "https://images.unsplash.com/photo-1516321497487-e288fb19713f",
-    }
-  ])
+  const { data: images, refetch } = useSiteImages()
+  const queryClient = useQueryClient()
+  const [uploading, setUploading] = useState(false)
 
-  const handleImageUpdate = (id: number, newUrl: string) => {
-    setCurrentImages(prevImages =>
-      prevImages.map(img =>
-        img.id === id ? { ...img, currentUrl: newUrl } : img
-      )
-    )
+  const handleImageUpdate = async (id: number, newUrl: string) => {
+    // Invalidar la caché para forzar una recarga de las imágenes
+    await queryClient.invalidateQueries({ queryKey: ['site-images'] })
+    await refetch()
   }
 
   return (
@@ -92,10 +75,12 @@ export function StyleSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ImageTable 
-            images={currentImages}
-            onImageUpdate={handleImageUpdate}
-          />
+          {images && (
+            <ImageTable 
+              images={images}
+              onImageUpdate={handleImageUpdate}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

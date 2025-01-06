@@ -41,9 +41,10 @@ export function useSiteImages() {
 
       // Si hay configuraciones personalizadas, las usamos
       if (siteSettings?.hero_images) {
+        const heroImages = siteSettings.hero_images as Record<string, { url: string }>;
         return defaultImages.map(img => ({
           ...img,
-          currentUrl: siteSettings.hero_images[img.id]?.url || img.currentUrl
+          currentUrl: heroImages[img.id]?.url || img.currentUrl
         }));
       }
 
