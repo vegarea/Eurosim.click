@@ -1,41 +1,66 @@
-import { Order } from "./types"
-import { Badge } from "@/components/ui/badge"
+import { Order } from "@/types/database/orders"
 import {
   Card,
   CardContent,
 } from "@/components/ui/card"
+import { formatCurrency } from "@/utils/currency"
+import { Json } from "@/types/database/common"
 
 interface OrderBasicInfoProps {
   order: Order
 }
 
+interface ShippingAddress {
+  street: string
+  city: string
+  state: string
+  country: string
+  postal_code: string
+}
+
 export function OrderBasicInfo({ order }: OrderBasicInfoProps) {
+  const shippingAddress = order.shipping_address as ShippingAddress | null
+  const shippingCost = (order.metadata as any)?.shipping_cost || 0
+  const subtotal = order.total_amount - shippingCost
+
   return (
     <Card>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-6">
+          {/* Información de Pago */}
           <div>
-            <h3 className="font-medium mb-1">Cliente</h3>
-            <p>{order.customer_name}</p>
+            <h3 className="font-medium mb-3">Detalles del Pago</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span>{formatCurrency(subtotal)}</span>
+              </div>
+              {shippingCost > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span>Costo de envío</span>
+                  <span>{formatCurrency(shippingCost)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-medium pt-2 border-t">
+                <span>Total</span>
+                <span>{formatCurrency(order.total_amount)}</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="font-medium mb-1">Fecha</h3>
-            <p>{new Date(order.created_at || '').toLocaleDateString()}</p>
-          </div>
-          <div>
-            <h3 className="font-medium mb-1">Total</h3>
-            <p>${(order.total_amount / 100).toFixed(2)}</p>
-          </div>
-          <div>
-            <h3 className="font-medium mb-1">Tipo</h3>
-            <Badge variant="secondary" className="bg-gray-100">
-              {order.type === "physical" ? "SIM Física" : "E-SIM"}
-            </Badge>
-          </div>
-          <div>
-            <h3 className="font-medium mb-1">Método de Pago</h3>
-            <p className="capitalize">{order.payment_method || "No especificado"}</p>
-          </div>
+
+          {/* Dirección de Envío */}
+          {shippingAddress && (
+            <div>
+              <h3 className="font-medium mb-3">Dirección de Envío</h3>
+              <div className="text-sm space-y-1">
+                <p>{shippingAddress.street}</p>
+                <p>
+                  {shippingAddress.city}, {shippingAddress.state} {shippingAddress.postal_code}
+                </p>
+                <p>{shippingAddress.country}</p>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
