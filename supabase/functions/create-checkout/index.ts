@@ -71,9 +71,7 @@ serve(async (req) => {
       success_url: `${req.headers.get('origin')}/thank-you?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.get('origin')}/checkout`,
       metadata,
-      shipping_address_collection: cartItems[0].metadata.product_type === 'physical' ? {
-        allowed_countries: ['MX'],
-      } : undefined,
+      // Removemos shipping_address_collection para que no solicite dirección
     })
 
     console.log('Stripe session created:', {
