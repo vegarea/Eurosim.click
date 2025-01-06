@@ -1,5 +1,5 @@
-import { Order } from "./types"
-import { User, ExternalLink, Clock } from "lucide-react"
+import { Order } from "@/types/database/orders"
+import { User, ExternalLink, Clock, Mail, Phone } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { OrderStatusControl } from "./OrderStatusControl"
-import { OrderStatus } from "./types"
+import { OrderStatus } from "@/types/database/enums"
 
 interface OrderCustomerInfoProps {
   order: Order
@@ -16,7 +16,8 @@ interface OrderCustomerInfoProps {
 }
 
 export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoProps) {
-  const formatDateTime = (date: string) => {
+  const formatDateTime = (date: string | null) => {
+    if (!date) return "No especificado"
     return new Date(date).toLocaleString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -39,31 +40,42 @@ export function OrderCustomerInfo({ order, onStatusChange }: OrderCustomerInfoPr
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <h3 className="font-medium mb-1">Cliente</h3>
-              <p className="flex items-center gap-2">
-                {order.customer_name}
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-6 px-2"
-                  onClick={() => window.open(`/admin/customers/${order.customer_id}`, '_blank')}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
-              </p>
+              <div className="flex items-center gap-2">
+                <p>{order.customer?.name || "Cliente no registrado"}</p>
+                {order.customer_id && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-6 px-2"
+                    onClick={() => window.open(`/admin/customers/${order.customer_id}`, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
+            
             <div>
               <h3 className="font-medium mb-1">Email</h3>
-              <p>{order.customer_email || "No especificado"}</p>
+              <p className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-gray-500" />
+                {order.customer?.email || "No especificado"}
+              </p>
             </div>
+
             <div>
               <h3 className="font-medium mb-1">Teléfono</h3>
-              <p>{order.customer_phone || "No especificado"}</p>
+              <p className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-gray-500" />
+                {order.customer?.phone || "No especificado"}
+              </p>
             </div>
+
             <div>
               <h3 className="font-medium mb-1">Fecha y Hora</h3>
               <div className="flex items-center gap-1 text-gray-600">
                 <Clock className="h-4 w-4" />
-                <span>{formatDateTime(order.created_at || '')}</span>
+                <span>{formatDateTime(order.created_at)}</span>
               </div>
             </div>
           </div>

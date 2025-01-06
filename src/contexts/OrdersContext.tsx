@@ -1,78 +1,86 @@
-import { createContext, useContext, ReactNode } from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { supabase } from "@/integrations/supabase/client"
+import { createContext, useContext, useState, useEffect } from "react"
 import { Order } from "@/types/database/orders"
+import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 
 interface OrdersContextType {
   orders: Order[]
-  isLoading: boolean
+  loading: boolean
   error: Error | null
-  updateOrder: (orderId: string, updates: Partial<Order>) => void
+  updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>
 }
 
-const OrdersContext = createContext<OrdersContextType | undefined>(undefined)
+const OrdersContext = createContext<OrdersContextType>({
+  orders: [],
+  loading: false,
+  error: null,
+  updateOrder: async () => {},
+})
 
-export function OrdersProvider({ children }: { children: ReactNode }) {
-  const queryClient = useQueryClient()
+export function OrdersProvider({ children }: { children: React.ReactNode }) {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-  const { data: orders = [], isLoading, error } = useQuery({
-    queryKey: ['orders'],
-    queryFn: async () => {
+  useEffect(() => {
+    fetchOrders()
+  }, [])
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true)
       const { data, error } = await supabase
         .from('orders')
         .select(`
           *,
-          customers (
-            name,
-            email,
-            phone
-          )
+          customer:customers(*)
         `)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      return data as Order[]
-    }
-  })
 
-  const updateOrderMutation = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Order> & { id: string }) => {
-      const { data, error } = await supabase
+      setOrders(data)
+    } catch (err) {
+      console.error('Error fetching orders:', err)
+      setError(err as Error)
+      toast.error('Error al cargar los pedidos')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateOrder = async (orderId: string, updates: Partial<Order>) => {
+    try {
+      const { error } = await supabase
         .from('orders')
         .update(updates)
-        .eq('id', id)
-        .select()
-        .single()
+        .eq('id', orderId)
 
       if (error) throw error
-      return data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
+
+      // Actualizar el estado local
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, ...updates } : order
+      ))
+
       toast.success('Pedido actualizado correctamente')
-    },
-    onError: (error) => {
-      console.error('Error updating order:', error)
+    } catch (err) {
+      console.error('Error updating order:', err)
       toast.error('Error al actualizar el pedido')
+      throw err
     }
-  })
+  }
 
   return (
-    <OrdersContext.Provider value={{
-      orders,
-      isLoading,
-      error: error as Error | null,
-      updateOrder: (id, updates) => updateOrderMutation.mutate({ id, ...updates })
-    }}>
+    <OrdersContext.Provider value={{ orders, loading, error, updateOrder }}>
       {children}
     </OrdersContext.Provider>
   )
 }
 
-export function useOrders() {
+export const useOrders = () => {
   const context = useContext(OrdersContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useOrders must be used within an OrdersProvider')
   }
   return context
