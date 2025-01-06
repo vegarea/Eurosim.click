@@ -21,10 +21,8 @@ const getButtonColor = (productTitle: string) => {
       return 'bg-[#FEF7CD]'; // Amarillo suave
     case 'E-sim XL':
       return 'bg-[#FFDEE2]'; // Rosa suave
-    case 'E-sim XXL':
-      return 'bg-[#E5DEFF]'; // Morado suave
     default:
-      return 'bg-[#B8E2FF]'; // Azul cielo claro
+      return 'bg-white'; // Color por defecto
   }
 };
 
