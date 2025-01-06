@@ -7,18 +7,37 @@ interface ProductButtonProps {
   product: Product;
   isSelected: boolean;
   onClick: () => void;
-  onSelect?: () => void; // Añadimos esta prop para compatibilidad
+  onSelect?: () => void;
   isPopular?: boolean;
 }
+
+// Función para obtener el color basado en el índice del producto
+const getButtonColor = (productId: string) => {
+  const colors = {
+    bg: [
+      'bg-[#D3E4FD]', // Soft Blue
+      'bg-[#F2FCE2]', // Soft Green
+      'bg-[#FEF7CD]', // Soft Yellow
+      'bg-[#FFDEE2]', // Soft Pink
+      'bg-[#E5DEFF]', // Soft Purple
+      'bg-[#FDE1D3]', // Soft Peach
+    ];
+  };
+
+  // Usar los últimos caracteres del ID como índice
+  const index = parseInt(productId.slice(-6), 16) % colors.bg.length;
+  return colors.bg[index];
+};
 
 export function ProductButton({ 
   product,
   isSelected, 
   onClick,
-  onSelect, // Añadimos esta prop
+  onSelect,
   isPopular = false
 }: ProductButtonProps) {
   const [amount, currency] = formatCurrency(product.price).split(' ');
+  const buttonColor = getButtonColor(product.id);
 
   const handleClick = () => {
     onClick();
@@ -33,8 +52,8 @@ export function ProductButton({
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-3",
         isSelected ? 
-          `bg-[#D3E4FD] shadow-lg` : 
-          `bg-[#D3E4FD] opacity-80 hover:opacity-100`
+          `${buttonColor} shadow-lg` : 
+          `${buttonColor} opacity-80 hover:opacity-100`
       )}
     >
       {isPopular && (
