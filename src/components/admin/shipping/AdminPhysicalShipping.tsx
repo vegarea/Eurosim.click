@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { OrderEvent } from "@/types/database/common"
 import { ShippingSettings } from "./components/ShippingSettings"
 import { ShippingTabs } from "./components/ShippingTabs"
+import { usePhysicalOrders } from "./components/usePhysicalOrders"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -16,18 +17,7 @@ export function AdminPhysicalShipping() {
   const [showDeliveredDialog, setShowDeliveredDialog] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  // Filtramos y organizamos los pedidos físicos por estado
-  const pendingOrders = orders.filter(
-    order => order.type === "physical" && order.status === "processing"
-  )
-
-  const shippedOrders = orders.filter(
-    order => order.type === "physical" && order.status === "shipped"
-  )
-
-  const deliveredOrders = orders.filter(
-    order => order.type === "physical" && order.status === "delivered"
-  )
+  const { pendingOrders, shippedOrders, deliveredOrders } = usePhysicalOrders(orders)
 
   const handleConfirmShipment = async (
     orderId: string, 
@@ -174,34 +164,32 @@ export function AdminPhysicalShipping() {
         columns={columns}
       />
 
-      {/* Diálogo de confirmación de envío */}
       {selectedOrder && (
-        <ShippingConfirmDialog
-          open={showConfirmDialog}
-          onOpenChange={setShowConfirmDialog}
-          onConfirm={(trackingNumber, carrier) => {
-            if (selectedOrder && trackingNumber && carrier) {
-              handleConfirmShipment(selectedOrder.id, trackingNumber, carrier)
-            }
-          }}
-          orderId={selectedOrder.id}
-          mode="ship"
-        />
-      )}
+        <>
+          <ShippingConfirmDialog
+            open={showConfirmDialog}
+            onOpenChange={setShowConfirmDialog}
+            onConfirm={(trackingNumber, carrier) => {
+              if (selectedOrder && trackingNumber && carrier) {
+                handleConfirmShipment(selectedOrder.id, trackingNumber, carrier)
+              }
+            }}
+            orderId={selectedOrder.id}
+            mode="ship"
+          />
 
-      {/* Diálogo de confirmación de entrega */}
-      {selectedOrder && (
-        <ShippingConfirmDialog
-          open={showDeliveredDialog}
-          onOpenChange={setShowDeliveredDialog}
-          onConfirm={() => {
-            if (selectedOrder) {
-              handleConfirmDelivery(selectedOrder.id)
-            }
-          }}
-          orderId={selectedOrder.id}
-          mode="deliver"
-        />
+          <ShippingConfirmDialog
+            open={showDeliveredDialog}
+            onOpenChange={setShowDeliveredDialog}
+            onConfirm={() => {
+              if (selectedOrder) {
+                handleConfirmDelivery(selectedOrder.id)
+              }
+            }}
+            orderId={selectedOrder.id}
+            mode="deliver"
+          />
+        </>
       )}
     </div>
   )
