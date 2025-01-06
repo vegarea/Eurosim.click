@@ -1,9 +1,12 @@
 import { Phone } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSiteImages } from "@/hooks/useSiteImages";
 
 export function InternationalCalling() {
   const isMobile = useIsMobile();
+  const { data: images } = useSiteImages();
+  const internationalImage = images?.find(img => img.id === 3)?.currentUrl;
 
   return (
     <section className="py-12 lg:py-24">
@@ -16,12 +19,19 @@ export function InternationalCalling() {
         >
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Espacio para la imagen */}
+              {/* Imagen */}
               <div className="h-64 md:h-full bg-gray-100 min-h-[300px]">
-                {/* La imagen se añadirá después */}
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  <span>Imagen pendiente</span>
-                </div>
+                {internationalImage ? (
+                  <img 
+                    src={internationalImage} 
+                    alt="Llamadas internacionales" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <span>Imagen pendiente</span>
+                  </div>
+                )}
               </div>
 
               {/* Contenido */}
