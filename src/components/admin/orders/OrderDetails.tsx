@@ -64,29 +64,16 @@ export default function OrderDetails() {
     setShowConfirmDialog(true)
   }
 
-  const confirmStatusChange = () => {
+  const confirmStatusChange = async () => {
     if (pendingStatus) {
-      updateOrder(order.id, { status: pendingStatus })
-      toast.success("Estado actualizado correctamente")
-      setShowConfirmDialog(false)
-    }
-  }
-
-  const handleAddNote = (text: string) => {
-    const newEvent: OrderEvent = {
-      id: crypto.randomUUID(),
-      type: "note_added",
-      description: text,
-      created_at: new Date().toISOString(),
-      metadata: {
-        automated: false
+      try {
+        await updateOrder(order.id, { status: pendingStatus })
+        toast.success("Estado actualizado correctamente")
+        setShowConfirmDialog(false)
+      } catch (error) {
+        toast.error("Error al actualizar el estado")
       }
     }
-
-    const currentEvents = order.events || []
-    updateOrder(order.id, {
-      events: [newEvent, ...currentEvents]
-    })
   }
 
   const getProgressPercentage = () => {
