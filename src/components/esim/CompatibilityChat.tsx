@@ -17,6 +17,8 @@ export function CompatibilityChat() {
   const [isTyping, setIsTyping] = useState(false)
 
   const sendMessage = async (message: string) => {
+    if (!message.trim()) return
+
     try {
       setIsLoading(true)
       setShowChat(true)
@@ -65,11 +67,6 @@ export function CompatibilityChat() {
     }
   }
 
-  const getPlaceholder = () => {
-    if (!showChat) return "¿Cuál es el modelo de tu teléfono?"
-    return "Escribe tu pregunta aquí"
-  }
-
   return (
     <div className="flex flex-col p-4 md:p-8">
       <div className={cn(
@@ -97,9 +94,9 @@ export function CompatibilityChat() {
         input={input}
         setInput={setInput}
         isLoading={isLoading}
-        onSend={() => input.trim() && sendMessage(input.trim())}
+        onSend={() => sendMessage(input)}
         showChat={showChat}
-        placeholder={getPlaceholder()}
+        placeholder={!showChat ? "¿Cuál es el modelo de tu teléfono?" : "Escribe tu pregunta aquí"}
       />
     </div>
   )

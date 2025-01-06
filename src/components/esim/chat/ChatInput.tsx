@@ -28,12 +28,6 @@ export function ChatInput({
     }
   }, [showChat])
 
-  const handleSend = () => {
-    if (input.trim() && !isLoading) {
-      onSend()
-    }
-  }
-
   return (
     <div className="flex flex-col md:flex-row gap-2">
       <div className="relative flex-1">
@@ -51,15 +45,15 @@ export function ChatInput({
             !showChat && "pl-10"
           )}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && input.trim() && !isLoading) {
-              handleSend()
+            if (e.key === 'Enter' && input.trim()) {
+              onSend()
             }
           }}
         />
       </div>
       <Button 
-        onClick={handleSend}
-        disabled={!input.trim() || isLoading}
+        onClick={onSend}
+        disabled={!input.trim()}
         className={cn(
           "w-full md:w-auto",
           !showChat && "bg-gradient-to-r from-primary to-secondary hover:opacity-90"
