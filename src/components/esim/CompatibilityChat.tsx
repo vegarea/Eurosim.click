@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -18,6 +18,20 @@ export function CompatibilityChat() {
   const [isLoading, setIsLoading] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+  // Función para hacer scroll al último mensaje
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current
+      scrollContainer.scrollTop = scrollContainer.scrollHeight
+    }
+  }
+
+  // Efecto para hacer scroll cuando se añaden nuevos mensajes
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const sendMessage = async (message: string) => {
     try {
@@ -112,7 +126,10 @@ export function CompatibilityChat() {
         "transition-all duration-500 ease-in-out",
         !showChat ? "h-0 opacity-0" : "h-[500px] opacity-100"
       )}>
-        <ScrollArea className="flex-1 p-4 border rounded-lg mb-4">
+        <div 
+          ref={scrollAreaRef}
+          className="flex-1 p-4 border rounded-lg mb-4 overflow-y-auto h-[420px]"
+        >
           <div className="space-y-4">
             <AnimatePresence>
               {messages.map((message, index) => (
@@ -176,7 +193,7 @@ export function CompatibilityChat() {
               )}
             </AnimatePresence>
           </div>
-        </ScrollArea>
+        </div>
 
         <div className="flex gap-2">
           <Input
