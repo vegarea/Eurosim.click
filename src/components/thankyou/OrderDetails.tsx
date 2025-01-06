@@ -6,8 +6,8 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {
-  // Cast shipping_address to the correct type
-  const shippingAddress = order.shipping_address as ShippingAddress | null;
+  // Cast shipping_address to the correct type with type assertion
+  const shippingAddress = order.shipping_address as unknown as ShippingAddress | null;
 
   return (
     <div className="space-y-6">

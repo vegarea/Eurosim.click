@@ -42,7 +42,7 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
         throw fetchError
       }
 
-      const currentHeroImages = currentSettings?.hero_images || {}
+      const currentHeroImages = currentSettings?.hero_images as Record<string, { url: string }> || {}
       
       // Actualizar site_settings con la nueva URL
       const { error: updateError } = await supabase

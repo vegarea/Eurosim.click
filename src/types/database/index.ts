@@ -1,17 +1,18 @@
-// Re-export everything from enums except EventType
-export { 
+// Re-export everything from enums as types
+export type { 
   OrderStatus,
   OrderType,
   PaymentMethod,
   PaymentStatus,
   ProductStatus,
   ProductType,
-  CustomerGender
+  CustomerGender,
+  EventType
 } from "./enums";
 
 // Export everything from other files
-export * from "./common";
-export * from "./customers";
-export * from "./orders";
-export * from "./orderItems";
-export * from "./products";
+export type * from "./common";
+export type * from "./customers";
+export type * from "./orders";
+export type * from "./orderItems";
+export type * from "./products";
