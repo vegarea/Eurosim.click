@@ -1,199 +1,176 @@
 import { useState } from "react"
-import { ShippingTabs } from "./components/ShippingTabs"
-import { ShippingSettings } from "./components/ShippingSettings"
 import { useOrders } from "@/contexts/OrdersContext"
-import { ColumnDef } from "@tanstack/react-table"
 import { Order } from "@/types/database/orders"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Truck, Package, CheckCircle } from "lucide-react"
+import { OrderStatus } from "@/types/database/enums"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
-import { createShippingConfirmationEvent, createDeliveryConfirmationEvent } from "./utils/shippingEvents"
+import { OrderEvent } from "@/types/database/common"
 
 export function AdminPhysicalShipping() {
-  const { orders, updateOrder } = useOrders()
+  const { orders, refetchOrders } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [showShippingDialog, setShowShippingDialog] = useState(false)
-  const [dialogMode, setDialogMode] = useState<'ship' | 'deliver'>('ship')
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
 
-  // Filtrar pedidos por estado
-  const pendingOrders = orders.filter(order => 
-    order.type === 'physical' && order.status === 'processing'
-  )
-  const shippedOrders = orders.filter(order => 
-    order.type === 'physical' && order.status === 'shipped'
-  )
-  const deliveredOrders = orders.filter(order => 
-    order.type === 'physical' && order.status === 'delivered'
+  const physicalOrders = orders.filter(
+    order => order.type === "physical" && 
+    ["processing", "shipped"].includes(order.status)
   )
 
-  const handleShippingConfirm = async (trackingNumber?: string, carrier?: string) => {
-    if (!selectedOrder) return
-
+  const handleConfirmShipment = async (
+    orderId: string, 
+    trackingNumber: string, 
+    carrier: string
+  ) => {
     try {
-      if (dialogMode === 'ship') {
-        await updateOrder(selectedOrder.id, {
-          status: 'shipped',
+      setIsUpdating(true)
+
+      // Actualizar la orden
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({
+          status: 'shipped' as OrderStatus,
           tracking_number: trackingNumber,
           carrier: carrier
         })
+        .eq('id', orderId)
 
-        const { error: eventError } = await supabase
-          .from('order_events')
-          .insert(createShippingConfirmationEvent(selectedOrder.id, trackingNumber!, carrier!))
+      if (orderError) throw orderError
 
-        if (eventError) throw eventError
-
-      } else { // deliver mode
-        await updateOrder(selectedOrder.id, {
-          status: 'delivered'
-        })
-
-        const { error: eventError } = await supabase
-          .from('order_events')
-          .insert(createDeliveryConfirmationEvent(selectedOrder.id))
-
-        if (eventError) throw eventError
+      // Crear evento de envío
+      const shippingEvent: Omit<OrderEvent, "id"> = {
+        order_id: orderId,
+        type: "shipping_updated",
+        description: `Pedido enviado con ${carrier}. Número de seguimiento: ${trackingNumber}`,
+        metadata: {
+          carrier,
+          tracking_number: trackingNumber,
+          automated: false
+        },
+        created_at: new Date().toISOString()
       }
 
-      toast.success(
-        dialogMode === 'ship' 
-          ? 'Envío confirmado correctamente'
-          : 'Entrega confirmada correctamente'
-      )
-      setShowShippingDialog(false)
-      setSelectedOrder(null)
+      const { error: eventError } = await supabase
+        .from('order_events')
+        .insert(shippingEvent)
+
+      if (eventError) throw eventError
+
+      await refetchOrders()
+      toast.success("Envío confirmado correctamente")
+      setShowConfirmDialog(false)
     } catch (error) {
       console.error('Error al confirmar envío:', error)
-      toast.error(
-        dialogMode === 'ship'
-          ? 'Error al confirmar el envío'
-          : 'Error al confirmar la entrega'
-      )
+      toast.error("Error al confirmar el envío")
+    } finally {
+      setIsUpdating(false)
     }
   }
 
-  const columns: ColumnDef<Order>[] = [
-    {
-      accessorKey: "id",
-      header: "ID Pedido",
-      cell: ({ row }) => {
-        const id = row.getValue("id") as string
-        return <span className="font-medium">#{id.substring(0,8)}</span>
+  const handleConfirmDelivery = async (orderId: string) => {
+    try {
+      setIsUpdating(true)
+
+      // Actualizar estado de la orden
+      const { error: orderError } = await supabase
+        .from('orders')
+        .update({ status: 'delivered' as OrderStatus })
+        .eq('id', orderId)
+
+      if (orderError) throw orderError
+
+      // Crear evento de entrega
+      const deliveryEvent: Omit<OrderEvent, "id"> = {
+        order_id: orderId,
+        type: "status_changed",
+        description: "Pedido marcado como entregado",
+        metadata: {
+          old_status: "shipped",
+          new_status: "delivered",
+          automated: false
+        },
+        created_at: new Date().toISOString()
       }
-    },
-    {
-      accessorKey: "customer",
-      header: "Cliente",
-      cell: ({ row }) => {
-        const order = row.original
-        return <span>{order.customer?.name || 'Cliente no registrado'}</span>
-      }
-    },
-    {
-      accessorKey: "created_at",
-      header: "Fecha",
-      cell: ({ row }) => {
-        const date = row.getValue("created_at") as string
-        return new Date(date).toLocaleDateString()
-      }
-    },
-    {
-      accessorKey: "status",
-      header: "Estado",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string
-        return (
-          <Badge 
-            variant="secondary"
-            className={
-              status === 'processing' ? "bg-blue-100 text-blue-800" :
-              status === 'shipped' ? "bg-orange-100 text-orange-800" :
-              "bg-green-100 text-green-800"
-            }
-          >
-            {status === 'processing' ? <Package className="w-4 h-4 mr-1" /> :
-             status === 'shipped' ? <Truck className="w-4 h-4 mr-1" /> :
-             <CheckCircle className="w-4 h-4 mr-1" />
-            }
-            {status === 'processing' ? 'En Preparación' :
-             status === 'shipped' ? 'En Tránsito' :
-             'Entregado'
-            }
-          </Badge>
-        )
-      }
-    },
-    {
-      accessorKey: "tracking_number",
-      header: "Tracking",
-      cell: ({ row }) => row.getValue("tracking_number") || "-"
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        const order = row.original
-        return (
-          <div className="flex gap-2">
-            {order.status === 'processing' && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setSelectedOrder(order)
-                  setDialogMode('ship')
-                  setShowShippingDialog(true)
-                }}
-              >
-                Confirmar Envío
-              </Button>
-            )}
-            {order.status === 'shipped' && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setSelectedOrder(order)
-                  setDialogMode('deliver')
-                  setShowShippingDialog(true)
-                }}
-              >
-                Marcar como Entregado
-              </Button>
-            )}
-          </div>
-        )
-      }
+
+      const { error: eventError } = await supabase
+        .from('order_events')
+        .insert(deliveryEvent)
+
+      if (eventError) throw eventError
+
+      await refetchOrders()
+      toast.success("Entrega confirmada correctamente")
+    } catch (error) {
+      console.error('Error al confirmar entrega:', error)
+      toast.error("Error al confirmar la entrega")
+    } finally {
+      setIsUpdating(false)
     }
-  ]
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Envíos Físicos</h1>
-        <p className="text-muted-foreground">
-          Gestiona los envíos físicos y su configuración
-        </p>
+      <div className="grid gap-4">
+        {physicalOrders.map((order) => (
+          <div key={order.id} className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="font-medium">Pedido #{order.id}</h3>
+                <p className="text-sm text-gray-500">
+                  {order.customer?.name || "Cliente no registrado"}
+                </p>
+              </div>
+              <div className="space-x-2">
+                {order.status === "processing" && (
+                  <button
+                    onClick={() => {
+                      setSelectedOrder(order)
+                      setShowConfirmDialog(true)
+                    }}
+                    disabled={isUpdating}
+                    className="bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-blue-600 transition-colors"
+                  >
+                    Confirmar Envío
+                  </button>
+                )}
+                {order.status === "shipped" && (
+                  <button
+                    onClick={() => handleConfirmDelivery(order.id)}
+                    disabled={isUpdating}
+                    className="bg-green-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-green-600 transition-colors"
+                  >
+                    Marcar como Entregado
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {order.tracking_number && (
+              <div className="text-sm text-gray-600">
+                <p>Tracking: {order.tracking_number}</p>
+                <p>Carrier: {order.carrier}</p>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {physicalOrders.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No hay pedidos físicos pendientes de envío o entrega
+          </div>
+        )}
       </div>
 
-      <ShippingSettings />
-      
-      <ShippingTabs 
-        pendingOrders={pendingOrders}
-        shippedOrders={shippedOrders}
-        deliveredOrders={deliveredOrders}
-        columns={columns}
-      />
-
-      <ShippingConfirmDialog 
-        open={showShippingDialog}
-        onOpenChange={setShowShippingDialog}
-        orderId={selectedOrder?.id || ''}
-        mode={dialogMode}
-        onConfirm={handleShippingConfirm}
-      />
+      {selectedOrder && (
+        <ShippingConfirmDialog
+          open={showConfirmDialog}
+          onOpenChange={setShowConfirmDialog}
+          onConfirm={handleConfirmShipment}
+          orderId={selectedOrder.id}
+          isUpdating={isUpdating}
+        />
+      )}
     </div>
   )
 }

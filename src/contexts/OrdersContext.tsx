@@ -8,6 +8,7 @@ interface OrdersContextType {
   loading: boolean
   error: Error | null
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>
+  refetchOrders: () => Promise<void>
 }
 
 const OrdersContext = createContext<OrdersContextType>({
@@ -15,16 +16,13 @@ const OrdersContext = createContext<OrdersContextType>({
   loading: false,
   error: null,
   updateOrder: async () => {},
+  refetchOrders: async () => {}
 })
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    fetchOrders()
-  }, [])
 
   const fetchOrders = async () => {
     try {
@@ -50,6 +48,10 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  useEffect(() => {
+    fetchOrders()
+  }, [])
+
   const updateOrder = async (orderId: string, updates: Partial<Order>) => {
     try {
       const { error } = await supabase
@@ -64,6 +66,9 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         order.id === orderId ? { ...order, ...updates } : order
       ))
 
+      // Refrescar los datos para asegurar sincronización
+      await fetchOrders()
+
       toast.success('Pedido actualizado correctamente')
     } catch (err) {
       console.error('Error updating order:', err)
@@ -73,7 +78,13 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <OrdersContext.Provider value={{ orders, loading, error, updateOrder }}>
+    <OrdersContext.Provider value={{ 
+      orders, 
+      loading, 
+      error, 
+      updateOrder,
+      refetchOrders: fetchOrders 
+    }}>
       {children}
     </OrdersContext.Provider>
   )
