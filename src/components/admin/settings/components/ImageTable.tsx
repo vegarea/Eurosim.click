@@ -2,11 +2,7 @@ import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-
-interface SiteImage {
-  id: number
-  url: string
-}
+import { SiteImage } from "@/hooks/useSiteImages"
 
 interface ImageTableProps {
   images: SiteImage[]
@@ -79,10 +75,16 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       {images.map(image => (
-        <div key={image.id} className="flex items-center justify-between">
-          <img src={image.url} alt={`Image ${image.id}`} className="w-32 h-32 object-cover" />
+        <div key={image.id} className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center gap-4">
+            <img src={image.currentUrl} alt={image.description} className="w-32 h-32 object-cover rounded-md" />
+            <div>
+              <h3 className="font-medium">{image.location}</h3>
+              <p className="text-sm text-muted-foreground">{image.description}</p>
+            </div>
+          </div>
           <input
             type="file"
             accept="image/*"
@@ -92,6 +94,7 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
               }
             }}
             disabled={uploading}
+            className="ml-4"
           />
         </div>
       ))}
