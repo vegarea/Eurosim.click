@@ -3,21 +3,26 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/ui/data-table"
 import { NoOrdersMessage } from "./NoOrdersMessage"
+import { ColumnDef } from "@tanstack/react-table"
 
 interface ShippingTabsProps {
   pendingOrders: Order[]
   shippedOrders: Order[]
   deliveredOrders: Order[]
-  columns: any[]
+  pendingColumns: ColumnDef<Order>[]
+  shippedColumns: ColumnDef<Order>[]
+  deliveredColumns: ColumnDef<Order>[]
 }
 
 export function ShippingTabs({ 
   pendingOrders, 
   shippedOrders, 
-  deliveredOrders, 
-  columns 
+  deliveredOrders,
+  pendingColumns,
+  shippedColumns,
+  deliveredColumns
 }: ShippingTabsProps) {
-  const renderOrdersTable = (orders: Order[]) => {
+  const renderOrdersTable = (orders: Order[], columns: ColumnDef<Order>[]) => {
     if (orders.length === 0) {
       return <NoOrdersMessage />
     }
@@ -63,15 +68,15 @@ export function ShippingTabs({
       </TabsList>
       
       <TabsContent value="pending" className="mt-6">
-        {renderOrdersTable(pendingOrders)}
+        {renderOrdersTable(pendingOrders, pendingColumns)}
       </TabsContent>
       
       <TabsContent value="shipped" className="mt-6">
-        {renderOrdersTable(shippedOrders)}
+        {renderOrdersTable(shippedOrders, shippedColumns)}
       </TabsContent>
 
       <TabsContent value="delivered" className="mt-6">
-        {renderOrdersTable(deliveredOrders)}
+        {renderOrdersTable(deliveredOrders, deliveredColumns)}
       </TabsContent>
     </Tabs>
   )

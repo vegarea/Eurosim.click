@@ -8,6 +8,7 @@ import { ShippingTabs } from "./components/ShippingTabs"
 import { usePhysicalOrders } from "./components/usePhysicalOrders"
 import { useShippingActions } from "./components/useShippingActions"
 import { ColumnDef } from "@tanstack/react-table"
+import { formatCurrency } from "@/utils/currency"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -24,13 +25,21 @@ export function AdminPhysicalShipping() {
     setShowDeliveredDialog
   })
 
-  const columns: ColumnDef<Order>[] = [
+  const baseColumns: ColumnDef<Order>[] = [
     {
       accessorKey: "id",
       header: "ID Pedido",
       cell: ({ row }) => {
         const order = row.original
         return order?.id ? order.id.slice(0, 8) : "N/A"
+      }
+    },
+    {
+      accessorKey: "created_at",
+      header: "Fecha",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.created_at ? new Date(order.created_at).toLocaleDateString() : "N/A"
       }
     },
     {
@@ -42,6 +51,18 @@ export function AdminPhysicalShipping() {
       }
     },
     {
+      accessorKey: "total_amount",
+      header: "Total",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.total_amount ? formatCurrency(order.total_amount) : "N/A"
+      }
+    }
+  ]
+
+  const pendingColumns: ColumnDef<Order>[] = [
+    ...baseColumns,
+    {
       id: "actions",
       header: "Acciones",
       cell: ({ row }) => {
@@ -49,33 +70,78 @@ export function AdminPhysicalShipping() {
         if (!order) return null
 
         return (
-          <div className="space-x-2">
-            {order.status === "processing" && (
-              <button
-                onClick={() => {
-                  setSelectedOrder(order)
-                  setShowConfirmDialog(true)
-                }}
-                disabled={isUpdating}
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-              >
-                Confirmar Envío
-              </button>
-            )}
-            {order.status === "shipped" && (
-              <button
-                onClick={() => {
-                  setSelectedOrder(order)
-                  setShowDeliveredDialog(true)
-                }}
-                disabled={isUpdating}
-                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-              >
-                Confirmar Entrega
-              </button>
-            )}
-          </div>
+          <button
+            onClick={() => {
+              setSelectedOrder(order)
+              setShowConfirmDialog(true)
+            }}
+            disabled={isUpdating}
+            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+          >
+            Confirmar Envío
+          </button>
         )
+      }
+    }
+  ]
+
+  const shippedColumns: ColumnDef<Order>[] = [
+    ...baseColumns,
+    {
+      accessorKey: "tracking_number",
+      header: "Tracking",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.tracking_number || "N/A"
+      }
+    },
+    {
+      accessorKey: "carrier",
+      header: "Transportista",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.carrier || "N/A"
+      }
+    },
+    {
+      id: "actions",
+      header: "Acciones",
+      cell: ({ row }) => {
+        const order = row.original
+        if (!order) return null
+
+        return (
+          <button
+            onClick={() => {
+              setSelectedOrder(order)
+              setShowDeliveredDialog(true)
+            }}
+            disabled={isUpdating}
+            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+          >
+            Confirmar Entrega
+          </button>
+        )
+      }
+    }
+  ]
+
+  const deliveredColumns: ColumnDef<Order>[] = [
+    ...baseColumns,
+    {
+      accessorKey: "tracking_number",
+      header: "Tracking",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.tracking_number || "N/A"
+      }
+    },
+    {
+      accessorKey: "carrier",
+      header: "Transportista",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.carrier || "N/A"
       }
     }
   ]
@@ -88,7 +154,9 @@ export function AdminPhysicalShipping() {
         pendingOrders={pendingOrders}
         shippedOrders={shippedOrders}
         deliveredOrders={deliveredOrders}
-        columns={columns}
+        pendingColumns={pendingColumns}
+        shippedColumns={shippedColumns}
+        deliveredColumns={deliveredColumns}
       />
 
       {selectedOrder && (
