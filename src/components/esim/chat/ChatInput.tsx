@@ -74,7 +74,7 @@ export function ChatInput({
       </div>
       <Button 
         onClick={handleClick}
-        disabled={!input.trim()}
+        disabled={isLoading}
         className={cn(
           "w-full md:w-auto",
           !showChat && "bg-gradient-to-r from-primary to-secondary hover:opacity-90"
