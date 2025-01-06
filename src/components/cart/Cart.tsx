@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 
 export function Cart() {
-  const { items } = useCart()
+  const { items, updateQuantity, removeItem } = useCart()
   const [shippingCost, setShippingCost] = useState(0)
   const subtotal = items.reduce((sum, item) => sum + item.total_price, 0)
   
@@ -42,6 +42,8 @@ export function Cart() {
           <CartItem 
             key={item.id} 
             item={item}
+            onUpdateQuantity={(quantity) => updateQuantity(item.id, quantity)}
+            onRemove={() => removeItem(item.id)}
           />
         ))}
       </div>
