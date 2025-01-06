@@ -6,9 +6,8 @@ import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { OrderEvent } from "@/types/database/common"
-import { OrderStatusBadge } from "../orders/OrderStatusBadge"
-import { Button } from "@/components/ui/button"
-import { Truck, CheckCircle2 } from "lucide-react"
+import { PhysicalOrderCard } from "./components/PhysicalOrderCard"
+import { NoOrdersMessage } from "./components/NoOrdersMessage"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +18,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { ShippingTabs } from "./components/ShippingTabs"
+import { ShippingSettings } from "./components/ShippingSettings"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -127,67 +128,26 @@ export function AdminPhysicalShipping() {
 
   return (
     <div className="space-y-6">
+      <ShippingSettings />
+      
       <div className="grid gap-4">
         {physicalOrders.map((order) => (
-          <div key={order.id} className="bg-white p-4 rounded-lg shadow-sm border">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="font-medium">Pedido #{order.id}</h3>
-                <p className="text-sm text-gray-500">
-                  {order.customer?.name || "Cliente no registrado"}
-                </p>
-              </div>
-              <OrderStatusBadge status={order.status} />
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-600">
-                {order.tracking_number && (
-                  <>
-                    <p>Tracking: {order.tracking_number}</p>
-                    <p>Carrier: {order.carrier}</p>
-                  </>
-                )}
-              </div>
-              
-              <div className="space-x-2">
-                {order.status === "processing" && (
-                  <Button
-                    onClick={() => {
-                      setSelectedOrder(order)
-                      setShowConfirmDialog(true)
-                    }}
-                    disabled={isUpdating}
-                    className="gap-2"
-                  >
-                    <Truck className="h-4 w-4" />
-                    Confirmar Envío
-                  </Button>
-                )}
-                {order.status === "shipped" && (
-                  <Button
-                    onClick={() => {
-                      setSelectedOrder(order)
-                      setShowDeliveredDialog(true)
-                    }}
-                    disabled={isUpdating}
-                    variant="success"
-                    className="gap-2"
-                  >
-                    <CheckCircle2 className="h-4 w-4" />
-                    Marcar como Entregado
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
+          <PhysicalOrderCard
+            key={order.id}
+            order={order}
+            onShipOrder={(order) => {
+              setSelectedOrder(order)
+              setShowConfirmDialog(true)
+            }}
+            onMarkDelivered={(order) => {
+              setSelectedOrder(order)
+              setShowDeliveredDialog(true)
+            }}
+            isUpdating={isUpdating}
+          />
         ))}
 
-        {physicalOrders.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No hay pedidos físicos pendientes de envío o entrega
-          </div>
-        )}
+        {physicalOrders.length === 0 && <NoOrdersMessage />}
       </div>
 
       {/* Diálogo de confirmación de envío */}
@@ -201,7 +161,6 @@ export function AdminPhysicalShipping() {
             }
           }}
           orderId={selectedOrder.id}
-          isUpdating={isUpdating}
         />
       )}
 
