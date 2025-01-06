@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Loader2, Smartphone, Bot, User } from "lucide-react"
+import { Loader2, Smartphone } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
+import { ChatMessage } from "./chat/ChatMessage"
+import { TypingIndicator } from "./chat/TypingIndicator"
 
 interface Message {
   role: 'user' | 'assistant'
@@ -20,7 +21,6 @@ export function CompatibilityChat() {
   const [isTyping, setIsTyping] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-  // Función para hacer scroll al último mensaje
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
       const scrollContainer = scrollAreaRef.current
@@ -28,7 +28,6 @@ export function CompatibilityChat() {
     }
   }
 
-  // Efecto para hacer scroll cuando se añaden nuevos mensajes
   useEffect(() => {
     scrollToBottom()
   }, [messages])
@@ -38,7 +37,7 @@ export function CompatibilityChat() {
       setIsLoading(true)
       setShowChat(true)
       
-      const newMessages: Message[] = [...messages, { role: 'user' as const, content: message }]
+      const newMessages: Message[] = [...messages, { role: 'user', content: message }]
       setMessages(newMessages)
       setInput("")
       setIsTyping(true)
@@ -52,7 +51,6 @@ export function CompatibilityChat() {
 
       if (error) throw error
 
-      // Simular efecto de typing
       const response = data.response
       const words = response.split(' ')
       let currentText = ''
@@ -71,7 +69,7 @@ export function CompatibilityChat() {
           }
           return updatedMessages
         })
-        await new Promise(resolve => setTimeout(resolve, 50)) // Ajusta la velocidad del typing
+        await new Promise(resolve => setTimeout(resolve, 50))
       }
       
       setIsTyping(false)
@@ -128,9 +126,9 @@ export function CompatibilityChat() {
       )}>
         <div 
           ref={scrollAreaRef}
-          className="flex-1 p-4 border rounded-lg mb-4 overflow-y-auto h-[420px]"
+          className="flex-1 p-2 sm:p-4 border rounded-lg mb-4 overflow-y-auto h-[420px]"
         >
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <AnimatePresence>
               {messages.map((message, index) => (
                 <motion.div
@@ -139,35 +137,8 @@ export function CompatibilityChat() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
                 >
-                  <div className={`flex items-start max-w-[80%] space-x-2 ${
-                    message.role === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
-                  }`}>
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      message.role === 'user' 
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-gray-100'
-                    }`}>
-                      {message.role === 'user' ? (
-                        <User className="h-5 w-5" />
-                      ) : (
-                        <Bot className="h-5 w-5" />
-                      )}
-                    </div>
-                    <div
-                      className={cn(
-                        "p-3 rounded-lg",
-                        message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-gray-100 text-gray-900'
-                      )}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
+                  <ChatMessage role={message.role} content={message.content} />
                 </motion.div>
               ))}
               {isTyping && (
@@ -175,20 +146,8 @@ export function CompatibilityChat() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="flex justify-start"
                 >
-                  <div className="flex items-start space-x-2">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <Bot className="h-5 w-5" />
-                    </div>
-                    <div className="bg-gray-100 p-3 rounded-lg">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    </div>
-                  </div>
+                  <TypingIndicator />
                 </motion.div>
               )}
             </AnimatePresence>
