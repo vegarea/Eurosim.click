@@ -2,6 +2,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { EmailIntegration } from "./integrations/EmailIntegration"
 import { MakeWebhooks } from "./integrations/MakeWebhooks"
 import { ZapierIntegration } from "./integrations/ZapierIntegration"
+import { OpenAIIntegration } from "./integrations/OpenAIIntegration"
 
 export function IntegrationsSettings() {
   const { toast } = useToast()
@@ -22,6 +23,7 @@ export function IntegrationsSettings() {
 
   return (
     <div className="space-y-6">
+      <OpenAIIntegration onSave={handleSave} />
       <EmailIntegration onSave={handleSave} />
       <MakeWebhooks onTest={handleTestWebhook} onSave={handleSave} />
       <ZapierIntegration onSave={handleSave} />
