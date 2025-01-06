@@ -16,14 +16,13 @@ export function ChatInput({ input, setInput, isLoading, onSend, showChat, placeh
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    // Auto-focus en el campo de entrada
     if (inputRef.current) {
       inputRef.current.focus()
     }
   }, [showChat])
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-col md:flex-row gap-2">
       <div className="relative flex-1">
         {!showChat && (
           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -33,7 +32,7 @@ export function ChatInput({ input, setInput, isLoading, onSend, showChat, placeh
           placeholder={placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className={!showChat ? "pl-10" : ""}
+          className={cn(!showChat ? "pl-10" : "")}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && input.trim() && !isLoading) {
               onSend()
@@ -44,12 +43,15 @@ export function ChatInput({ input, setInput, isLoading, onSend, showChat, placeh
       <Button 
         onClick={onSend}
         disabled={!input.trim() || isLoading}
-        className={!showChat ? "bg-gradient-to-r from-primary to-secondary hover:opacity-90 w-full md:w-auto" : ""}
+        className={cn(
+          "w-full md:w-auto",
+          !showChat && "bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+        )}
       >
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          showChat ? 'Enviar' : 'Verificar Compatibilidad'
+          showChat ? 'Enviar' : 'Verificar'
         )}
       </Button>
     </div>

@@ -66,8 +66,8 @@ export function CompatibilityChat() {
   }
 
   const getPlaceholder = () => {
-    if (!showChat) return "Coloca el modelo de tu móvil"
-    return "Haz una pregunta al asistente"
+    if (!showChat) return "¿Cuál es el modelo de tu teléfono?"
+    return "Escribe tu pregunta aquí"
   }
 
   return (
@@ -78,7 +78,7 @@ export function CompatibilityChat() {
       )}>
         <div className="flex flex-col items-center justify-center space-y-6">
           <h3 className="text-xl font-medium text-center text-gray-800">
-            ¿Quieres saber si tu teléfono es compatible?
+            ¿Tu teléfono es apto para eSIM?
           </h3>
         </div>
       </div>
