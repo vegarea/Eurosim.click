@@ -48,6 +48,29 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Suscribirse a cambios en tiempo real
+  useEffect(() => {
+    const channel = supabase
+      .channel('orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          console.log('Orden actualizada, refrescando datos...')
+          fetchOrders()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [])
+
   useEffect(() => {
     fetchOrders()
   }, [])
@@ -66,9 +89,6 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, ...updates } : order
       ))
-
-      // Refrescar los datos para asegurar sincronización
-      await fetchOrders()
 
       toast.success('Pedido actualizado correctamente')
     } catch (err) {
