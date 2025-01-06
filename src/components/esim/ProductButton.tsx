@@ -20,7 +20,7 @@ const getButtonColor = (productId: string) => {
       'bg-[#FEF7CD]', // Soft Yellow
       'bg-[#FFDEE2]', // Soft Pink
       'bg-[#E5DEFF]', // Soft Purple
-      'bg-[#FDE1D3]'  // Soft Peach
+      'bg-[#B8E2FF]'  // Light Sky Blue (nuevo color)
     ]
   }
 
