@@ -5,19 +5,17 @@ import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { AdminLayout } from "@/components/admin/AdminLayout"
 import { ChevronLeft } from "lucide-react"
-import { OrderStatus } from "@/components/admin/orders/types"
+import { OrderStatus } from "@/types/database/enums"
 import { toast } from "sonner"
 import { OrderStatusConfirmDialog } from "@/components/admin/orders/OrderStatusConfirmDialog"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
 import { OrderDocumentation } from "@/components/admin/orders/OrderDocumentation"
-import { OrderShippingInfo } from "@/components/admin/orders/OrderShippingInfo"
 import { OrderCustomerInfo } from "@/components/admin/orders/OrderCustomerInfo"
 import { OrderNotes } from "@/components/admin/orders/OrderNotes"
 import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
-import { OrderEvent } from "@/types/database/common"
 
 const statusOrder = [
   "payment_pending",
@@ -82,6 +80,16 @@ export default function OrderDetails() {
     return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
+  const handleAddNote = async (note: string) => {
+    try {
+      const updatedNotes = [...(order.notes || []), note]
+      await updateOrder(order.id, { notes: updatedNotes })
+      toast.success("Nota añadida correctamente")
+    } catch (error) {
+      toast.error("Error al añadir la nota")
+    }
+  }
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -124,7 +132,6 @@ export default function OrderDetails() {
           <div className="space-y-6">
             <OrderBasicInfo order={order} />
             <OrderProductInfo order={order} />
-            {order.type === "physical" && <OrderShippingInfo order={order} />}
           </div>
           
           <div className="space-y-6">
