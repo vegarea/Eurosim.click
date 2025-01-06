@@ -2,6 +2,7 @@ import { Order } from "@/types/database/orders"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/ui/data-table"
+import { NoOrdersMessage } from "./NoOrdersMessage"
 
 interface ShippingTabsProps {
   pendingOrders: Order[]
@@ -16,6 +17,13 @@ export function ShippingTabs({
   deliveredOrders, 
   columns 
 }: ShippingTabsProps) {
+  const renderOrdersTable = (orders: Order[]) => {
+    if (orders.length === 0) {
+      return <NoOrdersMessage />
+    }
+    return <DataTable columns={columns} data={orders} />
+  }
+
   return (
     <Tabs defaultValue="pending" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
@@ -55,24 +63,15 @@ export function ShippingTabs({
       </TabsList>
       
       <TabsContent value="pending" className="mt-6">
-        <DataTable 
-          columns={columns} 
-          data={pendingOrders}
-        />
+        {renderOrdersTable(pendingOrders)}
       </TabsContent>
       
       <TabsContent value="shipped" className="mt-6">
-        <DataTable 
-          columns={columns} 
-          data={shippedOrders}
-        />
+        {renderOrdersTable(shippedOrders)}
       </TabsContent>
 
       <TabsContent value="delivered" className="mt-6">
-        <DataTable 
-          columns={columns} 
-          data={deliveredOrders}
-        />
+        {renderOrdersTable(deliveredOrders)}
       </TabsContent>
     </Tabs>
   )

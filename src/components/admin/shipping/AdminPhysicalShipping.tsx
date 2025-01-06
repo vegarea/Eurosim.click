@@ -114,11 +114,16 @@ export function AdminPhysicalShipping() {
   const columns = [
     {
       header: "ID Pedido",
-      cell: (order: Order) => order.id
+      cell: (order: Order) => order.id.slice(0, 8)
     },
     {
       header: "Cliente",
-      cell: (order: Order) => order.customer?.name || "Cliente no registrado"
+      cell: (order: Order) => {
+        if (order.customer_id) {
+          return order.customer?.name || "Cliente no registrado"
+        }
+        return "Cliente no registrado"
+      }
     },
     {
       header: "Acciones",

@@ -14,6 +14,9 @@ export function usePhysicalOrders(orders: Order[]) {
     order => order.type === "physical" && order.status === "delivered"
   )
 
+  console.log('Pending Orders:', pendingOrders)
+  console.log('All Orders:', orders)
+
   return {
     pendingOrders,
     shippedOrders,
