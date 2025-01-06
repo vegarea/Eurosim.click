@@ -59,7 +59,7 @@ serve(async (req) => {
       })
     }
 
-    // Actualizar el secreto usando la API de Supabase
+    // Actualizar el secreto usando la API de Supabase Functions
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/secrets`, {
       method: 'POST',
       headers: {
@@ -73,6 +73,7 @@ serve(async (req) => {
     })
 
     if (!response.ok) {
+      console.error('Failed to update secret:', await response.text())
       throw new Error('Failed to update secret')
     }
 
