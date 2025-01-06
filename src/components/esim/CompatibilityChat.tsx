@@ -126,7 +126,7 @@ export function CompatibilityChat() {
       )}>
         <div 
           ref={scrollAreaRef}
-          className="flex-1 p-2 sm:p-4 border rounded-lg mb-4 overflow-y-auto h-[420px]"
+          className="flex-1 p-2 sm:p-4 border rounded-lg mb-4 overflow-y-auto h-[420px] touch-pan-y"
         >
           <div className="space-y-3 sm:space-y-4">
             <AnimatePresence>
