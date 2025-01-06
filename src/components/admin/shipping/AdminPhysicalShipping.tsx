@@ -11,11 +11,13 @@ import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { createShippingConfirmationEvent } from "./utils/shippingEvents"
+import { useShippingNotifications } from "@/hooks/useShippingNotifications"
 
 export function AdminPhysicalShipping() {
   const { orders, updateOrder } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showShippingDialog, setShowShippingDialog] = useState(false)
+  const { notifyShipment } = useShippingNotifications()
 
   // Filtrar pedidos por estado
   const pendingOrders = orders.filter(order => 
@@ -43,6 +45,9 @@ export function AdminPhysicalShipping() {
         .insert(createShippingConfirmationEvent(selectedOrder.id, trackingNumber, carrier))
 
       if (eventError) throw eventError
+
+      // Enviar notificaciones
+      await notifyShipment(selectedOrder, trackingNumber, carrier)
 
       toast.success('Envío confirmado correctamente')
       setShowShippingDialog(false)
