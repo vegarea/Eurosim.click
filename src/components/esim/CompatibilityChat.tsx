@@ -16,17 +16,49 @@ export function CompatibilityChat() {
   const [showChat, setShowChat] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
 
+  const verifyDevice = async (deviceModel: string) => {
+    if (!deviceModel.trim()) return
+
+    try {
+      setIsLoading(true)
+      
+      const { data, error } = await supabase.functions.invoke('ai-assistant', {
+        body: {
+          role: 'compatibility_checker',
+          message: deviceModel
+        }
+      })
+
+      if (error) throw error
+
+      const response = data.response
+      setShowChat(true)
+      
+      // Añadir el mensaje inicial
+      const initialMessages: Message[] = [
+        { role: 'user', content: deviceModel },
+        { role: 'assistant', content: response }
+      ]
+      setMessages(initialMessages)
+      setInput("")
+      
+    } catch (error) {
+      console.error('Error al verificar dispositivo:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const sendMessage = async (message: string) => {
     if (!message.trim()) return
 
     try {
       setIsLoading(true)
-      setShowChat(true)
+      setIsTyping(true)
       
       const newMessages: Message[] = [...messages, { role: 'user', content: message }]
       setMessages(newMessages)
       setInput("")
-      setIsTyping(true)
 
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
@@ -66,8 +98,10 @@ export function CompatibilityChat() {
     }
   }
 
-  const handleSendMessage = () => {
-    if (input.trim()) {
+  const handleAction = () => {
+    if (!showChat) {
+      verifyDevice(input)
+    } else {
       sendMessage(input)
     }
   }
@@ -99,7 +133,7 @@ export function CompatibilityChat() {
         input={input}
         setInput={setInput}
         isLoading={isLoading}
-        onSend={handleSendMessage}
+        onSend={handleAction}
         showChat={showChat}
         placeholder={!showChat ? "¿Cuál es el modelo de tu teléfono?" : "Escribe tu pregunta aquí"}
       />
