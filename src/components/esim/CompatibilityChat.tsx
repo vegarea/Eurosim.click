@@ -1,11 +1,8 @@
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Loader2, Smartphone, Bot, User } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
 import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
+import { ChatInput } from "./chat/ChatInput"
+import { ChatMessages } from "./chat/ChatMessages"
 
 interface Message {
   role: 'user' | 'assistant'
@@ -24,7 +21,7 @@ export function CompatibilityChat() {
       setIsLoading(true)
       setShowChat(true)
       
-      const newMessages: Message[] = [...messages, { role: 'user' as const, content: message }]
+      const newMessages: Message[] = [...messages, { role: 'user', content: message }]
       setMessages(newMessages)
       setInput("")
       setIsTyping(true)
@@ -57,7 +54,7 @@ export function CompatibilityChat() {
           }
           return updatedMessages
         })
-        await new Promise(resolve => setTimeout(resolve, 50)) // Ajusta la velocidad del typing
+        await new Promise(resolve => setTimeout(resolve, 50))
       }
       
       setIsTyping(false)
@@ -68,139 +65,42 @@ export function CompatibilityChat() {
     }
   }
 
+  const getPlaceholder = () => {
+    if (!showChat) return "Coloca el modelo de tu móvil"
+    return "Haz una pregunta al asistente"
+  }
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col p-4 md:p-8">
       <div className={cn(
         "transition-all duration-500 ease-in-out",
         showChat ? "h-0 opacity-0" : "h-auto opacity-100"
       )}>
-        <div className="flex flex-col items-center justify-center space-y-6 p-8">
+        <div className="flex flex-col items-center justify-center space-y-6">
           <h3 className="text-xl font-medium text-center text-gray-800">
             ¿Quieres saber si tu teléfono es compatible?
           </h3>
-          <div className="w-full max-w-md space-y-4">
-            <div className="relative">
-              <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <Input
-                placeholder="Coloca el modelo de tu móvil"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="pl-10"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && input.trim() && !isLoading) {
-                    sendMessage(input.trim())
-                  }
-                }}
-              />
-            </div>
-            <Button 
-              onClick={() => input.trim() && sendMessage(input.trim())}
-              disabled={!input.trim() || isLoading}
-              className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90"
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                "Verificar Compatibilidad"
-              )}
-            </Button>
-          </div>
         </div>
       </div>
 
       <div className={cn(
         "transition-all duration-500 ease-in-out",
-        !showChat ? "h-0 opacity-0" : "h-[500px] opacity-100"
+        !showChat ? "h-0 opacity-0" : "opacity-100"
       )}>
-        <ScrollArea className="flex-1 p-4 border rounded-lg mb-4">
-          <div className="space-y-4">
-            <AnimatePresence>
-              {messages.map((message, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div className={`flex items-start max-w-[80%] space-x-2 ${
-                    message.role === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
-                  }`}>
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      message.role === 'user' 
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-gray-100'
-                    }`}>
-                      {message.role === 'user' ? (
-                        <User className="h-5 w-5" />
-                      ) : (
-                        <Bot className="h-5 w-5" />
-                      )}
-                    </div>
-                    <div
-                      className={cn(
-                        "p-3 rounded-lg",
-                        message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-gray-100 text-gray-900'
-                      )}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="flex justify-start"
-                >
-                  <div className="flex items-start space-x-2">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <Bot className="h-5 w-5" />
-                    </div>
-                    <div className="bg-gray-100 p-3 rounded-lg">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </ScrollArea>
-
-        <div className="flex gap-2">
-          <Input
-            placeholder="Haz una pregunta al asistente"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && input.trim() && !isLoading) {
-                sendMessage(input.trim())
-              }
-            }}
-          />
-          <Button 
-            onClick={() => input.trim() && sendMessage(input.trim())}
-            disabled={!input.trim() || isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              'Enviar'
-            )}
-          </Button>
-        </div>
+        <ChatMessages 
+          messages={messages}
+          isTyping={isTyping}
+        />
       </div>
+
+      <ChatInput 
+        input={input}
+        setInput={setInput}
+        isLoading={isLoading}
+        onSend={() => input.trim() && sendMessage(input.trim())}
+        showChat={showChat}
+        placeholder={getPlaceholder()}
+      />
     </div>
   )
 }
