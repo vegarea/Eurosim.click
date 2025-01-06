@@ -28,13 +28,6 @@ export function ChatInput({
     }
   }, [showChat])
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    if (input.trim()) {
-      onSend()
-    }
-  }
-
   return (
     <div className="flex flex-col md:flex-row gap-2">
       <div className="relative flex-1">
@@ -60,11 +53,11 @@ export function ChatInput({
         />
       </div>
       <Button 
-        onClick={handleClick}
-        disabled={isLoading || !input.trim()}
+        onClick={() => onSend()}
+        disabled={!input.trim()}
         type="button"
         className={cn(
-          "w-full md:w-auto",
+          "w-full md:w-auto cursor-pointer",
           !showChat && "bg-gradient-to-r from-primary to-secondary hover:opacity-90"
         )}
       >
