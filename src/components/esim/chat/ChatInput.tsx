@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Loader2, Smartphone } from "lucide-react"
 import { useEffect, useRef } from "react"
@@ -13,7 +12,14 @@ interface ChatInputProps {
   placeholder: string
 }
 
-export function ChatInput({ input, setInput, isLoading, onSend, showChat, placeholder }: ChatInputProps) {
+export function ChatInput({ 
+  input, 
+  setInput, 
+  isLoading, 
+  onSend, 
+  showChat, 
+  placeholder 
+}: ChatInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -22,27 +28,37 @@ export function ChatInput({ input, setInput, isLoading, onSend, showChat, placeh
     }
   }, [showChat])
 
+  const handleSend = () => {
+    if (input.trim() && !isLoading) {
+      onSend()
+    }
+  }
+
   return (
     <div className="flex flex-col md:flex-row gap-2">
       <div className="relative flex-1">
         {!showChat && (
           <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         )}
-        <Input
+        <input
           ref={inputRef}
+          type="text"
           placeholder={placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className={cn(!showChat ? "pl-10" : "")}
+          className={cn(
+            "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            !showChat && "pl-10"
+          )}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && input.trim() && !isLoading) {
-              onSend()
+              handleSend()
             }
           }}
         />
       </div>
       <Button 
-        onClick={onSend}
+        onClick={handleSend}
         disabled={!input.trim() || isLoading}
         className={cn(
           "w-full md:w-auto",
