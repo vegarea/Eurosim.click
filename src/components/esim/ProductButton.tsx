@@ -45,12 +45,11 @@ export function ProductButton({
     <button
       onClick={handleClick}
       className={cn(
-        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl backdrop-blur-sm relative",
+        "w-full transition-all duration-300 p-2 md:p-4 rounded-xl",
+        buttonColor,
         "hover:shadow-lg hover:-translate-y-1",
         "flex items-center gap-2 md:gap-3",
-        isSelected ? 
-          `${buttonColor} shadow-lg` : 
-          `${buttonColor} opacity-80 hover:opacity-100`
+        isSelected ? "shadow-lg" : "opacity-80 hover:opacity-100"
       )}
     >
       {isPopular && (
@@ -61,7 +60,7 @@ export function ProductButton({
       )}
       
       <div className={cn(
-        "p-2 rounded-lg bg-white/50 backdrop-blur-sm"
+        "p-2 rounded-lg bg-white/50"
       )}>
         {product.type === 'physical' ? (
           <CreditCard className="h-4 w-4 text-gray-700" />
