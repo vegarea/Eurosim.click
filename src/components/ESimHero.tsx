@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Smartphone, HelpCircle } from "lucide-react";
+import { Smartphone, HelpCircle, Flag } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/accordion";
 import { compatibleDevices } from "@/data/compatibleDevices";
 import { useSiteImages } from "@/hooks/useSiteImages";
+import EUFlag from "@/components/icons/EUFlag";
 
 export function ESimHero() {
   const { data: siteImages } = useSiteImages();
@@ -37,7 +38,7 @@ export function ESimHero() {
             <div className="animate-fade-in space-y-6">
               <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl flex items-center gap-4">
                 <span className="text-primary">eSIM</span> para
-                <span className="h-12 w-16 inline-block" />
+                <EUFlag className="h-12 w-16 inline-block" />
                 Europa
               </h1>
               <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
