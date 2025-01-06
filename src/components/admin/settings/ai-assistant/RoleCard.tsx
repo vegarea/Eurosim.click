@@ -27,10 +27,8 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Actualizar el prompt local cuando cambia el role
   useEffect(() => {
     setLocalPrompt(role.system_prompt)
-    setHasChanges(false)
   }, [role.system_prompt])
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -40,16 +38,16 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   }
 
   const handleSave = async () => {
-    if (!hasChanges) return
+    if (localPrompt === role.system_prompt) return
     
     setIsSaving(true)
     try {
       await onUpdate(role.id, { system_prompt: localPrompt })
-      setHasChanges(false)
       toast({
         title: "Cambios guardados",
         description: "El prompt se ha actualizado correctamente."
       })
+      setHasChanges(false)
     } catch (error) {
       console.error('Error al guardar:', error)
       toast({
@@ -57,7 +55,6 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
         description: "No se pudieron guardar los cambios. Por favor, intenta de nuevo.",
         variant: "destructive"
       })
-      // Revertir a la versión anterior en caso de error
       setLocalPrompt(role.system_prompt)
     } finally {
       setIsSaving(false)
@@ -108,7 +105,7 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
             </p>
             <Button
               onClick={handleSave}
-              disabled={isSaving || !hasChanges}
+              disabled={!hasChanges || isSaving}
               size="sm"
               variant={hasChanges ? "default" : "secondary"}
             >

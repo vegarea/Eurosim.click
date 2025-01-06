@@ -57,10 +57,11 @@ export function RolesList() {
 
       if (error) throw error
 
-      // Actualizar estado local solo si la actualización fue exitosa
-      setRoles(roles.map(role => 
-        role.id === roleId ? { ...role, ...updates } : role
-      ))
+      if (data) {
+        setRoles(roles.map(role => 
+          role.id === roleId ? { ...role, ...updates } : role
+        ))
+      }
 
       return Promise.resolve()
     } catch (error) {
