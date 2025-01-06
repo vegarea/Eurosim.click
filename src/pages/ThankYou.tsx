@@ -3,14 +3,18 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { CheckCircle2, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
+import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
+import { OrderDetails } from "@/components/thankyou/OrderDetails"
+import { OrderItems } from "@/components/thankyou/OrderItems"
 
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
+  const [shippingCost, setShippingCost] = useState<number>()
   const location = useLocation()
   const navigate = useNavigate()
   
@@ -30,7 +34,7 @@ export default function ThankYou() {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
         // Primero intentamos con la ruta JSONB completa
-        let { data, error } = await supabase
+        let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
             *,
@@ -46,7 +50,7 @@ export default function ThankYou() {
           .maybeSingle()
 
         // Si no encontramos nada, intentamos con la ruta anidada
-        if (!data && !error) {
+        if (!orderData && !error) {
           console.log('Intentando búsqueda alternativa...')
           const { data: altData, error: altError } = await supabase
             .from('orders')
@@ -64,7 +68,7 @@ export default function ThankYou() {
             .maybeSingle()
 
           if (altError) throw altError
-          data = altData
+          orderData = altData
         }
 
         if (error) {
@@ -72,22 +76,33 @@ export default function ThankYou() {
           throw error
         }
 
-        if (!data && retryCount < 5) { // Aumentamos a 5 intentos
+        if (!orderData && retryCount < 5) {
           console.log('Orden no encontrada, reintentando en 3 segundos...')
           setRetryCount(prev => prev + 1)
-          // Aumentamos el tiempo entre intentos a 3 segundos
           setTimeout(() => {
             setIsLoading(true)
           }, 3000)
           return
         }
 
-        if (!data) {
+        if (!orderData) {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        console.log("Orden encontrada:", data)
-        setOrderDetails(data)
+        // Si es una orden física, obtener el costo de envío
+        if (orderData.type === 'physical') {
+          const { data: shippingData } = await supabase
+            .from('shipping_settings')
+            .select('shipping_cost')
+            .single()
+          
+          if (shippingData) {
+            setShippingCost(shippingData.shipping_cost)
+          }
+        }
+
+        console.log("Orden encontrada:", orderData)
+        setOrderDetails(orderData)
         setIsLoading(false)
       } catch (error) {
         console.error('Error final al obtener detalles de la orden:', error)
@@ -148,60 +163,16 @@ export default function ThankYou() {
       
       <main className="container mx-auto py-8 px-4">
         <Card className="max-w-2xl mx-auto p-8">
-          <div className="text-center mb-8">
-            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              ¡Gracias por tu compra!
-            </h1>
-            <p className="text-gray-600">
-              Tu pedido ha sido confirmado y procesado correctamente
-            </p>
-          </div>
+          <OrderConfirmationHeader 
+            customerEmail={orderDetails.customer?.email || ''} 
+          />
 
-          <div className="space-y-6">
-            <div className="border-t border-gray-200 pt-6">
-              <h2 className="text-xl font-semibold mb-4">Detalles del pedido</h2>
-              <div className="space-y-2">
-                <p><span className="font-medium">Número de orden:</span> {orderDetails.id}</p>
-                <p><span className="font-medium">Cliente:</span> {orderDetails.customer?.name}</p>
-                <p><span className="font-medium">Email:</span> {orderDetails.customer?.email}</p>
-                <p><span className="font-medium">Fecha:</span> {new Date(orderDetails.created_at).toLocaleDateString()}</p>
-                {orderDetails.shipping_address && (
-                  <div>
-                    <p className="font-medium">Dirección de envío:</p>
-                    <p className="text-gray-600">
-                      {orderDetails.shipping_address.street}<br />
-                      {orderDetails.shipping_address.city}, {orderDetails.shipping_address.state}<br />
-                      {orderDetails.shipping_address.postal_code}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold mb-4">Productos</h3>
-              {orderDetails.items?.map((item: any, index: number) => (
-                <div key={index} className="flex justify-between py-2">
-                  <div>
-                    <p className="font-medium">{item.metadata?.product_title}</p>
-                    <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
-                  </div>
-                  <p className="font-medium">
-                    ${(item.total_price / 100).toFixed(2)} MXN
-                  </p>
-                </div>
-              ))}
-              <div className="border-t border-gray-200 mt-4 pt-4">
-                <div className="flex justify-between">
-                  <p className="font-semibold">Total</p>
-                  <p className="font-semibold">
-                    ${(orderDetails.total_amount / 100).toFixed(2)} MXN
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <OrderDetails order={orderDetails} />
+          
+          <OrderItems 
+            order={orderDetails}
+            shippingCost={shippingCost}
+          />
 
           <div className="mt-8 text-center">
             <Button onClick={() => navigate('/')} className="min-w-[200px]">
