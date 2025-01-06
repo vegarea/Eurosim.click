@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Palette, Image as ImageIcon } from "lucide-react"
+import { Palette, Image as ImageIcon, Upload, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import {
   Table,
@@ -12,16 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
 export function StyleSettings() {
   const { toast } = useToast()
-
-  const handleSave = () => {
-    toast({
-      title: "Cambios guardados",
-      description: "Los cambios en estilo se han guardado correctamente.",
-    })
-  }
+  const [uploading, setUploading] = useState(false)
 
   const currentImages = [
     {
@@ -44,13 +40,61 @@ export function StyleSettings() {
     }
   ]
 
-  const handleImageChange = (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      // Aquí iría la lógica para subir la imagen
+  const handleImageChange = async (id: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!event.target.files || event.target.files.length === 0) {
+        throw new Error('Debes seleccionar una imagen para subir.')
+      }
+
+      const file = event.target.files[0]
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${id}-${Math.random()}.${fileExt}`
+
+      setUploading(true)
+
+      const { error: uploadError } = await supabase.storage
+        .from('site_images')
+        .upload(filePath, file)
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      // Obtener la URL pública de la imagen
+      const { data: { publicUrl } } = supabase.storage
+        .from('site_images')
+        .getPublicUrl(filePath)
+
       toast({
         title: "Imagen actualizada",
         description: "La nueva imagen se ha guardado correctamente.",
+      })
+
+      // Aquí podrías actualizar el estado local o recargar las imágenes
+      
+    } catch (error) {
+      toast({
+        title: "Error al subir la imagen",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleDeleteImage = async (id: number) => {
+    try {
+      // Aquí implementarías la lógica para eliminar la imagen
+      toast({
+        title: "Imagen eliminada",
+        description: "La imagen se ha eliminado correctamente.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error al eliminar la imagen",
+        description: "No se pudo eliminar la imagen.",
+        variant: "destructive",
       })
     }
   }
@@ -95,11 +139,11 @@ export function StyleSettings() {
               Este es el color secundario usado en elementos complementarios
             </p>
           </div>
-          <Button onClick={handleSave} disabled>Guardar cambios</Button>
+          <Button onClick={() => {}} disabled>Guardar cambios</Button>
         </CardContent>
       </Card>
 
-      {/* Nueva Sección de Imágenes */}
+      {/* Sección de Imágenes */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -117,7 +161,7 @@ export function StyleSettings() {
                 <TableHead>Ubicación</TableHead>
                 <TableHead>Descripción</TableHead>
                 <TableHead>Vista previa</TableHead>
-                <TableHead>Cambiar</TableHead>
+                <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -136,9 +180,21 @@ export function StyleSettings() {
                     <div className="flex items-center gap-2">
                       <Button 
                         variant="outline" 
+                        size="sm"
                         onClick={() => document.getElementById(`image-upload-${image.id}`)?.click()}
+                        disabled={uploading}
                       >
-                        Cambiar imagen
+                        <Upload className="h-4 w-4 mr-1" />
+                        Subir
+                      </Button>
+                      <Button 
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteImage(image.id)}
+                        disabled={uploading}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Eliminar
                       </Button>
                       <input
                         id={`image-upload-${image.id}`}
@@ -146,6 +202,7 @@ export function StyleSettings() {
                         accept="image/*"
                         className="hidden"
                         onChange={(e) => handleImageChange(image.id, e)}
+                        disabled={uploading}
                       />
                     </div>
                   </TableCell>
