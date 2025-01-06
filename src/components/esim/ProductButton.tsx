@@ -11,22 +11,18 @@ interface ProductButtonProps {
   isPopular?: boolean;
 }
 
-// Función para obtener el color basado en el índice del producto
-const getButtonColor = (productId: string) => {
+// Función para obtener el color basado en el título del producto
+const getButtonColor = (productTitle: string) => {
   const colors = {
-    bg: [
-      'bg-[#D3E4FD]', // Soft Blue
-      'bg-[#F2FCE2]', // Soft Green
-      'bg-[#FEF7CD]', // Soft Yellow
-      'bg-[#FFDEE2]', // Soft Pink
-      'bg-[#E5DEFF]', // Soft Purple
-      'bg-[#B8E2FF]'  // Light Sky Blue (nuevo color)
-    ]
-  }
+    'E-sim S': 'bg-[#D3E4FD]', // Soft Blue
+    'E-sim M': 'bg-[#F2FCE2]', // Soft Green
+    'E-sim L': 'bg-[#FEF7CD]', // Soft Yellow
+    'E-sim XL': 'bg-[#FFDEE2]', // Soft Pink
+    'E-sim XXL': 'bg-[#E5DEFF]', // Soft Purple
+    'default': 'bg-[#B8E2FF]'  // Light Sky Blue
+  };
 
-  // Usar los últimos caracteres del ID como índice
-  const index = parseInt(productId.slice(-6), 16) % colors.bg.length;
-  return colors.bg[index];
+  return colors[productTitle as keyof typeof colors] || colors.default;
 };
 
 export function ProductButton({ 
@@ -37,7 +33,7 @@ export function ProductButton({
   isPopular = false
 }: ProductButtonProps) {
   const [amount, currency] = formatCurrency(product.price).split(' ');
-  const buttonColor = getButtonColor(product.id);
+  const buttonColor = getButtonColor(product.title);
 
   const handleClick = () => {
     onClick();
