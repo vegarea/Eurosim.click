@@ -22,12 +22,10 @@ export function CompatibilityChat() {
       setIsLoading(true)
       setShowChat(true)
       
-      // Agregar mensaje del usuario al chat
       const newMessages: Message[] = [...messages, { role: 'user' as const, content: message }]
       setMessages(newMessages)
       setInput("")
 
-      // Llamar al asistente a través de la Edge Function
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
           role: 'compatibility_checker',
@@ -37,7 +35,6 @@ export function CompatibilityChat() {
 
       if (error) throw error
 
-      // Agregar respuesta del asistente
       setMessages([...newMessages, { role: 'assistant' as const, content: data.response }])
     } catch (error) {
       console.error('Error al enviar mensaje:', error)
@@ -47,10 +44,10 @@ export function CompatibilityChat() {
   }
 
   return (
-    <div className="flex flex-col h-[500px]">
+    <div className="flex flex-col">
       <div className={cn(
         "transition-all duration-500 ease-in-out",
-        showChat ? "opacity-0 h-0" : "opacity-100 h-full"
+        showChat ? "h-0 opacity-0" : "h-auto opacity-100"
       )}>
         <div className="flex flex-col items-center justify-center space-y-6 p-8">
           <h3 className="text-xl font-medium text-center text-gray-800">
@@ -88,7 +85,7 @@ export function CompatibilityChat() {
 
       <div className={cn(
         "transition-all duration-500 ease-in-out",
-        !showChat ? "opacity-0 h-0" : "opacity-100 h-full"
+        !showChat ? "h-0 opacity-0" : "h-[500px] opacity-100"
       )}>
         <ScrollArea className="flex-1 p-4 border rounded-lg mb-4">
           <div className="space-y-4">
