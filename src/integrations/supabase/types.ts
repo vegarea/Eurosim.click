@@ -66,6 +66,44 @@ export type Database = {
         }
         Relationships: []
       }
+      order_events: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          order_id: string
+          type: Database["public"]["Enums"]["event_type"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          order_id: string
+          type: Database["public"]["Enums"]["event_type"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          order_id?: string
+          type?: Database["public"]["Enums"]["event_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -352,6 +390,13 @@ export type Database = {
     }
     Enums: {
       customer_gender: "M" | "F"
+      event_type:
+        | "created"
+        | "status_changed"
+        | "payment_processed"
+        | "shipping_updated"
+        | "note_added"
+        | "document_validated"
       order_status:
         | "payment_pending"
         | "payment_failed"

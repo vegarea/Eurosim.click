@@ -1,20 +1,25 @@
-/**
- * @lovable-protected
- * This file contains types that match Supabase schema exactly.
- * DO NOT MODIFY without explicit user permission.
- */
-
 export type OrderStatus = 
   | "payment_pending"
-  | "payment_failed" 
+  | "payment_failed"
   | "processing"
   | "shipped"
   | "delivered"
-  | "cancelled";
+  | "cancelled"
 
-export type OrderType = "physical" | "esim";
-export type PaymentMethod = "stripe" | "paypal" | "test";
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
-export type ProductStatus = "active" | "inactive" | "out_of_stock";
-export type ProductType = "physical" | "esim";
-export type CustomerGender = "M" | "F";
+export type OrderType = "physical" | "esim"
+
+export type PaymentMethod = "stripe" | "paypal"
+
+export type PaymentStatus = "pending" | "completed" | "failed" | "refunded"
+
+export type ProductStatus = "active" | "inactive"
+
+export type ProductType = "physical" | "esim"
+
+export type EventType = 
+  | "created"
+  | "status_changed"
+  | "payment_processed"
+  | "shipping_updated"
+  | "note_added"
+  | "document_validated"

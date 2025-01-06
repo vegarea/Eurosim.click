@@ -1,26 +1,34 @@
 import { useState } from "react"
 import { OrdersFilter } from "./orders/OrdersFilter"
 import { OrdersTable } from "./orders/OrdersTable"
-import { Order, OrderStatus } from "./orders/types"
+import { OrderStatus } from "@/types/database/enums"
 import { useOrders } from "@/contexts/OrdersContext"
 import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function AdminOrders() {
-  const { orders, updateOrder } = useOrders()
+  const { orders, isLoading, error, updateOrder } = useOrders()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all")
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toLowerCase().includes(search.toLowerCase()) ||
-      (order.customer_name || '').toLowerCase().includes(search.toLowerCase())
+      (order.customer?.name || '').toLowerCase().includes(search.toLowerCase())
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
 
   const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
     updateOrder(orderId, { status: newStatus })
-    toast.success("Estado del pedido actualizado correctamente")
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-red-500">Error al cargar los pedidos: {error.message}</p>
+      </div>
+    )
   }
 
   return (
@@ -36,10 +44,18 @@ export function AdminOrders() {
         onStatusFilterChange={setStatusFilter}
       />
 
-      <OrdersTable 
-        orders={filteredOrders}
-        onStatusChange={handleStatusChange}
-      />
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      ) : (
+        <OrdersTable 
+          orders={filteredOrders}
+          onStatusChange={handleStatusChange}
+        />
+      )}
     </div>
   )
 }

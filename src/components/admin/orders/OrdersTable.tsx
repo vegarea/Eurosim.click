@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusBadge } from "./OrderStatusBadge"
-import { Order } from "./types"
+import { Order } from "@/types/database/orders"
+import { formatCurrency } from "@/utils/currency"
 
 interface OrdersTableProps {
   orders: Order[]
@@ -25,6 +26,14 @@ const getSimTypeBadgeStyle = (type: "physical" | "esim") => {
 
 export function OrdersTable({ orders }: OrdersTableProps) {
   const navigate = useNavigate()
+
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No se encontraron pedidos
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-md border">
@@ -47,9 +56,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               className="cursor-pointer hover:bg-muted/50"
               onClick={() => navigate(`/admin/orders/${order.id}`)}
             >
-              <TableCell className="font-medium">{order.id}</TableCell>
-              <TableCell>{new Date(order.created_at || '').toLocaleDateString()}</TableCell>
-              <TableCell>{order.customer_name}</TableCell>
+              <TableCell className="font-medium">{order.id.slice(0, 8)}</TableCell>
+              <TableCell>
+                {new Date(order.created_at || '').toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                {order.customer?.name || 'Cliente no registrado'}
+              </TableCell>
               <TableCell>
                 <Badge 
                   variant="secondary" 
@@ -58,7 +71,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                   {order.type === "physical" ? "SIM Física" : "E-SIM"}
                 </Badge>
               </TableCell>
-              <TableCell>${(order.total_amount / 100).toFixed(2)}</TableCell>
+              <TableCell>{formatCurrency(order.total_amount)}</TableCell>
               <TableCell>
                 <OrderStatusBadge status={order.status} />
               </TableCell>
