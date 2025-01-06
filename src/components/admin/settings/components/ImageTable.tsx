@@ -22,9 +22,10 @@ interface SiteImage {
 interface ImageTableProps {
   images: SiteImage[]
   onImageUpdate: (id: number, newUrl: string) => void
+  siteSettingsId: string
 }
 
-export function ImageTable({ images, onImageUpdate }: ImageTableProps) {
+export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTableProps) {
   const { toast } = useToast()
   const [uploading, setUploading] = useState(false)
 
@@ -53,17 +54,32 @@ export function ImageTable({ images, onImageUpdate }: ImageTableProps) {
         .from('site_images')
         .getPublicUrl(fileName)
 
+      // Obtener el valor actual de hero_images
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from('site_settings')
+        .select('hero_images')
+        .eq('id', siteSettingsId)
+        .single()
+
+      if (fetchError) {
+        throw fetchError
+      }
+
+      // Combinar los valores existentes con el nuevo
+      const updatedHeroImages = {
+        ...(currentSettings?.hero_images || {}),
+        [id]: {
+          url: publicUrl
+        }
+      }
+
       // Actualizar site_settings con la nueva URL
       const { error: updateError } = await supabase
         .from('site_settings')
         .update({
-          hero_images: {
-            [id]: {
-              url: publicUrl
-            }
-          }
+          hero_images: updatedHeroImages
         })
-        .eq('id', 1)
+        .eq('id', siteSettingsId)
 
       if (updateError) {
         throw updateError

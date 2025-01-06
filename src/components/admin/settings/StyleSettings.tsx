@@ -7,11 +7,27 @@ import { Palette, Image as ImageIcon } from "lucide-react"
 import { ImageTable } from "./components/ImageTable"
 import { useSiteImages } from "@/hooks/useSiteImages"
 import { useQueryClient } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
 
 export function StyleSettings() {
   const { data: images, refetch } = useSiteImages()
   const queryClient = useQueryClient()
   const [uploading, setUploading] = useState(false)
+
+  // Obtener el ID de site_settings
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .single()
+      
+      if (error) throw error
+      return data
+    }
+  })
 
   const handleImageUpdate = async (id: number, newUrl: string) => {
     // Invalidar la caché para forzar una recarga de las imágenes
@@ -75,10 +91,11 @@ export function StyleSettings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {images && (
+          {images && siteSettings?.id && (
             <ImageTable 
               images={images}
               onImageUpdate={handleImageUpdate}
+              siteSettingsId={siteSettings.id}
             />
           )}
         </CardContent>
