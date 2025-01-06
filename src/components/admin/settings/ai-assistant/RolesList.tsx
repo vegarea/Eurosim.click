@@ -30,7 +30,10 @@ export function RolesList() {
         .order('role')
 
       if (error) throw error
-      setRoles(data)
+      
+      if (data) {
+        setRoles(data)
+      }
     } catch (error) {
       console.error('Error loading roles:', error)
       toast({
@@ -45,22 +48,21 @@ export function RolesList() {
 
   const handleUpdateRole = async (roleId: string, updates: Partial<AssistantRole>) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('ai_assistant_roles')
         .update(updates)
         .eq('id', roleId)
+        .select()
+        .single()
 
       if (error) throw error
 
-      // Actualizar estado local
+      // Actualizar estado local solo si la actualización fue exitosa
       setRoles(roles.map(role => 
         role.id === roleId ? { ...role, ...updates } : role
       ))
 
-      toast({
-        title: "Rol actualizado",
-        description: "Los cambios en el rol se han guardado correctamente."
-      })
+      return Promise.resolve()
     } catch (error) {
       console.error('Error updating role:', error)
       toast({
