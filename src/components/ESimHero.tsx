@@ -90,7 +90,9 @@ export function ESimHero() {
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-2">
+                    <Button 
+                      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+                    >
                       <Smartphone className="h-4 w-4" />
                       Verifica la compatibilidad
                     </Button>
