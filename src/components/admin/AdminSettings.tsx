@@ -1,11 +1,12 @@
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, ShoppingCart, Search, Palette, Plug } from "lucide-react"
+import { Building2, ShoppingCart, Search, Palette, Plug, Bot } from "lucide-react"
 import { CompanySettings } from "./settings/CompanySettings"
 import { EcommerceSettings } from "./settings/EcommerceSettings"
 import { SeoSettings } from "./settings/SeoSettings"
 import { StyleSettings } from "./settings/StyleSettings"
 import { IntegrationsSettings } from "./settings/IntegrationsSettings"
+import { AIAssistantSettings } from "./settings/AIAssistantSettings"
 
 export function AdminSettings() {
   return (
@@ -41,6 +42,10 @@ export function AdminSettings() {
             <Plug className="mr-2 h-4 w-4" />
             Integraciones
           </TabsTrigger>
+          <TabsTrigger value="assistant" className="data-[state=active]:bg-white">
+            <Bot className="mr-2 h-4 w-4" />
+            Asistente Virtual
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="company">
@@ -61,6 +66,10 @@ export function AdminSettings() {
 
         <TabsContent value="integrations">
           <IntegrationsSettings />
+        </TabsContent>
+
+        <TabsContent value="assistant">
+          <AIAssistantSettings />
         </TabsContent>
       </Tabs>
     </div>
