@@ -1,4 +1,4 @@
-import { Order } from "../../orders/types"
+import { Order } from "@/types/database/orders"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { DataTable } from "@/components/ui/data-table"

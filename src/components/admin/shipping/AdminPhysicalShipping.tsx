@@ -6,20 +6,8 @@ import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { OrderEvent } from "@/types/database/common"
-import { PhysicalOrderCard } from "./components/PhysicalOrderCard"
-import { NoOrdersMessage } from "./components/NoOrdersMessage"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { ShippingTabs } from "./components/ShippingTabs"
 import { ShippingSettings } from "./components/ShippingSettings"
+import { ShippingTabs } from "./components/ShippingTabs"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -28,10 +16,17 @@ export function AdminPhysicalShipping() {
   const [showDeliveredDialog, setShowDeliveredDialog] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  // Filtramos solo pedidos físicos que estén en procesamiento o enviados
-  const physicalOrders = orders.filter(
-    order => order.type === "physical" && 
-    ["processing", "shipped"].includes(order.status)
+  // Filtramos y organizamos los pedidos físicos por estado
+  const pendingOrders = orders.filter(
+    order => order.type === "physical" && order.status === "processing"
+  )
+
+  const shippedOrders = orders.filter(
+    order => order.type === "physical" && order.status === "shipped"
+  )
+
+  const deliveredOrders = orders.filter(
+    order => order.type === "physical" && order.status === "delivered"
   )
 
   const handleConfirmShipment = async (
@@ -126,29 +121,58 @@ export function AdminPhysicalShipping() {
     }
   }
 
+  const columns = [
+    {
+      header: "ID Pedido",
+      cell: (order: Order) => order.id
+    },
+    {
+      header: "Cliente",
+      cell: (order: Order) => order.customer?.name || "Cliente no registrado"
+    },
+    {
+      header: "Acciones",
+      cell: (order: Order) => (
+        <div className="space-x-2">
+          {order.status === "processing" && (
+            <button
+              onClick={() => {
+                setSelectedOrder(order)
+                setShowConfirmDialog(true)
+              }}
+              disabled={isUpdating}
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+            >
+              Confirmar Envío
+            </button>
+          )}
+          {order.status === "shipped" && (
+            <button
+              onClick={() => {
+                setSelectedOrder(order)
+                setShowDeliveredDialog(true)
+              }}
+              disabled={isUpdating}
+              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+            >
+              Confirmar Entrega
+            </button>
+          )}
+        </div>
+      )
+    }
+  ]
+
   return (
     <div className="space-y-6">
       <ShippingSettings />
       
-      <div className="grid gap-4">
-        {physicalOrders.map((order) => (
-          <PhysicalOrderCard
-            key={order.id}
-            order={order}
-            onShipOrder={(order) => {
-              setSelectedOrder(order)
-              setShowConfirmDialog(true)
-            }}
-            onMarkDelivered={(order) => {
-              setSelectedOrder(order)
-              setShowDeliveredDialog(true)
-            }}
-            isUpdating={isUpdating}
-          />
-        ))}
-
-        {physicalOrders.length === 0 && <NoOrdersMessage />}
-      </div>
+      <ShippingTabs
+        pendingOrders={pendingOrders}
+        shippedOrders={shippedOrders}
+        deliveredOrders={deliveredOrders}
+        columns={columns}
+      />
 
       {/* Diálogo de confirmación de envío */}
       {selectedOrder && (
@@ -161,30 +185,24 @@ export function AdminPhysicalShipping() {
             }
           }}
           orderId={selectedOrder.id}
+          mode="ship"
         />
       )}
 
       {/* Diálogo de confirmación de entrega */}
-      <AlertDialog open={showDeliveredDialog} onOpenChange={setShowDeliveredDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar entrega</AlertDialogTitle>
-            <AlertDialogDescription>
-              ¿Estás seguro de que deseas marcar este pedido como entregado?
-              Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isUpdating}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={isUpdating}
-              onClick={() => selectedOrder && handleConfirmDelivery(selectedOrder.id)}
-            >
-              Confirmar entrega
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {selectedOrder && (
+        <ShippingConfirmDialog
+          open={showDeliveredDialog}
+          onOpenChange={setShowDeliveredDialog}
+          onConfirm={() => {
+            if (selectedOrder) {
+              handleConfirmDelivery(selectedOrder.id)
+            }
+          }}
+          orderId={selectedOrder.id}
+          mode="deliver"
+        />
+      )}
     </div>
   )
 }
