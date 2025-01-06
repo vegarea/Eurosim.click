@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query"
 import { UIOrder } from "@/types/ui/orders"
 import { Package2, CreditCard, Wifi } from "lucide-react"
 import {
@@ -7,12 +8,67 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { supabase } from "@/integrations/supabase/client"
+import { Product } from "@/types/database/products"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface OrderProductInfoProps {
-  order: UIOrder;
+  order: UIOrder
 }
 
 export function OrderProductInfo({ order }: OrderProductInfoProps) {
+  const { data: product, isLoading } = useQuery({
+    queryKey: ['product', order.product_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', order.product_id)
+        .single()
+
+      if (error) throw error
+      return data as Product
+    }
+  })
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package2 className="h-5 w-5 text-gray-500" />
+            Detalles del Producto
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!product) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package2 className="h-5 w-5 text-gray-500" />
+            Detalles del Producto
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Producto no encontrado
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -26,41 +82,83 @@ export function OrderProductInfo({ order }: OrderProductInfoProps) {
           <div>
             <h3 className="font-medium mb-1">Producto</h3>
             <div className="flex items-center gap-2">
-              {order.type === 'physical' ? (
+              {product.type === 'physical' ? (
                 <CreditCard className="h-4 w-4 text-primary" />
               ) : (
                 <Wifi className="h-4 w-4 text-primary" />
               )}
-              <span>{order.metadata?.title || "No especificado"}</span>
+              <span>{product.title}</span>
             </div>
           </div>
+
           <div>
             <h3 className="font-medium mb-1">Tipo de SIM</h3>
             <Badge variant="secondary" className="capitalize">
-              {order.type === 'physical' ? 'SIM Física' : 'eSIM'}
+              {product.type === 'physical' ? 'SIM Física' : 'eSIM'}
             </Badge>
           </div>
+
           <div>
             <h3 className="font-medium mb-1">Datos en Europa</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.description?.match(/(\d+)GB Europa/)?.[1] || "0"}GB
+              {product.data_eu_gb}GB
             </p>
           </div>
+
           <div>
             <h3 className="font-medium mb-1">Datos en España</h3>
             <p className="font-semibold text-primary">
-              {order.metadata?.description?.match(/(\d+)GB España/)?.[1] || "0"}GB
+              {product.data_es_gb}GB
             </p>
           </div>
+
           <div>
             <h3 className="font-medium mb-1">Cantidad</h3>
-            <p>{order.quantity || 1}</p>
+            <p>{order.quantity}</p>
           </div>
+
           <div>
             <h3 className="font-medium mb-1">Precio</h3>
             <p className="font-semibold">${(order.total_amount / 100).toFixed(2)} MXN</p>
           </div>
+
+          <div>
+            <h3 className="font-medium mb-1">Validez</h3>
+            <p>{product.validity_days} días</p>
+          </div>
+
+          <div>
+            <h3 className="font-medium mb-1">Estado del Producto</h3>
+            <Badge variant={product.status === 'active' ? 'success' : 'destructive'}>
+              {product.status === 'active' ? 'Activo' : 'Inactivo'}
+            </Badge>
+          </div>
+
+          {product.type === 'physical' && (
+            <div>
+              <h3 className="font-medium mb-1">Stock Disponible</h3>
+              <p>{product.stock || 0} unidades</p>
+            </div>
+          )}
         </div>
+
+        {product.description && (
+          <div className="mt-6">
+            <h3 className="font-medium mb-2">Descripción</h3>
+            <p className="text-sm text-muted-foreground">{product.description}</p>
+          </div>
+        )}
+
+        {product.features && Array.isArray(product.features) && product.features.length > 0 && (
+          <div className="mt-6">
+            <h3 className="font-medium mb-2">Características</h3>
+            <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+              {product.features.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
