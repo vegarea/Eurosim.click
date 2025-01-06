@@ -22,7 +22,7 @@ const getButtonColor = (productId: string) => {
       'bg-[#E5DEFF]', // Soft Purple
       'bg-[#FDE1D3]'  // Soft Peach
     ]
-  };
+  }
 
   // Usar los últimos caracteres del ID como índice
   const index = parseInt(productId.slice(-6), 16) % colors.bg.length;
