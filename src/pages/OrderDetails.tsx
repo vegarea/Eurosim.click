@@ -14,10 +14,11 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { OrderStatus } from "@/types/database/enums"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft } from "lucide-react"
+import { ChevronLeft, ExternalLink } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Progress } from "@/components/ui/progress"
 import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
+import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 
 const statusOrder = [
   "payment_pending",
@@ -25,6 +26,15 @@ const statusOrder = [
   "shipped",
   "delivered",
 ] as const
+
+// Mock payment data - In a real app, this would come from your payment provider's API
+const mockPaymentData = {
+  paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
+  logs: [
+    { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
+    { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
+  ]
+}
 
 export default function OrderDetails() {
   const { orderId } = useParams<{ orderId: string }>()
@@ -112,6 +122,17 @@ export default function OrderDetails() {
     return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
+  const formatDateTime = (date: string | null) => {
+    if (!date) return "No especificado"
+    return new Date(date).toLocaleString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -157,6 +178,22 @@ export default function OrderDetails() {
             </div>
             <Progress value={getProgressPercentage()} className="h-2" />
           </div>
+
+          <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+            <div>
+              Creado: {formatDateTime(order.created_at)}
+            </div>
+            {order.stripe_payment_intent_id && (
+              <a
+                href={order.stripe_receipt_url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-primary hover:underline"
+              >
+                Ver en Stripe <ExternalLink className="h-4 w-4" />
+              </a>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -170,16 +207,18 @@ export default function OrderDetails() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <OrderProductInfo order={order} />
-          <OrderDocumentation order={order} />
+          <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
+          <OrderDocumentation order={order} />
           <OrderNotes 
             order={order} 
             onAddNote={handleAddNote}
           />
-          <OrderHistory events={order.events || []} />
         </div>
+
+        <OrderHistory events={order.events || []} />
       </div>
     </AdminLayout>
   )
