@@ -59,10 +59,22 @@ serve(async (req) => {
       })
     }
 
-    // Actualizar el secreto en Supabase
-    const { error } = await supabaseClient.functions.setSecret('OPENAI_API_KEY', apiKey)
+    // Actualizar el secreto usando la API de Supabase
+    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/secrets`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: 'OPENAI_API_KEY',
+        value: apiKey,
+      }),
+    })
 
-    if (error) throw error
+    if (!response.ok) {
+      throw new Error('Failed to update secret')
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
