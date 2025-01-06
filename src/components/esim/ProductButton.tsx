@@ -20,8 +20,8 @@ const getButtonColor = (productId: string) => {
       'bg-[#FEF7CD]', // Soft Yellow
       'bg-[#FFDEE2]', // Soft Pink
       'bg-[#E5DEFF]', // Soft Purple
-      'bg-[#FDE1D3]', // Soft Peach
-    ];
+      'bg-[#FDE1D3]'  // Soft Peach
+    ]
   };
 
   // Usar los últimos caracteres del ID como índice
