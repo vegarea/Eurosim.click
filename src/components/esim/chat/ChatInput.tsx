@@ -28,6 +28,13 @@ export function ChatInput({
     }
   }, [showChat])
 
+  const handleClick = () => {
+    console.log("Button clicked, input:", input)
+    if (input.trim()) {
+      onSend()
+    }
+  }
+
   return (
     <div className="flex flex-col md:flex-row gap-2">
       <div className="relative flex-1">
@@ -52,7 +59,7 @@ export function ChatInput({
         />
       </div>
       <Button 
-        onClick={onSend}
+        onClick={handleClick}
         disabled={!input.trim()}
         className={cn(
           "w-full md:w-auto",

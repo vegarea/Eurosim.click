@@ -17,9 +17,14 @@ export function CompatibilityChat() {
   const [isTyping, setIsTyping] = useState(false)
 
   const sendMessage = async (message: string) => {
-    if (!message.trim()) return
+    console.log("sendMessage called with:", message)
+    if (!message.trim()) {
+      console.log("Message is empty, returning")
+      return
+    }
 
     try {
+      console.log("Setting loading state and showing chat")
       setIsLoading(true)
       setShowChat(true)
       
@@ -28,6 +33,7 @@ export function CompatibilityChat() {
       setInput("")
       setIsTyping(true)
 
+      console.log("Calling AI assistant")
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
           role: 'compatibility_checker',
@@ -35,9 +41,12 @@ export function CompatibilityChat() {
         }
       })
 
-      if (error) throw error
+      if (error) {
+        console.error("Error from AI assistant:", error)
+        throw error
+      }
 
-      // Simular efecto de typing
+      console.log("Response received:", data)
       const response = data.response
       const words = response.split(' ')
       let currentText = ''
@@ -64,6 +73,13 @@ export function CompatibilityChat() {
       console.error('Error al enviar mensaje:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleSendMessage = () => {
+    console.log("handleSendMessage called, input:", input)
+    if (input.trim()) {
+      sendMessage(input)
     }
   }
 
@@ -94,7 +110,7 @@ export function CompatibilityChat() {
         input={input}
         setInput={setInput}
         isLoading={isLoading}
-        onSend={() => sendMessage(input)}
+        onSend={handleSendMessage}
         showChat={showChat}
         placeholder={!showChat ? "¿Cuál es el modelo de tu teléfono?" : "Escribe tu pregunta aquí"}
       />
