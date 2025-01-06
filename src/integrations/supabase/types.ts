@@ -423,7 +423,6 @@ export type Database = {
           hero_images: Json | null
           id: string
           logo_url: string | null
-          openai_api_key: string | null
           updated_at: string | null
         }
         Insert: {
@@ -431,7 +430,6 @@ export type Database = {
           hero_images?: Json | null
           id?: string
           logo_url?: string | null
-          openai_api_key?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -439,7 +437,6 @@ export type Database = {
           hero_images?: Json | null
           id?: string
           logo_url?: string | null
-          openai_api_key?: string | null
           updated_at?: string | null
         }
         Relationships: []
