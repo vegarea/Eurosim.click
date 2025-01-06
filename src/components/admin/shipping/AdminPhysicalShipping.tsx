@@ -10,14 +10,13 @@ import { Truck, Package, CheckCircle } from "lucide-react"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
-import { createShippingConfirmationEvent } from "./utils/shippingEvents"
-import { useShippingNotifications } from "@/hooks/useShippingNotifications"
+import { createShippingConfirmationEvent, createDeliveryConfirmationEvent } from "./utils/shippingEvents"
 
 export function AdminPhysicalShipping() {
   const { orders, updateOrder } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showShippingDialog, setShowShippingDialog] = useState(false)
-  const { notifyShipment } = useShippingNotifications()
+  const [dialogMode, setDialogMode] = useState<'ship' | 'deliver'>('ship')
 
   // Filtrar pedidos por estado
   const pendingOrders = orders.filter(order => 
@@ -30,31 +29,49 @@ export function AdminPhysicalShipping() {
     order.type === 'physical' && order.status === 'delivered'
   )
 
-  const handleShippingConfirm = async (trackingNumber: string, carrier: string) => {
+  const handleShippingConfirm = async (trackingNumber?: string, carrier?: string) => {
     if (!selectedOrder) return
 
     try {
-      await updateOrder(selectedOrder.id, {
-        status: 'shipped',
-        tracking_number: trackingNumber,
-        carrier: carrier
-      })
+      if (dialogMode === 'ship') {
+        await updateOrder(selectedOrder.id, {
+          status: 'shipped',
+          tracking_number: trackingNumber,
+          carrier: carrier
+        })
 
-      const { error: eventError } = await supabase
-        .from('order_events')
-        .insert(createShippingConfirmationEvent(selectedOrder.id, trackingNumber, carrier))
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert(createShippingConfirmationEvent(selectedOrder.id, trackingNumber!, carrier!))
 
-      if (eventError) throw eventError
+        if (eventError) throw eventError
 
-      // Enviar notificaciones
-      await notifyShipment(selectedOrder, trackingNumber, carrier)
+      } else { // deliver mode
+        await updateOrder(selectedOrder.id, {
+          status: 'delivered'
+        })
 
-      toast.success('Envío confirmado correctamente')
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert(createDeliveryConfirmationEvent(selectedOrder.id))
+
+        if (eventError) throw eventError
+      }
+
+      toast.success(
+        dialogMode === 'ship' 
+          ? 'Envío confirmado correctamente'
+          : 'Entrega confirmada correctamente'
+      )
       setShowShippingDialog(false)
       setSelectedOrder(null)
     } catch (error) {
       console.error('Error al confirmar envío:', error)
-      toast.error('Error al confirmar el envío')
+      toast.error(
+        dialogMode === 'ship'
+          ? 'Error al confirmar el envío'
+          : 'Error al confirmar la entrega'
+      )
     }
   }
 
@@ -120,17 +137,32 @@ export function AdminPhysicalShipping() {
         const order = row.original
         return (
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                setSelectedOrder(order)
-                setShowShippingDialog(true)
-              }}
-              disabled={order.status !== 'processing'}
-            >
-              Confirmar Envío
-            </Button>
+            {order.status === 'processing' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedOrder(order)
+                  setDialogMode('ship')
+                  setShowShippingDialog(true)
+                }}
+              >
+                Confirmar Envío
+              </Button>
+            )}
+            {order.status === 'shipped' && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedOrder(order)
+                  setDialogMode('deliver')
+                  setShowShippingDialog(true)
+                }}
+              >
+                Marcar como Entregado
+              </Button>
+            )}
           </div>
         )
       }
@@ -159,6 +191,7 @@ export function AdminPhysicalShipping() {
         open={showShippingDialog}
         onOpenChange={setShowShippingDialog}
         orderId={selectedOrder?.id || ''}
+        mode={dialogMode}
         onConfirm={handleShippingConfirm}
       />
     </div>
