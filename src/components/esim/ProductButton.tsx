@@ -36,7 +36,7 @@ export function ProductButton({
         // Colores directos para cada plan
         product.price <= 50000 && "bg-[#D3E4FD]", // Azul suave para el plan básico
         product.price > 50000 && product.price <= 70000 && "bg-[#F2FCE2]", // Verde suave para el plan medio
-        product.price > 70000 && product.price <= 90000 && "bg-[#FEC6A1]", // Naranja suave para el plan L
+        product.price > 70000 && product.price <= 90000 && "bg-[#fad7c0]", // Naranja más suave para el plan L
         product.price > 90000 && "bg-[#FFDEE2]" // Rosa suave para el plan premium
       )}
     >
