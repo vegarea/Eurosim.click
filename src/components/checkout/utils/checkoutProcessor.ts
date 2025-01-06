@@ -4,7 +4,7 @@ import { Order, OrderInsert } from "@/types/database/orders";
 import { OrderItem, OrderItemInsert } from "@/types/database/orderItems";
 import { checkoutLogger } from "./checkoutLogger";
 import { Json } from "@/types/database/common";
-import { PaymentMethod } from "@/types/database/enums";
+import { PaymentMethod, OrderType } from "@/types/database/enums";
 
 export class CheckoutProcessor {
   constructor(
@@ -140,7 +140,7 @@ export class CheckoutProcessor {
       customer_id: customerId,
       product_id: firstItem.product_id,
       status: "payment_pending",
-      type: metadata.product_type,
+      type: metadata.product_type as OrderType,
       total_amount: this.totalAmount,
       quantity: firstItem.quantity,
       payment_method: "stripe" as PaymentMethod,

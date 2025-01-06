@@ -44,19 +44,14 @@ export function ImageTable({ images, onImageUpdate, siteSettingsId }: ImageTable
 
       const currentHeroImages = currentSettings?.hero_images || {}
       
-      // Combinar los valores existentes con el nuevo
-      const updatedHeroImages = {
-        ...currentHeroImages,
-        [id]: {
-          url: publicUrl
-        }
-      }
-
       // Actualizar site_settings con la nueva URL
       const { error: updateError } = await supabase
         .from('site_settings')
         .update({
-          hero_images: updatedHeroImages
+          hero_images: {
+            ...currentHeroImages,
+            [id]: { url: publicUrl }
+          }
         })
         .eq('id', siteSettingsId)
 
