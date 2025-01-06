@@ -190,6 +190,33 @@ export type Database = {
           },
         ]
       }
+      pending_orders: {
+        Row: {
+          created_at: string
+          customer_info: Json
+          expires_at: string
+          id: string
+          order_info: Json
+          shipping_address: Json
+        }
+        Insert: {
+          created_at?: string
+          customer_info: Json
+          expires_at: string
+          id?: string
+          order_info: Json
+          shipping_address: Json
+        }
+        Update: {
+          created_at?: string
+          customer_info?: Json
+          expires_at?: string
+          id?: string
+          order_info?: Json
+          shipping_address?: Json
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           created_at: string | null
@@ -294,7 +321,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_pending_orders: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       customer_gender: "M" | "F"
