@@ -9,6 +9,7 @@ import { OrderEvent } from "@/types/database/common"
 import { ShippingSettings } from "./components/ShippingSettings"
 import { ShippingTabs } from "./components/ShippingTabs"
 import { usePhysicalOrders } from "./components/usePhysicalOrders"
+import { useShippingActions } from "./components/useShippingActions"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -18,98 +19,12 @@ export function AdminPhysicalShipping() {
   const [isUpdating, setIsUpdating] = useState(false)
 
   const { pendingOrders, shippedOrders, deliveredOrders } = usePhysicalOrders(orders)
-
-  const handleConfirmShipment = async (
-    orderId: string, 
-    trackingNumber: string, 
-    carrier: string
-  ) => {
-    try {
-      setIsUpdating(true)
-
-      // Actualizar la orden
-      const { error: orderError } = await supabase
-        .from('orders')
-        .update({
-          status: 'shipped' as OrderStatus,
-          tracking_number: trackingNumber,
-          carrier: carrier
-        })
-        .eq('id', orderId)
-
-      if (orderError) throw orderError
-
-      // Crear evento de envío
-      const shippingEvent: Omit<OrderEvent, "id"> = {
-        order_id: orderId,
-        type: "shipping_updated",
-        description: `Pedido enviado con ${carrier}. Número de seguimiento: ${trackingNumber}`,
-        metadata: {
-          carrier,
-          tracking_number: trackingNumber,
-          automated: false
-        },
-        created_at: new Date().toISOString()
-      }
-
-      const { error: eventError } = await supabase
-        .from('order_events')
-        .insert(shippingEvent)
-
-      if (eventError) throw eventError
-
-      await refetchOrders()
-      toast.success("Envío confirmado correctamente")
-      setShowConfirmDialog(false)
-    } catch (error) {
-      console.error('Error al confirmar envío:', error)
-      toast.error("Error al confirmar el envío")
-    } finally {
-      setIsUpdating(false)
-    }
-  }
-
-  const handleConfirmDelivery = async (orderId: string) => {
-    try {
-      setIsUpdating(true)
-
-      // Actualizar estado de la orden
-      const { error: orderError } = await supabase
-        .from('orders')
-        .update({ status: 'delivered' as OrderStatus })
-        .eq('id', orderId)
-
-      if (orderError) throw orderError
-
-      // Crear evento de entrega
-      const deliveryEvent: Omit<OrderEvent, "id"> = {
-        order_id: orderId,
-        type: "status_changed",
-        description: "Pedido marcado como entregado",
-        metadata: {
-          old_status: "shipped",
-          new_status: "delivered",
-          automated: false
-        },
-        created_at: new Date().toISOString()
-      }
-
-      const { error: eventError } = await supabase
-        .from('order_events')
-        .insert(deliveryEvent)
-
-      if (eventError) throw eventError
-
-      await refetchOrders()
-      toast.success("Entrega confirmada correctamente")
-      setShowDeliveredDialog(false)
-    } catch (error) {
-      console.error('Error al confirmar entrega:', error)
-      toast.error("Error al confirmar la entrega")
-    } finally {
-      setIsUpdating(false)
-    }
-  }
+  const { handleConfirmShipment, handleConfirmDelivery } = useShippingActions({
+    setIsUpdating,
+    refetchOrders,
+    setShowConfirmDialog,
+    setShowDeliveredDialog
+  })
 
   const columns = [
     {
@@ -119,10 +34,8 @@ export function AdminPhysicalShipping() {
     {
       header: "Cliente",
       cell: (order: Order) => {
-        if (order.customer_id) {
-          return order.customer?.name || "Cliente no registrado"
-        }
-        return "Cliente no registrado"
+        const customerName = order.customer?.name
+        return customerName || "Cliente no registrado"
       }
     },
     {

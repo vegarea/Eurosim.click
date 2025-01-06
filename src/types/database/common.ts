@@ -13,6 +13,21 @@ export interface OrderEvent {
   order_id: string
   type: EventType
   description: string
-  metadata?: Json
+  metadata?: {
+    automated?: boolean
+    oldStatus?: string
+    newStatus?: string
+    details?: string
+    [key: string]: any
+  }
   created_at: string
+}
+
+export interface ShippingAddress {
+  street: string
+  city: string
+  state: string
+  country: string
+  postal_code: string
+  phone?: string
 }
