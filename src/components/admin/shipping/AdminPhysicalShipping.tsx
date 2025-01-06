@@ -6,13 +6,28 @@ import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { OrderEvent } from "@/types/database/common"
+import { OrderStatusBadge } from "../orders/OrderStatusBadge"
+import { Button } from "@/components/ui/button"
+import { Truck, CheckCircle2 } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [showDeliveredDialog, setShowDeliveredDialog] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
 
+  // Filtramos solo pedidos físicos que estén en procesamiento o enviados
   const physicalOrders = orders.filter(
     order => order.type === "physical" && 
     ["processing", "shipped"].includes(order.status)
@@ -101,6 +116,7 @@ export function AdminPhysicalShipping() {
 
       await refetchOrders()
       toast.success("Entrega confirmada correctamente")
+      setShowDeliveredDialog(false)
     } catch (error) {
       console.error('Error al confirmar entrega:', error)
       toast.error("Error al confirmar la entrega")
@@ -121,37 +137,49 @@ export function AdminPhysicalShipping() {
                   {order.customer?.name || "Cliente no registrado"}
                 </p>
               </div>
+              <OrderStatusBadge status={order.status} />
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-gray-600">
+                {order.tracking_number && (
+                  <>
+                    <p>Tracking: {order.tracking_number}</p>
+                    <p>Carrier: {order.carrier}</p>
+                  </>
+                )}
+              </div>
+              
               <div className="space-x-2">
                 {order.status === "processing" && (
-                  <button
+                  <Button
                     onClick={() => {
                       setSelectedOrder(order)
                       setShowConfirmDialog(true)
                     }}
                     disabled={isUpdating}
-                    className="bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-blue-600 transition-colors"
+                    className="gap-2"
                   >
+                    <Truck className="h-4 w-4" />
                     Confirmar Envío
-                  </button>
+                  </Button>
                 )}
                 {order.status === "shipped" && (
-                  <button
-                    onClick={() => handleConfirmDelivery(order.id)}
+                  <Button
+                    onClick={() => {
+                      setSelectedOrder(order)
+                      setShowDeliveredDialog(true)
+                    }}
                     disabled={isUpdating}
-                    className="bg-green-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-green-600 transition-colors"
+                    variant="success"
+                    className="gap-2"
                   >
+                    <CheckCircle2 className="h-4 w-4" />
                     Marcar como Entregado
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
-            
-            {order.tracking_number && (
-              <div className="text-sm text-gray-600">
-                <p>Tracking: {order.tracking_number}</p>
-                <p>Carrier: {order.carrier}</p>
-              </div>
-            )}
           </div>
         ))}
 
@@ -162,15 +190,42 @@ export function AdminPhysicalShipping() {
         )}
       </div>
 
+      {/* Diálogo de confirmación de envío */}
       {selectedOrder && (
         <ShippingConfirmDialog
           open={showConfirmDialog}
           onOpenChange={setShowConfirmDialog}
-          onConfirm={handleConfirmShipment}
+          onConfirm={(trackingNumber, carrier) => {
+            if (selectedOrder && trackingNumber && carrier) {
+              handleConfirmShipment(selectedOrder.id, trackingNumber, carrier)
+            }
+          }}
           orderId={selectedOrder.id}
           isUpdating={isUpdating}
         />
       )}
+
+      {/* Diálogo de confirmación de entrega */}
+      <AlertDialog open={showDeliveredDialog} onOpenChange={setShowDeliveredDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar entrega</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que deseas marcar este pedido como entregado?
+              Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isUpdating}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isUpdating}
+              onClick={() => selectedOrder && handleConfirmDelivery(selectedOrder.id)}
+            >
+              Confirmar entrega
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

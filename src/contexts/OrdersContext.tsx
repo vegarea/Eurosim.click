@@ -5,7 +5,7 @@ import { toast } from "sonner"
 
 interface OrdersContextType {
   orders: Order[]
-  loading: boolean
+  isLoading: boolean
   error: Error | null
   updateOrder: (orderId: string, updates: Partial<Order>) => Promise<void>
   refetchOrders: () => Promise<void>
@@ -13,7 +13,7 @@ interface OrdersContextType {
 
 const OrdersContext = createContext<OrdersContextType>({
   orders: [],
-  loading: false,
+  isLoading: false,
   error: null,
   updateOrder: async () => {},
   refetchOrders: async () => {}
@@ -21,12 +21,12 @@ const OrdersContext = createContext<OrdersContextType>({
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
+      setIsLoading(true)
       const { data, error } = await supabase
         .from('orders')
         .select(`
@@ -44,7 +44,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       setError(err as Error)
       toast.error('Error al cargar los pedidos')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -54,6 +54,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
 
   const updateOrder = async (orderId: string, updates: Partial<Order>) => {
     try {
+      setIsLoading(true)
       const { error } = await supabase
         .from('orders')
         .update(updates)
@@ -74,13 +75,15 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       console.error('Error updating order:', err)
       toast.error('Error al actualizar el pedido')
       throw err
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
     <OrdersContext.Provider value={{ 
       orders, 
-      loading, 
+      isLoading, 
       error, 
       updateOrder,
       refetchOrders: fetchOrders 
