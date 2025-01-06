@@ -53,25 +53,29 @@ export default function ESims() {
               Elige tu plan eSIM
             </h2>
 
-            <div className="max-w-4xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-                {products.map((product) => (
-                  <ProductButton
-                    key={product.id}
-                    product={product}
-                    isSelected={selectedPlan?.id === product.id}
-                    onClick={() => setSelectedPlan(product)}
-                  />
-                ))}
-              </div>
-
-              {selectedPlan && (
-                <div className="max-w-3xl mx-auto">
-                  <PlanDetails
-                    product={selectedPlan}
-                  />
+            <div className="max-w-5xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-[300px,1fr] gap-6 md:gap-8 items-start">
+                {/* Columna de botones de productos */}
+                <div className="flex flex-col gap-4">
+                  {products.map((product) => (
+                    <ProductButton
+                      key={product.id}
+                      product={product}
+                      isSelected={selectedPlan?.id === product.id}
+                      onClick={() => setSelectedPlan(product)}
+                    />
+                  ))}
                 </div>
-              )}
+
+                {/* Columna de detalles del producto */}
+                <div className="sticky top-4">
+                  {selectedPlan && (
+                    <PlanDetails
+                      product={selectedPlan}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
