@@ -1,18 +1,20 @@
-import { Order } from "./types"
-import { FileText } from "lucide-react"
+import { Order } from "@/types/database/orders"
+import { FileText, Calendar } from "lucide-react"
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { format } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface OrderDocumentationProps {
   order: Order
 }
 
 export function OrderDocumentation({ order }: OrderDocumentationProps) {
-  const metadata = order.metadata as any;
+  const customer = order.customer
   
   return (
     <Card>
@@ -26,19 +28,38 @@ export function OrderDocumentation({ order }: OrderDocumentationProps) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <h4 className="text-sm font-medium text-gray-500">Pasaporte</h4>
-            <p>{metadata?.passport_number || "No especificado"}</p>
+            <p>{customer?.passport_number || "No especificado"}</p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">Fecha de nacimiento</h4>
-            <p>{metadata?.birth_date || "No especificada"}</p>
+            <p>
+              {customer?.birth_date 
+                ? format(new Date(customer.birth_date), "PPP", { locale: es })
+                : "No especificada"}
+            </p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500">Género</h4>
-            <p>{metadata?.gender === 'M' ? 'Masculino' : metadata?.gender === 'F' ? 'Femenino' : 'No especificado'}</p>
+            <p>
+              {customer?.gender === 'M' 
+                ? 'Masculino' 
+                : customer?.gender === 'F' 
+                  ? 'Femenino' 
+                  : 'No especificado'}
+            </p>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-gray-500">Fecha de activación</h4>
-            <p>{order.activation_date ? new Date(order.activation_date).toLocaleDateString() : "No especificada"}</p>
+          
+          {/* Fecha de activación con fondo pastel */}
+          <div className="col-span-2 bg-[#F2FCE2] p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-500 flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Fecha de activación
+            </h4>
+            <p className="font-medium">
+              {order.activation_date 
+                ? format(new Date(order.activation_date), "PPP", { locale: es })
+                : "No especificada"}
+            </p>
           </div>
         </div>
       </CardContent>
