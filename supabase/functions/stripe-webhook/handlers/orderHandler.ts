@@ -1,64 +1,71 @@
-import { createClient } from '@supabase/supabase-js'
-import { Database } from '../../../types/database'
-import { OrderStatus, PaymentStatus } from '../types/enums'
-import { stripe } from '../stripe'
+export async function handleOrderCreation(session: any, customer: any, supabase: any) {
+  console.log('📦 Starting order creation for customer:', customer.id)
+  console.log('Session data:', {
+    shipping: session.shipping,
+    metadata: session.metadata
+  })
 
-export async function handleOrderCreation(session: any) {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const supabase = createClient<Database>(supabaseUrl, supabaseKey)
+  try {
+    if (!session || !customer) {
+      console.error('❌ Missing required data:', { 
+        session: !!session, 
+        customer: !!customer 
+      })
+      throw new Error('Missing required session or customer data')
+    }
 
-  const pendingOrderId = session.metadata.pending_order_id
+    // Formatear la dirección de envío desde Stripe
+    const shippingAddress = session.shipping ? {
+      street: session.shipping.address.line1 + 
+        (session.shipping.address.line2 ? ` ${session.shipping.address.line2}` : ''),
+      city: session.shipping.address.city,
+      state: session.shipping.address.state,
+      country: session.shipping.address.country,
+      postal_code: session.shipping.address.postal_code,
+      phone: session.customer_details?.phone || null
+    } : null;
 
-  // Obtener la orden pendiente
-  const { data: pendingOrder, error: pendingError } = await supabase
-    .from('pending_orders')
-    .select('*')
-    .eq('id', pendingOrderId)
-    .single()
+    console.log('📦 Formatted shipping address:', shippingAddress)
 
-  if (pendingError || !pendingOrder) {
-    throw new Error(`No se encontró la orden pendiente: ${pendingError?.message}`)
-  }
-
-  // Crear el cliente
-  const { data: customer, error: customerError } = await supabase
-    .from('customers')
-    .insert({
-      ...pendingOrder.customer_info,
-      default_shipping_address: pendingOrder.shipping_address
-    })
-    .select()
-    .single()
-
-  if (customerError) throw customerError
-
-  // Crear la orden
-  const { data: order, error: orderError } = await supabase
-    .from('orders')
-    .insert({
+    const orderData = {
       customer_id: customer.id,
-      product_id: pendingOrder.order_info.product_id,
-      status: OrderStatus.PROCESSING,
-      type: pendingOrder.order_info.type,
+      product_id: session.metadata.product_id,
+      status: 'processing',
+      type: session.metadata.order_type || 'esim',
       total_amount: parseInt(session.metadata.total_amount),
-      quantity: 1,
+      quantity: parseInt(session.metadata.quantity) || 1,
       payment_method: 'stripe',
-      payment_status: PaymentStatus.COMPLETED,
-      shipping_address: pendingOrder.shipping_address,
+      payment_status: 'completed',
       stripe_payment_intent_id: session.payment_intent,
-      activation_date: pendingOrder.order_info.activation_date
-    })
-    .select()
-    .single()
+      stripe_receipt_url: session.receipt_url,
+      shipping_address: shippingAddress,
+      activation_date: session.metadata.activation_date ? 
+        new Date(session.metadata.activation_date).toISOString() : null,
+      metadata: {
+        stripe_session_id: session.id,
+        original_metadata: session.metadata,
+        shipping_details: session.shipping,
+        customer_details: session.customer_details
+      }
+    }
 
-  if (orderError) throw orderError
+    console.log('📝 Creating order with data:', orderData)
 
-  // Eliminar la orden pendiente
-  await supabase
-    .from('pending_orders')
-    .delete()
-    .eq('id', pendingOrderId)
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert(orderData)
+      .select()
+      .single()
 
-  return { customer, order }
+    if (orderError) {
+      console.error('❌ Error creating order:', orderError)
+      throw orderError
+    }
+
+    console.log('✅ Order created successfully:', order)
+    return order
+  } catch (error) {
+    console.error('❌ Error in order creation:', error)
+    throw error
+  }
 }
