@@ -1,21 +1,21 @@
 import { Order } from "@/types/database/orders"
 
 export function usePhysicalOrders(orders: Order[]) {
+  // Aseguramos que orders sea un array
+  const safeOrders = Array.isArray(orders) ? orders : []
+  
   // Filtramos y organizamos los pedidos físicos por estado
-  const pendingOrders = orders.filter(
-    order => order.type === "physical" && order.status === "processing"
+  const pendingOrders = safeOrders.filter(
+    order => order?.type === "physical" && order?.status === "processing"
   )
 
-  const shippedOrders = orders.filter(
-    order => order.type === "physical" && order.status === "shipped"
+  const shippedOrders = safeOrders.filter(
+    order => order?.type === "physical" && order?.status === "shipped"
   )
 
-  const deliveredOrders = orders.filter(
-    order => order.type === "physical" && order.status === "delivered"
+  const deliveredOrders = safeOrders.filter(
+    order => order?.type === "physical" && order?.status === "delivered"
   )
-
-  console.log('Pending Orders:', pendingOrders)
-  console.log('All Orders:', orders)
 
   return {
     pendingOrders,

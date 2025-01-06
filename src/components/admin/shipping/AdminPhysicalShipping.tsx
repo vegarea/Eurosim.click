@@ -3,13 +3,11 @@ import { useOrders } from "@/contexts/OrdersContext"
 import { Order } from "@/types/database/orders"
 import { OrderStatus } from "@/types/database/enums"
 import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
-import { supabase } from "@/integrations/supabase/client"
-import { toast } from "sonner"
-import { OrderEvent } from "@/types/database/common"
 import { ShippingSettings } from "./components/ShippingSettings"
 import { ShippingTabs } from "./components/ShippingTabs"
 import { usePhysicalOrders } from "./components/usePhysicalOrders"
 import { useShippingActions } from "./components/useShippingActions"
+import { ColumnDef } from "@tanstack/react-table"
 
 export function AdminPhysicalShipping() {
   const { orders, refetchOrders } = useOrders()
@@ -26,48 +24,59 @@ export function AdminPhysicalShipping() {
     setShowDeliveredDialog
   })
 
-  const columns = [
+  const columns: ColumnDef<Order>[] = [
     {
+      accessorKey: "id",
       header: "ID Pedido",
-      cell: (order: Order) => order.id.slice(0, 8)
-    },
-    {
-      header: "Cliente",
-      cell: (order: Order) => {
-        const customerName = order.customer?.name
-        return customerName || "Cliente no registrado"
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.id ? order.id.slice(0, 8) : "N/A"
       }
     },
     {
+      accessorKey: "customer",
+      header: "Cliente",
+      cell: ({ row }) => {
+        const order = row.original
+        return order?.customer?.name || "Cliente no registrado"
+      }
+    },
+    {
+      id: "actions",
       header: "Acciones",
-      cell: (order: Order) => (
-        <div className="space-x-2">
-          {order.status === "processing" && (
-            <button
-              onClick={() => {
-                setSelectedOrder(order)
-                setShowConfirmDialog(true)
-              }}
-              disabled={isUpdating}
-              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              Confirmar Envío
-            </button>
-          )}
-          {order.status === "shipped" && (
-            <button
-              onClick={() => {
-                setSelectedOrder(order)
-                setShowDeliveredDialog(true)
-              }}
-              disabled={isUpdating}
-              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-            >
-              Confirmar Entrega
-            </button>
-          )}
-        </div>
-      )
+      cell: ({ row }) => {
+        const order = row.original
+        if (!order) return null
+
+        return (
+          <div className="space-x-2">
+            {order.status === "processing" && (
+              <button
+                onClick={() => {
+                  setSelectedOrder(order)
+                  setShowConfirmDialog(true)
+                }}
+                disabled={isUpdating}
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              >
+                Confirmar Envío
+              </button>
+            )}
+            {order.status === "shipped" && (
+              <button
+                onClick={() => {
+                  setSelectedOrder(order)
+                  setShowDeliveredDialog(true)
+                }}
+                disabled={isUpdating}
+                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              >
+                Confirmar Entrega
+              </button>
+            )}
+          </div>
+        )
+      }
     }
   ]
 
