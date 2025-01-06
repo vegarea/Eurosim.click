@@ -53,7 +53,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       payment_status: 'completed',
       stripe_payment_intent_id: session.payment_intent,
       stripe_receipt_url: null, // Se actualizará cuando esté disponible
-      shipping_address: shippingAddress,
+      shipping_address: shippingAddress, // Guardamos la dirección estructurada aquí
       activation_date: session.metadata.activation_date ? 
         new Date(session.metadata.activation_date).toISOString() : null,
       metadata: {
