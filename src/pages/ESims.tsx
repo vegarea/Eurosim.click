@@ -11,6 +11,7 @@ import { HowItWorks } from "@/components/HowItWorks"
 import { FrequentQuestions } from "@/components/FrequentQuestions"
 import { CountryCoverage } from "@/components/CountryCoverage"
 import { CommonFeatures } from "@/components/CommonFeatures"
+import { InternationalCalling } from "@/components/InternationalCalling"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
@@ -83,6 +84,7 @@ export default function ESims() {
         <div className="container mx-auto max-w-6xl px-4">
           <CountryCoverage />
           <CommonFeatures />
+          <InternationalCalling />
           <TrustElements />
           <HowItWorks />
           <FrequentQuestions />
