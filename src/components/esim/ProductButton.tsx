@@ -11,18 +11,21 @@ interface ProductButtonProps {
   isPopular?: boolean;
 }
 
-// Función para obtener el color basado en el título del producto
 const getButtonColor = (productTitle: string) => {
-  const colors = {
-    'E-sim S': 'bg-[#D3E4FD]', // Soft Blue
-    'E-sim M': 'bg-[#F2FCE2]', // Soft Green
-    'E-sim L': 'bg-[#FEF7CD]', // Soft Yellow
-    'E-sim XL': 'bg-[#FFDEE2]', // Soft Pink
-    'E-sim XXL': 'bg-[#E5DEFF]', // Soft Purple
-    'default': 'bg-[#B8E2FF]'  // Light Sky Blue
-  };
-
-  return colors[productTitle as keyof typeof colors] || colors.default;
+  switch (productTitle) {
+    case 'E-sim S':
+      return 'bg-[#D3E4FD]'; // Azul suave
+    case 'E-sim M':
+      return 'bg-[#F2FCE2]'; // Verde suave
+    case 'E-sim L':
+      return 'bg-[#FEF7CD]'; // Amarillo suave
+    case 'E-sim XL':
+      return 'bg-[#FFDEE2]'; // Rosa suave
+    case 'E-sim XXL':
+      return 'bg-[#E5DEFF]'; // Morado suave
+    default:
+      return 'bg-[#B8E2FF]'; // Azul cielo claro
+  }
 };
 
 export function ProductButton({ 
