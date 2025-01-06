@@ -17,27 +17,17 @@ export function CompatibilityChat() {
   const [isTyping, setIsTyping] = useState(false)
 
   const sendMessage = async (message: string) => {
-    console.log("1. sendMessage llamado con:", message)
-    console.log("2. Estado actual - showChat:", showChat, "isLoading:", isLoading)
-    
-    if (!message.trim()) {
-      console.log("3. Mensaje vacío, retornando")
-      return
-    }
+    if (!message.trim()) return
 
     try {
-      console.log("4. Iniciando envío del mensaje")
       setIsLoading(true)
       setShowChat(true)
-      
-      console.log("5. Estados actualizados - showChat:", true, "isLoading:", true)
       
       const newMessages: Message[] = [...messages, { role: 'user', content: message }]
       setMessages(newMessages)
       setInput("")
       setIsTyping(true)
 
-      console.log("6. Llamando al asistente de IA")
       const { data, error } = await supabase.functions.invoke('ai-assistant', {
         body: {
           role: 'compatibility_checker',
@@ -45,12 +35,8 @@ export function CompatibilityChat() {
         }
       })
 
-      if (error) {
-        console.error("7. Error del asistente:", error)
-        throw error
-      }
+      if (error) throw error
 
-      console.log("8. Respuesta recibida:", data)
       const response = data.response
       const words = response.split(' ')
       let currentText = ''
@@ -74,16 +60,13 @@ export function CompatibilityChat() {
       
       setIsTyping(false)
     } catch (error) {
-      console.error('9. Error al enviar mensaje:', error)
+      console.error('Error al enviar mensaje:', error)
     } finally {
-      console.log("10. Finalizando - Reseteando isLoading")
       setIsLoading(false)
     }
   }
 
   const handleSendMessage = () => {
-    console.log("handleSendMessage llamado - input:", input)
-    console.log("Estado del botón - input.trim():", Boolean(input.trim()))
     if (input.trim()) {
       sendMessage(input)
     }

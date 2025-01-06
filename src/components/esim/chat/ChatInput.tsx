@@ -28,8 +28,11 @@ export function ChatInput({
     }
   }, [showChat])
 
-  const handleClick = () => {
-    onSend()
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (input.trim()) {
+      onSend()
+    }
   }
 
   return (
@@ -50,6 +53,7 @@ export function ChatInput({
           )}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && input.trim()) {
+              e.preventDefault()
               onSend()
             }
           }}
@@ -57,7 +61,7 @@ export function ChatInput({
       </div>
       <Button 
         onClick={handleClick}
-        disabled={isLoading}
+        disabled={isLoading || !input.trim()}
         type="button"
         className={cn(
           "w-full md:w-auto",
