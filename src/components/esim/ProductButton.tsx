@@ -30,7 +30,7 @@ export function ProductButton({
     // Ordenados de menor a mayor precio
     if (price <= 50000) return "#D3E4FD"; // Azul suave para el plan más básico
     if (price <= 70000) return "#F2FCE2"; // Verde suave para el plan medio-bajo
-    if (price <= 90000) return "#FEF7CD"; // Amarillo suave para el plan medio-alto
+    if (price <= 90000) return "#FEC6A1"; // Naranja suave para el plan medio-alto
     return "#FFDEE2"; // Rosa suave para el plan premium
   };
 
