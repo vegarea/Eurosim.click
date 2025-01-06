@@ -139,7 +139,7 @@ export function ESimHero() {
           </div>
 
           <div className="relative lg:block">
-            <div className="relative w-full max-w-[500px] mx-auto">
+            <div className="relative max-w-[280px] sm:max-w-[400px] mx-auto lg:max-w-none">
               {/* Efectos de blob animados */}
               <div className="absolute -top-4 -left-4 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -top-4 -right-4 w-72 h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
