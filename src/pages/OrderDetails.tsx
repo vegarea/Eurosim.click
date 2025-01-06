@@ -16,6 +16,15 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 import { Link } from "react-router-dom"
+import { Progress } from "@/components/ui/progress"
+import { OrderStatusBadge } from "@/components/admin/orders/OrderStatusBadge"
+
+const statusOrder = [
+  "payment_pending",
+  "processing",
+  "shipped",
+  "delivered",
+] as const
 
 export default function OrderDetails() {
   const { orderId } = useParams<{ orderId: string }>()
@@ -97,6 +106,12 @@ export default function OrderDetails() {
     }
   }
 
+  const getProgressPercentage = () => {
+    const currentIndex = statusOrder.indexOf(order?.status as any)
+    if (currentIndex === -1) return 0
+    return ((currentIndex + 1) / statusOrder.length) * 100
+  }
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -116,12 +131,32 @@ export default function OrderDetails() {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        {/* Header y Navegación */}
         <div className="flex items-center justify-between">
           <Link to="/admin/orders">
             <Button variant="ghost" className="gap-2">
               <ChevronLeft className="h-4 w-4" /> Volver a pedidos
             </Button>
           </Link>
+        </div>
+
+        {/* Estado del Pedido y Progreso */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold">Pedido {order.id}</h1>
+            <OrderStatusBadge status={order.status} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-gray-500">
+              {statusOrder.map((status) => (
+                <span key={status} className="capitalize">
+                  {status.replace('_', ' ')}
+                </span>
+              ))}
+            </div>
+            <Progress value={getProgressPercentage()} className="h-2" />
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
