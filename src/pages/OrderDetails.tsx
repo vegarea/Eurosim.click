@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Order } from "@/types/database/orders"
 import { OrderEvent } from "@/types/database/common"
+import { AdminLayout } from "@/components/admin/AdminLayout"
 import { OrderBasicInfo } from "@/components/admin/orders/OrderBasicInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
 import { OrderNotes } from "@/components/admin/orders/OrderNotes"
@@ -12,6 +13,9 @@ import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl
 import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { OrderStatus } from "@/types/database/enums"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export default function OrderDetails() {
   const { orderId } = useParams<{ orderId: string }>()
@@ -47,7 +51,6 @@ export default function OrderDetails() {
 
       if (updateError) throw updateError
 
-      // Registrar el evento de cambio de estado
       const { error: eventError } = await supabase
         .from('order_events')
         .insert({
@@ -87,6 +90,7 @@ export default function OrderDetails() {
         })
 
       if (error) throw error
+      toast.success('Nota añadida correctamente')
     } catch (error) {
       console.error('Error al añadir nota:', error)
       toast.error('Error al añadir la nota')
@@ -94,36 +98,54 @@ export default function OrderDetails() {
   }
 
   if (isLoading) {
-    return <div>Cargando...</div>
+    return (
+      <AdminLayout>
+        <div>Cargando...</div>
+      </AdminLayout>
+    )
   }
 
   if (error || !order) {
-    return <div>Error al cargar el pedido</div>
+    return (
+      <AdminLayout>
+        <div>Error al cargar el pedido</div>
+      </AdminLayout>
+    )
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <OrderStatusControl
-          currentStatus={order.status}
-          orderType={order.type}
-          onStatusChange={handleStatusChange}
-        />
-        <OrderBasicInfo order={order} />
-      </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Link to="/admin/orders">
+            <Button variant="ghost" className="gap-2">
+              <ChevronLeft className="h-4 w-4" /> Volver a pedidos
+            </Button>
+          </Link>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <OrderProductInfo order={order} />
-        <OrderDocumentation order={order} />
-      </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <OrderStatusControl
+            currentStatus={order.status}
+            orderType={order.type}
+            onStatusChange={handleStatusChange}
+          />
+          <OrderBasicInfo order={order} />
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <OrderNotes 
-          order={order} 
-          onAddNote={handleAddNote}
-        />
-        <OrderHistory events={order.events || []} />
+        <div className="grid gap-6 md:grid-cols-2">
+          <OrderProductInfo order={order} />
+          <OrderDocumentation order={order} />
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <OrderNotes 
+            order={order} 
+            onAddNote={handleAddNote}
+          />
+          <OrderHistory events={order.events || []} />
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   )
 }
