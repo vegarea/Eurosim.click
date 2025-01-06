@@ -81,10 +81,10 @@ export default function ESims() {
         </section>
 
         <div className="container mx-auto max-w-6xl px-4">
+          <CountryCoverage />
           <CommonFeatures />
           <TrustElements />
           <HowItWorks />
-          <CountryCoverage />
           <FrequentQuestions />
         </div>
       </main>
