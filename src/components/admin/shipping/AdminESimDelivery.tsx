@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Order } from "../orders/types"
+import { Order } from "@/types/database/orders"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
 import { useOrders } from "@/contexts/OrdersContext"
 
@@ -42,7 +42,11 @@ export function AdminESimDelivery() {
     },
     {
       accessorKey: "customer",
-      header: "Cliente"
+      header: "Cliente",
+      cell: ({ row }: any) => {
+        const order = row.original
+        return <span>{order.customer?.name || 'Cliente no registrado'}</span>
+      }
     },
     {
       accessorKey: "date",

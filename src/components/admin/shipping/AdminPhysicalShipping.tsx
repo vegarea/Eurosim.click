@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ShippingTabs } from "./components/ShippingTabs"
 import { ShippingSettings } from "./components/ShippingSettings"
 import { useOrders } from "@/contexts/OrdersContext"
@@ -32,17 +32,15 @@ export function AdminPhysicalShipping() {
     if (!selectedOrder) return
 
     try {
-      // Actualizar la orden con la información de envío
       await updateOrder(selectedOrder.id, {
         status: 'shipped',
         tracking_number: trackingNumber,
         carrier: carrier
       })
 
-      // Crear evento de envío
       const { error: eventError } = await supabase
         .from('order_events')
-        .insert(createShippingConfirmationEvent(trackingNumber, carrier))
+        .insert(createShippingConfirmationEvent(selectedOrder.id, trackingNumber, carrier))
 
       if (eventError) throw eventError
 
@@ -62,6 +60,14 @@ export function AdminPhysicalShipping() {
       cell: ({ row }) => {
         const id = row.getValue("id") as string
         return <span className="font-medium">#{id.substring(0,8)}</span>
+      }
+    },
+    {
+      accessorKey: "customer",
+      header: "Cliente",
+      cell: ({ row }) => {
+        const order = row.original
+        return <span>{order.customer?.name || 'Cliente no registrado'}</span>
       }
     },
     {
