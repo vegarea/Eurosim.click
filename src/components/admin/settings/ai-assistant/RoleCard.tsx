@@ -27,10 +27,9 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
 
+  // Inicializar el estado local
   useEffect(() => {
-    if (role.system_prompt !== localPrompt) {
-      setLocalPrompt(role.system_prompt)
-    }
+    setLocalPrompt(role.system_prompt)
   }, [role.system_prompt])
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -110,7 +109,6 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
               onClick={handleSave}
               disabled={!hasChanges || isSaving}
               size="sm"
-              variant={hasChanges ? "default" : "secondary"}
             >
               <Save className="mr-2 h-4 w-4" />
               {isSaving ? "Guardando..." : "Guardar Cambios"}
