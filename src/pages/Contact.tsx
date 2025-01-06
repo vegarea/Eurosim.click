@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, HelpCircle, WhatsappIcon, Search } from "lucide-react";
+import { Bot, HelpCircle, MessageSquare, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Contact() {
@@ -64,7 +64,7 @@ export default function Contact() {
                 className="w-full justify-start text-gray-700 hover:text-primary hover:border-primary"
                 onClick={() => window.open("https://wa.me/+34600000000", "_blank")}
               >
-                <WhatsappIcon className="mr-2 h-5 w-5" />
+                <MessageSquare className="mr-2 h-5 w-5" />
                 Escríbenos por WhatsApp
               </Button>
             </div>
