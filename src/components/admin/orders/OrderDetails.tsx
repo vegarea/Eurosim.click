@@ -16,6 +16,7 @@ import { OrderHistory } from "@/components/admin/orders/OrderHistory"
 import { Progress } from "@/components/ui/progress"
 import { OrderPaymentInfo } from "@/components/admin/orders/OrderPaymentInfo"
 import { OrderProductInfo } from "@/components/admin/orders/OrderProductInfo"
+import { OrderStatusControl } from "@/components/admin/orders/OrderStatusControl"
 
 const statusOrder = [
   "payment_pending",
@@ -111,11 +112,15 @@ export default function OrderDetails() {
           </div>
         </div>
 
-        {/* Control de Estado */}
-        <OrderCustomerInfo 
-          order={order} 
-          onStatusChange={handleStatusChange}
-        />
+        {/* Información del Cliente y Control de Estado */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <OrderCustomerInfo order={order} />
+          <OrderStatusControl
+            currentStatus={order.status}
+            orderType={order.type}
+            onStatusChange={handleStatusChange}
+          />
+        </div>
 
         {/* Grid de 2 columnas para información principal */}
         <div className="grid lg:grid-cols-2 gap-6">
