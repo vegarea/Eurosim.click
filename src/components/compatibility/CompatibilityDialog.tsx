@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DeviceVerification } from "./DeviceVerification";
 import { DeviceChat } from "./DeviceChat";
-import { compatibleDevices } from "@/data/compatibleDevices";
 
-export function CompatibilityDialog({ 
-  open,
-  onOpenChange
-}: { 
+interface CompatibilityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+export function CompatibilityDialog({ open, onOpenChange }: CompatibilityDialogProps) {
   const [showChat, setShowChat] = useState(false);
   const [deviceModel, setDeviceModel] = useState("");
 
@@ -19,27 +17,25 @@ export function CompatibilityDialog({
     setShowChat(true);
   };
 
+  const handleReset = () => {
+    setShowChat(false);
+    setDeviceModel("");
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Verificar Compatibilidad</DialogTitle>
-          <DialogDescription>
-            Consulta si tu dispositivo es compatible con eSIM
-          </DialogDescription>
+          <DialogTitle>
+            {showChat ? "Chat de Compatibilidad" : "Verificar Compatibilidad"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="mt-4">
           {!showChat ? (
-            <DeviceVerification 
-              onVerify={handleVerification}
-              compatibleDevices={compatibleDevices}
-            />
+            <DeviceVerification onVerify={handleVerification} />
           ) : (
-            <DeviceChat 
-              deviceModel={deviceModel}
-              onReset={() => setShowChat(false)}
-            />
+            <DeviceChat deviceModel={deviceModel} onReset={handleReset} />
           )}
         </div>
       </DialogContent>
