@@ -28,7 +28,9 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    setLocalPrompt(role.system_prompt)
+    if (role.system_prompt !== localPrompt) {
+      setLocalPrompt(role.system_prompt)
+    }
   }, [role.system_prompt])
 
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -38,7 +40,7 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
   }
 
   const handleSave = async () => {
-    if (localPrompt === role.system_prompt) return
+    if (!hasChanges) return
     
     setIsSaving(true)
     try {
@@ -56,6 +58,7 @@ export function RoleCard({ role, onUpdate }: RoleCardProps) {
         variant: "destructive"
       })
       setLocalPrompt(role.system_prompt)
+      setHasChanges(false)
     } finally {
       setIsSaving(false)
     }
