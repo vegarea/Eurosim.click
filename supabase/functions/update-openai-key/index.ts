@@ -59,11 +59,12 @@ serve(async (req) => {
       })
     }
 
-    // Actualizar el secreto usando la API de Supabase Functions
-    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/secrets`, {
+    // Actualizar el secreto usando la API de Supabase Management
+    const managementApiUrl = `https://api.supabase.com/v1/projects/${Deno.env.get('SUPABASE_PROJECT_ID')}/secrets`
+    const response = await fetch(managementApiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ACCESS_TOKEN')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
