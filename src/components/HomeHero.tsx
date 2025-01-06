@@ -6,8 +6,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import SimQuiz from "@/components/SimQuiz";
+import { useSiteImages } from "@/hooks/useSiteImages";
 
 export function HomeHero() {
+  const { data: siteImages } = useSiteImages();
+  const heroImage = siteImages?.find(img => img.location === "Hero Principal")?.currentUrl;
+
   return (
     <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden">
       {/* Burbujas de gradiente animadas */}
@@ -92,7 +96,7 @@ export function HomeHero() {
                 <div className="relative bg-white p-2 sm:p-3 rounded-[1.75rem] sm:rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-3 sm:border-4 border-white">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[1.75rem] sm:rounded-[2rem] opacity-50"></div>
                   <img
-                    src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=2070&auto=format&fit=crop"
+                    src={heroImage}
                     alt="Persona feliz usando su teléfono"
                     className="w-full aspect-[4/3] object-cover rounded-[1.5rem] sm:rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
                   />

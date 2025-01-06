@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import EUFlag from "@/components/icons/EUFlag";
 import MexicoFlag from "@/components/icons/MexicoFlag";
 import { Truck, ArrowDown } from "lucide-react";
+import { useSiteImages } from "@/hooks/useSiteImages";
 
 export function SimHero() {
+  const { data: siteImages } = useSiteImages();
+  const heroImage = siteImages?.find(img => img.location === "Hero SIM Física")?.currentUrl;
+
   const scrollToProducts = () => {
     const productsSection = document.querySelector('#products-section');
     if (productsSection) {
@@ -64,7 +68,7 @@ export function SimHero() {
                 <div className="relative bg-white p-3 rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-4 border-white">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[2rem] opacity-50"></div>
                   <img
-                    src="https://images.unsplash.com/photo-1557180295-76eee20ae8aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80"
+                    src={heroImage}
                     alt="SIM Card para Europa"
                     className="w-full aspect-[4/3] object-cover rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
                   />

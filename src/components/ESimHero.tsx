@@ -15,8 +15,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { compatibleDevices } from "@/data/compatibleDevices";
+import { useSiteImages } from "@/hooks/useSiteImages";
 
 export function ESimHero() {
+  const { data: siteImages } = useSiteImages();
+  const heroImage = siteImages?.find(img => img.location === "Hero E-SIM")?.currentUrl;
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white to-brand-50 min-h-[90vh]">
       <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
@@ -31,8 +35,10 @@ export function ESimHero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-left space-y-8">
             <div className="animate-fade-in space-y-6">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                <span className="text-primary">eSIM</span> para tu viaje a Europa
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl flex items-center gap-4">
+                <span className="text-primary">eSIM</span> para
+                <span className="h-12 w-16 inline-block" />
+                Europa
               </h1>
               <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
                 Conéctate de manera instantánea y disfruta de internet de alta velocidad dondequiera que estés en Europa.
@@ -144,7 +150,7 @@ export function ESimHero() {
                 <div className="relative bg-white p-3 rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-4 border-white">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[2rem] opacity-50"></div>
                   <img
-                    src="https://images.unsplash.com/photo-1517022812141-23620dba5c23"
+                    src={heroImage}
                     alt="Persona feliz usando su teléfono"
                     className="w-full aspect-[4/3] object-cover rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
                   />
