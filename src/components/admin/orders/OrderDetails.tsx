@@ -80,16 +80,6 @@ export default function OrderDetails() {
     return ((currentIndex + 1) / statusOrder.length) * 100
   }
 
-  const handleAddNote = async (note: string) => {
-    try {
-      const updatedNotes = [...(order.notes || []), note]
-      await updateOrder(order.id, { notes: updatedNotes })
-      toast.success("Nota añadida correctamente")
-    } catch (error) {
-      toast.error("Error al añadir la nota")
-    }
-  }
-
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -137,7 +127,7 @@ export default function OrderDetails() {
           <div className="space-y-6">
             <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
             <OrderDocumentation order={order} />
-            <OrderNotes order={order} onAddNote={handleAddNote} />
+            <OrderNotes order={order} />
           </div>
         </div>
 

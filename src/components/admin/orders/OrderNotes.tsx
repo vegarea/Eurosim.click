@@ -10,25 +10,46 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { MessageSquare, Send } from "lucide-react"
 import { toast } from "sonner"
-import { OrderEvent } from "@/types/database/common"
+import { supabase } from "@/integrations/supabase/client"
 
 interface OrderNotesProps {
   order: UIOrder;
-  onAddNote: (note: string) => void;
 }
 
-export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
+export function OrderNotes({ order }: OrderNotesProps) {
   const [newNote, setNewNote] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newNote.trim()) {
       toast.error("La nota no puede estar vacía")
       return
     }
-    onAddNote(newNote)
-    setNewNote("")
-    toast.success("Nota añadida correctamente")
+
+    setIsSubmitting(true)
+    try {
+      const { error } = await supabase
+        .from('order_events')
+        .insert({
+          order_id: order.id,
+          type: 'note_added',
+          description: newNote.trim(),
+          metadata: {
+            automated: false
+          }
+        })
+
+      if (error) throw error
+
+      setNewNote("")
+      toast.success("Nota añadida correctamente")
+    } catch (error) {
+      console.error('Error al añadir nota:', error)
+      toast.error("Error al añadir la nota")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const formatDateTime = (date: string) => {
@@ -42,9 +63,9 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
   }
 
   // Filtrar eventos que son notas
-  const noteEvents = (order.events || []).filter(
-    (event: OrderEvent) => event.type === 'note_added'
-  );
+  const noteEvents = (order.events || [])
+    .filter(event => event.type === 'note_added')
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   return (
     <Card>
@@ -62,8 +83,14 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               className="min-h-[80px]"
+              disabled={isSubmitting}
             />
-            <Button type="submit" size="icon" className="h-10 w-10">
+            <Button 
+              type="submit" 
+              size="icon" 
+              className="h-10 w-10"
+              disabled={isSubmitting}
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>
@@ -76,7 +103,7 @@ export function OrderNotes({ order, onAddNote }: OrderNotesProps) {
             </p>
           )}
           
-          {noteEvents.map((event: OrderEvent) => (
+          {noteEvents.map((event) => (
             <div 
               key={event.id} 
               className="bg-gray-50 p-4 rounded-lg space-y-2"
