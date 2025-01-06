@@ -1,11 +1,12 @@
-import { OrderEvent } from "@/types/database/common";
-import { OrderStatus } from "@/types/database/enums";
+import { OrderEvent } from "@/types/database/common"
+import { OrderStatus } from "@/types/database/enums"
 
 export const createShippingConfirmationEvent = (
+  orderId: string,
   trackingNumber: string, 
   carrier: string
-): OrderEvent => ({
-  id: crypto.randomUUID(),
+): Omit<OrderEvent, 'id'> => ({
+  order_id: orderId,
   type: "shipping_updated",
   description: `Pedido enviado con ${carrier}. Número de seguimiento: ${trackingNumber}`,
   created_at: new Date().toISOString(),
@@ -16,10 +17,12 @@ export const createShippingConfirmationEvent = (
     carrier,
     automated: false
   }
-});
+})
 
-export const createDeliveryConfirmationEvent = (): OrderEvent => ({
-  id: crypto.randomUUID(),
+export const createDeliveryConfirmationEvent = (
+  orderId: string
+): Omit<OrderEvent, 'id'> => ({
+  order_id: orderId,
   type: "status_changed",
   description: "Pedido marcado como entregado",
   created_at: new Date().toISOString(),
@@ -28,4 +31,4 @@ export const createDeliveryConfirmationEvent = (): OrderEvent => ({
     newStatus: "delivered" as OrderStatus,
     automated: false
   }
-});
+})

@@ -3,15 +3,21 @@ import { ShippingTabs } from "./components/ShippingTabs"
 import { ShippingSettings } from "./components/ShippingSettings"
 import { useOrders } from "@/contexts/OrdersContext"
 import { ColumnDef } from "@tanstack/react-table"
-import { Order } from "../orders/types"
+import { Order } from "@/types/database/orders"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Truck, Package, CheckCircle } from "lucide-react"
+import { ShippingConfirmDialog } from "./ShippingConfirmDialog"
+import { supabase } from "@/integrations/supabase/client"
+import { toast } from "sonner"
+import { createShippingConfirmationEvent } from "./utils/shippingEvents"
 
 export function AdminPhysicalShipping() {
-  const { orders } = useOrders()
+  const { orders, updateOrder } = useOrders()
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [showShippingDialog, setShowShippingDialog] = useState(false)
 
-  // Filter orders by status
+  // Filtrar pedidos por estado
   const pendingOrders = orders.filter(order => 
     order.type === 'physical' && order.status === 'processing'
   )
@@ -21,6 +27,33 @@ export function AdminPhysicalShipping() {
   const deliveredOrders = orders.filter(order => 
     order.type === 'physical' && order.status === 'delivered'
   )
+
+  const handleShippingConfirm = async (trackingNumber: string, carrier: string) => {
+    if (!selectedOrder) return
+
+    try {
+      // Actualizar la orden con la información de envío
+      await updateOrder(selectedOrder.id, {
+        status: 'shipped',
+        tracking_number: trackingNumber,
+        carrier: carrier
+      })
+
+      // Crear evento de envío
+      const { error: eventError } = await supabase
+        .from('order_events')
+        .insert(createShippingConfirmationEvent(trackingNumber, carrier))
+
+      if (eventError) throw eventError
+
+      toast.success('Envío confirmado correctamente')
+      setShowShippingDialog(false)
+      setSelectedOrder(null)
+    } catch (error) {
+      console.error('Error al confirmar envío:', error)
+      toast.error('Error al confirmar el envío')
+    }
+  }
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -73,10 +106,21 @@ export function AdminPhysicalShipping() {
     {
       id: "actions",
       cell: ({ row }) => {
+        const order = row.original
         return (
-          <Button variant="outline" size="sm">
-            Ver Detalles
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setSelectedOrder(order)
+                setShowShippingDialog(true)
+              }}
+              disabled={order.status !== 'processing'}
+            >
+              Confirmar Envío
+            </Button>
+          </div>
         )
       }
     }
@@ -98,6 +142,13 @@ export function AdminPhysicalShipping() {
         shippedOrders={shippedOrders}
         deliveredOrders={deliveredOrders}
         columns={columns}
+      />
+
+      <ShippingConfirmDialog 
+        open={showShippingDialog}
+        onOpenChange={setShowShippingDialog}
+        orderId={selectedOrder?.id || ''}
+        onConfirm={handleShippingConfirm}
       />
     </div>
   )
