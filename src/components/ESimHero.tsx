@@ -9,12 +9,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useSiteImages } from "@/hooks/useSiteImages";
-import { CompatibilityChat } from "./esim/CompatibilityChat";
+import { CompatibilityDialog } from "./compatibility/CompatibilityDialog";
 import EUFlag from "@/components/icons/EUFlag";
+import { useState } from "react";
 
 export function ESimHero() {
   const { data: siteImages } = useSiteImages();
   const heroImage = siteImages?.find(img => img.location === "Hero E-SIM")?.currentUrl;
+  const [showCompatibility, setShowCompatibility] = useState(false);
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white to-brand-50 min-h-[90vh]">
@@ -82,25 +84,13 @@ export function ESimHero() {
                   </DialogContent>
                 </Dialog>
 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
-                    >
-                      <Smartphone className="h-4 w-4" />
-                      Verifica la compatibilidad
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>Verificar Compatibilidad</DialogTitle>
-                      <DialogDescription>
-                        Consulta si tu dispositivo es compatible con eSIM
-                      </DialogDescription>
-                    </DialogHeader>
-                    <CompatibilityChat />
-                  </DialogContent>
-                </Dialog>
+                <Button 
+                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+                  onClick={() => setShowCompatibility(true)}
+                >
+                  <Smartphone className="h-4 w-4" />
+                  Verifica la compatibilidad
+                </Button>
               </div>
             </div>
           </div>
@@ -137,6 +127,11 @@ export function ESimHero() {
       <div className="absolute bottom-1/4 left-10 w-32 h-32 bg-gradient-to-tr from-secondary/10 to-primary/10 rounded-full blur-xl animate-float delay-1000" />
       <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full blur-lg animate-float delay-500" />
       <div className="absolute bottom-1/3 right-1/4 w-20 h-20 bg-gradient-to-l from-secondary/15 to-primary/15 rounded-full blur-lg animate-float delay-700" />
+
+      <CompatibilityDialog 
+        open={showCompatibility} 
+        onOpenChange={setShowCompatibility}
+      />
     </div>
   );
 }

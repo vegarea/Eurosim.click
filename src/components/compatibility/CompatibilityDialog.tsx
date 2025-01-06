@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { DeviceVerification } from "./DeviceVerification";
 import { DeviceChat } from "./DeviceChat";
-import { compatibleDevices } from "./devices-data";
+import { compatibleDevices } from "@/data/compatibleDevices";
 
 export function CompatibilityDialog({ 
   open,

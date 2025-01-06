@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Smartphone } from "lucide-react";
-import { BrandDevices } from "./devices-data";
+import { BrandDevices } from "@/data/compatibleDevices";
 
 interface DeviceVerificationProps {
   onVerify: (model: string) => void;
@@ -11,55 +12,64 @@ interface DeviceVerificationProps {
 
 export function DeviceVerification({ onVerify, compatibleDevices }: DeviceVerificationProps) {
   const [deviceModel, setDeviceModel] = useState("");
-  const [error, setError] = useState("");
 
-  const handleVerify = () => {
-    if (!deviceModel.trim()) {
-      setError("Por favor, ingresa el modelo de tu dispositivo");
-      return;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (deviceModel.trim()) {
+      onVerify(deviceModel);
     }
-    setError("");
-    onVerify(deviceModel);
   };
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="device-model" className="text-sm font-medium text-gray-700">
-          Modelo de tu dispositivo
-        </label>
-        <div className="relative">
-          <Input
-            id="device-model"
-            value={deviceModel}
-            onChange={(e) => setDeviceModel(e.target.value)}
-            placeholder="Ej: iPhone 14, Samsung S23..."
-            className="pl-10"
-          />
-          <Smartphone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+    <div className="space-y-6">
+      <div className="flex flex-col items-center justify-center text-center space-y-4">
+        <div className="p-3 bg-primary/10 rounded-full">
+          <Smartphone className="w-6 h-6 text-primary" />
         </div>
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
+        <div>
+          <h3 className="text-lg font-medium">Verifica tu dispositivo</h3>
+          <p className="text-sm text-gray-500">
+            Ingresa el modelo de tu teléfono para verificar la compatibilidad
+          </p>
+        </div>
       </div>
 
-      <Button 
-        onClick={handleVerify}
-        className="w-full"
-      >
-        Verificar Compatibilidad
-      </Button>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="deviceModel">Modelo del dispositivo</Label>
+          <Input
+            id="deviceModel"
+            placeholder="Ej: iPhone 14, Galaxy S23..."
+            value={deviceModel}
+            onChange={(e) => setDeviceModel(e.target.value)}
+          />
+        </div>
+        <Button type="submit" className="w-full">
+          Verificar Compatibilidad
+        </Button>
+      </form>
 
-      <div className="mt-4 text-sm text-gray-500">
-        <p>Marcas compatibles:</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+      <div className="space-y-4">
+        <p className="text-sm text-gray-500 text-center">
+          O selecciona tu dispositivo de la lista
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
           {compatibleDevices.map((brand) => (
-            <span
-              key={brand.name}
-              className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
-            >
-              {brand.name}
-            </span>
+            <div key={brand.name} className="space-y-2">
+              <h4 className="font-medium text-sm">{brand.name}</h4>
+              <div className="space-y-1">
+                {brand.models.map((model) => (
+                  <Button
+                    key={model.name}
+                    variant="ghost"
+                    className="w-full justify-start text-sm"
+                    onClick={() => onVerify(model.name)}
+                  >
+                    {model.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

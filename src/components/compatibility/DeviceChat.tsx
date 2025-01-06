@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send } from "lucide-react";
@@ -19,7 +19,7 @@ interface DeviceChatProps {
 export function DeviceChat({ deviceModel, onReset }: DeviceChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -27,89 +27,94 @@ export function DeviceChat({ deviceModel, onReset }: DeviceChatProps) {
   };
 
   useEffect(() => {
-    // Mensaje inicial cuando se inicia el chat
-    const initialMessage: Message = {
-      role: "user",
-      content: `¿Es compatible mi ${deviceModel} con eSIM?`
+    const checkCompatibility = async () => {
+      try {
+        setIsTyping(true);
+        const { data, error } = await supabase.functions.invoke("ai-assistant", {
+          body: {
+            role: "compatibility_checker",
+            message: deviceModel,
+          },
+        });
+
+        if (error) throw error;
+
+        const initialMessages: Message[] = [
+          { role: "user", content: `¿Es compatible ${deviceModel} con eSIM?` },
+          { role: "assistant", content: data.response },
+        ];
+        setMessages(initialMessages);
+      } catch (error) {
+        console.error("Error checking compatibility:", error);
+      } finally {
+        setIsTyping(false);
+      }
     };
-    setMessages([initialMessage]);
-    handleSendMessage(initialMessage.content);
+
+    checkCompatibility();
   }, [deviceModel]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
-  const handleSendMessage = async (content: string) => {
+  const handleSend = async () => {
+    if (!input.trim()) return;
+
+    const newMessage: Message = { role: "user", content: input };
+    setMessages((prev) => [...prev, newMessage]);
+    setInput("");
+    setIsTyping(true);
+
     try {
-      setIsLoading(true);
-
       const { data, error } = await supabase.functions.invoke("ai-assistant", {
         body: {
           role: "compatibility_checker",
-          message: content
-        }
+          message: input,
+        },
       });
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, { role: "assistant", content: data.response }]);
-      setInput("");
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: data.response },
+      ]);
     } catch (error) {
       console.error("Error sending message:", error);
     } finally {
-      setIsLoading(false);
+      setIsTyping(false);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const newMessage: Message = { role: "user", content: input };
-    setMessages(prev => [...prev, newMessage]);
-    handleSendMessage(input);
   };
 
   return (
     <div className="flex flex-col h-[60vh]">
       <div className="flex items-center gap-2 mb-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onReset}
-          className="h-8 w-8"
-        >
+        <Button variant="ghost" size="icon" onClick={onReset}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h3 className="text-sm font-medium">
-          Consultando compatibilidad: {deviceModel}
-        </h3>
+        <h3 className="text-lg font-medium">Chat de Compatibilidad</h3>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50 rounded-lg">
         {messages.map((message, index) => (
           <ChatMessage key={index} message={message} />
         ))}
-        {isLoading && <TypingIndicator />}
+        {isTyping && <TypingIndicator />}
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      <div className="flex gap-2 mt-4">
         <Input
+          placeholder="Escribe tu pregunta aquí..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Escribe tu pregunta..."
-          disabled={isLoading}
+          onKeyPress={(e) => e.key === "Enter" && handleSend()}
         />
-        <Button 
-          type="submit" 
-          disabled={!input.trim() || isLoading}
-          className="shrink-0"
-        >
+        <Button onClick={handleSend} size="icon">
           <Send className="h-4 w-4" />
         </Button>
-      </form>
+      </div>
     </div>
   );
 }
