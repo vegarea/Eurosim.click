@@ -1,22 +1,18 @@
-/**
- * @lovable-protected
- * This file contains types that match Supabase schema exactly.
- * DO NOT MODIFY without explicit user permission.
- */
-
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface OrderEvent {
-  id: string
-  type: "created" | "status_changed" | "payment_processed" | "shipping_updated" | "note_added" | "document_validated"
-  description: string
-  user_id?: string
-  metadata?: Record<string, any>
-  created_at: string
+  id: string;
+  timestamp: string;
+  type: string;
+  description: string;
+  metadata?: Json;
+}
+
+export interface ShippingAddress {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+  phone?: string;
 }

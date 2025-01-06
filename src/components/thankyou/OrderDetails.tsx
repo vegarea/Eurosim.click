@@ -1,11 +1,14 @@
 import { UIOrder } from "@/types/ui/orders"
-import { formatCurrency } from "@/utils/currency"
+import { ShippingAddress } from "@/types/database/common"
 
 interface OrderDetailsProps {
   order: UIOrder;
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {
+  // Cast shipping_address to the correct type
+  const shippingAddress = order.shipping_address as ShippingAddress | null;
+
   return (
     <div className="space-y-6">
       <div className="border-t border-gray-200 pt-6">
@@ -15,13 +18,13 @@ export function OrderDetails({ order }: OrderDetailsProps) {
           <p><span className="font-medium">Cliente:</span> {order.customer?.name}</p>
           <p><span className="font-medium">Email:</span> {order.customer?.email}</p>
           <p><span className="font-medium">Fecha:</span> {new Date(order.created_at || '').toLocaleDateString()}</p>
-          {order.shipping_address && (
+          {shippingAddress && (
             <div>
               <p className="font-medium">Dirección de envío:</p>
               <p className="text-gray-600">
-                {order.shipping_address.street}<br />
-                {order.shipping_address.city}, {order.shipping_address.state}<br />
-                {order.shipping_address.postal_code}
+                {shippingAddress.street}<br />
+                {shippingAddress.city}, {shippingAddress.state}<br />
+                {shippingAddress.postal_code}
               </p>
             </div>
           )}
