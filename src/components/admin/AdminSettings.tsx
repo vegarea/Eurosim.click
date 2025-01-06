@@ -1,12 +1,13 @@
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, ShoppingCart, Search, Palette, Plug, Bot } from "lucide-react"
+import { Building2, ShoppingCart, Search, Palette, Plug, Bot, MessageCircle } from "lucide-react"
 import { CompanySettings } from "./settings/CompanySettings"
 import { EcommerceSettings } from "./settings/EcommerceSettings"
 import { SeoSettings } from "./settings/SeoSettings"
 import { StyleSettings } from "./settings/StyleSettings"
 import { IntegrationsSettings } from "./settings/IntegrationsSettings"
 import { AIAssistantSettings } from "./settings/AIAssistantSettings"
+import { ChatSettings } from "./settings/ChatSettings"
 
 export function AdminSettings() {
   return (
@@ -46,6 +47,10 @@ export function AdminSettings() {
             <Bot className="mr-2 h-4 w-4" />
             Asistente Virtual
           </TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-white">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Chat Atención
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="company">
@@ -70,6 +75,10 @@ export function AdminSettings() {
 
         <TabsContent value="assistant">
           <AIAssistantSettings />
+        </TabsContent>
+
+        <TabsContent value="chat">
+          <ChatSettings />
         </TabsContent>
       </Tabs>
     </div>

@@ -69,6 +69,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_settings: {
+        Row: {
+          ai_system_prompt: string | null
+          ai_welcome_message: string | null
+          chat_type: Database["public"]["Enums"]["chat_type"] | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+          whatsapp_message: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          ai_system_prompt?: string | null
+          ai_welcome_message?: string | null
+          chat_type?: Database["public"]["Enums"]["chat_type"] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          whatsapp_message?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          ai_system_prompt?: string | null
+          ai_welcome_message?: string | null
+          chat_type?: Database["public"]["Enums"]["chat_type"] | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+          whatsapp_message?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           billing_address: Json | null
@@ -457,6 +493,7 @@ export type Database = {
         | "support"
         | "compatibility_checker"
         | "blog_writer"
+      chat_type: "ai" | "whatsapp"
       customer_gender: "M" | "F"
       event_type:
         | "created"
