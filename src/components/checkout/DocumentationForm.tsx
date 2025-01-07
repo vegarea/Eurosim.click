@@ -22,7 +22,7 @@ export function DocumentationForm({
   isTestMode,
   testData 
 }: DocumentationFormProps) {
-  const { updateCustomerInfo, updateOrderInfo } = useCheckout()
+  const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
   
   const form = useForm<DocumentationFormValues>({
     resolver: zodResolver(documentationFormSchema),
@@ -48,9 +48,10 @@ export function DocumentationForm({
         onValidityChange(isValid)
       }
 
-      // Actualizar el contexto con los valores del formulario
+      // Mantener la información básica existente al actualizar
       const formValues = form.getValues()
       updateCustomerInfo({
+        ...state.customerInfo, // Mantener valores existentes
         passport_number: formValues.passportNumber,
         birth_date: formValues.birthDate?.toISOString(),
         gender: formValues.gender
@@ -61,7 +62,7 @@ export function DocumentationForm({
     })
 
     return () => subscription.unsubscribe()
-  }, [form, onValidityChange, updateCustomerInfo, updateOrderInfo])
+  }, [form, onValidityChange, updateCustomerInfo, updateOrderInfo, state.customerInfo])
 
   useEffect(() => {
     if (isTestMode && testData) {

@@ -63,10 +63,13 @@ export function CheckoutContent({
     }
   })
 
+  // Sincronizar cambios del formulario con el contexto
   React.useEffect(() => {
     const subscription = form.watch(() => {
       const formValues = form.getValues();
+      // Mantener los valores existentes y actualizar solo los campos básicos
       updateCustomerInfo({
+        ...state.customerInfo, // Mantener valores existentes
         name: formValues.name,
         email: formValues.email,
         phone: formValues.phone
@@ -74,8 +77,9 @@ export function CheckoutContent({
     });
 
     return () => subscription.unsubscribe();
-  }, [form, updateCustomerInfo]);
+  }, [form, updateCustomerInfo, state.customerInfo]);
 
+  // Validación del paso de pago
   React.useEffect(() => {
     if (step === 3) {
       const isValid = !!state.customerInfo.email && 
@@ -110,7 +114,9 @@ export function CheckoutContent({
       new Date(values.activationDate).toISOString() : 
       null;
 
+    // Mantener los valores existentes al actualizar
     const customerInfo = {
+      ...state.customerInfo, // Mantener valores existentes
       name: values.name,
       email: values.email,
       phone: values.phone,
