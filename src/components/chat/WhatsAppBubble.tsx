@@ -25,17 +25,12 @@ export function WhatsAppBubble() {
 
   const handleSendMessage = () => {
     if (chatSettings?.whatsapp_number && message.trim()) {
-      // Limpiar el número de teléfono
+      // Limpiar el número de teléfono de espacios y caracteres especiales
       const cleanNumber = chatSettings.whatsapp_number.replace(/[\s\(\)\-\+]/g, '');
-      
-      // Asegurarnos de que el número tenga el formato correcto
-      const formattedNumber = cleanNumber.startsWith('34') ? cleanNumber : 
-                             cleanNumber.startsWith('1') ? cleanNumber :
-                             `34${cleanNumber}`;
       
       // Crear la URL de WhatsApp con el mensaje codificado
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodedMessage}`;
       
       // Abrir WhatsApp en una nueva pestaña
       window.open(whatsappUrl, "_blank");
