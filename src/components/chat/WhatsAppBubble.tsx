@@ -59,7 +59,7 @@ export function WhatsAppBubble() {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <div className="p-4 space-y-4">
+          <div className="p-4 space-y-4 bg-gray-50">
             <p className="text-sm text-gray-600">
               Escribe tu mensaje y te responderemos por WhatsApp lo antes posible.
             </p>
