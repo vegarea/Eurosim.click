@@ -45,9 +45,16 @@ export default function Contact() {
 
   const handleWhatsAppClick = () => {
     if (siteSettings?.whatsapp_number) {
-      // Limpiar el número de teléfono (eliminar '+' y espacios)
-      const cleanNumber = siteSettings.whatsapp_number.replace(/[\+\s]/g, '');
-      const whatsappUrl = `https://wa.me/${cleanNumber}`;
+      // Limpiar el número de teléfono (eliminar espacios, paréntesis, guiones)
+      const cleanNumber = siteSettings.whatsapp_number.replace(/[\s\(\)\-\+]/g, '');
+      
+      // Si el número no comienza con '+' o código de país, asumimos que es de México
+      const formattedNumber = cleanNumber.startsWith('52') ? cleanNumber : 
+                             cleanNumber.startsWith('1') ? cleanNumber :
+                             `52${cleanNumber}`;
+      
+      // Crear la URL de WhatsApp con el número formateado
+      const whatsappUrl = `https://wa.me/${formattedNumber}`;
       window.open(whatsappUrl, "_blank");
     }
   };
