@@ -11,12 +11,16 @@ import { cn } from "@/lib/utils"
 import { UseFormReturn } from "react-hook-form"
 import { DocumentationFormValues } from "./types"
 import { BirthDatePicker } from "./BirthDatePicker"
+import { useState } from "react"
 
 interface DocumentationFormFieldsProps {
   form: UseFormReturn<DocumentationFormValues>
 }
 
 export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) {
+  const [birthDateOpen, setBirthDateOpen] = useState(false)
+  const [activationDateOpen, setActivationDateOpen] = useState(false)
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -71,7 +75,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Fecha de nacimiento</FormLabel>
-              <Popover>
+              <Popover open={birthDateOpen} onOpenChange={setBirthDateOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -92,7 +96,10 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                 <PopoverContent className="w-auto p-0" align="start">
                   <BirthDatePicker
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(date) => {
+                      field.onChange(date)
+                      setBirthDateOpen(false)
+                    }}
                   />
                 </PopoverContent>
               </Popover>
@@ -111,7 +118,7 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                   <CalendarIcon className="w-4 h-4" />
                   Fecha de activación
                 </FormLabel>
-                <Popover>
+                <Popover open={activationDateOpen} onOpenChange={setActivationDateOpen}>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
@@ -133,7 +140,10 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(date) => {
+                        field.onChange(date)
+                        setActivationDateOpen(false)
+                      }}
                       disabled={(date) =>
                         date < new Date()
                       }

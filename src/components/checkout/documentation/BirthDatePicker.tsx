@@ -3,7 +3,8 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover } from "@radix-ui/react-popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
 
 interface BirthDatePickerProps {
   value: Date;
@@ -12,7 +13,6 @@ interface BirthDatePickerProps {
 
 export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
   const [currentDate, setCurrentDate] = useState<Date>(value || new Date())
-  const [open, setOpen] = useState(false)
 
   const handleYearChange = (year: string) => {
     const yearNum = parseInt(year)
@@ -38,8 +38,6 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       newDate.setMonth(currentDate.getMonth())
       setCurrentDate(newDate)
       onChange(newDate)
-      // Cerrar el calendario después de seleccionar una fecha
-      setOpen(false)
     }
   }
 
@@ -86,18 +84,16 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
           </Select>
         </div>
       </div>
-      <Popover open={open} onOpenChange={setOpen}>
-        <Calendar
-          mode="single"
-          selected={value}
-          onSelect={handleDaySelect}
-          month={currentDate}
-          disabled={(date) =>
-            date > new Date() || date < new Date("1940-01-01")
-          }
-          className="rounded-md"
-        />
-      </Popover>
+      <Calendar
+        mode="single"
+        selected={value}
+        onSelect={handleDaySelect}
+        month={currentDate}
+        disabled={(date) =>
+          date > new Date() || date < new Date("1940-01-01")
+        }
+        className="rounded-md"
+      />
     </div>
   )
 }
