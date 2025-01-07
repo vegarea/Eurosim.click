@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, MessageCircle, Send } from "lucide-react";
+import { Bot, MessageCircle, Send, WhatsApp } from "lucide-react";
 import { Header } from "@/components/Header";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { useFloatingChat } from "@/hooks/useFloatingChat";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const [email, setEmail] = useState("");
@@ -15,6 +17,20 @@ export default function Contact() {
   const [message, setMessage] = useState("");
   const { toast } = useToast();
   const { openChat } = useFloatingChat();
+
+  // Fetch site settings to get WhatsApp number
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .maybeSingle()
+      
+      if (error) throw error
+      return data
+    }
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +41,13 @@ export default function Contact() {
     setEmail("");
     setName("");
     setMessage("");
+  };
+
+  const handleWhatsAppClick = () => {
+    if (siteSettings?.whatsapp_number) {
+      const whatsappUrl = `https://wa.me/${siteSettings.whatsapp_number.replace(/\+/g, '')}`;
+      window.open(whatsappUrl, "_blank");
+    }
   };
 
   return (
@@ -77,11 +100,11 @@ export default function Contact() {
                 <Button
                   variant="outline"
                   className="w-full group relative h-auto p-6 bg-white hover:bg-gradient-to-br hover:from-green-50 hover:to-white border border-gray-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={() => window.open("https://wa.me/+34600000000", "_blank")}
+                  onClick={handleWhatsAppClick}
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-green-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <MessageCircle className="h-6 w-6 text-green-600" />
+                      <WhatsApp className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">WhatsApp</h3>
