@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Image, Upload, Building2, Phone, Facebook, Instagram } from "lucide-react"
+import { Image, Upload, Building2, Phone, Facebook, Instagram, Youtube, BrandTiktok } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -12,24 +12,40 @@ export function CompanySettings() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const [isUploading, setIsUploading] = useState(false)
-  const [companyName, setCompanyName] = useState("Mi Empresa")
-  const [whatsapp, setWhatsapp] = useState("+34600000000")
-  const [facebookUrl, setFacebookUrl] = useState("https://facebook.com/")
-  const [instagramUrl, setInstagramUrl] = useState("https://instagram.com/")
+  const [isSaving, setIsSaving] = useState(false)
 
-  // Fetch current logo and id
+  // Fetch current settings
   const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('id, logo_url')
+        .select('*')
         .single()
       
       if (error) throw error
       return data
     }
   })
+
+  const [companyName, setCompanyName] = useState(settings?.company_name || "Mi Empresa")
+  const [whatsapp, setWhatsapp] = useState(settings?.whatsapp_number || "+34600000000")
+  const [facebookUrl, setFacebookUrl] = useState(settings?.facebook_url || "https://facebook.com/")
+  const [instagramUrl, setInstagramUrl] = useState(settings?.instagram_url || "https://instagram.com/")
+  const [youtubeUrl, setYoutubeUrl] = useState(settings?.youtube_url || "https://youtube.com/")
+  const [tiktokUrl, setTiktokUrl] = useState(settings?.tiktok_url || "https://tiktok.com/")
+
+  // Update state when settings are loaded
+  React.useEffect(() => {
+    if (settings) {
+      setCompanyName(settings.company_name || "Mi Empresa")
+      setWhatsapp(settings.whatsapp_number || "+34600000000")
+      setFacebookUrl(settings.facebook_url || "https://facebook.com/")
+      setInstagramUrl(settings.instagram_url || "https://instagram.com/")
+      setYoutubeUrl(settings.youtube_url || "https://youtube.com/")
+      setTiktokUrl(settings.tiktok_url || "https://tiktok.com/")
+    }
+  }, [settings])
 
   const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -79,11 +95,39 @@ export function CompanySettings() {
     }
   }
 
-  const handleSave = () => {
-    toast({
-      title: "Cambios guardados",
-      description: "Los cambios en identidad de marca se han guardado correctamente.",
-    })
+  const handleSave = async () => {
+    try {
+      setIsSaving(true)
+      const { error } = await supabase
+        .from('site_settings')
+        .update({
+          company_name: companyName,
+          whatsapp_number: whatsapp,
+          facebook_url: facebookUrl,
+          instagram_url: instagramUrl,
+          youtube_url: youtubeUrl,
+          tiktok_url: tiktokUrl
+        })
+        .eq('id', settings?.id)
+
+      if (error) throw error
+
+      queryClient.invalidateQueries({ queryKey: ['site-settings'] })
+
+      toast({
+        title: "Cambios guardados",
+        description: "Los cambios en identidad de marca se han guardado correctamente.",
+      })
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      toast({
+        title: "Error al guardar",
+        description: "No se pudieron guardar los cambios. Por favor, intenta de nuevo.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -171,7 +215,35 @@ export function CompanySettings() {
             />
           </div>
         </div>
-        <Button onClick={handleSave}>Guardar cambios</Button>
+        <div className="space-y-2">
+          <Label htmlFor="youtube">Link de YouTube</Label>
+          <div className="flex items-center">
+            <Youtube className="h-4 w-4 mr-2 text-red-600" />
+            <Input
+              id="youtube"
+              type="url"
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              placeholder="https://youtube.com/tu-canal"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="tiktok">Link de TikTok</Label>
+          <div className="flex items-center">
+            <BrandTiktok className="h-4 w-4 mr-2 text-gray-900" />
+            <Input
+              id="tiktok"
+              type="url"
+              value={tiktokUrl}
+              onChange={(e) => setTiktokUrl(e.target.value)}
+              placeholder="https://tiktok.com/@tu-cuenta"
+            />
+          </div>
+        </div>
+        <Button onClick={handleSave} disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar cambios'}
+        </Button>
       </CardContent>
     </Card>
   )

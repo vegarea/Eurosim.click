@@ -455,25 +455,43 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          company_name: string | null
           created_at: string | null
+          facebook_url: string | null
           hero_images: Json | null
           id: string
+          instagram_url: string | null
           logo_url: string | null
+          tiktok_url: string | null
           updated_at: string | null
+          whatsapp_number: string | null
+          youtube_url: string | null
         }
         Insert: {
+          company_name?: string | null
           created_at?: string | null
+          facebook_url?: string | null
           hero_images?: Json | null
           id?: string
+          instagram_url?: string | null
           logo_url?: string | null
+          tiktok_url?: string | null
           updated_at?: string | null
+          whatsapp_number?: string | null
+          youtube_url?: string | null
         }
         Update: {
+          company_name?: string | null
           created_at?: string | null
+          facebook_url?: string | null
           hero_images?: Json | null
           id?: string
+          instagram_url?: string | null
           logo_url?: string | null
+          tiktok_url?: string | null
           updated_at?: string | null
+          whatsapp_number?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
       }
