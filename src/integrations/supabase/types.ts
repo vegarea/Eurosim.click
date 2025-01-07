@@ -162,6 +162,98 @@ export type Database = {
         }
         Relationships: []
       }
+      email_logs: {
+        Row: {
+          created_at: string | null
+          error: string | null
+          id: string
+          metadata: Json | null
+          recipient: string
+          status: string
+          subject: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient: string
+          status: string
+          subject: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          metadata?: Json | null
+          recipient?: string
+          status?: string
+          subject?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          carrier_id: string | null
+          content: string
+          created_at: string | null
+          created_by: string | null
+          description: string
+          id: string
+          is_active: boolean
+          name: string
+          status: Database["public"]["Enums"]["order_status"]
+          subject: string
+          type: Database["public"]["Enums"]["email_template_type"]
+          updated_at: string | null
+          updated_by: string | null
+          variables: Json
+        }
+        Insert: {
+          carrier_id?: string | null
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          id?: string
+          is_active?: boolean
+          name: string
+          status: Database["public"]["Enums"]["order_status"]
+          subject: string
+          type: Database["public"]["Enums"]["email_template_type"]
+          updated_at?: string | null
+          updated_by?: string | null
+          variables?: Json
+        }
+        Update: {
+          carrier_id?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          status?: Database["public"]["Enums"]["order_status"]
+          subject?: string
+          type?: Database["public"]["Enums"]["email_template_type"]
+          updated_at?: string | null
+          updated_by?: string | null
+          variables?: Json
+        }
+        Relationships: []
+      }
       order_events: {
         Row: {
           created_at: string
@@ -513,6 +605,7 @@ export type Database = {
         | "blog_writer"
       chat_type: "ai" | "whatsapp"
       customer_gender: "M" | "F"
+      email_template_type: "physical" | "esim" | "both"
       event_type:
         | "created"
         | "status_changed"
