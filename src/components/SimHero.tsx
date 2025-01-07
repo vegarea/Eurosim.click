@@ -45,7 +45,7 @@ export function SimHero() {
                 </span>
               </p>
               <p className="text-base leading-7 text-gray-600 backdrop-blur-sm bg-white/30 p-4 rounded-xl">
-                Mantente conectado en toda Europa con internet de alta velocidad. Activación sencilla y soporte en español 24/7.
+                ¿Quieres estar tranquilo antes de iniciar tu viaje y tener tu SIM card antes de salir de casa? ¡Pídela ahora! y recibela en casa. ¡Inicia tu viaje por Europa desde el primer minuto a tu llegada!
               </p>
 
               <Button 
