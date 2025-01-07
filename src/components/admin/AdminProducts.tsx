@@ -25,6 +25,22 @@ export function AdminProducts() {
     }
   }
 
+  const updateAIContext = async () => {
+    try {
+      const { error } = await supabase.functions.invoke('update-ai-context')
+      if (error) throw error
+      
+      console.log('AI context updated successfully')
+    } catch (error) {
+      console.error('Error updating AI context:', error)
+      toast({
+        title: "Advertencia",
+        description: "Se actualizaron los productos pero hubo un error al actualizar el contexto del asistente virtual",
+        variant: "destructive"
+      })
+    }
+  }
+
   const fetchProducts = async () => {
     try {
       console.log("Fetching products from database...")
@@ -82,6 +98,9 @@ export function AdminProducts() {
       const transformedNewProducts = (data as SupabaseProduct[]).map(transformSupabaseProduct)
       setProducts([...transformedNewProducts, ...products])
       
+      // Update AI context after adding product
+      await updateAIContext()
+      
       toast({
         title: "Producto añadido",
         description: "El producto se ha añadido correctamente"
@@ -103,11 +122,9 @@ export function AdminProducts() {
       console.log('Actualizando producto. ID:', id)
       console.log('Datos de actualización:', updates)
 
-      // Verificar que el precio esté en centavos
       const priceInCents = typeof updates.price === 'number' ? 
         Math.round(updates.price * 100) : updates.price
 
-      // Preparar datos para actualización, excluyendo campos de fecha
       const { created_at, updated_at, ...updateFields } = updates
 
       const updateData = {
@@ -134,6 +151,9 @@ export function AdminProducts() {
 
       // Recargar todos los productos para asegurar datos actualizados
       await fetchProducts()
+      
+      // Update AI context after editing product
+      await updateAIContext()
       
       toast({
         title: "Producto actualizado",
@@ -165,6 +185,10 @@ export function AdminProducts() {
       }
 
       setProducts(products.filter(p => p.id !== id))
+      
+      // Update AI context after deleting product
+      await updateAIContext()
+      
       toast({
         title: "Producto eliminado",
         description: "El producto se ha eliminado correctamente"
