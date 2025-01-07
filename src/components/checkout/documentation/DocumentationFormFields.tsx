@@ -98,7 +98,10 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
                     value={field.value}
                     onChange={(date) => {
                       field.onChange(date)
-                      setBirthDateOpen(false)
+                      // Solo cerramos el calendario cuando se selecciona un día específico
+                      if (date.getDate() !== field.value?.getDate()) {
+                        setBirthDateOpen(false)
+                      }
                     }}
                   />
                 </PopoverContent>
