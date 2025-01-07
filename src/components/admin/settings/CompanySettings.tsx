@@ -51,9 +51,21 @@ export function CompanySettings() {
   const handleSave = async () => {
     try {
       setIsSaving(true)
+      
+      // Get the ID of the first record if it exists
+      const { data: existingSettings, error: fetchError } = await supabase
+        .from('site_settings')
+        .select('id')
+        .single()
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError
+      }
+
       const { error } = await supabase
         .from('site_settings')
-        .update({
+        .upsert({
+          id: existingSettings?.id || undefined, // Use existing ID if available
           company_name: companyName,
           whatsapp_number: whatsapp,
           facebook_url: facebookUrl,
@@ -61,7 +73,6 @@ export function CompanySettings() {
           youtube_url: youtubeUrl,
           tiktok_url: tiktokUrl
         })
-        .single()
 
       if (error) throw error
 
