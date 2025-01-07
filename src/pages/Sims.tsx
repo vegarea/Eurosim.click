@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/database/products";
+import { MainLayout } from "@/components/layouts/MainLayout";
 
 const Sims = () => {
   const isMobile = useIsMobile();
@@ -34,31 +35,33 @@ const Sims = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
-      <Header />
-      <SimHero />
-      
-      <div id="products-section" className="container mx-auto px-4 py-8 lg:py-12 relative scroll-mt-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-4 lg:gap-8 mb-8">
-            {!isLoading && products?.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2 }}
-              >
-                <SimCard product={product} />
-              </motion.div>
-            ))}
-          </div>
+    <MainLayout>
+      <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
+        <Header />
+        <SimHero />
+        
+        <div id="products-section" className="container mx-auto px-4 py-8 lg:py-12 relative scroll-mt-16">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-4 lg:gap-8 mb-8">
+              {!isLoading && products?.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.2 }}
+                >
+                  <SimCard product={product} />
+                </motion.div>
+              ))}
+            </div>
 
-          <CountryCoverage />
-          <DeliveryBenefits />
-          <SimFeatures />
+            <CountryCoverage />
+            <DeliveryBenefits />
+            <SimFeatures />
+          </div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 
