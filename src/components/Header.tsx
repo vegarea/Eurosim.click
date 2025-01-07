@@ -9,15 +9,11 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { CountryCoverage } from "./CountryCoverage";
+import { CountryCoverageModal } from "./modals/CountryCoverageModal";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showCoverage, setShowCoverage] = useState(false);
   const location = useLocation();
   const [cartItems] = useState(0);
 
@@ -64,21 +60,15 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
-              >
-                <EUFlag className="w-4 h-4" />
-                <span>Cobertura en toda Europa</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto sm:max-h-none">
-              <CountryCoverage defaultOpen={true} />
-            </DialogContent>
-          </Dialog>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            onClick={() => setShowCoverage(true)}
+          >
+            <EUFlag className="w-4 h-4" />
+            <span>Cobertura en toda Europa</span>
+          </Button>
 
           <Link to="/checkout">
             <Button 
@@ -134,21 +124,17 @@ export function Header() {
               ))}
               
               <div className="mt-4 space-y-3">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="ghost"
-                      className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <EUFlag className="w-4 h-4 mr-2" />
-                      Cobertura en toda Europa
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto sm:max-w-3xl sm:max-h-none">
-                    <CountryCoverage defaultOpen={true} />
-                  </DialogContent>
-                </Dialog>
+                <Button 
+                  variant="ghost"
+                  className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setShowCoverage(true);
+                  }}
+                >
+                  <EUFlag className="w-4 h-4 mr-2" />
+                  Cobertura en toda Europa
+                </Button>
                 
                 <Link to="/checkout">
                   <Button 
@@ -165,6 +151,11 @@ export function Header() {
           </SheetContent>
         </Sheet>
       </div>
+
+      <CountryCoverageModal 
+        isOpen={showCoverage} 
+        onClose={() => setShowCoverage(false)} 
+      />
     </header>
   );
 }
