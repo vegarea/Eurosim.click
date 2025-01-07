@@ -45,7 +45,9 @@ export default function Contact() {
 
   const handleWhatsAppClick = () => {
     if (siteSettings?.whatsapp_number) {
-      const whatsappUrl = `https://wa.me/${siteSettings.whatsapp_number.replace(/\+/g, '')}`;
+      // Limpiar el número de teléfono (eliminar '+' y espacios)
+      const cleanNumber = siteSettings.whatsapp_number.replace(/[\+\s]/g, '');
+      const whatsappUrl = `https://wa.me/${cleanNumber}`;
       window.open(whatsappUrl, "_blank");
     }
   };
