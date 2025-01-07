@@ -5,18 +5,30 @@ import { UseFormReturn } from "react-hook-form"
 import { motion } from "framer-motion"
 import { ShippingFormValues } from "./types"
 import { PhoneField } from "./PhoneField"
+import { useCheckout } from "@/contexts/CheckoutContext"
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<ShippingFormValues>
 }
 
 export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
+  const { updateCustomerInfo, state } = useCheckout()
+
   const handleInputChange = (field: keyof ShippingFormValues, value: string) => {
     console.log(`PersonalInfoFields - Campo ${field} cambió:`, value);
+    
+    // Actualizar el formulario
     form.setValue(field, value, {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true
+    });
+
+    // Actualizar el contexto global inmediatamente
+    console.log("Actualizando contexto global con:", field, value);
+    updateCustomerInfo({
+      ...state.customerInfo,
+      [field]: value
     });
   };
 

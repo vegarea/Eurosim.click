@@ -6,6 +6,7 @@ import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
+import { useCheckout } from "@/contexts/CheckoutContext"
 
 interface PhoneFieldProps {
   form: UseFormReturn<ShippingFormValues>
@@ -13,15 +14,25 @@ interface PhoneFieldProps {
 
 export function PhoneField({ form }: PhoneFieldProps) {
   const [isValid, setIsValid] = useState(false)
+  const { updateCustomerInfo, state } = useCheckout()
 
   const handlePhoneChange = (value: string | undefined) => {
     console.log("PhoneField - Teléfono actualizado:", value);
+    
+    // Actualizar el formulario
     form.setValue('phone', value || '', { 
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true
-    })
-    setIsValid(!!value && isValidPhoneNumber(value))
+    });
+    
+    // Actualizar el contexto global
+    updateCustomerInfo({
+      ...state.customerInfo,
+      phone: value || null
+    });
+
+    setIsValid(!!value && isValidPhoneNumber(value));
   }
 
   // Validar el número inicial si existe
