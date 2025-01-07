@@ -46,7 +46,12 @@ function CheckoutContent() {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { state, updateCustomerInfo } = useCheckout()
-  
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
   )
