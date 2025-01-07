@@ -63,17 +63,39 @@ export function CheckoutContent({
     }
   })
 
+  // Manejar cambios en campos individuales
+  const handleFieldChange = React.useCallback((field: keyof ShippingFormValues, value: string) => {
+    console.log(`Campo ${field} actualizado:`, value);
+    form.setValue(field, value);
+    
+    // Actualizar el contexto inmediatamente con el nuevo valor
+    const currentValues = form.getValues();
+    console.log("Actualizando customer info con:", {
+      ...state.customerInfo,
+      [field]: value
+    });
+    
+    updateCustomerInfo({
+      ...state.customerInfo,
+      [field]: value
+    });
+  }, [form, updateCustomerInfo, state.customerInfo]);
+
   // Sincronizar cambios del formulario con el contexto
   React.useEffect(() => {
-    const subscription = form.watch(() => {
-      const formValues = form.getValues();
-      // Mantener los valores existentes y actualizar solo los campos básicos
-      updateCustomerInfo({
-        ...state.customerInfo, // Mantener valores existentes
-        name: formValues.name,
-        email: formValues.email,
-        phone: formValues.phone
-      });
+    const subscription = form.watch((value, { name, type }) => {
+      if (name) {
+        console.log(`Campo ${name} cambió:`, value);
+        const formValues = form.getValues();
+        console.log("Valores actuales del formulario:", formValues);
+        
+        updateCustomerInfo({
+          ...state.customerInfo,
+          name: formValues.name,
+          email: formValues.email,
+          phone: formValues.phone
+        });
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -114,9 +136,8 @@ export function CheckoutContent({
       new Date(values.activationDate).toISOString() : 
       null;
 
-    // Mantener los valores existentes al actualizar
     const customerInfo = {
-      ...state.customerInfo, // Mantener valores existentes
+      ...state.customerInfo,
       name: values.name,
       email: values.email,
       phone: values.phone,

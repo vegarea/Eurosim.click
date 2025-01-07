@@ -11,6 +11,15 @@ interface PersonalInfoFieldsProps {
 }
 
 export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
+  const handleInputChange = (field: keyof ShippingFormValues, value: string) => {
+    console.log(`PersonalInfoFields - Campo ${field} cambió:`, value);
+    form.setValue(field, value, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true
+    });
+  };
+
   return (
     <>
       <motion.div
@@ -31,6 +40,10 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
                 <Input 
                   placeholder="Juan Pérez" 
                   {...field} 
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleInputChange('name', e.target.value);
+                  }}
                   className="transition-all duration-200 focus:scale-[1.01] pl-10"
                 />
               </FormControl>
@@ -60,6 +73,10 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
                     type="email" 
                     placeholder="juan@ejemplo.com" 
                     {...field} 
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleInputChange('email', e.target.value);
+                    }}
                     className="transition-all duration-200 focus:scale-[1.01] pl-10"
                   />
                 </FormControl>

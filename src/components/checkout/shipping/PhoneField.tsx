@@ -15,6 +15,7 @@ export function PhoneField({ form }: PhoneFieldProps) {
   const [isValid, setIsValid] = useState(false)
 
   const handlePhoneChange = (value: string | undefined) => {
+    console.log("PhoneField - Teléfono actualizado:", value);
     form.setValue('phone', value || '', { 
       shouldValidate: true,
       shouldDirty: true,
