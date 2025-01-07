@@ -22,12 +22,12 @@ export const sendEmail = async (
   }
 };
 
-// Función para validar la conexión
 export const testEmailService = async (email: string) => {
   try {
     const { data, error } = await supabase.functions.invoke('send-email', {
       body: {
         to: [email],
+        isTest: true,
         subject: "Prueba de Configuración de Email",
         html: `
           <h1>¡La configuración de email funciona correctamente!</h1>

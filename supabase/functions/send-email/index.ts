@@ -11,9 +11,12 @@ const corsHeaders = {
 }
 
 interface EmailRequest {
-  templateId: string
+  templateId?: string
   to: string[]
   variables?: Record<string, any>
+  isTest?: boolean
+  subject?: string
+  html?: string
 }
 
 serve(async (req) => {
@@ -24,28 +27,47 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
-    const { templateId, to, variables } = await req.json() as EmailRequest
+    const { templateId, to, variables, isTest, subject, html } = await req.json() as EmailRequest
 
-    // Obtener la plantilla
-    const { data: template, error: templateError } = await supabase
-      .from('email_templates')
-      .select('*')
-      .eq('id', templateId)
-      .single()
+    let emailContent: { subject: string; html: string }
 
-    if (templateError) throw new Error(`Error al obtener plantilla: ${templateError.message}`)
-    if (!template) throw new Error('Plantilla no encontrada')
+    // Si es un email de prueba, usar el contenido proporcionado directamente
+    if (isTest) {
+      if (!subject || !html) {
+        throw new Error('Subject y html son requeridos para emails de prueba')
+      }
+      emailContent = { subject, html }
+    } else {
+      // Si no es de prueba, obtener la plantilla
+      if (!templateId) {
+        throw new Error('templateId es requerido para emails normales')
+      }
 
-    // Reemplazar variables en el contenido
-    let htmlContent = template.content
-    let subject = template.subject
+      const { data: template, error: templateError } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('id', templateId)
+        .single()
 
-    if (variables) {
-      Object.entries(variables).forEach(([key, value]) => {
-        const regex = new RegExp(`{{${key}}}`, 'g')
-        htmlContent = htmlContent.replace(regex, String(value))
-        subject = subject.replace(regex, String(value))
-      })
+      if (templateError) throw new Error(`Error al obtener plantilla: ${templateError.message}`)
+      if (!template) throw new Error('Plantilla no encontrada')
+
+      // Reemplazar variables en el contenido
+      let processedHtml = template.content
+      let processedSubject = template.subject
+
+      if (variables) {
+        Object.entries(variables).forEach(([key, value]) => {
+          const regex = new RegExp(`{{${key}}}`, 'g')
+          processedHtml = processedHtml.replace(regex, String(value))
+          processedSubject = processedSubject.replace(regex, String(value))
+        })
+      }
+
+      emailContent = {
+        subject: processedSubject,
+        html: processedHtml
+      }
     }
 
     // Enviar email usando Resend
@@ -58,34 +80,36 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'EuroSim <noreply@eurosim.click>',
         to,
-        subject,
-        html: htmlContent,
+        subject: emailContent.subject,
+        html: emailContent.html,
       }),
     })
 
     const resendResponse = await res.json()
 
-    // Registrar el envío
-    const { error: logError } = await supabase
-      .from('email_logs')
-      .insert({
-        template_id: templateId,
-        recipient: to[0],
-        subject,
-        status: res.ok ? 'sent' : 'failed',
-        error: !res.ok ? JSON.stringify(resendResponse) : null,
-        metadata: {
-          resend_id: resendResponse.id,
-          variables
-        }
-      })
-
-    if (logError) {
-      console.error('Error al registrar log:', logError)
-    }
-
     if (!res.ok) {
       throw new Error(`Error al enviar email: ${JSON.stringify(resendResponse)}`)
+    }
+
+    // Registrar el envío solo si no es una prueba
+    if (!isTest && templateId) {
+      const { error: logError } = await supabase
+        .from('email_logs')
+        .insert({
+          template_id: templateId,
+          recipient: to[0],
+          subject: emailContent.subject,
+          status: res.ok ? 'sent' : 'failed',
+          error: !res.ok ? JSON.stringify(resendResponse) : null,
+          metadata: {
+            resend_id: resendResponse.id,
+            variables
+          }
+        })
+
+      if (logError) {
+        console.error('Error al registrar log:', logError)
+      }
     }
 
     return new Response(JSON.stringify(resendResponse), {
