@@ -50,7 +50,7 @@ export function WhatsAppBubble() {
       {isOpen ? (
         <Card className="w-80 mb-4 overflow-hidden shadow-lg">
           <div className="bg-green-500 p-4 flex items-center justify-between">
-            <span className="text-white font-medium">WhatsApp Chat</span>
+            <span className="text-white font-medium">¡Mándanos un WhatsApp! 😊</span>
             <Button
               variant="ghost"
               size="icon"
@@ -62,7 +62,7 @@ export function WhatsAppBubble() {
           </div>
           <div className="p-4 space-y-4 bg-gray-50">
             <p className="text-sm text-gray-600">
-              Escribe tu mensaje y te responderemos por WhatsApp lo antes posible.
+              ¿Alguna duda? Escríbenos ahora
             </p>
             <div className="flex gap-2">
               <Input
