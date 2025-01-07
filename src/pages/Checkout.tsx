@@ -13,25 +13,29 @@ import { CustomerGender } from "@/types/database/enums"
 import { CheckoutProvider, useCheckout } from "@/contexts/CheckoutContext"
 import { Card } from "@/components/ui/card"
 import { StripeCheckout } from "@/components/checkout/payment/StripeCheckout"
+import { Form } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { PersonalInfoFields } from "@/components/checkout/shipping/PersonalInfoFields"
 
 const testData = {
   shipping: {
-    fullName: "Juan Pérez",
+    name: "Juan Pérez",
     email: "juan@ejemplo.com",
     phone: "5512345678",
-    address: "Calle Principal 123",
-    city: "Ciudad de México",
-    state: "CDMX",
-    zipCode: "11111"
+    shipping_address: {
+      street: "Calle Principal 123",
+      city: "Ciudad de México",
+      state: "CDMX",
+      country: "Mexico",
+      postal_code: "11111",
+      phone: "5512345678"
+    }
   },
   documentation: {
-    fullName: "Juan Pérez",
+    passportNumber: "AB123456",
     birthDate: new Date(),
     gender: "M" as CustomerGender,
-    passportNumber: "AB123456",
-    activationDate: new Date(),
-    email: "juan@ejemplo.com",
-    phone: "5512345678"
+    activationDate: new Date()
   }
 }
 
@@ -41,11 +45,27 @@ function CheckoutContent() {
   const [isTestMode, setIsTestMode] = useState(false)
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { state } = useCheckout()
+  const { state, updateCustomerInfo } = useCheckout()
   
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
   )
+
+  const form = useForm({
+    defaultValues: {
+      name: state.customerInfo.name || "",
+      email: state.customerInfo.email || "",
+      phone: state.customerInfo.phone || "",
+      shipping_address: {
+        street: "",
+        city: "",
+        state: "",
+        country: "Mexico",
+        postal_code: "",
+        phone: ""
+      }
+    }
+  })
 
   useEffect(() => {
     if (items.length === 0) {
@@ -77,6 +97,15 @@ function CheckoutContent() {
     setIsFormValid(isValid)
   }
 
+  const handleFormSubmit = (values: any) => {
+    console.log('Form submitted:', values)
+    updateCustomerInfo({
+      name: values.name,
+      email: values.email,
+      phone: values.phone
+    })
+  }
+
   if (items.length === 0) {
     return null;
   }
@@ -97,18 +126,32 @@ function CheckoutContent() {
               transition={{ duration: 0.3 }}
             >
               <div className="space-y-6">
+                {/* Información Personal siempre visible */}
+                <Card className="p-6">
+                  <h2 className="text-xl font-semibold mb-4">Información Personal</h2>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+                      <PersonalInfoFields form={form} />
+                    </form>
+                  </Form>
+                </Card>
+
+                {/* Dirección de envío solo para SIM física */}
                 {hasPhysicalSim && (
                   <Card className="p-6">
-                    <h2 className="text-xl font-semibold mb-4">Información de Envío</h2>
+                    <h2 className="text-xl font-semibold mb-4">Dirección de Envío</h2>
                     <ShippingForm
                       onSubmit={() => {}}
                       onValidityChange={handleFormValidityChange}
                       isTestMode={isTestMode}
                       testData={testData.shipping}
+                      initialData={state.customerInfo}
+                      skipPersonalInfo={true}
                     />
                   </Card>
                 )}
 
+                {/* Documentación UE siempre visible */}
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold mb-4">Documentación UE</h2>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -122,6 +165,7 @@ function CheckoutContent() {
                     onValidityChange={handleFormValidityChange}
                     isTestMode={isTestMode}
                     testData={testData.documentation}
+                    initialData={state.customerInfo}
                   />
                 </Card>
               </div>
