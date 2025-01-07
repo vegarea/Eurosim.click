@@ -3,6 +3,7 @@ import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useRef } from "react"
 
 interface BirthDatePickerProps {
   value: Date;
@@ -11,6 +12,7 @@ interface BirthDatePickerProps {
 
 export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
   const [currentDate, setCurrentDate] = useState<Date>(value || new Date())
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleYearChange = (year: string) => {
     const yearNum = parseInt(year)
@@ -36,6 +38,8 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       newDate.setMonth(currentDate.getMonth())
       setCurrentDate(newDate)
       onChange(newDate)
+      // Cerrar el calendario después de seleccionar una fecha
+      setIsOpen(false)
     }
   }
 
