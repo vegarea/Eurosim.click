@@ -28,13 +28,24 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     )
 
+    // Obtener información del producto, incluyendo el tipo
+    const { data: product, error: productError } = await supabaseClient
+      .from('products')
+      .select('type, title')
+      .eq('id', cartItems[0].product_id)
+      .single()
+
+    if (productError) {
+      throw new Error(`Error fetching product: ${productError.message}`)
+    }
+
+    console.log('Product info:', product)
+
     // Obtener costo de envío si hay productos físicos
     let shippingCost = 0
-    const hasPhysicalProducts = cartItems.some((item: any) => 
-      item.metadata?.product_type === 'physical'
-    )
+    const isPhysicalProduct = product.type === 'physical'
 
-    if (hasPhysicalProducts) {
+    if (isPhysicalProduct) {
       const { data: shippingSettings } = await supabaseClient
         .from('shipping_settings')
         .select('shipping_cost')
@@ -59,13 +70,15 @@ serve(async (req) => {
       customer_birth_date: String(customerInfo.birth_date),
       customer_gender: String(customerInfo.gender),
       product_id: String(cartItems[0].product_id),
+      product_type: String(product.type), // Añadimos el tipo de producto
+      product_title: String(product.title), // Añadimos el título del producto
       activation_date: String(orderInfo.activation_date),
       total_amount: String(cartItems[0].total_price),
       shipping_cost: String(shippingCost)
     }
 
-    // Añadir información de envío si existe
-    if (orderInfo.shipping_address) {
+    // Añadir información de envío si existe y es producto físico
+    if (isPhysicalProduct && orderInfo.shipping_address) {
       metadata.shipping_street = String(orderInfo.shipping_address.street || '')
       metadata.shipping_city = String(orderInfo.shipping_address.city || '')
       metadata.shipping_state = String(orderInfo.shipping_address.state || '')
@@ -82,19 +95,17 @@ serve(async (req) => {
       throw new Error('Metadata exceeds Stripe limit of 4096 characters')
     }
 
-    // Crear los line items incluyendo el costo de envío si aplica
     const lineItems = cartItems.map((item: any) => ({
       price_data: {
         currency: 'mxn',
         product_data: {
-          name: item.metadata.product_title,
+          name: product.title,
         },
         unit_amount: item.unit_price,
       },
       quantity: item.quantity,
     }))
 
-    // Añadir el costo de envío como un item separado si aplica
     if (shippingCost > 0) {
       lineItems.push({
         price_data: {

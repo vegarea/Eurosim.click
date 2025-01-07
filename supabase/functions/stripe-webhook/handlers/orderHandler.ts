@@ -14,8 +14,12 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       throw new Error('Missing required session or customer data')
     }
 
+    // Obtener el tipo de producto de los metadatos
+    const productType = session.metadata.product_type || 'physical'
+    console.log('📦 Product type from metadata:', productType)
+
     // Formatear la dirección de envío desde los metadatos de Stripe
-    const shippingAddress = session.metadata ? {
+    const shippingAddress = productType === 'physical' && session.metadata ? {
       street: session.metadata.shipping_street || '',
       city: session.metadata.shipping_city || '',
       state: session.metadata.shipping_state || '',
@@ -46,14 +50,14 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       customer_id: customer.id,
       product_id: session.metadata.product_id,
       status: 'processing',
-      type: shippingAddress ? 'physical' : 'esim',
+      type: productType, // Usamos el tipo de producto de los metadatos
       total_amount: totalAmount,
       quantity: 1,
       payment_method: 'stripe',
       payment_status: 'completed',
       stripe_payment_intent_id: session.payment_intent,
-      stripe_receipt_url: null, // Se actualizará cuando esté disponible
-      shipping_address: shippingAddress, // Guardamos la dirección estructurada aquí
+      stripe_receipt_url: null,
+      shipping_address: shippingAddress,
       activation_date: session.metadata.activation_date ? 
         new Date(session.metadata.activation_date).toISOString() : null,
       metadata: {
@@ -61,7 +65,8 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
         shipping_cost: shippingCost,
         original_amount: parseInt(session.metadata.total_amount, 10),
         customer_details: session.customer_details,
-        payment_status: session.payment_status
+        payment_status: session.payment_status,
+        product_title: session.metadata.product_title
       }
     }
 
