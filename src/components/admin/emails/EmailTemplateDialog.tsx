@@ -34,7 +34,9 @@ export function EmailTemplateDialog({
     description: "",
     type: "both",
     variables: [],
-    content: ""
+    content: "",
+    is_active: true,
+    carrier_id: null
   })
 
   useEffect(() => {
@@ -49,7 +51,9 @@ export function EmailTemplateDialog({
         description: "",
         type: "both",
         variables: [],
-        content: ""
+        content: "",
+        is_active: true,
+        carrier_id: null
       })
     }
   }, [template])

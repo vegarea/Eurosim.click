@@ -5,7 +5,7 @@ export interface EmailTemplate {
   content: string
   description: string
   type: "physical" | "esim" | "both"
-  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled" | "payment_failed"
   variables: string[]
   carrier_id?: string | null
   is_active: boolean
@@ -21,7 +21,8 @@ export const getStatusColor = (status: EmailTemplate["status"]) => {
     processing: "bg-[#9b87f5] hover:bg-[#9b87f5]/90",
     shipped: "bg-[#7E69AB] hover:bg-[#7E69AB]/90",
     delivered: "bg-[#6E59A5] hover:bg-[#6E59A5]/90",
-    cancelled: "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+    cancelled: "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90",
+    payment_failed: "bg-red-500 hover:bg-red-600"
   }
   return colors[status]
 }
@@ -32,7 +33,8 @@ export const getStatusLabel = (status: EmailTemplate["status"]) => {
     processing: "En Preparación",
     shipped: "En Tránsito",
     delivered: "Entregado",
-    cancelled: "Cancelado"
+    cancelled: "Cancelado",
+    payment_failed: "Pago Fallido"
   }
   return labels[status]
 }

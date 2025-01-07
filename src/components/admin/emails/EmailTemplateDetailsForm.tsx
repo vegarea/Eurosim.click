@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
 import {
   Select,
   SelectContent,
@@ -76,6 +77,7 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
             <SelectItem value="shipped">En Tránsito</SelectItem>
             <SelectItem value="delivered">Entregado</SelectItem>
             <SelectItem value="cancelled">Cancelado</SelectItem>
+            <SelectItem value="payment_failed">Pago Fallido</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -99,6 +101,14 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
         <p className="text-sm text-muted-foreground">
           Estas variables serán reemplazadas con datos reales al enviar el email
         </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="is_active"
+          checked={formData.is_active}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+        />
+        <Label htmlFor="is_active">Plantilla Activa</Label>
       </div>
     </div>
   )
