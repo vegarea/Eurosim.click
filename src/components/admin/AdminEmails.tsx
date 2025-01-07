@@ -31,7 +31,14 @@ export function AdminEmails() {
 
       if (error) throw error
 
-      setTemplates(data)
+      // Transformar los datos para asegurar que cc_emails sea siempre un array
+      const transformedData = data.map(template => ({
+        ...template,
+        cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : 
+                  template.cc_emails ? JSON.parse(template.cc_emails as string) : []
+      })) as EmailTemplate[]
+
+      setTemplates(transformedData)
     } catch (error) {
       console.error('Error al cargar plantillas:', error)
       toast({
@@ -56,11 +63,17 @@ export function AdminEmails() {
 
   const handleSaveTemplate = async (template: EmailTemplate) => {
     try {
+      // Asegurarse de que cc_emails sea un array válido antes de guardar
+      const templateToSave = {
+        ...template,
+        cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : []
+      }
+
       if (selectedTemplate) {
         // Actualizar plantilla existente
         const { error } = await supabase
           .from('email_templates')
-          .update(template)
+          .update(templateToSave)
           .eq('id', template.id)
 
         if (error) throw error
@@ -73,7 +86,7 @@ export function AdminEmails() {
         // Crear nueva plantilla
         const { error } = await supabase
           .from('email_templates')
-          .insert(template)
+          .insert(templateToSave)
 
         if (error) throw error
 
