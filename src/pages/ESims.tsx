@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import { Header } from "@/components/Header"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
@@ -11,6 +12,7 @@ import { CountryCoverage } from "@/components/CountryCoverage"
 import { CommonFeatures } from "@/components/CommonFeatures"
 import { InternationalCalling } from "@/components/InternationalCalling"
 import { MainLayout } from "@/components/layouts/MainLayout"
+import { ESimHero } from "@/components/ESimHero"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
