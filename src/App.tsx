@@ -16,6 +16,7 @@ import OrderDetails from "./pages/OrderDetails"
 import Login from "./pages/Login"
 import Contact from "./pages/Contact"
 import HowItWorks from "./pages/HowItWorks"
+import FAQ from "./pages/FAQ"
 import "flag-icons/css/flag-icons.min.css"
 
 const queryClient = new QueryClient()
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/como-funciona" element={<HowItWorks />} />
+              <Route path="/preguntas-frecuentes" element={<FAQ />} />
               <Route
                 path="/admin/*"
                 element={
