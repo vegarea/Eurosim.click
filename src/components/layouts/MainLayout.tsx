@@ -1,5 +1,6 @@
 import { FloatingChat } from "../chat/FloatingChat"
 import { WhatsAppBubble } from "../chat/WhatsAppBubble"
+import { Footer } from "../Footer"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 
@@ -22,8 +23,11 @@ export function MainLayout({ children }: MainLayoutProps) {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      {children}
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1">
+        {children}
+      </div>
+      <Footer />
       {chatSettings?.chat_type === 'ai' ? (
         <FloatingChat />
       ) : chatSettings?.chat_type === 'whatsapp' ? (
