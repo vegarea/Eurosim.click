@@ -22,17 +22,25 @@ export const sendEmail = async (
   }
 };
 
-// Función para validar la API key
-export const validateApiKey = async (): Promise<boolean> => {
+// Función para validar la conexión
+export const testEmailService = async (email: string) => {
   try {
-    const { data } = await supabase.functions.invoke('send-email', {
+    const { data, error } = await supabase.functions.invoke('send-email', {
       body: {
-        templateId: 'test',
-        to: ['test@test.com']
+        to: [email],
+        subject: "Prueba de Configuración de Email",
+        html: `
+          <h1>¡La configuración de email funciona correctamente!</h1>
+          <p>Este es un email de prueba enviado desde EuroSim.</p>
+          <p>Si estás recibiendo este mensaje, significa que la configuración de Resend está funcionando correctamente.</p>
+        `
       }
     });
-    return !!data;
-  } catch {
-    return false;
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error al enviar email de prueba:', error);
+    throw error;
   }
 };
