@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { EmailTemplate } from "./types"
 import { useToast } from "@/components/ui/use-toast"
+import { supabase } from "@/integrations/supabase/client"
 
 interface TestEmailDialogProps {
   open: boolean
@@ -22,22 +23,16 @@ export function TestEmailDialog({ open, onOpenChange, template }: TestEmailDialo
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: {
           to: [email],
           subject: template.subject,
           html: template.content,
           isTest: true
-        }),
+        },
       })
 
-      if (!response.ok) {
-        throw new Error('Error al enviar el email')
-      }
+      if (error) throw error
 
       toast({
         title: "Email enviado",
