@@ -69,6 +69,42 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_automation_settings: {
+        Row: {
+          created_at: string | null
+          generation_frequency: unknown
+          id: string
+          images_per_paragraph: number | null
+          images_style_prompt: string | null
+          is_active: boolean | null
+          style_prompt: string
+          topics: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          generation_frequency?: unknown
+          id?: string
+          images_per_paragraph?: number | null
+          images_style_prompt?: string | null
+          is_active?: boolean | null
+          style_prompt?: string
+          topics?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          generation_frequency?: unknown
+          id?: string
+          images_per_paragraph?: number | null
+          images_style_prompt?: string | null
+          is_active?: boolean | null
+          style_prompt?: string
+          topics?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       blog_post_images: {
         Row: {
           ai_prompt: string | null

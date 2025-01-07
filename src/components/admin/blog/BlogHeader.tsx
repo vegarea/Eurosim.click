@@ -1,15 +1,17 @@
-import { CreatePostDialog } from "./CreatePostDialog"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function BlogHeader() {
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Blog</h2>
-        <p className="text-muted-foreground">
-          Gestiona el contenido del blog
-        </p>
-      </div>
-      <CreatePostDialog />
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Blog</CardTitle>
+        <CardDescription>
+          Gestiona el contenido del blog generado automáticamente
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-6">
+        {/* Aquí podrías añadir estadísticas generales del blog si lo deseas */}
+      </CardContent>
+    </Card>
   )
 }
