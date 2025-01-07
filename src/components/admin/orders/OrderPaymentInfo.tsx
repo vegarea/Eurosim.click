@@ -37,7 +37,7 @@ export function OrderPaymentInfo({ order }: OrderPaymentInfoProps) {
             <div>
               <h3 className="font-medium mb-2">Estado del Pago</h3>
               <Badge 
-                variant={order.payment_status === "completed" ? "success" : "secondary"}
+                variant={order.payment_status === "completed" ? "default" : "secondary"}
                 className="capitalize"
               >
                 {order.payment_status}
