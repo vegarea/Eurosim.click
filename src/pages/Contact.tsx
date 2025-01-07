@@ -7,30 +7,17 @@ import { Header } from "@/components/Header";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
-import { useFloatingChat } from "@/hooks/useFloatingChat";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { WhatsAppModal } from "@/components/chat/WhatsAppModal";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { FloatingChat } from "@/components/chat/FloatingChat";
 
 export default function Contact() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const { toast } = useToast();
-  const { openChat } = useFloatingChat();
-
-  // Fetch site settings to get WhatsApp number
-  const { data: siteSettings } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .maybeSingle()
-      
-      if (error) throw error
-      return data
-    }
-  });
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,22 +28,6 @@ export default function Contact() {
     setEmail("");
     setName("");
     setMessage("");
-  };
-
-  const handleWhatsAppClick = () => {
-    if (siteSettings?.whatsapp_number) {
-      // Limpiar el número de teléfono (eliminar espacios, paréntesis, guiones)
-      const cleanNumber = siteSettings.whatsapp_number.replace(/[\s\(\)\-\+]/g, '');
-      
-      // Si el número no comienza con '+' o código de país, asumimos que es de México
-      const formattedNumber = cleanNumber.startsWith('52') ? cleanNumber : 
-                             cleanNumber.startsWith('1') ? cleanNumber :
-                             `52${cleanNumber}`;
-      
-      // Crear la URL de WhatsApp con el número formateado
-      const whatsappUrl = `https://wa.me/${formattedNumber}`;
-      window.open(whatsappUrl, "_blank");
-    }
   };
 
   return (
@@ -91,7 +62,7 @@ export default function Contact() {
                 <Button
                   variant="outline"
                   className="w-full group relative h-auto p-6 bg-white hover:bg-gradient-to-br hover:from-brand-50 hover:to-white border border-gray-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={openChat}
+                  onClick={() => setIsAIModalOpen(true)}
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-brand-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -109,7 +80,7 @@ export default function Contact() {
                 <Button
                   variant="outline"
                   className="w-full group relative h-auto p-6 bg-white hover:bg-gradient-to-br hover:from-green-50 hover:to-white border border-gray-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={handleWhatsAppClick}
+                  onClick={() => setIsWhatsAppModalOpen(true)}
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-green-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -177,6 +148,18 @@ export default function Contact() {
           </div>
         </main>
       </div>
+
+      {/* Modales */}
+      <WhatsAppModal 
+        open={isWhatsAppModalOpen} 
+        onOpenChange={setIsWhatsAppModalOpen} 
+      />
+
+      <Dialog open={isAIModalOpen} onOpenChange={setIsAIModalOpen}>
+        <DialogContent className="p-0 bg-transparent border-none">
+          <FloatingChat />
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 }
