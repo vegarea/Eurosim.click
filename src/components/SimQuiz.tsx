@@ -3,6 +3,7 @@ import { CompatibilityChat } from "./esim/CompatibilityChat"
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ArrowLeft } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 type Step = 'urgency' | 'compatibility' | 'recommendation';
 
@@ -13,6 +14,7 @@ export function SimQuiz() {
     isUrgent: false,
     isCompatible: null as boolean | null
   })
+  const navigate = useNavigate()
 
   if (showCompatibilityChat) {
     return <CompatibilityChat />
@@ -40,7 +42,8 @@ export function SimQuiz() {
         description: "Para uso inmediato necesitas un teléfono compatible con eSIM. Con una SIM física el tiempo de entrega es de 3-5 días.",
         bgColor: "bg-yellow-50",
         textColor: "text-yellow-800",
-        descColor: "text-yellow-600"
+        descColor: "text-yellow-600",
+        route: "/sims"
       }
     }
     
@@ -51,7 +54,8 @@ export function SimQuiz() {
         description: "Activación instantánea para uso inmediato",
         bgColor: "bg-green-50",
         textColor: "text-green-800",
-        descColor: "text-green-600"
+        descColor: "text-green-600",
+        route: "/e-sims"
       }
     }
     
@@ -62,7 +66,8 @@ export function SimQuiz() {
         description: "La opción más conveniente para dispositivos compatibles",
         bgColor: "bg-green-50",
         textColor: "text-green-800",
-        descColor: "text-green-600"
+        descColor: "text-green-600",
+        route: "/e-sims"
       }
     }
     
@@ -72,7 +77,8 @@ export function SimQuiz() {
       description: "Entrega en 3-5 días hábiles",
       bgColor: "bg-blue-50",
       textColor: "text-blue-800",
-      descColor: "text-blue-600"
+      descColor: "text-blue-600",
+      route: "/sims"
     }
   }
 
@@ -188,7 +194,10 @@ export function SimQuiz() {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver
               </Button>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button 
+                className="bg-primary hover:bg-primary/90"
+                onClick={() => navigate(recommendation.route)}
+              >
                 Ver detalles
               </Button>
             </div>
