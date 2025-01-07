@@ -92,7 +92,7 @@ export function EmailLogs() {
                 {log.error && (
                   <p className="text-sm text-red-600">{log.error}</p>
                 )}
-                {log.cc_emails && log.cc_emails.length > 0 && (
+                {log.cc_emails && Array.isArray(log.cc_emails) && log.cc_emails.length > 0 && (
                   <p className="text-xs text-muted-foreground">
                     CC: {log.cc_emails.join(", ")}
                   </p>
