@@ -1,17 +1,18 @@
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Image, Upload, Building2, Phone, Facebook, Instagram, Youtube, BrandTiktok } from "lucide-react"
+import { Building2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { LogoUploader } from "./components/LogoUploader"
+import { SocialMediaInputs } from "./components/SocialMediaInputs"
 
 export function CompanySettings() {
   const { toast } = useToast()
   const queryClient = useQueryClient()
-  const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
   // Fetch current settings
@@ -36,7 +37,7 @@ export function CompanySettings() {
   const [tiktokUrl, setTiktokUrl] = useState(settings?.tiktok_url || "https://tiktok.com/")
 
   // Update state when settings are loaded
-  React.useEffect(() => {
+  useEffect(() => {
     if (settings) {
       setCompanyName(settings.company_name || "Mi Empresa")
       setWhatsapp(settings.whatsapp_number || "+34600000000")
@@ -46,54 +47,6 @@ export function CompanySettings() {
       setTiktokUrl(settings.tiktok_url || "https://tiktok.com/")
     }
   }, [settings])
-
-  const handleLogoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    try {
-      setIsUploading(true)
-
-      // Upload file to Supabase Storage
-      const fileExt = file.name.split('.').pop()
-      const fileName = `logo-${Date.now()}.${fileExt}`
-      const { error: uploadError, data } = await supabase.storage
-        .from('site_assets')
-        .upload(fileName, file)
-
-      if (uploadError) throw uploadError
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('site_assets')
-        .getPublicUrl(fileName)
-
-      // Update site settings with new logo URL
-      const { error: updateError } = await supabase
-        .from('site_settings')
-        .update({ logo_url: publicUrl })
-        .eq('id', settings?.id)
-
-      if (updateError) throw updateError
-
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] })
-
-      toast({
-        title: "Logo actualizado",
-        description: "El nuevo logo se ha guardado correctamente.",
-      })
-    } catch (error) {
-      console.error('Error uploading logo:', error)
-      toast({
-        title: "Error al actualizar el logo",
-        description: "No se pudo guardar el nuevo logo. Por favor, intenta de nuevo.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsUploading(false)
-    }
-  }
 
   const handleSave = async () => {
     try {
@@ -108,7 +61,7 @@ export function CompanySettings() {
           youtube_url: youtubeUrl,
           tiktok_url: tiktokUrl
         })
-        .eq('id', settings?.id)
+        .single()
 
       if (error) throw error
 
@@ -142,32 +95,8 @@ export function CompanySettings() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-center p-4 border-2 border-dashed rounded-lg">
-          <img 
-            src={settings?.logo_url || "/logo.png"} 
-            alt="Logo actual" 
-            className="max-h-32 object-contain" 
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={() => document.getElementById('logo-upload')?.click()}
-            disabled={isUploading}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            {isUploading ? 'Subiendo...' : 'Subir nuevo logo'}
-          </Button>
-          <input
-            id="logo-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleLogoChange}
-            disabled={isUploading}
-          />
-        </div>
+        <LogoUploader currentLogo={settings?.logo_url} />
+        
         <div className="space-y-2">
           <Label htmlFor="company-name">Nombre de la empresa</Label>
           <Input
@@ -176,71 +105,20 @@ export function CompanySettings() {
             onChange={(e) => setCompanyName(e.target.value)}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="whatsapp">WhatsApp de atención al cliente</Label>
-          <div className="flex items-center">
-            <Phone className="h-4 w-4 mr-2 text-green-500" />
-            <Input
-              id="whatsapp"
-              type="tel"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+34600000000"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="facebook">Link de Facebook</Label>
-          <div className="flex items-center">
-            <Facebook className="h-4 w-4 mr-2 text-blue-600" />
-            <Input
-              id="facebook"
-              type="url"
-              value={facebookUrl}
-              onChange={(e) => setFacebookUrl(e.target.value)}
-              placeholder="https://facebook.com/tu-pagina"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="instagram">Link de Instagram</Label>
-          <div className="flex items-center">
-            <Instagram className="h-4 w-4 mr-2 text-pink-600" />
-            <Input
-              id="instagram"
-              type="url"
-              value={instagramUrl}
-              onChange={(e) => setInstagramUrl(e.target.value)}
-              placeholder="https://instagram.com/tu-cuenta"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="youtube">Link de YouTube</Label>
-          <div className="flex items-center">
-            <Youtube className="h-4 w-4 mr-2 text-red-600" />
-            <Input
-              id="youtube"
-              type="url"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://youtube.com/tu-canal"
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="tiktok">Link de TikTok</Label>
-          <div className="flex items-center">
-            <BrandTiktok className="h-4 w-4 mr-2 text-gray-900" />
-            <Input
-              id="tiktok"
-              type="url"
-              value={tiktokUrl}
-              onChange={(e) => setTiktokUrl(e.target.value)}
-              placeholder="https://tiktok.com/@tu-cuenta"
-            />
-          </div>
-        </div>
+
+        <SocialMediaInputs 
+          whatsapp={whatsapp}
+          setWhatsapp={setWhatsapp}
+          facebookUrl={facebookUrl}
+          setFacebookUrl={setFacebookUrl}
+          instagramUrl={instagramUrl}
+          setInstagramUrl={setInstagramUrl}
+          youtubeUrl={youtubeUrl}
+          setYoutubeUrl={setYoutubeUrl}
+          tiktokUrl={tiktokUrl}
+          setTiktokUrl={setTiktokUrl}
+        />
+
         <Button onClick={handleSave} disabled={isSaving}>
           {isSaving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
