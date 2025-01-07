@@ -29,7 +29,7 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
     const { templateId, to, variables, isTest, subject, html } = await req.json() as EmailRequest
 
-    let emailContent: { subject: string; html: string }
+    let emailContent: { subject: string; html: string; cc?: string[] }
 
     // Si es un email de prueba, usar el contenido proporcionado directamente
     if (isTest) {
@@ -66,7 +66,8 @@ serve(async (req) => {
 
       emailContent = {
         subject: processedSubject,
-        html: processedHtml
+        html: processedHtml,
+        cc: Array.isArray(template.cc_emails) ? template.cc_emails : []
       }
     }
 
@@ -80,6 +81,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'EuroSim <noreply@eurosim.click>',
         to,
+        cc: emailContent.cc,
         subject: emailContent.subject,
         html: emailContent.html,
       }),
@@ -101,6 +103,7 @@ serve(async (req) => {
           subject: emailContent.subject,
           status: res.ok ? 'sent' : 'failed',
           error: !res.ok ? JSON.stringify(resendResponse) : null,
+          cc_emails: emailContent.cc,
           metadata: {
             resend_id: resendResponse.id,
             variables

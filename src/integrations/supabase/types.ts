@@ -164,6 +164,7 @@ export type Database = {
       }
       email_logs: {
         Row: {
+          cc_emails: Json | null
           created_at: string | null
           error: string | null
           id: string
@@ -174,6 +175,7 @@ export type Database = {
           template_id: string
         }
         Insert: {
+          cc_emails?: Json | null
           created_at?: string | null
           error?: string | null
           id?: string
@@ -184,6 +186,7 @@ export type Database = {
           template_id: string
         }
         Update: {
+          cc_emails?: Json | null
           created_at?: string | null
           error?: string | null
           id?: string
@@ -206,6 +209,7 @@ export type Database = {
       email_templates: {
         Row: {
           carrier_id: string | null
+          cc_emails: Json | null
           content: string
           created_at: string | null
           created_by: string | null
@@ -222,6 +226,7 @@ export type Database = {
         }
         Insert: {
           carrier_id?: string | null
+          cc_emails?: Json | null
           content: string
           created_at?: string | null
           created_by?: string | null
@@ -238,6 +243,7 @@ export type Database = {
         }
         Update: {
           carrier_id?: string | null
+          cc_emails?: Json | null
           content?: string
           created_at?: string | null
           created_by?: string | null

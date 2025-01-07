@@ -10,6 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { EmailTemplate } from "./types"
+import { Badge } from "@/components/ui/badge"
+import { X } from "lucide-react"
+import { useState } from "react"
 
 interface EmailTemplateDetailsFormProps {
   formData: EmailTemplate
@@ -17,6 +20,8 @@ interface EmailTemplateDetailsFormProps {
 }
 
 export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplateDetailsFormProps) {
+  const [newCcEmail, setNewCcEmail] = useState("")
+
   const handleVariablesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const vars = e.target.value.split(',').map(v => v.trim()).filter(v => v)
     setFormData({ ...formData, variables: vars })
@@ -27,6 +32,28 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
       return formData.variables.join(', ')
     }
     return ''
+  }
+
+  const handleAddCcEmail = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && newCcEmail) {
+      e.preventDefault()
+      const currentCcEmails = Array.isArray(formData.cc_emails) ? formData.cc_emails : []
+      if (!currentCcEmails.includes(newCcEmail)) {
+        setFormData({
+          ...formData,
+          cc_emails: [...currentCcEmails, newCcEmail]
+        })
+        setNewCcEmail("")
+      }
+    }
+  }
+
+  const handleRemoveCcEmail = (emailToRemove: string) => {
+    const currentCcEmails = Array.isArray(formData.cc_emails) ? formData.cc_emails : []
+    setFormData({
+      ...formData,
+      cc_emails: currentCcEmails.filter(email => email !== emailToRemove)
+    })
   }
 
   return (
@@ -48,6 +75,33 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
           required
         />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="cc_emails">Emails en Copia (CC)</Label>
+        <Input
+          id="cc_emails"
+          value={newCcEmail}
+          onChange={(e) => setNewCcEmail(e.target.value)}
+          onKeyDown={handleAddCcEmail}
+          placeholder="Escribe un email y presiona Enter"
+          type="email"
+        />
+        {Array.isArray(formData.cc_emails) && formData.cc_emails.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {formData.cc_emails.map((email) => (
+              <Badge key={email} variant="secondary" className="flex items-center gap-1">
+                {email}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveCcEmail(email)}
+                  className="hover:text-destructive"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
       <div className="grid gap-2">
         <Label htmlFor="type">Tipo de Producto</Label>

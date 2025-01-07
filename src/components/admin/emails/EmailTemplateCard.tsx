@@ -59,6 +59,18 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
               {getStatusLabel(template.status)}
             </Badge>
           </div>
+          {Array.isArray(template.cc_emails) && template.cc_emails.length > 0 && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">CC:</span>
+              <div className="flex flex-wrap gap-1">
+                {template.cc_emails.map((email) => (
+                  <Badge key={email} variant="outline" className="text-xs">
+                    {email}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">{template.description}</p>
           {template.variables && getVariablesArray(template.variables).length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
