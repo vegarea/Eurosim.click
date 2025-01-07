@@ -1,44 +1,57 @@
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Eye, TrendingUp, Image } from "lucide-react"
+import { Calendar, Eye, Pencil } from "lucide-react"
 import { ArticlesFilter } from "./ArticlesFilter"
-import { useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
-interface Article {
-  id: number
+interface BlogPost {
+  id: string
   title: string
-  publishedAt: string
-  views: number
-  image: string
+  status: string
+  created_at: string
+  views_count: number
 }
-
-const mockArticles: Article[] = [
-  {
-    id: 1,
-    title: "Los mejores lugares para visitar en Europa #1",
-    publishedAt: "2024-04-10",
-    views: 1250,
-    image: "/placeholder.svg"
-  },
-  {
-    id: 2,
-    title: "Guía completa: Viajando por Italia",
-    publishedAt: "2024-04-08",
-    views: 850,
-    image: "/placeholder.svg"
-  },
-  {
-    id: 3,
-    title: "Top 10 destinos históricos en España",
-    publishedAt: "2024-04-05",
-    views: 2100,
-    image: "/placeholder.svg"
-  }
-]
 
 export function ArticlesList() {
   const [dateFilter, setDateFilter] = useState("all")
   const [viewsFilter, setViewsFilter] = useState("all")
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadPosts()
+  }, [dateFilter, viewsFilter])
+
+  const loadPosts = async () => {
+    try {
+      let query = supabase
+        .from('blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (dateFilter === 'week') {
+        query = query.gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      } else if (dateFilter === 'month') {
+        query = query.gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      }
+
+      if (viewsFilter === 'high') {
+        query = query.gte('views_count', 1000)
+      } else if (viewsFilter === 'low') {
+        query = query.lt('views_count', 1000)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+      setPosts(data)
+    } catch (error) {
+      console.error('Error loading posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -50,31 +63,24 @@ export function ArticlesList() {
       />
 
       <div className="grid gap-4">
-        {mockArticles.map((article) => (
-          <Card key={article.id}>
+        {posts.map((post) => (
+          <Card key={post.id}>
             <CardContent className="flex items-center gap-4 p-4">
-              <div className="relative h-24 w-32 overflow-hidden rounded-lg bg-muted">
-                <Image className="absolute inset-0 m-auto h-8 w-8 text-muted-foreground" />
-              </div>
               <div className="flex-1 space-y-1">
-                <h3 className="font-semibold">{article.title}</h3>
+                <h3 className="font-semibold">{post.title}</h3>
                 <div className="flex gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {new Date(article.publishedAt).toLocaleDateString()}
+                    {new Date(post.created_at).toLocaleDateString()}
                   </span>
                   <span className="flex items-center gap-1">
                     <Eye className="h-4 w-4" />
-                    {article.views.toLocaleString()} vistas
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <TrendingUp className="h-4 w-4" />
-                    {article.views > 1000 ? "Tendencia" : "Normal"}
+                    {post.views_count.toLocaleString()} vistas
                   </span>
                 </div>
               </div>
               <Button variant="outline" size="sm">
-                Editar
+                <Pencil className="h-4 w-4" />
               </Button>
             </CardContent>
           </Card>

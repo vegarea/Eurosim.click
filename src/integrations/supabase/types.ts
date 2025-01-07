@@ -69,6 +69,134 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_post_images: {
+        Row: {
+          ai_prompt: string | null
+          alt_text: string
+          caption: string | null
+          created_at: string | null
+          height: number
+          id: string
+          is_ai_generated: boolean | null
+          is_featured: boolean | null
+          mime_type: string
+          position: number | null
+          post_id: string | null
+          size_bytes: number
+          storage_path: string
+          thumbnail_url: string | null
+          updated_at: string | null
+          url: string
+          width: number
+        }
+        Insert: {
+          ai_prompt?: string | null
+          alt_text: string
+          caption?: string | null
+          created_at?: string | null
+          height: number
+          id?: string
+          is_ai_generated?: boolean | null
+          is_featured?: boolean | null
+          mime_type: string
+          position?: number | null
+          post_id?: string | null
+          size_bytes: number
+          storage_path: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          url: string
+          width: number
+        }
+        Update: {
+          ai_prompt?: string | null
+          alt_text?: string
+          caption?: string | null
+          created_at?: string | null
+          height?: number
+          id?: string
+          is_ai_generated?: boolean | null
+          is_featured?: boolean | null
+          mime_type?: string
+          position?: number | null
+          post_id?: string | null
+          size_bytes?: number
+          storage_path?: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          url?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_images_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          ai_model: string | null
+          ai_prompt: string | null
+          author_id: string | null
+          content: string
+          created_at: string | null
+          excerpt: string
+          featured_image_id: string | null
+          id: string
+          is_ai_generated: boolean | null
+          published_at: string | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          ai_model?: string | null
+          ai_prompt?: string | null
+          author_id?: string | null
+          content: string
+          created_at?: string | null
+          excerpt: string
+          featured_image_id?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          ai_model?: string | null
+          ai_prompt?: string | null
+          author_id?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string
+          featured_image_id?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          published_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       chat_settings: {
         Row: {
           ai_system_prompt: string | null
