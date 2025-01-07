@@ -10,11 +10,11 @@ export function WhatsAppBubble() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { data: siteSettings } = useQuery({
-    queryKey: ['site-settings'],
+  const { data: chatSettings } = useQuery({
+    queryKey: ['chat-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('site_settings')
+        .from('chat_settings')
         .select('*')
         .maybeSingle();
       
@@ -24,12 +24,14 @@ export function WhatsAppBubble() {
   });
 
   const handleSendMessage = () => {
-    if (siteSettings?.whatsapp_number && message.trim()) {
+    if (chatSettings?.whatsapp_number && message.trim()) {
       // Limpiar el número de teléfono
-      const cleanNumber = siteSettings.whatsapp_number.replace(/[\s\(\)\-\+]/g, '');
-      const formattedNumber = cleanNumber.startsWith('52') ? cleanNumber : 
+      const cleanNumber = chatSettings.whatsapp_number.replace(/[\s\(\)\-\+]/g, '');
+      
+      // Asegurarnos de que el número tenga el formato correcto
+      const formattedNumber = cleanNumber.startsWith('34') ? cleanNumber : 
                              cleanNumber.startsWith('1') ? cleanNumber :
-                             `52${cleanNumber}`;
+                             `34${cleanNumber}`;
       
       // Crear la URL de WhatsApp con el mensaje codificado
       const encodedMessage = encodeURIComponent(message);
@@ -43,6 +45,10 @@ export function WhatsAppBubble() {
       setIsOpen(false);
     }
   };
+
+  if (!chatSettings?.is_active || chatSettings?.chat_type !== 'whatsapp') {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -67,7 +73,7 @@ export function WhatsAppBubble() {
               <Input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Escribe tu mensaje..."
+                placeholder={chatSettings?.whatsapp_message || "Escribe tu mensaje..."}
                 className="flex-1"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
