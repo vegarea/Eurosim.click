@@ -1,40 +1,71 @@
 import { useCart } from "@/contexts/CartContext"
-import { CartItem } from "./CartItem"
 import { formatCurrency } from "@/utils/currency"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/hooks/use-toast"
-import { Toaster } from "@/components/ui/toaster"
+import { CartItem } from "./CartItem"
+import { useEffect, useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
 
 export function Cart() {
-  const { items, total } = useCart()
-  const { toast } = useToast()
+  const { items, updateQuantity, removeItem } = useCart()
+  const [shippingCost, setShippingCost] = useState(0)
+  const subtotal = items.reduce((sum, item) => sum + item.total_price, 0)
+  
+  const hasPhysicalProducts = items.some(item => 
+    item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
+  )
 
-  const showAddedToCartToast = () => {
-    toast({
-      title: "Producto añadido al carrito",
-      duration: 2000, // 2 segundos
-      className: "bottom-0",
-    })
-  }
+  useEffect(() => {
+    async function fetchShippingCost() {
+      if (hasPhysicalProducts) {
+        const { data } = await supabase
+          .from('shipping_settings')
+          .select('shipping_cost')
+          .eq('is_active', true)
+          .single()
+        
+        if (data) {
+          setShippingCost(data.shipping_cost)
+        }
+      } else {
+        setShippingCost(0)
+      }
+    }
+
+    fetchShippingCost()
+  }, [hasPhysicalProducts])
+
+  const total = subtotal + (hasPhysicalProducts ? shippingCost : 0)
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
+      <div className="space-y-3">
         {items.map((item) => (
-          <CartItem key={item.id} item={item} onAdd={showAddedToCartToast} />
+          <CartItem 
+            key={item.id} 
+            item={item}
+            onUpdateQuantity={(quantity) => updateQuantity(item.id, quantity)}
+            onRemove={() => removeItem(item.id)}
+          />
         ))}
       </div>
-      
-      {items.length > 0 && (
-        <>
-          <Separator />
-          <div className="flex justify-between font-medium">
-            <span>Total</span>
-            <span>{formatCurrency(total)}</span>
+
+      <div className="border-t pt-4 space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Subtotal:</span>
+          <span>{formatCurrency(subtotal)}</span>
+        </div>
+        
+        {hasPhysicalProducts && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-600">Costo de envío:</span>
+            <span>{formatCurrency(shippingCost)}</span>
           </div>
-        </>
-      )}
-      <Toaster position="bottom-center" />
+        )}
+
+        <div className="flex justify-between text-lg font-semibold pt-2 border-t">
+          <span>Total:</span>
+          <span>{formatCurrency(total)}</span>
+        </div>
+      </div>
     </div>
   )
 }
