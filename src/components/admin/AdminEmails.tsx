@@ -10,6 +10,7 @@ import { ApiKeySetup } from "./emails/ApiKeySetup"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
+import { createDefaultTemplates } from "./emails/utils/createDefaultTemplates"
 
 export function AdminEmails() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
@@ -48,6 +49,24 @@ export function AdminEmails() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleCreateDefaultTemplates = async () => {
+    try {
+      await createDefaultTemplates()
+      toast({
+        title: "Plantillas creadas",
+        description: "Las plantillas predefinidas se han creado correctamente"
+      })
+      loadTemplates()
+    } catch (error) {
+      console.error('Error al crear plantillas:', error)
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudieron crear las plantillas predefinidas"
+      })
     }
   }
 
@@ -120,10 +139,17 @@ export function AdminEmails() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Configuración de Emails</h1>
-        <Button onClick={handleAddTemplate} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Añadir Plantilla
-        </Button>
+        <div className="flex gap-2">
+          {templates.length === 0 && (
+            <Button onClick={handleCreateDefaultTemplates} variant="outline">
+              Crear Plantillas Predefinidas
+            </Button>
+          )}
+          <Button onClick={handleAddTemplate} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Añadir Plantilla
+          </Button>
+        </div>
       </div>
 
       <Card>
