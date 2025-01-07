@@ -33,7 +33,19 @@ export function SimQuiz() {
   }
 
   const getRecommendation = () => {
-    if (answers.isUrgent) {
+    // Si necesita la SIM en los próximos 3 días Y el teléfono no es compatible con eSIM
+    if (answers.isUrgent && answers.isCompatible === false) {
+      return {
+        title: "Lo sentimos",
+        description: "Para uso inmediato necesitas un teléfono compatible con eSIM. Con una SIM física el tiempo de entrega es de 3-5 días.",
+        bgColor: "bg-yellow-50",
+        textColor: "text-yellow-800",
+        descColor: "text-yellow-600"
+      }
+    }
+    
+    // Si necesita la SIM en los próximos 3 días Y el teléfono es compatible con eSIM
+    if (answers.isUrgent && answers.isCompatible === true) {
       return {
         title: "eSIM Europa",
         description: "Activación instantánea para uso inmediato",
@@ -43,7 +55,8 @@ export function SimQuiz() {
       }
     }
     
-    if (answers.isCompatible) {
+    // Si no es urgente Y el teléfono es compatible con eSIM
+    if (!answers.isUrgent && answers.isCompatible === true) {
       return {
         title: "eSIM Europa",
         description: "La opción más conveniente para dispositivos compatibles",
@@ -53,6 +66,7 @@ export function SimQuiz() {
       }
     }
     
+    // Si no es urgente Y el teléfono NO es compatible con eSIM
     return {
       title: "SIM Física Europa",
       description: "Entrega en 3-5 días hábiles",
