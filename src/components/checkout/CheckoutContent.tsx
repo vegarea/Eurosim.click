@@ -28,6 +28,14 @@ const personalInfoSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
   email: z.string().email("Email inválido"),
   phone: z.string().min(1, "El teléfono es requerido"),
+  shipping_address: z.object({
+    street: z.string(),
+    city: z.string(),
+    state: z.string(),
+    country: z.string(),
+    postal_code: z.string(),
+    phone: z.string()
+  }).optional()
 })
 
 export function CheckoutContent({
@@ -38,12 +46,20 @@ export function CheckoutContent({
   onFormValidityChange,
 }: CheckoutContentProps) {
   const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
-  const form = useForm({
+  const form = useForm<ShippingFormValues>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: {
       name: state.customerInfo.name || "",
       email: state.customerInfo.email || "",
       phone: state.customerInfo.phone || "",
+      shipping_address: {
+        street: "",
+        city: "",
+        state: "",
+        country: "Mexico",
+        postal_code: "",
+        phone: ""
+      }
     }
   })
 
