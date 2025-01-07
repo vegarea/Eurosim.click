@@ -22,7 +22,16 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
         return <MailCheck className="h-3 w-3" />
       case "cancelled":
         return <MailX className="h-3 w-3" />
+      case "payment_failed":
+        return <MailX className="h-3 w-3" />
     }
+  }
+
+  const getVariablesArray = (variables: EmailTemplate['variables']): string[] => {
+    if (Array.isArray(variables)) {
+      return variables.map(v => String(v))
+    }
+    return []
   }
   
   return (
@@ -51,9 +60,9 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">{template.description}</p>
-          {template.variables && template.variables.length > 0 && (
+          {template.variables && getVariablesArray(template.variables).length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {template.variables.map((variable) => (
+              {getVariablesArray(template.variables).map((variable) => (
                 <Badge key={variable} variant="outline" className="text-xs">
                   {`{${variable}}`}
                 </Badge>

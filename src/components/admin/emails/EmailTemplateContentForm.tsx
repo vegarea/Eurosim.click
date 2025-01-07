@@ -20,6 +20,13 @@ export function EmailTemplateContentForm({ formData, setFormData }: EmailTemplat
     ],
   }
 
+  const getVariablesArray = (variables: EmailTemplate['variables']): string[] => {
+    if (Array.isArray(variables)) {
+      return variables.map(v => String(v))
+    }
+    return []
+  }
+
   return (
     <div className="grid gap-2">
       <Label>Contenido del Email</Label>
@@ -35,7 +42,7 @@ export function EmailTemplateContentForm({ formData, setFormData }: EmailTemplat
       <div className="mt-4 p-4 border rounded-md bg-muted">
         <p className="text-sm font-medium mb-2">Variables disponibles:</p>
         <div className="flex flex-wrap gap-2">
-          {formData.variables.map((variable) => (
+          {getVariablesArray(formData.variables).map((variable) => (
             <code key={variable} className="px-2 py-1 bg-background rounded text-sm">
               {`{${variable}}`}
             </code>
