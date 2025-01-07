@@ -36,62 +36,75 @@ export function PlanDetails({ product }: PlanDetailsProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden max-h-[600px]"
+      className="bg-white/50 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden"
     >
-      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            {product.title}
-          </h2>
-          <div className="text-right">
-            <p className="text-3xl font-bold text-primary flex items-baseline gap-1 justify-end">
+      <div className="bg-gradient-to-br from-primary/5 to-secondary/5 p-3">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              {product.title}
+            </h2>
+            <p className="text-2xl font-bold text-primary flex items-baseline gap-1">
               {amount}
               <span className="text-sm font-normal text-gray-500">{currency}</span>
             </p>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/80 rounded-lg p-2 text-center">
-            <p className="text-xl font-bold text-primary">{product.data_eu_gb}GB</p>
-            <p className="text-xs text-gray-600">Europa</p>
-          </div>
-          <div className="bg-white/80 rounded-lg p-2 text-center">
-            <p className="text-xl font-bold text-primary">{product.data_es_gb}GB</p>
-            <p className="text-xs text-gray-600">España</p>
+          
+          <div className="grid grid-cols-2 gap-2 text-center">
+            <div className="bg-white/80 rounded-lg p-1.5">
+              <p className="text-lg font-bold text-primary">{product.data_eu_gb}GB</p>
+              <p className="text-xs text-gray-600">Europa</p>
+            </div>
+            <div className="bg-white/80 rounded-lg p-1.5">
+              <p className="text-lg font-bold text-primary">{product.data_es_gb}GB</p>
+              <p className="text-xs text-gray-600">España</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
-        <div className="space-y-1.5">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-2"
-            >
-              <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
-              <span className="text-sm text-gray-700">{feature}</span>
-            </motion.div>
-          ))}
+      <div className="p-3 space-y-3">
+        <div className="grid grid-cols-2 gap-x-4">
+          <div className="space-y-1">
+            {features.slice(0, Math.ceil(features.length / 2)).map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-1.5"
+              >
+                <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
+                <span className="text-xs text-gray-700">{feature}</span>
+              </motion.div>
+            ))}
+          </div>
+          <div className="space-y-1">
+            {features.slice(Math.ceil(features.length / 2)).map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-1.5"
+              >
+                <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-primary to-secondary" />
+                <span className="text-xs text-gray-700">{feature}</span>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
-        <div className="scale-95 origin-top">
-          <UsageMeter
-            europeGB={product.data_eu_gb}
-            spainGB={product.data_es_gb}
-            isHighlighted={true}
-          />
-        </div>
+        <UsageMeter
+          europeGB={product.data_eu_gb}
+          spainGB={product.data_es_gb}
+          isHighlighted={true}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="pt-2"
         >
           <Button 
             onClick={handlePurchase}
