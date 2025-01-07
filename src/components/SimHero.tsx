@@ -32,10 +32,13 @@ export function SimHero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-left space-y-8">
             <div className="animate-fade-in space-y-6">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl flex items-center gap-4">
-                <span className="text-primary">SIM Card</span> para
-                <EUFlag className="h-12 w-16 inline-block" />
-                Europa
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl flex flex-wrap items-center gap-4">
+                <span className="text-primary">SIM Card</span>
+                <span className="flex items-center gap-2 whitespace-nowrap">
+                  para
+                  <EUFlag className="h-8 w-12 sm:h-12 sm:w-16 inline-block" />
+                  Europa
+                </span>
               </h1>
               <p className="text-lg font-semibold leading-8 text-gray-800 backdrop-blur-sm bg-white/30 p-4 rounded-xl flex items-center gap-3">
                 <Truck className="h-6 w-6 text-primary flex-shrink-0" />
