@@ -18,6 +18,7 @@ import Contact from "./pages/Contact"
 import HowItWorks from "./pages/HowItWorks"
 import FAQ from "./pages/FAQ"
 import Privacy from "./pages/Privacy"
+import Terms from "./pages/Terms"
 import "flag-icons/css/flag-icons.min.css"
 
 const queryClient = new QueryClient()
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/como-funciona" element={<HowItWorks />} />
               <Route path="/preguntas-frecuentes" element={<FAQ />} />
               <Route path="/privacidad" element={<Privacy />} />
+              <Route path="/terminos" element={<Terms />} />
               <Route
                 path="/admin/*"
                 element={
