@@ -147,8 +147,8 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
         />
       </div>
 
-      <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mt-2">
-        <p className="text-sm text-blue-700">
+      <div className="bg-[#F2FCE2] border border-green-200 rounded-lg p-3 mt-2">
+        <p className="text-sm text-green-700">
           La fecha de activación es cuando empezarás a usar tu SIM en Europa. A partir de esta fecha tendrás disponible tu plan de datos.
         </p>
       </div>
