@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, MessageCircle, Send, WhatsApp } from "lucide-react";
+import { Bot, MessageCircle, Send } from "lucide-react";
 import { Header } from "@/components/Header";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { useToast } from "@/components/ui/use-toast";
@@ -104,7 +104,7 @@ export default function Contact() {
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-green-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <WhatsApp className="h-6 w-6 text-green-600" />
+                      <MessageCircle className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">WhatsApp</h3>
