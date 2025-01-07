@@ -18,7 +18,7 @@ export function TrackingSettings() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('tracking_scripts')
+        .select('tracking_scripts, id')
         .single()
 
       if (error) throw error
