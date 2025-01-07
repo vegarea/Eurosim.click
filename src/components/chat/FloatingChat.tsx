@@ -15,7 +15,11 @@ interface Message {
   content: string
 }
 
-export function FloatingChat() {
+interface FloatingChatProps {
+  isModal?: boolean;
+}
+
+export function FloatingChat({ isModal = false }: FloatingChatProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -49,13 +53,13 @@ export function FloatingChat() {
 
   // Mostrar mensaje de bienvenida cuando se abre el chat
   useEffect(() => {
-    if (isOpen && messages.length === 0 && chatSettings?.ai_welcome_message) {
+    if ((isOpen || isModal) && messages.length === 0 && chatSettings?.ai_welcome_message) {
       setMessages([{
         role: 'assistant',
         content: chatSettings.ai_welcome_message
       }])
     }
-  }, [isOpen, chatSettings])
+  }, [isOpen, isModal, chatSettings])
 
   const sendMessage = async (message: string) => {
     try {
@@ -104,8 +108,69 @@ export function FloatingChat() {
     }
   }
 
-  if (!chatSettings?.is_active || chatSettings?.chat_type !== 'ai') {
+  if (!isModal && (!chatSettings?.is_active || chatSettings?.chat_type !== 'ai')) {
     return null
+  }
+
+  const renderChatContent = () => (
+    <>
+      <div className="p-4 bg-primary text-white flex justify-between items-center">
+        <h3 className="font-medium">Asistente Virtual</h3>
+        {!isModal && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:text-white/80"
+            onClick={toggleChat}
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        )}
+      </div>
+
+      <div 
+        ref={scrollAreaRef}
+        className="flex-1 p-4 overflow-y-auto touch-pan-y space-y-4"
+      >
+        {messages.map((message, index) => (
+          <ChatMessage 
+            key={index}
+            role={message.role}
+            content={message.content}
+          />
+        ))}
+        {isTyping && <TypingIndicator />}
+      </div>
+
+      <div className="p-4 border-t">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Escribe tu mensaje..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && input.trim() && !isLoading) {
+                sendMessage(input.trim())
+              }
+            }}
+          />
+          <Button 
+            onClick={() => input.trim() && sendMessage(input.trim())}
+            disabled={!input.trim() || isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              'Enviar'
+            )}
+          </Button>
+        </div>
+      </div>
+    </>
+  )
+
+  if (isModal) {
+    return renderChatContent()
   }
 
   return (
@@ -119,56 +184,7 @@ export function FloatingChat() {
             transition={{ duration: 0.2 }}
             className="absolute bottom-16 right-0 w-[90vw] sm:w-[400px] bg-white rounded-lg shadow-xl border overflow-hidden"
           >
-            <div className="p-4 bg-primary text-white flex justify-between items-center">
-              <h3 className="font-medium">Asistente Virtual</h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:text-white/80"
-                onClick={toggleChat}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-
-            <div 
-              ref={scrollAreaRef}
-              className="flex-1 p-4 h-[400px] overflow-y-auto touch-pan-y space-y-4"
-            >
-              {messages.map((message, index) => (
-                <ChatMessage 
-                  key={index}
-                  role={message.role}
-                  content={message.content}
-                />
-              ))}
-              {isTyping && <TypingIndicator />}
-            </div>
-
-            <div className="p-4 border-t">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Escribe tu mensaje..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && input.trim() && !isLoading) {
-                      sendMessage(input.trim())
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={() => input.trim() && sendMessage(input.trim())}
-                  disabled={!input.trim() || isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    'Enviar'
-                  )}
-                </Button>
-              </div>
-            </div>
+            {renderChatContent()}
           </motion.div>
         )}
       </AnimatePresence>

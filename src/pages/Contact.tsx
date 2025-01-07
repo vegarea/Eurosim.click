@@ -8,7 +8,7 @@ import { MainLayout } from "@/components/layouts/MainLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import { WhatsAppModal } from "@/components/chat/WhatsAppModal";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FloatingChat } from "@/components/chat/FloatingChat";
 
 export default function Contact() {
@@ -156,8 +156,11 @@ export default function Contact() {
       />
 
       <Dialog open={isAIModalOpen} onOpenChange={setIsAIModalOpen}>
-        <DialogContent className="p-0 bg-transparent border-none">
-          <FloatingChat />
+        <DialogContent className="p-0 max-w-[500px] bg-white">
+          <DialogTitle className="sr-only">Asistente Virtual</DialogTitle>
+          <div className="h-[600px] flex flex-col">
+            <FloatingChat isModal={true} />
+          </div>
         </DialogContent>
       </Dialog>
     </MainLayout>
