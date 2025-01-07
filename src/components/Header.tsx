@@ -75,7 +75,7 @@ export function Header() {
                 <span>Cobertura en toda Europa</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto sm:max-h-none">
               <CountryCoverage defaultOpen={true} />
             </DialogContent>
           </Dialog>
@@ -139,12 +139,13 @@ export function Header() {
                     <Button 
                       variant="ghost"
                       className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                      onClick={() => setIsOpen(false)}
                     >
                       <EUFlag className="w-4 h-4 mr-2" />
                       Cobertura en toda Europa
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-3xl">
+                  <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto sm:max-w-3xl sm:max-h-none">
                     <CountryCoverage defaultOpen={true} />
                   </DialogContent>
                 </Dialog>
@@ -153,6 +154,7 @@ export function Header() {
                   <Button 
                     variant="ghost"
                     className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                    onClick={() => setIsOpen(false)}
                   >
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Carrito ({cartItems})
