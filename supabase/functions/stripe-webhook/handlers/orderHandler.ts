@@ -50,7 +50,7 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       customer_id: customer.id,
       product_id: session.metadata.product_id,
       status: 'processing',
-      type: productType, // Usamos el tipo de producto de los metadatos
+      type: productType,
       total_amount: totalAmount,
       quantity: 1,
       payment_method: 'stripe',
@@ -81,6 +81,30 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
     if (orderError) {
       console.error('❌ Error creating order:', orderError)
       throw orderError
+    }
+
+    // Crear el evento inicial de la orden
+    const eventData = {
+      order_id: order.id,
+      type: 'created',
+      description: `Pedido creado - ${session.metadata.product_title}`,
+      metadata: {
+        automated: true,
+        details: `Pedido creado exitosamente con ID ${order.id}`,
+        payment_method: 'stripe',
+        amount: totalAmount,
+        product_type: productType
+      }
+    }
+
+    const { error: eventError } = await supabase
+      .from('order_events')
+      .insert(eventData)
+
+    if (eventError) {
+      console.error('❌ Error creating order event:', eventError)
+      // No lanzamos el error aquí para no afectar la creación de la orden
+      // pero lo registramos para debugging
     }
 
     console.log('✅ Order created successfully:', order)
