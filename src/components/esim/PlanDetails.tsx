@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { UsageMeter } from "@/components/UsageMeter";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "@/utils/currency";
@@ -23,8 +23,6 @@ export function PlanDetails({ product }: PlanDetailsProps) {
     toast({
       title: "Producto añadido al carrito",
       description: `Has seleccionado el plan ${product.title}`,
-      duration: 2000, // 2 segundos
-      className: "bottom-0 right-0 flex fixed md:bottom-4 md:right-4 mb-4 mr-4"
     });
     
     navigate('/checkout');
