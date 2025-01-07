@@ -7,20 +7,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { formatCurrency } from "@/utils/currency"
 
 interface OrderPaymentInfoProps {
   order: Order
-  paymentData: {
-    paymentUrl: string
-    logs: Array<{
-      date: string
-      event: string
-      status: string
-    }>
-  }
 }
 
-export function OrderPaymentInfo({ order, paymentData }: OrderPaymentInfoProps) {
+export function OrderPaymentInfo({ order }: OrderPaymentInfoProps) {
+  // Formatear el monto total para mostrar
+  const formattedAmount = formatCurrency(order.total_amount)
+
   return (
     <Card>
       <CardHeader>
@@ -31,53 +27,93 @@ export function OrderPaymentInfo({ order, paymentData }: OrderPaymentInfoProps) 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div>
-            <h3 className="font-medium mb-2">Método de Pago</h3>
-            <div className="flex items-center gap-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-medium mb-2">Método de Pago</h3>
               <Badge variant="outline" className="capitalize">
                 {order.payment_method || "No especificado"}
               </Badge>
             </div>
+            <div>
+              <h3 className="font-medium mb-2">Estado del Pago</h3>
+              <Badge 
+                variant={order.payment_status === "completed" ? "success" : "secondary"}
+                className="capitalize"
+              >
+                {order.payment_status}
+              </Badge>
+            </div>
           </div>
 
-          {paymentData.paymentUrl && (
+          <div>
+            <h3 className="font-medium mb-2">Monto Total</h3>
+            <p className="text-lg font-semibold">{formattedAmount}</p>
+          </div>
+
+          {order.stripe_payment_intent_id && (
             <div>
-              <h3 className="font-medium mb-2">URL de Pago</h3>
+              <h3 className="font-medium mb-2">ID de Pago Stripe</h3>
+              <p className="text-sm text-gray-600">{order.stripe_payment_intent_id}</p>
+            </div>
+          )}
+
+          {order.stripe_receipt_url && (
+            <div>
+              <h3 className="font-medium mb-2">Recibo de Pago</h3>
               <a 
-                href={paymentData.paymentUrl}
+                href={order.stripe_receipt_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline flex items-center gap-1"
               >
-                Ver en {order.payment_method} <ExternalLink className="h-4 w-4" />
+                Ver en Stripe <ExternalLink className="h-4 w-4" />
               </a>
             </div>
           )}
 
-          <div>
-            <h3 className="font-medium mb-2">Registro de Eventos</h3>
-            <div className="space-y-2">
-              {paymentData.logs.map((log, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-                >
-                  <div>
-                    <p className="text-sm font-medium">{log.event}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(log.date).toLocaleString()}
-                    </p>
-                  </div>
-                  <Badge 
-                    variant="secondary"
-                    className={log.status === "completed" ? "bg-green-100 text-green-800" : ""}
-                  >
-                    {log.status}
-                  </Badge>
-                </div>
-              ))}
+          {order.paypal_order_id && (
+            <div>
+              <h3 className="font-medium mb-2">ID de Pago PayPal</h3>
+              <p className="text-sm text-gray-600">{order.paypal_order_id}</p>
             </div>
-          </div>
+          )}
+
+          {order.paypal_receipt_url && (
+            <div>
+              <h3 className="font-medium mb-2">Recibo de PayPal</h3>
+              <a 
+                href={order.paypal_receipt_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline flex items-center gap-1"
+              >
+                Ver en PayPal <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
+          )}
+
+          {order.events && order.events.length > 0 && (
+            <div>
+              <h3 className="font-medium mb-2">Registro de Eventos de Pago</h3>
+              <div className="space-y-2">
+                {order.events
+                  .filter(event => event.type.includes('payment'))
+                  .map((event, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{event.description}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(event.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

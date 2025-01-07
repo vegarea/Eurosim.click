@@ -25,15 +25,6 @@ const statusOrder = [
   "delivered",
 ] as const
 
-// Mock payment data - In a real app, this would come from your payment provider's API
-const mockPaymentData = {
-  paymentUrl: "https://checkout.stripe.com/c/pay/cs_test_...",
-  logs: [
-    { date: "2024-01-25T10:30:00Z", event: "payment.created", status: "pending" },
-    { date: "2024-01-25T10:31:00Z", event: "payment.succeeded", status: "completed" }
-  ]
-}
-
 export default function OrderDetails() {
   const { orderId } = useParams()
   const { orders, updateOrder } = useOrders()
@@ -130,7 +121,7 @@ export default function OrderDetails() {
           </div>
           
           <div className="space-y-6">
-            <OrderPaymentInfo order={order} paymentData={mockPaymentData} />
+            <OrderPaymentInfo order={order} />
             <OrderDocumentation order={order} />
             <OrderNotes order={order} />
           </div>
