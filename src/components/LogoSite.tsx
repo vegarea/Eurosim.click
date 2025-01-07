@@ -2,7 +2,11 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Link } from "react-router-dom"
 
-export function LogoSite() {
+interface LogoSiteProps {
+  className?: string;
+}
+
+export function LogoSite({ className }: LogoSiteProps) {
   const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
@@ -24,7 +28,7 @@ export function LogoSite() {
       <img 
         src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className="h-12 w-auto drop-shadow-sm" 
+        className={className || "h-12 w-auto drop-shadow-sm"} 
       />
     </Link>
   )
