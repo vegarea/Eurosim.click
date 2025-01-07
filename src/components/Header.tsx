@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, ShoppingCart, Signal, Wifi, MessageCircle, Info } from "lucide-react";
+import { Menu, ShoppingCart, Signal, Wifi, MessageCircle } from "lucide-react";
 import EUFlag from "@/components/icons/EUFlag";
 import { LogoSite } from "./LogoSite";
 import {
@@ -21,7 +21,6 @@ export function Header() {
     { label: "Inicio", href: "/" },
     { label: "eSIMs", href: "/e-sims", icon: <Wifi className="w-4 h-4" /> },
     { label: "SIM Card", href: "/sims", icon: <Signal className="w-4 h-4" /> },
-    { label: "¿Cómo funciona?", href: "/como-funciona", icon: <Info className="w-4 h-4" /> },
     { label: "Contacto", href: "/contact", icon: <MessageCircle className="w-4 h-4" /> },
   ];
 
