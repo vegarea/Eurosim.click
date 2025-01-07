@@ -64,17 +64,33 @@ export function CheckoutContent({
   })
 
   React.useEffect(() => {
+    const subscription = form.watch(() => {
+      const formValues = form.getValues();
+      updateCustomerInfo({
+        name: formValues.name,
+        email: formValues.email,
+        phone: formValues.phone
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, updateCustomerInfo]);
+
+  React.useEffect(() => {
     if (step === 3) {
-      const isValid = !!state.customerInfo.email && !!state.customerInfo.name;
+      const isValid = !!state.customerInfo.email && 
+                     !!state.customerInfo.name && 
+                     !!state.customerInfo.phone;
       console.log("Payment step validation:", { 
         isValid, 
         email: state.customerInfo.email,
         name: state.customerInfo.name,
+        phone: state.customerInfo.phone,
         state: state 
       });
       onFormValidityChange(isValid);
     }
-  }, [step, state.customerInfo.email, state.customerInfo.name, onFormValidityChange]);
+  }, [step, state.customerInfo, onFormValidityChange]);
 
   const handleFormSubmit = (values: any) => {
     console.log("Form submitted with values:", values);
@@ -95,7 +111,7 @@ export function CheckoutContent({
       null;
 
     const customerInfo = {
-      name: values.name || values.fullName,
+      name: values.name,
       email: values.email,
       phone: values.phone,
       passport_number: values.passportNumber,
