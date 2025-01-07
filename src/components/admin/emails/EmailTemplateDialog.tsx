@@ -27,7 +27,7 @@ export function EmailTemplateDialog({
   onSave,
 }: EmailTemplateDialogProps) {
   const [formData, setFormData] = useState<EmailTemplate>({
-    id: "",
+    id: crypto.randomUUID(),
     name: "",
     subject: "",
     status: "processing",

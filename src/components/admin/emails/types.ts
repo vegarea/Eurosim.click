@@ -1,3 +1,5 @@
+import { Json } from "@/integrations/supabase/types"
+
 export interface EmailTemplate {
   id: string
   name: string
@@ -6,7 +8,7 @@ export interface EmailTemplate {
   description: string
   type: "physical" | "esim" | "both"
   status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled" | "payment_failed"
-  variables: string[]
+  variables: Json
   carrier_id?: string | null
   is_active: boolean
   created_at?: string

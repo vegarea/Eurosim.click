@@ -22,6 +22,13 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
     setFormData({ ...formData, variables: vars })
   }
 
+  const getVariablesString = () => {
+    if (Array.isArray(formData.variables)) {
+      return formData.variables.join(', ')
+    }
+    return ''
+  }
+
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">
@@ -94,7 +101,7 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
         <Label htmlFor="variables">Variables Disponibles (separadas por comas)</Label>
         <Textarea
           id="variables"
-          value={formData.variables.join(', ')}
+          value={getVariablesString()}
           onChange={handleVariablesChange}
           placeholder="nombre_cliente, numero_pedido, etc..."
         />
