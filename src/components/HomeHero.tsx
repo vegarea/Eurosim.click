@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import SimQuiz from "@/components/SimQuiz";
+import { SimQuiz } from "@/components/SimQuiz";
 import { useSiteImages } from "@/hooks/useSiteImages";
 
 export function HomeHero() {
