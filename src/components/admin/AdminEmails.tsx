@@ -8,9 +8,10 @@ import { EmailTemplateCard } from "./emails/EmailTemplateCard"
 import { EmailLogs } from "./emails/EmailLogs"
 import { ApiKeySetup } from "./emails/ApiKeySetup"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { initialTemplates } from "./emails/initialData"
 
 export function AdminEmails() {
-  const [templates, setTemplates] = useState<EmailTemplate[]>([])
+  const [templates, setTemplates] = useState<EmailTemplate[]>(initialTemplates)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
 
