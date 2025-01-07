@@ -30,8 +30,8 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
 
   const handleDaySelect = (date: Date | undefined) => {
     if (date) {
-      // Mantener el año y mes seleccionados
       const newDate = new Date(date)
+      // Mantener el año y mes seleccionados
       newDate.setFullYear(currentDate.getFullYear())
       newDate.setMonth(currentDate.getMonth())
       setCurrentDate(newDate)
@@ -84,9 +84,9 @@ export function BirthDatePicker({ value, onChange }: BirthDatePickerProps) {
       </div>
       <Calendar
         mode="single"
-        selected={currentDate}
+        selected={value}
         onSelect={handleDaySelect}
-        defaultMonth={currentDate}
+        month={currentDate}
         disabled={(date) =>
           date > new Date() || date < new Date("1940-01-01")
         }
