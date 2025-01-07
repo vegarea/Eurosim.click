@@ -2,7 +2,6 @@ import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
@@ -144,41 +143,6 @@ export function ChatSettings() {
                   updateSettings.mutate({ whatsapp_message: e.target.value })
                 }
               />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {settings.chat_type === 'ai' && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuración del Asistente Virtual</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="aiWelcome">Mensaje de Bienvenida</Label>
-              <Input
-                id="aiWelcome"
-                value={settings.ai_welcome_message}
-                onChange={(e) => 
-                  updateSettings.mutate({ ai_welcome_message: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="aiPrompt">Prompt del Sistema</Label>
-              <textarea
-                id="aiPrompt"
-                className="w-full min-h-[100px] p-2 border rounded-md"
-                value={settings.ai_system_prompt}
-                onChange={(e) => 
-                  updateSettings.mutate({ ai_system_prompt: e.target.value })
-                }
-              />
-              <p className="text-sm text-muted-foreground">
-                Este prompt define cómo se comportará el asistente virtual.
-              </p>
             </div>
           </CardContent>
         </Card>
