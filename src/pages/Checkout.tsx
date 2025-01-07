@@ -4,7 +4,6 @@ import { PaymentSecurity } from "@/components/PaymentSecurity"
 import { useCart } from "@/contexts/CartContext"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { useToast } from "@/components/ui/use-toast"
 import { useNavigate } from "react-router-dom"
 import { CheckoutHeader } from "@/components/checkout/CheckoutHeader"
 import { DocumentationForm } from "@/components/checkout/DocumentationForm"
@@ -43,7 +42,6 @@ function CheckoutContent() {
   const { items } = useCart()
   const [isFormValid, setIsFormValid] = useState(false)
   const [isTestMode, setIsTestMode] = useState(false)
-  const { toast } = useToast()
   const navigate = useNavigate()
   const { state, updateCustomerInfo } = useCheckout()
 
@@ -72,17 +70,6 @@ function CheckoutContent() {
     }
   })
 
-  useEffect(() => {
-    if (items.length === 0) {
-      toast({
-        title: "Carrito vacío",
-        description: "Agrega productos a tu carrito para continuar con la compra",
-        variant: "destructive",
-      })
-      navigate('/')
-    }
-  }, [items, navigate, toast])
-
   const loadTestData = () => {
     const data = hasPhysicalSim ? 
       { ...testData.shipping, ...testData.documentation } :
@@ -90,11 +77,6 @@ function CheckoutContent() {
     
     setIsTestMode(true);
     setIsFormValid(true);
-    
-    toast({
-      title: "Modo de prueba activado",
-      description: "Se han cargado datos de prueba para facilitar el testing",
-    });
   };
 
   const handleFormValidityChange = (isValid: boolean) => {
