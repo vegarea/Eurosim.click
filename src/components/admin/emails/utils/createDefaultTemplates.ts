@@ -87,7 +87,7 @@ export const createDefaultTemplates = async () => {
     </html>
   `
 
-  const templates = [
+  const templates: Array<Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>> = [
     {
       name: "Pago Pendiente",
       subject: "Completa tu pago para finalizar tu pedido",
