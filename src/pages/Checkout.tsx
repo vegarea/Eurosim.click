@@ -46,6 +46,11 @@ function CheckoutContent() {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { state, updateCustomerInfo } = useCheckout()
+
+  // Efecto para asegurar que la página se cargue desde arriba
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
