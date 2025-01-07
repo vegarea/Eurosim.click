@@ -23,6 +23,17 @@ const shippingFormSchema = z.object({
   })
 })
 
+const shippingAddressOnlySchema = z.object({
+  shipping_address: z.object({
+    street: z.string().min(1, "La dirección es requerida"),
+    city: z.string().min(1, "La ciudad es requerida"),
+    state: z.string().min(1, "El estado es requerido"),
+    country: z.string().min(1, "El país es requerido"),
+    postal_code: z.string().min(1, "El código postal es requerido"),
+    phone: z.string().min(1, "El teléfono es requerido")
+  })
+})
+
 interface ShippingFormProps {
   onSubmit: (values: ShippingFormValues) => void;
   onValidityChange?: (isValid: boolean) => void;
@@ -35,6 +46,7 @@ interface ShippingFormProps {
   };
   isTestMode?: boolean;
   testData?: Partial<ShippingFormValues>;
+  skipPersonalInfo?: boolean;
 }
 
 export function ShippingForm({ 
@@ -43,11 +55,12 @@ export function ShippingForm({
   email = '', 
   initialData,
   isTestMode,
-  testData
+  testData,
+  skipPersonalInfo = false
 }: ShippingFormProps) {
   const { updateCustomerInfo } = useCheckout()
   const form = useForm<ShippingFormValues>({
-    resolver: zodResolver(shippingFormSchema),
+    resolver: zodResolver(skipPersonalInfo ? shippingAddressOnlySchema : shippingFormSchema),
     defaultValues: {
       email: email || initialData?.email || "",
       name: initialData?.name || "",
@@ -115,7 +128,7 @@ export function ShippingForm({
         onSubmit={form.handleSubmit(handleSubmit)} 
         className="space-y-6"
       >
-        <PersonalInfoFields form={form} />
+        {!skipPersonalInfo && <PersonalInfoFields form={form} />}
         <AddressAutocomplete form={form} />
         <LocationFields form={form} />
       </form>

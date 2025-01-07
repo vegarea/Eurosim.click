@@ -6,6 +6,12 @@ import { useCheckout } from "@/contexts/CheckoutContext"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
 import { format } from "date-fns"
+import { Card } from "@/components/ui/card"
+import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
+import { Form } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 
 interface CheckoutContentProps {
   step: number;
@@ -18,6 +24,12 @@ interface CheckoutContentProps {
   onFormValidityChange: (isValid: boolean) => void;
 }
 
+const personalInfoSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("Email inválido"),
+  phone: z.string().min(1, "El teléfono es requerido"),
+})
+
 export function CheckoutContent({
   step,
   hasPhysicalSim,
@@ -26,6 +38,14 @@ export function CheckoutContent({
   onFormValidityChange,
 }: CheckoutContentProps) {
   const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
+  const form = useForm({
+    resolver: zodResolver(personalInfoSchema),
+    defaultValues: {
+      name: state.customerInfo.name || "",
+      email: state.customerInfo.email || "",
+      phone: state.customerInfo.phone || "",
+    }
+  })
 
   React.useEffect(() => {
     if (step === 3) {
@@ -61,7 +81,7 @@ export function CheckoutContent({
       null;
 
     const customerInfo = {
-      name: values.fullName || values.name, // Soporte para ambos campos
+      name: values.name || values.fullName, // Soporte para ambos campos
       email: values.email,
       phone: values.phone,
       passport_number: values.passportNumber,
@@ -83,29 +103,42 @@ export function CheckoutContent({
   const getCurrentStep = () => {
     switch (step) {
       case 1:
-        if (hasPhysicalSim) {
-          return (
-            <ShippingForm
-              onSubmit={handleFormSubmit}
-              onValidityChange={onFormValidityChange}
-              isTestMode={isTestMode}
-              testData={testData.shipping}
-              initialData={state.customerInfo}
-            />
-          )
-        }
         return (
-          <DocumentationForm
-            onSubmit={handleFormSubmit}
-            onValidityChange={onFormValidityChange}
-            isTestMode={isTestMode}
-            testData={testData.documentation}
-            initialData={state.customerInfo}
-          />
-        )
+          <div className="space-y-6">
+            <Card className="p-6">
+              <h2 className="text-xl font-semibold mb-4">Información Personal</h2>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+                  <PersonalInfoFields form={form} />
+                </form>
+              </Form>
+            </Card>
+
+            {hasPhysicalSim && (
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Dirección de Envío</h2>
+                <ShippingForm
+                  onSubmit={handleFormSubmit}
+                  onValidityChange={onFormValidityChange}
+                  isTestMode={isTestMode}
+                  testData={testData.shipping}
+                  initialData={state.customerInfo}
+                  skipPersonalInfo={true}
+                />
+              </Card>
+            )}
+          </div>
+        );
       case 2:
-        if (hasPhysicalSim) {
-          return (
+        return (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-4">Documentación UE</h2>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <p className="text-blue-700 text-sm">
+                Para cumplir con las regulaciones de la Unión Europea y poder asignarte un número local europeo,
+                necesitamos algunos datos adicionales. Esta información es requerida por las autoridades de telecomunicaciones.
+              </p>
+            </div>
             <DocumentationForm
               onSubmit={handleFormSubmit}
               onValidityChange={onFormValidityChange}
@@ -113,17 +146,16 @@ export function CheckoutContent({
               testData={testData.documentation}
               initialData={state.customerInfo}
             />
-          )
-        }
-        return null
+          </Card>
+        );
       case 3:
         return (
           <PaymentStep 
             formData={state}
           />
-        )
+        );
       default:
-        return null
+        return null;
     }
   }
 
