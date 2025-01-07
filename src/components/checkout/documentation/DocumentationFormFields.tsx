@@ -101,56 +101,57 @@ export function DocumentationFormFields({ form }: DocumentationFormFieldsProps) 
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="activationDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4" />
-                Fecha de activación
-              </FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: es })
-                      ) : (
-                        <span>Selecciona una fecha</span>
-                      )}
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 bg-white shadow-md" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date < new Date()
-                    }
-                    initialFocus
-                    className="rounded-md border p-3"
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-
-      <div className="bg-[#F2FCE2] border border-green-200 rounded-lg p-3 mt-2">
-        <p className="text-sm text-green-700">
-          La fecha de activación es cuando empezarás a usar tu SIM en Europa. A partir de esta fecha tendrás disponible tu plan de datos.
-        </p>
+        <div className="space-y-2">
+          <FormField
+            control={form.control}
+            name="activationDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="flex items-center gap-2">
+                  <CalendarIcon className="w-4 h-4" />
+                  Fecha de activación
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP", { locale: es })
+                        ) : (
+                          <span>Selecciona una fecha</span>
+                        )}
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white shadow-md" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date < new Date()
+                      }
+                      initialFocus
+                      className="rounded-md border p-3"
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="bg-[#F2FCE2] border border-green-200 rounded-lg p-2">
+            <p className="text-xs text-green-700">
+              La fecha de activación es cuando empezarás a usar tu SIM en Europa. A partir de esta fecha tendrás disponible tu plan de datos.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
