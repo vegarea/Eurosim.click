@@ -2,11 +2,17 @@ export interface EmailTemplate {
   id: string
   name: string
   subject: string
-  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled"
+  content: string
   description: string
   type: "physical" | "esim" | "both"
+  status: "payment_pending" | "processing" | "shipped" | "delivered" | "cancelled"
   variables: string[]
-  content?: string
+  carrier_id?: string | null
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+  created_by?: string | null
+  updated_by?: string | null
 }
 
 export const getStatusColor = (status: EmailTemplate["status"]) => {
@@ -29,15 +35,4 @@ export const getStatusLabel = (status: EmailTemplate["status"]) => {
     cancelled: "Cancelado"
   }
   return labels[status]
-}
-
-export const getStatusIcon = (status: EmailTemplate["status"]) => {
-  const icons = {
-    payment_pending: "MailWarning",
-    processing: "Mail",
-    shipped: "Mail",
-    delivered: "MailCheck",
-    cancelled: "MailX"
-  }
-  return icons[status]
 }
