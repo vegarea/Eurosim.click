@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { LogoUploader } from "./components/LogoUploader"
 import { SocialMediaInputs } from "./components/SocialMediaInputs"
+import React, { useState, useEffect } from "react"
 
 export function CompanySettings() {
   const { toast } = useToast()
@@ -22,7 +23,7 @@ export function CompanySettings() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
-        .single()
+        .maybeSingle()
       
       if (error) throw error
       return data
@@ -56,7 +57,7 @@ export function CompanySettings() {
       const { data: existingSettings, error: fetchError } = await supabase
         .from('site_settings')
         .select('id')
-        .single()
+        .maybeSingle()
 
       if (fetchError && fetchError.code !== 'PGRST116') {
         throw fetchError
@@ -72,6 +73,8 @@ export function CompanySettings() {
           instagram_url: instagramUrl,
           youtube_url: youtubeUrl,
           tiktok_url: tiktokUrl
+        }, {
+          onConflict: 'id'
         })
 
       if (error) throw error
