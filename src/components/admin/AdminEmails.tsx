@@ -5,11 +5,12 @@ import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmailTemplate } from "./emails/types"
 import { EmailTemplateCard } from "./emails/EmailTemplateCard"
-import { initialTemplates } from "./emails/initialData"
 import { EmailLogs } from "./emails/EmailLogs"
+import { ApiKeySetup } from "./emails/ApiKeySetup"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function AdminEmails() {
-  const [templates, setTemplates] = useState<EmailTemplate[]>(initialTemplates)
+  const [templates, setTemplates] = useState<EmailTemplate[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
 
@@ -36,6 +37,15 @@ export function AdminEmails() {
           Añadir Plantilla
         </Button>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Prueba de Configuración</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApiKeySetup />
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="all" className="space-y-4">
         <TabsList>
