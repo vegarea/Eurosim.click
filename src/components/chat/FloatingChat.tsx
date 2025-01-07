@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChatMessage } from "../esim/chat/ChatMessage"
 import { TypingIndicator } from "../esim/chat/TypingIndicator"
 import { useQuery } from "@tanstack/react-query"
+import { useFloatingChat } from "@/hooks/useFloatingChat"
 
 interface Message {
   role: 'user' | 'assistant'
@@ -18,9 +19,9 @@ export function FloatingChat() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const { isOpen, toggleChat } = useFloatingChat()
 
   const { data: chatSettings } = useQuery({
     queryKey: ['chat-settings'],
@@ -124,7 +125,7 @@ export function FloatingChat() {
                 variant="ghost"
                 size="icon"
                 className="text-white hover:text-white/80"
-                onClick={() => setIsOpen(false)}
+                onClick={toggleChat}
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -178,7 +179,7 @@ export function FloatingChat() {
           "h-14 w-14 rounded-full shadow-lg",
           isOpen && "bg-primary/90 hover:bg-primary/80"
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleChat}
       >
         <MessageCircle className="h-6 w-6" />
       </Button>

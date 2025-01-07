@@ -2,17 +2,19 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, MessageSquare, Send } from "lucide-react";
+import { Bot, MessageCircle, Send } from "lucide-react";
 import { Header } from "@/components/Header";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
+import { useFloatingChat } from "@/hooks/useFloatingChat";
 
 export default function Contact() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const { toast } = useToast();
+  const { openChat } = useFloatingChat();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +50,6 @@ export default function Contact() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 items-start">
-              {/* Columna de botones */}
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -58,7 +59,7 @@ export default function Contact() {
                 <Button
                   variant="outline"
                   className="w-full group relative h-auto p-6 bg-white hover:bg-gradient-to-br hover:from-brand-50 hover:to-white border border-gray-100 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  onClick={() => window.location.href = "/assistant"}
+                  onClick={openChat}
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-brand-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -80,7 +81,7 @@ export default function Contact() {
                 >
                   <div className="relative z-10 flex items-center text-left space-x-4">
                     <div className="h-12 w-12 rounded-xl bg-green-100/80 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <MessageSquare className="h-6 w-6 text-green-600" />
+                      <MessageCircle className="h-6 w-6 text-green-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">WhatsApp</h3>
@@ -92,7 +93,6 @@ export default function Contact() {
                 </Button>
               </motion.div>
 
-              {/* Columna del formulario */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
