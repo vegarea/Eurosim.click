@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Building2, ShoppingCart, Search, Palette, Plug, Bot, MessageCircle } from "lucide-react"
+import { Building2, ShoppingCart, Search, Palette, Plug, Bot, MessageCircle, Code2 } from "lucide-react"
 import { CompanySettings } from "./settings/CompanySettings"
 import { EcommerceSettings } from "./settings/EcommerceSettings"
 import { SeoSettings } from "./settings/SeoSettings"
@@ -8,6 +8,7 @@ import { StyleSettings } from "./settings/StyleSettings"
 import { IntegrationsSettings } from "./settings/IntegrationsSettings"
 import { AIAssistantSettings } from "./settings/AIAssistantSettings"
 import { ChatSettings } from "./settings/ChatSettings"
+import { TrackingSettings } from "./settings/TrackingSettings"
 
 export function AdminSettings() {
   return (
@@ -51,6 +52,10 @@ export function AdminSettings() {
             <MessageCircle className="mr-2 h-4 w-4" />
             Chat Atención
           </TabsTrigger>
+          <TabsTrigger value="tracking" className="data-[state=active]:bg-white">
+            <Code2 className="mr-2 h-4 w-4" />
+            Seguimiento
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="company">
@@ -79,6 +84,10 @@ export function AdminSettings() {
 
         <TabsContent value="chat">
           <ChatSettings />
+        </TabsContent>
+
+        <TabsContent value="tracking">
+          <TrackingSettings />
         </TabsContent>
       </Tabs>
     </div>
