@@ -4,6 +4,7 @@ import { AddressAutocomplete } from "./shipping/AddressAutocomplete"
 import { LocationFields } from "./shipping/LocationFields"
 import { ShippingFormValues } from "./shipping/types"
 import { UseFormReturn } from "react-hook-form"
+import { useCheckout } from "@/contexts/CheckoutContext"
 
 interface ShippingFormProps {
   form: UseFormReturn<ShippingFormValues>;
@@ -29,6 +30,24 @@ export function ShippingForm({
   testData,
   skipPersonalInfo = false
 }: ShippingFormProps) {
+  const { updateCustomerInfo, state } = useCheckout()
+
+  // Sincronizar cambios del formulario con el contexto
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name?.startsWith('shipping_address')) {
+        const formValues = form.getValues()
+        console.log("ShippingForm - Actualizando dirección:", formValues.shipping_address)
+        updateCustomerInfo({
+          ...state.customerInfo,
+          default_shipping_address: formValues.shipping_address
+        })
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [form, updateCustomerInfo, state.customerInfo])
+
   useEffect(() => {
     if (isTestMode && testData) {
       console.log('ShippingForm - Setting Test Data:', testData)
