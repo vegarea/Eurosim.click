@@ -11,12 +11,16 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Mejorar el manejo de CORS
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: corsHeaders,
+      status: 200 
+    })
   }
 
   try {
-    console.log('Webhook request received')
+    console.log('🎯 Webhook request received')
 
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
     const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')
@@ -24,7 +28,14 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
     if (!stripeSecretKey || !webhookSecret || !supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Server configuration error')
+      console.error('❌ Missing required environment variables')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const stripe = new Stripe(stripeSecretKey, {
@@ -34,7 +45,14 @@ serve(async (req) => {
 
     const signature = req.headers.get('stripe-signature')
     if (!signature) {
-      throw new Error('No Stripe signature found')
+      console.error('❌ No Stripe signature found')
+      return new Response(
+        JSON.stringify({ error: 'No Stripe signature found' }), 
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const bodyArray = await req.arrayBuffer()
@@ -50,63 +68,105 @@ serve(async (req) => {
         Stripe.createSubtleCryptoProvider()
       )
     } catch (err) {
-      console.error('Error verifying webhook signature:', err)
+      console.error('❌ Error verifying webhook signature:', err)
       return new Response(
         JSON.stringify({ error: 'Webhook signature verification failed' }), 
-        { status: 400, headers: corsHeaders }
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
       )
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    console.log('Processing event type:', event.type)
+    console.log('✅ Processing event type:', event.type)
 
     // Solo manejamos el evento checkout.session.completed
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-      console.log('Processing completed checkout session:', session.id)
+      console.log('📦 Processing completed checkout session:', session.id)
 
-      // Procesar la orden
-      const customer = await handleCustomerCreation(session, supabase)
-      console.log('Customer processed:', customer)
+      try {
+        // Procesar la orden
+        const customer = await handleCustomerCreation(session, supabase)
+        console.log('👤 Customer processed:', customer)
 
-      const order = await handleOrderCreation(session, customer, supabase)
-      console.log('Order created:', order)
+        const order = await handleOrderCreation(session, customer, supabase)
+        console.log('📝 Order created:', order)
 
-      const orderItems = await handleOrderItemCreation(session, order, supabase)
-      console.log('Order items created:', orderItems)
+        const orderItems = await handleOrderItemCreation(session, order, supabase)
+        console.log('🛍️ Order items created:', orderItems)
 
-      // Registrar el evento de pago completado
-      const paymentEvent = {
-        order_id: order.id,
-        type: 'payment_completed',
-        description: 'Pago completado exitosamente',
-        metadata: {
-          payment_intent: session.payment_intent,
-          payment_status: session.payment_status,
-          amount: session.amount_total
+        // Registrar el evento de pago completado
+        const paymentEvent = {
+          order_id: order.id,
+          type: 'payment_completed',
+          description: 'Pago completado exitosamente',
+          metadata: {
+            payment_intent: session.payment_intent,
+            payment_status: session.payment_status,
+            amount: session.amount_total
+          }
         }
-      }
 
-      const { error: eventError } = await supabase
-        .from('order_events')
-        .insert(paymentEvent)
+        const { error: eventError } = await supabase
+          .from('order_events')
+          .insert(paymentEvent)
 
-      if (eventError) {
-        console.error('Error creating payment event:', eventError)
+        if (eventError) {
+          console.error('❌ Error creating payment event:', eventError)
+          // No retornamos error aquí para no afectar el flujo principal
+        }
+
+        // Responder exitosamente a Stripe
+        return new Response(
+          JSON.stringify({ received: true, order_id: order.id }), 
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      } catch (error) {
+        console.error('❌ Error processing webhook:', error)
+        // Importante: Retornamos 200 incluso en caso de error para evitar reintentos
+        // pero incluimos el error en la respuesta para debugging
+        return new Response(
+          JSON.stringify({ 
+            received: true, 
+            error: error.message,
+            warning: 'Processed with errors' 
+          }), 
+          { 
+            status: 200, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
       }
     }
 
+    // Para otros eventos, confirmamos recepción
     return new Response(
       JSON.stringify({ received: true }), 
-      { headers: corsHeaders }
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
 
   } catch (error) {
-    console.error('Error processing webhook:', error)
+    console.error('❌ Fatal error processing webhook:', error)
+    // Retornamos 200 para evitar reintentos innecesarios
     return new Response(
-      JSON.stringify({ error: error.message }), 
-      { status: 500, headers: corsHeaders }
+      JSON.stringify({ 
+        received: true, 
+        error: error.message,
+        warning: 'Fatal error occurred' 
+      }), 
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
   }
 })
