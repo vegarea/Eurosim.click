@@ -13,6 +13,7 @@ import { EmailTemplate } from "./types"
 import { Badge } from "@/components/ui/badge"
 import { X } from "lucide-react"
 import { useState } from "react"
+import { Json } from "@/integrations/supabase/types"
 
 interface EmailTemplateDetailsFormProps {
   formData: EmailTemplate
@@ -24,24 +25,31 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
 
   const handleVariablesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const vars = e.target.value.split(',').map(v => v.trim()).filter(v => v)
-    setFormData({ ...formData, variables: vars })
+    setFormData({ ...formData, variables: vars as Json })
   }
 
-  const getVariablesString = () => {
+  const getVariablesString = (): string => {
     if (Array.isArray(formData.variables)) {
-      return formData.variables.join(', ')
+      return formData.variables.map(String).join(', ')
     }
     return ''
+  }
+
+  const getCcEmailsArray = (cc_emails: Json | undefined): string[] => {
+    if (Array.isArray(cc_emails)) {
+      return cc_emails.map(String)
+    }
+    return []
   }
 
   const handleAddCcEmail = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && newCcEmail) {
       e.preventDefault()
-      const currentCcEmails = Array.isArray(formData.cc_emails) ? formData.cc_emails : []
+      const currentCcEmails = getCcEmailsArray(formData.cc_emails)
       if (!currentCcEmails.includes(newCcEmail)) {
         setFormData({
           ...formData,
-          cc_emails: [...currentCcEmails, newCcEmail]
+          cc_emails: [...currentCcEmails, newCcEmail] as Json
         })
         setNewCcEmail("")
       }
@@ -49,10 +57,10 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
   }
 
   const handleRemoveCcEmail = (emailToRemove: string) => {
-    const currentCcEmails = Array.isArray(formData.cc_emails) ? formData.cc_emails : []
+    const currentCcEmails = getCcEmailsArray(formData.cc_emails)
     setFormData({
       ...formData,
-      cc_emails: currentCcEmails.filter(email => email !== emailToRemove)
+      cc_emails: currentCcEmails.filter(email => email !== emailToRemove) as Json
     })
   }
 
@@ -86,10 +94,10 @@ export function EmailTemplateDetailsForm({ formData, setFormData }: EmailTemplat
           placeholder="Escribe un email y presiona Enter"
           type="email"
         />
-        {Array.isArray(formData.cc_emails) && formData.cc_emails.length > 0 && (
+        {formData.cc_emails && getCcEmailsArray(formData.cc_emails).length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
-            {formData.cc_emails.map((email) => (
-              <Badge key={email} variant="secondary" className="flex items-center gap-1">
+            {getCcEmailsArray(formData.cc_emails).map((email, index) => (
+              <Badge key={`${email}-${index}`} variant="secondary" className="flex items-center gap-1">
                 {email}
                 <button
                   type="button"

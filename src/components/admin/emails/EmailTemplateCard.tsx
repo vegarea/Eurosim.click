@@ -6,6 +6,7 @@ import { EmailTemplate, getStatusColor, getStatusLabel } from "./types"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { TestEmailDialog } from "./TestEmailDialog"
+import { Json } from "@/integrations/supabase/types"
 
 interface EmailTemplateCardProps {
   template: EmailTemplate
@@ -33,9 +34,16 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
     }
   }
 
-  const getVariablesArray = (variables: EmailTemplate['variables']): string[] => {
+  const getVariablesArray = (variables: Json): string[] => {
     if (Array.isArray(variables)) {
       return variables.map(v => String(v))
+    }
+    return []
+  }
+
+  const getCcEmailsArray = (cc_emails: Json | undefined): string[] => {
+    if (Array.isArray(cc_emails)) {
+      return cc_emails.map(String)
     }
     return []
   }
@@ -85,12 +93,12 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
                 {getStatusLabel(template.status)}
               </Badge>
             </div>
-            {Array.isArray(template.cc_emails) && template.cc_emails.length > 0 && (
+            {template.cc_emails && getCcEmailsArray(template.cc_emails).length > 0 && (
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">CC:</span>
                 <div className="flex flex-wrap gap-1">
-                  {template.cc_emails.map((email) => (
-                    <Badge key={email} variant="outline" className="text-xs">
+                  {getCcEmailsArray(template.cc_emails).map((email, index) => (
+                    <Badge key={`${email}-${index}`} variant="outline" className="text-xs">
                       {email}
                     </Badge>
                   ))}
@@ -100,8 +108,8 @@ export function EmailTemplateCard({ template, onEdit }: EmailTemplateCardProps) 
             <p className="text-sm text-muted-foreground">{template.description}</p>
             {template.variables && getVariablesArray(template.variables).length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {getVariablesArray(template.variables).map((variable) => (
-                  <Badge key={variable} variant="outline" className="text-xs">
+                {getVariablesArray(template.variables).map((variable, index) => (
+                  <Badge key={`${variable}-${index}`} variant="outline" className="text-xs">
                     {`{${variable}}`}
                   </Badge>
                 ))}
