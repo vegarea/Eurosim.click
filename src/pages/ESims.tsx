@@ -12,6 +12,7 @@ import { InternationalCalling } from "@/components/InternationalCalling"
 import { MainLayout } from "@/components/layouts/MainLayout"
 import { ESimHero } from "@/components/ESimHero"
 import { ESimFAQ } from "@/components/esim/ESimFAQ"
+import { ActivationDateInfo } from "@/components/esim/ActivationDateInfo"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
@@ -33,7 +34,7 @@ export default function ESims() {
 
   useEffect(() => {
     if (products.length > 0 && !selectedPlan) {
-      setSelectedPlan(products[1]) // Seleccionar el plan medio por defecto
+      setSelectedPlan(products[1])
     }
   }, [products, selectedPlan])
 
@@ -85,6 +86,7 @@ export default function ESims() {
           <div className="container mx-auto max-w-6xl px-4">
             <CountryCoverage />
             <CommonFeatures />
+            <ActivationDateInfo />
             <InternationalCalling />
             <TrustElements />
             <ESimFAQ />
