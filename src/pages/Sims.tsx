@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/database/products";
 import { MainLayout } from "@/components/layouts/MainLayout";
+import { ActivationDateInfo } from "@/components/esim/ActivationDateInfo";
 
 const Sims = () => {
   const isMobile = useIsMobile();
@@ -57,6 +58,7 @@ const Sims = () => {
 
             <CountryCoverage />
             <DeliveryBenefits />
+            <ActivationDateInfo />
             <SimFeatures />
           </div>
         </div>
