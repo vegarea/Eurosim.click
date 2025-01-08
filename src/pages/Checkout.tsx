@@ -14,7 +14,7 @@ import { CheckoutProvider, useCheckout } from "@/contexts/CheckoutContext"
 import { Card } from "@/components/ui/card"
 import { StripeCheckout } from "@/components/checkout/payment/StripeCheckout"
 import { Form } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
+import { useCheckoutForm } from "@/components/checkout/forms/useCheckoutForm"
 import { PersonalInfoFields } from "@/components/checkout/shipping/PersonalInfoFields"
 
 const testData = {
@@ -46,8 +46,8 @@ function CheckoutContent() {
   const { toast } = useToast()
   const navigate = useNavigate()
   const { state, updateCustomerInfo } = useCheckout()
+  const form = useCheckoutForm()
 
-  // Efecto para asegurar que la página se cargue desde arriba
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -55,22 +55,6 @@ function CheckoutContent() {
   const hasPhysicalSim = items.some(item => 
     item.metadata && (item.metadata as Record<string, any>).product_type === "physical"
   )
-
-  const form = useForm({
-    defaultValues: {
-      name: state.customerInfo.name || "",
-      email: state.customerInfo.email || "",
-      phone: state.customerInfo.phone || "",
-      shipping_address: {
-        street: "",
-        city: "",
-        state: "",
-        country: "Mexico",
-        postal_code: "",
-        phone: ""
-      }
-    }
-  })
 
   useEffect(() => {
     if (items.length === 0) {
@@ -146,6 +130,7 @@ function CheckoutContent() {
                   <Card className="p-6">
                     <h2 className="text-xl font-semibold mb-4">Dirección de Envío</h2>
                     <ShippingForm
+                      form={form}
                       onSubmit={() => {}}
                       onValidityChange={handleFormValidityChange}
                       isTestMode={isTestMode}
