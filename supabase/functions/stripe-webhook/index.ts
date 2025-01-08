@@ -4,6 +4,8 @@ import Stripe from 'https://esm.sh/stripe@14.21.0'
 import { handleCustomerCreation } from './handlers/customerHandler.ts'
 import { handleOrderCreation } from './handlers/orderHandler.ts'
 import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
+import { getOrderConfirmationEmail } from './utils/emailTemplates.ts'
+import { formatCurrency } from './utils/formatters.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -86,7 +88,6 @@ serve(async (req) => {
       console.log('📦 Processing completed checkout session:', session.id)
 
       try {
-        // Procesar la orden
         const customer = await handleCustomerCreation(session, supabase)
         console.log('👤 Customer processed:', customer)
 
@@ -103,40 +104,12 @@ serve(async (req) => {
           .eq('id', order.product_id)
           .single()
 
-        // Formatear el monto total
-        const formattedAmount = new Intl.NumberFormat('es-MX', {
-          style: 'currency',
-          currency: 'MXN',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(order.total_amount / 100)
-
-        // Construir la sección de dirección de envío si es SIM física
-        let shippingSection = ''
-        if (order.type === 'physical' && order.shipping_address) {
-          const address = order.shipping_address as any
-          shippingSection = `
-            <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-              <h3 style="color: #1a1f2c; margin-bottom: 10px;">Dirección de envío:</h3>
-              <p style="margin: 5px 0;">${address.street}</p>
-              <p style="margin: 5px 0;">${address.city}, ${address.state}</p>
-              <p style="margin: 5px 0;">${address.postal_code}</p>
-            </p>
-            </div>
-          `
+        if (!product) {
+          throw new Error('Product not found')
         }
 
-        // Construir la sección de detalles del producto
-        const productDetails = `
-          <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-            <h3 style="color: #1a1f2c; margin-bottom: 10px;">Detalles del producto:</h3>
-            <p style="margin: 5px 0;"><strong>Producto:</strong> ${product.title}</p>
-            <p style="margin: 5px 0;"><strong>Tipo:</strong> ${order.type === 'physical' ? 'SIM Física' : 'eSIM'}</p>
-            <p style="margin: 5px 0;"><strong>Datos en Europa:</strong> ${product.data_eu_gb}GB</p>
-            <p style="margin: 5px 0;"><strong>Datos en España:</strong> ${product.data_es_gb}GB</p>
-            <p style="margin: 5px 0;"><strong>Validez:</strong> ${product.validity_days} días</p>
-          </div>
-        `
+        const formattedAmount = formatCurrency(order.total_amount)
+        const emailHtml = getOrderConfirmationEmail(order, product, customer, formattedAmount)
 
         // Enviar email de confirmación usando Resend
         try {
@@ -150,42 +123,7 @@ serve(async (req) => {
               from: 'EuroSim <noreply@eurosim.click>',
               to: [customer.email],
               subject: '¡Gracias por tu compra en EuroSim!',
-              html: `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                  <meta charset="utf-8">
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                </head>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                  <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="https://eurosim.click/wp-content/uploads/2021/11/website.png" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
-                  </div>
-                  
-                  <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <h1 style="color: #1a1f2c; margin-bottom: 20px; text-align: center;">¡Gracias por tu compra!</h1>
-                    
-                    <p style="margin-bottom: 15px;">Hola ${customer.name},</p>
-                    
-                    <p style="margin-bottom: 15px;">Hemos recibido tu pago correctamente para el pedido:</p>
-                    
-                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                      <p style="margin: 5px 0;"><strong>Número de pedido:</strong> ${order.id}</p>
-                      <p style="margin: 5px 0;"><strong>Total pagado:</strong> ${formattedAmount}</p>
-                      <p style="margin: 5px 0;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX')}</p>
-                    </div>
-
-                    ${productDetails}
-                    ${shippingSection}
-                    
-                    <div style="margin-top: 30px; text-align: center;">
-                      <p>Pronto recibirás más información sobre tu pedido.</p>
-                      <p style="color: #666; font-size: 14px;">Gracias por confiar en EuroSim</p>
-                    </div>
-                  </div>
-                </body>
-                </html>
-              `
+              html: emailHtml,
             }),
           })
 
