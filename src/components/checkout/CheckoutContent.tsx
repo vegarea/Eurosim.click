@@ -5,13 +5,10 @@ import { PaymentStep } from "./PaymentStep"
 import { useCheckout } from "@/contexts/CheckoutContext"
 import { ShippingFormValues } from "./shipping/types"
 import { DocumentationFormValues } from "./documentation/types"
-import { format } from "date-fns"
 import { Card } from "@/components/ui/card"
 import { PersonalInfoFields } from "./shipping/PersonalInfoFields"
 import { Form } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import { useCheckoutForm } from "./forms/useCheckoutForm"
 
 interface CheckoutContentProps {
   step: number;
@@ -24,20 +21,6 @@ interface CheckoutContentProps {
   onFormValidityChange: (isValid: boolean) => void;
 }
 
-const personalInfoSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido"),
-  email: z.string().email("Email inválido"),
-  phone: z.string().min(1, "El teléfono es requerido"),
-  shipping_address: z.object({
-    street: z.string(),
-    city: z.string(),
-    state: z.string(),
-    country: z.string(),
-    postal_code: z.string(),
-    phone: z.string()
-  }).optional()
-})
-
 export function CheckoutContent({
   step,
   hasPhysicalSim,
@@ -45,61 +28,8 @@ export function CheckoutContent({
   testData,
   onFormValidityChange,
 }: CheckoutContentProps) {
-  const { state, updateCustomerInfo, updateOrderInfo } = useCheckout()
-  const form = useForm<ShippingFormValues>({
-    resolver: zodResolver(personalInfoSchema),
-    defaultValues: {
-      name: state.customerInfo.name || "",
-      email: state.customerInfo.email || "",
-      phone: state.customerInfo.phone || "",
-      shipping_address: {
-        street: "",
-        city: "",
-        state: "",
-        country: "Mexico",
-        postal_code: "",
-        phone: ""
-      }
-    }
-  })
-
-  // Manejar cambios en campos individuales
-  const handleFieldChange = React.useCallback((field: keyof ShippingFormValues, value: string) => {
-    console.log(`Campo ${field} actualizado:`, value);
-    form.setValue(field, value);
-    
-    // Actualizar el contexto inmediatamente con el nuevo valor
-    const currentValues = form.getValues();
-    console.log("Actualizando customer info con:", {
-      ...state.customerInfo,
-      [field]: value
-    });
-    
-    updateCustomerInfo({
-      ...state.customerInfo,
-      [field]: value
-    });
-  }, [form, updateCustomerInfo, state.customerInfo]);
-
-  // Sincronizar cambios del formulario con el contexto
-  React.useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      if (name) {
-        console.log(`Campo ${name} cambió:`, value);
-        const formValues = form.getValues();
-        console.log("Valores actuales del formulario:", formValues);
-        
-        updateCustomerInfo({
-          ...state.customerInfo,
-          name: formValues.name,
-          email: formValues.email,
-          phone: formValues.phone
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, updateCustomerInfo, state.customerInfo]);
+  const { state, updateOrderInfo } = useCheckout()
+  const form = useCheckoutForm()
 
   // Validación del paso de pago
   React.useEffect(() => {
@@ -118,41 +48,13 @@ export function CheckoutContent({
     }
   }, [step, state.customerInfo, onFormValidityChange]);
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = (values: ShippingFormValues) => {
     console.log("Form submitted with values:", values);
 
-    if (values.shippingAddress) {
+    if (values.shipping_address) {
       updateOrderInfo({
-        shipping_address: values.shippingAddress,
+        shipping_address: values.shipping_address,
         type: hasPhysicalSim ? "physical" : "esim"
-      })
-    }
-
-    const formattedBirthDate = values.birthDate ? 
-      format(new Date(values.birthDate), 'yyyy-MM-dd') : 
-      null;
-
-    const formattedActivationDate = values.activationDate ? 
-      new Date(values.activationDate).toISOString() : 
-      null;
-
-    const customerInfo = {
-      ...state.customerInfo,
-      name: values.name,
-      email: values.email,
-      phone: values.phone,
-      passport_number: values.passportNumber,
-      birth_date: formattedBirthDate,
-      gender: values.gender,
-      default_shipping_address: values.shippingAddress
-    };
-
-    console.log("Updating customer info with:", customerInfo);
-    updateCustomerInfo(customerInfo);
-
-    if (formattedActivationDate) {
-      updateOrderInfo({
-        activation_date: formattedActivationDate
       })
     }
   }
@@ -177,6 +79,7 @@ export function CheckoutContent({
               <Card className="p-6">
                 <h2 className="text-xl font-semibold mb-4">Dirección de Envío</h2>
                 <ShippingForm
+                  form={form}
                   onSubmit={handleFormSubmit}
                   onValidityChange={onFormValidityChange}
                   isTestMode={isTestMode}
@@ -191,7 +94,6 @@ export function CheckoutContent({
       case 2:
         return (
           <div className="space-y-6">
-            {/* Información Personal siempre visible */}
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Información Personal</h2>
               <Form {...form}>
@@ -201,7 +103,6 @@ export function CheckoutContent({
               </Form>
             </Card>
 
-            {/* Documentación UE */}
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Documentación UE</h2>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
