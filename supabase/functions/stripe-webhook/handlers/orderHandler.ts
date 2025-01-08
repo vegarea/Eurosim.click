@@ -76,11 +76,15 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       .from('orders')
       .insert(orderData)
       .select()
-      .single()
+      .maybeSingle()
 
     if (orderError) {
       console.error('❌ Error creating order:', orderError)
       throw orderError
+    }
+
+    if (!order) {
+      throw new Error('No se pudo crear la orden')
     }
 
     // Crear el evento inicial de la orden
@@ -112,11 +116,20 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
       .eq('type', productType)
       .eq('status', 'processing')
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
 
     if (templateError) {
       console.error('❌ Error getting email template:', templateError)
       throw templateError
+    }
+
+    if (!emailTemplate) {
+      console.error('❌ No email template found for:', {
+        type: productType,
+        status: 'processing',
+        is_active: true
+      })
+      throw new Error('No se encontró una plantilla de email activa para el tipo de producto y estado')
     }
 
     // Preparar variables para el email
