@@ -3,11 +3,6 @@ import { Order } from "@/types/database/orders"
 import { useOrders } from "@/contexts/OrdersContext"
 import { supabase } from "@/integrations/supabase/client"
 
-interface OrderMetadata {
-  activation_code?: string;
-  qr_code_url?: string;
-}
-
 export function useESimDelivery() {
   const { toast } = useToast()
   const { orders, updateOrder } = useOrders()
