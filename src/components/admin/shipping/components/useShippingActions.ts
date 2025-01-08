@@ -3,6 +3,11 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderStatus } from "@/types/database/enums"
 import { OrderEvent } from "@/types/database/common"
 import { toast } from "sonner"
+import { Database } from "@/integrations/supabase/types"
+
+type Order = Database["public"]["Tables"]["orders"]["Row"] & {
+  customer: Database["public"]["Tables"]["customers"]["Row"] | null
+}
 
 interface UseShippingActionsProps {
   setIsUpdating: (value: boolean) => void
@@ -34,10 +39,11 @@ export function useShippingActions({
           carrier: carrier
         })
         .eq('id', orderId)
-        .select('*, customer(*)')
+        .select('*, customer:customers(*)')
         .single()
 
       if (orderError) throw orderError
+      if (!order) throw new Error('No se encontró la orden')
 
       // Crear evento de envío
       const shippingEvent: Omit<OrderEvent, "id"> = {
@@ -68,16 +74,23 @@ export function useShippingActions({
         .single()
 
       if (templateError) throw templateError
+      if (!emailTemplate) throw new Error('No se encontró la plantilla de email')
 
       // Preparar variables para el email
+      const shippingAddress = order.shipping_address as { 
+        street: string; 
+        city: string; 
+        state: string 
+      } | null
+
       const emailVariables = {
         nombre_cliente: order.customer?.name,
         numero_pedido: order.id,
         numero_tracking: trackingNumber,
         empresa_envio: carrier,
         url_tracking: `https://track.carrier.com/${trackingNumber}`, // Ajustar según el carrier
-        direccion_envio: order.shipping_address ? 
-          `${order.shipping_address.street}, ${order.shipping_address.city}, ${order.shipping_address.state}` :
+        direccion_envio: shippingAddress ? 
+          `${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.state}` :
           'No disponible'
       }
 
@@ -114,10 +127,11 @@ export function useShippingActions({
         .from('orders')
         .update({ status: 'delivered' as OrderStatus })
         .eq('id', orderId)
-        .select('*, customer(*)')
+        .select('*, customer:customers(*)')
         .single()
 
       if (orderError) throw orderError
+      if (!order) throw new Error('No se encontró la orden')
 
       // Crear evento de entrega
       const deliveryEvent: Omit<OrderEvent, "id"> = {
@@ -148,6 +162,7 @@ export function useShippingActions({
         .single()
 
       if (templateError) throw templateError
+      if (!emailTemplate) throw new Error('No se encontró la plantilla de email')
 
       // Preparar variables para el email
       const emailVariables = {
