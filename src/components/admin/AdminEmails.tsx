@@ -9,6 +9,7 @@ import { filterTemplatesByType } from "./emails/utils/filterTemplates"
 import { useEmailTemplates } from "./emails/hooks/useEmailTemplates"
 import { useEmailTemplate } from "./emails/hooks/useEmailTemplate"
 import { EmailTemplateList } from "./emails/components/EmailTemplateList"
+import { EmailTemplate } from "./emails/types"
 
 export function AdminEmails() {
   const { 

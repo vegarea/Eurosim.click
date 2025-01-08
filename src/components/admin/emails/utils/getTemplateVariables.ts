@@ -1,6 +1,7 @@
-import { EmailTemplate } from "../types"
 import { Order } from "@/types/database/orders"
 import { Customer } from "@/types/database/customers"
+import { EmailTemplate } from "../types"
+import { OrderMetadata } from "../types"
 
 export const getTemplateVariables = async (
   template: EmailTemplate,
@@ -25,11 +26,12 @@ export const getTemplateVariables = async (
   } : {}
 
   // Variables específicas para E-SIM
+  const metadata = order.metadata as OrderMetadata
   const esimVariables = order.type === 'esim' ? {
-    codigo_activacion: order.metadata?.activation_code || '',
-    qr_code: order.metadata?.qr_code || '',
+    codigo_activacion: metadata?.activation_code || '',
+    qr_code: metadata?.qr_code || '',
     fecha_activacion: order.activation_date ? new Date(order.activation_date).toLocaleDateString() : '',
-    instrucciones_activacion: order.metadata?.activation_instructions || ''
+    instrucciones_activacion: metadata?.activation_instructions || ''
   } : {}
 
   return {
