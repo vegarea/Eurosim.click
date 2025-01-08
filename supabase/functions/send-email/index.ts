@@ -45,6 +45,14 @@ serve(async (req) => {
 
       console.log('Buscando plantilla con ID:', templateId)
 
+      // Primero obtener la URL del logo desde site_settings
+      const { data: siteSettings } = await supabase
+        .from('site_settings')
+        .select('logo_url')
+        .single()
+
+      const logoUrl = siteSettings?.logo_url || '/logo.png'
+
       const { data: template, error: templateError } = await supabase
         .from('email_templates')
         .select('*')
@@ -65,6 +73,10 @@ serve(async (req) => {
       // Reemplazar variables en el contenido
       let processedHtml = template.content
       let processedSubject = template.subject
+
+      // Asegurarnos de que el logo use una URL absoluta
+      const absoluteLogoUrl = logoUrl.startsWith('http') ? logoUrl : `https://eurosim.click${logoUrl}`
+      processedHtml = processedHtml.replace(/src="[^"]*website\.png"/, `src="${absoluteLogoUrl}"`)
 
       if (variables) {
         Object.entries(variables).forEach(([key, value]) => {
@@ -132,8 +144,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
-  } catch (error) {
-    console.error('Error en send-email:', error)
+  } catch (error: any) {
+    console.error('Error en send-email function:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
