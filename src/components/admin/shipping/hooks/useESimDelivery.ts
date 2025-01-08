@@ -17,11 +17,13 @@ export function useESimDelivery() {
       await updateOrder(order.id, { status: "delivered" })
 
       // Registramos el evento
-      await supabase.from('order_events').insert({
+      const { error: eventError } = await supabase.from('order_events').insert({
         order_id: order.id,
         type: 'status_changed',
         description: 'eSIM QR enviado y pedido marcado como entregado'
       })
+
+      if (eventError) throw eventError
 
       toast({
         title: "QR enviado",
@@ -43,11 +45,13 @@ export function useESimDelivery() {
       await updateOrder(order.id, { status: "delivered" })
 
       // Registramos el evento
-      await supabase.from('order_events').insert({
+      const { error: eventError } = await supabase.from('order_events').insert({
         order_id: order.id,
         type: 'status_changed',
         description: 'Pedido marcado como entregado'
       })
+
+      if (eventError) throw eventError
 
       toast({
         title: "Pedido entregado",
