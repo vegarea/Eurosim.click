@@ -23,15 +23,37 @@ export function useESimDelivery() {
         description: 'eSIM QR enviado y pedido marcado como entregado'
       })
 
+      // Obtenemos la plantilla correcta
+      const { data: template } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('type', 'esim')
+        .eq('status', 'delivered')
+        .eq('is_active', true)
+        .single()
+
+      if (!template) {
+        throw new Error('No se encontró la plantilla de email activa')
+      }
+
       // Insertamos en la cola de emails con alta prioridad
       const { error: queueError } = await supabase.from('email_queue').insert({
         order_id: order.id,
+        template_id: template.id,
         status: 'pending',
         priority: 1,
         metadata: {
           order_type: 'esim',
           order_status: 'delivered',
-          customer_id: order.customer_id
+          customer_id: order.customer_id,
+          variables: {
+            nombre_cliente: order.customer?.name,
+            numero_pedido: order.id,
+            codigo_activacion: order.metadata?.activation_code,
+            qr_code: order.metadata?.qr_code_url,
+            fecha_activacion: order.activation_date,
+            instrucciones_activacion: template.metadata?.instructions || ''
+          }
         }
       })
 
@@ -62,15 +84,37 @@ export function useESimDelivery() {
         description: 'Pedido marcado como entregado'
       })
 
+      // Obtenemos la plantilla correcta
+      const { data: template } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('type', 'esim')
+        .eq('status', 'delivered')
+        .eq('is_active', true)
+        .single()
+
+      if (!template) {
+        throw new Error('No se encontró la plantilla de email activa')
+      }
+
       // Insertamos en la cola de emails
       const { error: queueError } = await supabase.from('email_queue').insert({
         order_id: order.id,
+        template_id: template.id,
         status: 'pending',
         priority: 2,
         metadata: {
           order_type: 'esim',
           order_status: 'delivered',
-          customer_id: order.customer_id
+          customer_id: order.customer_id,
+          variables: {
+            nombre_cliente: order.customer?.name,
+            numero_pedido: order.id,
+            codigo_activacion: order.metadata?.activation_code,
+            qr_code: order.metadata?.qr_code_url,
+            fecha_activacion: order.activation_date,
+            instrucciones_activacion: template.metadata?.instructions || ''
+          }
         }
       })
 
