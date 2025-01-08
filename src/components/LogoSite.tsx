@@ -7,21 +7,21 @@ interface LogoSiteProps {
 }
 
 export function LogoSite({ className }: LogoSiteProps) {
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
         .select('logo_url')
-        .single()
+        .maybeSingle()
       
       if (error) {
         console.error('Error fetching logo:', error)
-        return null
+        return { logo_url: "/logo.png" }
       }
-      return data
-    },
-    initialData: { logo_url: "/logo.png" } // Proporcionar un valor inicial
+      
+      return data || { logo_url: "/logo.png" }
+    }
   })
 
   return (
@@ -34,9 +34,9 @@ export function LogoSite({ className }: LogoSiteProps) {
         alt="Euro Connect" 
         className={className || "h-12 w-auto"}
         onError={(e) => {
-          // Si hay un error al cargar la imagen, usar el logo por defecto
           const target = e.target as HTMLImageElement;
           target.src = "/logo.png";
+          console.log('Logo fallback to default:', target.src);
         }}
       />
     </Link>
