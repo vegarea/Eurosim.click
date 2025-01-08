@@ -3,6 +3,11 @@ import { Order } from "@/types/database/orders"
 import { useOrders } from "@/contexts/OrdersContext"
 import { supabase } from "@/integrations/supabase/client"
 
+interface OrderMetadata {
+  activation_code?: string;
+  qr_code_url?: string;
+}
+
 export function useESimDelivery() {
   const { toast } = useToast()
   const { orders, updateOrder } = useOrders()
@@ -36,12 +41,14 @@ export function useESimDelivery() {
         throw new Error('No se encontró la plantilla de email activa')
       }
 
+      const metadata = order.metadata as OrderMetadata;
+
       // Insertamos en la cola de emails con alta prioridad
       const { error: queueError } = await supabase.from('email_queue').insert({
         order_id: order.id,
         template_id: template.id,
         status: 'pending',
-        priority: 1,
+        priority: 1, // Alta prioridad para envío de QR
         metadata: {
           order_type: 'esim',
           order_status: 'delivered',
@@ -49,10 +56,10 @@ export function useESimDelivery() {
           variables: {
             nombre_cliente: order.customer?.name,
             numero_pedido: order.id,
-            codigo_activacion: order.metadata?.activation_code,
-            qr_code: order.metadata?.qr_code_url,
+            codigo_activacion: metadata?.activation_code,
+            qr_code: metadata?.qr_code_url,
             fecha_activacion: order.activation_date,
-            instrucciones_activacion: template.metadata?.instructions || ''
+            instrucciones_activacion: ''
           }
         }
       })
@@ -97,12 +104,14 @@ export function useESimDelivery() {
         throw new Error('No se encontró la plantilla de email activa')
       }
 
+      const metadata = order.metadata as OrderMetadata;
+
       // Insertamos en la cola de emails
       const { error: queueError } = await supabase.from('email_queue').insert({
         order_id: order.id,
         template_id: template.id,
         status: 'pending',
-        priority: 2,
+        priority: 1, // Cambiado a prioridad 1 también
         metadata: {
           order_type: 'esim',
           order_status: 'delivered',
@@ -110,10 +119,10 @@ export function useESimDelivery() {
           variables: {
             nombre_cliente: order.customer?.name,
             numero_pedido: order.id,
-            codigo_activacion: order.metadata?.activation_code,
-            qr_code: order.metadata?.qr_code_url,
+            codigo_activacion: metadata?.activation_code,
+            qr_code: metadata?.qr_code_url,
             fecha_activacion: order.activation_date,
-            instrucciones_activacion: template.metadata?.instructions || ''
+            instrucciones_activacion: ''
           }
         }
       })
