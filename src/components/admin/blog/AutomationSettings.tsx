@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { TopicsManager } from "./automation/TopicsManager"
 import { GenerationSettings } from "./automation/GenerationSettings"
+import { Loader2 } from "lucide-react"
 
 type AutomationSettings = {
   id: string;
@@ -20,6 +21,7 @@ type AutomationSettings = {
 
 export function AutomationSettings() {
   const [loading, setLoading] = useState(true)
+  const [generating, setGenerating] = useState(false)
   const [settings, setSettings] = useState<AutomationSettings | null>(null)
 
   useEffect(() => {
@@ -82,6 +84,26 @@ export function AutomationSettings() {
     }
   }
 
+  const handleGenerateNow = async () => {
+    if (!settings) return
+
+    try {
+      setGenerating(true)
+      const { error } = await supabase.functions.invoke('generate-blog-post', {
+        body: { settings }
+      })
+
+      if (error) throw error
+
+      toast.success("Post generado exitosamente")
+    } catch (error) {
+      console.error('Error generating post:', error)
+      toast.error("Error al generar el post")
+    } finally {
+      setGenerating(false)
+    }
+  }
+
   if (loading) {
     return <div>Cargando configuración...</div>
   }
@@ -121,9 +143,25 @@ export function AutomationSettings() {
           onTopicsChange={(topics) => setSettings({ ...settings, topics })}
         />
 
-        <Button onClick={handleSaveSettings} className="w-full">
-          Guardar Configuración
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={handleSaveSettings} className="flex-1">
+            Guardar Configuración
+          </Button>
+          <Button 
+            onClick={handleGenerateNow} 
+            disabled={generating}
+            className="flex-1"
+          >
+            {generating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generando...
+              </>
+            ) : (
+              'Generar Post Ahora'
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )
