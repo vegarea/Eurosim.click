@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
 import { createDefaultTemplates } from "./emails/utils/createDefaultTemplates"
+import { filterTemplatesByType } from "./emails/utils/filterTemplates"
 
 export function AdminEmails() {
   const [templates, setTemplates] = useState<EmailTemplate[]>([])
@@ -32,7 +33,6 @@ export function AdminEmails() {
 
       if (error) throw error
 
-      // Transformar los datos para asegurar que cc_emails sea siempre un array
       const transformedData = data.map(template => ({
         ...template,
         cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : 
@@ -82,14 +82,12 @@ export function AdminEmails() {
 
   const handleSaveTemplate = async (template: EmailTemplate) => {
     try {
-      // Asegurarse de que cc_emails sea un array válido antes de guardar
       const templateToSave = {
         ...template,
         cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : []
       }
 
       if (selectedTemplate) {
-        // Actualizar plantilla existente
         const { error } = await supabase
           .from('email_templates')
           .update(templateToSave)
@@ -102,7 +100,6 @@ export function AdminEmails() {
           description: "La plantilla se actualizó correctamente"
         })
       } else {
-        // Crear nueva plantilla
         const { error } = await supabase
           .from('email_templates')
           .insert(templateToSave)
@@ -116,7 +113,7 @@ export function AdminEmails() {
       }
 
       setIsDialogOpen(false)
-      loadTemplates() // Recargar plantillas
+      loadTemplates()
     } catch (error) {
       console.error('Error al guardar plantilla:', error)
       toast({
@@ -125,10 +122,6 @@ export function AdminEmails() {
         description: "No se pudo guardar la plantilla"
       })
     }
-  }
-
-  const filterTemplatesByType = (type: EmailTemplate["type"]) => {
-    return templates.filter(template => template.type === type || template.type === "both")
   }
 
   if (isLoading) {
@@ -180,7 +173,7 @@ export function AdminEmails() {
         </TabsContent>
 
         <TabsContent value="physical" className="space-y-4">
-          {filterTemplatesByType("physical").map((template) => (
+          {filterTemplatesByType(templates, "physical").map((template) => (
             <EmailTemplateCard 
               key={template.id} 
               template={template} 
@@ -190,7 +183,7 @@ export function AdminEmails() {
         </TabsContent>
 
         <TabsContent value="esim" className="space-y-4">
-          {filterTemplatesByType("esim").map((template) => (
+          {filterTemplatesByType(templates, "esim").map((template) => (
             <EmailTemplateCard 
               key={template.id} 
               template={template} 
