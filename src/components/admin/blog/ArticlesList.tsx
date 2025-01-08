@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, Eye, Pencil } from "lucide-react"
+import { Calendar, Eye, Pencil, ExternalLink } from "lucide-react"
 import { ArticlesFilter } from "./ArticlesFilter"
 import { supabase } from "@/integrations/supabase/client"
+import { Link } from "react-router-dom"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface BlogPost {
   id: string
@@ -11,6 +13,7 @@ interface BlogPost {
   status: string
   created_at: string
   views_count: number
+  slug: string
 }
 
 export function ArticlesList() {
@@ -25,6 +28,7 @@ export function ArticlesList() {
 
   const loadPosts = async () => {
     try {
+      setLoading(true)
       let query = supabase
         .from('blog_posts')
         .select('*')
@@ -45,12 +49,35 @@ export function ArticlesList() {
       const { data, error } = await query
 
       if (error) throw error
-      setPosts(data)
+      setPosts(data || [])
     } catch (error) {
       console.error('Error loading posts:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <ArticlesFilter
+          dateFilter={dateFilter}
+          viewsFilter={viewsFilter}
+          onDateFilterChange={setDateFilter}
+          onViewsFilterChange={setViewsFilter}
+        />
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardContent className="flex items-center gap-4 p-4">
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -79,9 +106,16 @@ export function ArticlesList() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
-                <Pencil className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to={`/blog/${post.slug}`} target="_blank">
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
