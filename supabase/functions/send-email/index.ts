@@ -78,9 +78,21 @@ serve(async (req) => {
       const absoluteLogoUrl = logoUrl.startsWith('http') ? logoUrl : `https://eurosim.click${logoUrl}`
       processedHtml = processedHtml.replace(/src="[^"]*website\.png"/, `src="${absoluteLogoUrl}"`)
 
+      // Determinar el mensaje según el tipo de producto
+      const isEsim = variables?.type === 'esim'
+      const importantMessage = isEsim
+        ? "Tu compra ha sido procesada correctamente y recibirás tu código QR un día antes de tu fecha de activación con los pasos simples para que instales tu eSIM."
+        : "Tu SIM está procesando y recibirás un email con tu número de seguimiento en las próximas 48 hrs."
+
+      // Reemplazar el mensaje en el HTML con estilo destacado
+      processedHtml = processedHtml.replace(
+        /<p style="color: #666;">(Tu compra ha sido procesada.*?|Tu SIM está procesando.*?)<\/p>/,
+        `<p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">${importantMessage}</p>`
+      )
+
       if (variables) {
         Object.entries(variables).forEach(([key, value]) => {
-          const regex = new RegExp(`{{${key}}}`, 'g')
+          const regex = new RegExp(`{${key}}`, 'g')
           processedHtml = processedHtml.replace(regex, String(value))
           processedSubject = processedSubject.replace(regex, String(value))
         })
