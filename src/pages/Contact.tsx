@@ -10,24 +10,47 @@ import { motion } from "framer-motion";
 import { WhatsAppModal } from "@/components/chat/WhatsAppModal";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { FloatingChat } from "@/components/chat/FloatingChat";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Contact() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Mensaje enviado",
-      description: "Nos pondremos en contacto contigo pronto.",
-    });
-    setEmail("");
-    setName("");
-    setMessage("");
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: { name, email, message }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Mensaje enviado",
+        description: "Nos pondremos en contacto contigo pronto.",
+      });
+
+      // Limpiar el formulario
+      setEmail("");
+      setName("");
+      setMessage("");
+    } catch (error) {
+      console.error('Error al enviar el mensaje:', error);
+      toast({
+        title: "Error al enviar el mensaje",
+        description: "Por favor, intenta nuevamente más tarde.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -113,6 +136,7 @@ export default function Contact() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-colors duration-200"
+                      required
                     />
                   </div>
                   
@@ -123,6 +147,7 @@ export default function Contact() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="h-11 bg-gray-50/50 border-gray-200 focus:bg-white transition-colors duration-200"
+                      required
                     />
                   </div>
                   
@@ -132,15 +157,17 @@ export default function Contact() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       className="min-h-[120px] bg-gray-50/50 border-gray-200 focus:bg-white transition-colors duration-200 resize-none"
+                      required
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
                     className="w-full h-11 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                    disabled={isLoading}
                   >
                     <Send className="w-4 h-4" />
-                    Enviar mensaje
+                    {isLoading ? 'Enviando...' : 'Enviar mensaje'}
                   </Button>
                 </form>
               </motion.div>
