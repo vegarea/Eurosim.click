@@ -26,7 +26,7 @@ export function useShippingActions({
       setIsUpdating(true)
 
       // Actualizar la orden
-      const { error: orderError } = await supabase
+      const { data: order, error: orderError } = await supabase
         .from('orders')
         .update({
           status: 'shipped' as OrderStatus,
@@ -34,6 +34,8 @@ export function useShippingActions({
           carrier: carrier
         })
         .eq('id', orderId)
+        .select('*, customer(*)')
+        .single()
 
       if (orderError) throw orderError
 
@@ -56,6 +58,42 @@ export function useShippingActions({
 
       if (eventError) throw eventError
 
+      // Obtener la plantilla de email para envío
+      const { data: emailTemplate, error: templateError } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('type', order.type)
+        .eq('status', 'shipped')
+        .eq('is_active', true)
+        .single()
+
+      if (templateError) throw templateError
+
+      // Preparar variables para el email
+      const emailVariables = {
+        nombre_cliente: order.customer?.name,
+        numero_pedido: order.id,
+        numero_tracking: trackingNumber,
+        empresa_envio: carrier,
+        url_tracking: `https://track.carrier.com/${trackingNumber}`, // Ajustar según el carrier
+        direccion_envio: order.shipping_address ? 
+          `${order.shipping_address.street}, ${order.shipping_address.city}, ${order.shipping_address.state}` :
+          'No disponible'
+      }
+
+      // Enviar el email
+      if (order.customer?.email) {
+        const emailResponse = await supabase.functions.invoke('send-email', {
+          body: {
+            templateId: emailTemplate.id,
+            to: [order.customer.email],
+            variables: emailVariables
+          }
+        })
+
+        console.log('✉️ Email de envío enviado:', emailResponse)
+      }
+
       await refetchOrders()
       toast.success("Envío confirmado correctamente")
       setShowConfirmDialog(false)
@@ -71,11 +109,13 @@ export function useShippingActions({
     try {
       setIsUpdating(true)
 
-      // Actualizar estado de la orden
-      const { error: orderError } = await supabase
+      // Obtener la orden con datos del cliente
+      const { data: order, error: orderError } = await supabase
         .from('orders')
         .update({ status: 'delivered' as OrderStatus })
         .eq('id', orderId)
+        .select('*, customer(*)')
+        .single()
 
       if (orderError) throw orderError
 
@@ -97,6 +137,37 @@ export function useShippingActions({
         .insert(deliveryEvent)
 
       if (eventError) throw eventError
+
+      // Obtener la plantilla de email para entrega
+      const { data: emailTemplate, error: templateError } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('type', order.type)
+        .eq('status', 'delivered')
+        .eq('is_active', true)
+        .single()
+
+      if (templateError) throw templateError
+
+      // Preparar variables para el email
+      const emailVariables = {
+        nombre_cliente: order.customer?.name,
+        numero_pedido: order.id,
+        fecha_entrega: new Date().toLocaleDateString()
+      }
+
+      // Enviar el email
+      if (order.customer?.email) {
+        const emailResponse = await supabase.functions.invoke('send-email', {
+          body: {
+            templateId: emailTemplate.id,
+            to: [order.customer.email],
+            variables: emailVariables
+          }
+        })
+
+        console.log('✉️ Email de entrega enviado:', emailResponse)
+      }
 
       await refetchOrders()
       toast.success("Entrega confirmada correctamente")
