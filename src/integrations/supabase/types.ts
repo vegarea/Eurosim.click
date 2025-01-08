@@ -769,6 +769,16 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_trigger_info: {
+        Args: {
+          trigger_name: string
+        }
+        Returns: {
+          trigger_exists: boolean
+          event_manipulation: string
+          action_statement: string
+        }[]
+      }
       should_process_email: {
         Args: {
           priority: number
