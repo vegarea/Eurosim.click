@@ -83,6 +83,37 @@ export function HowItWorks() {
         </div>
       </div>
 
+      {/* Sección de proveedores */}
+      <div className="bg-gradient-to-br from-primary/5 to-secondary/5">
+        <div className="container mx-auto px-4 py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 mb-6">
+              Los mejores proveedores de conectividad
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              En Eurosim, trabajamos como intermediarios para ofrecerte las mejores opciones de conectividad móvil en Europa. 
+              Seleccionamos exclusivamente SIMs y eSIMs de operadores reconocidos como Vodafone, Orange, y otros líderes en telecomunicaciones.
+            </p>
+            <p className="text-lg text-gray-600">
+              Esto garantiza que obtendrás una conexión de alta calidad en toda Europa, con cobertura y velocidades óptimas.
+            </p>
+          </motion.div>
+
+          <div className="max-w-3xl mx-auto bg-white rounded-xl p-8 shadow-lg border border-primary/10">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">¿Qué significa esto para ti?</h3>
+            <p className="text-gray-600 mb-6">
+              Al recibir tu producto, notarás que es provisto por estos operadores, ya que utilizamos sus redes para asegurarte la mejor experiencia. 
+              Nuestro trabajo es asegurarnos de que tengas acceso a estos servicios de forma sencilla, segura y al mejor precio.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Sección de beneficios */}
       <div className="container mx-auto px-4 py-24">
         <motion.div
