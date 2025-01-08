@@ -4,7 +4,6 @@ import Stripe from 'https://esm.sh/stripe@14.21.0'
 import { handleCustomerCreation } from './handlers/customerHandler.ts'
 import { handleOrderCreation } from './handlers/orderHandler.ts'
 import { handleOrderItemCreation } from './handlers/orderItemHandler.ts'
-import { sendOrderConfirmationEmail } from './handlers/emailHandler.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -87,6 +86,7 @@ serve(async (req) => {
       console.log('📦 Processing completed checkout session:', session.id)
 
       try {
+        // Procesar la orden
         const customer = await handleCustomerCreation(session, supabase)
         console.log('👤 Customer processed:', customer)
 
@@ -96,8 +96,40 @@ serve(async (req) => {
         const orderItems = await handleOrderItemCreation(session, order, supabase)
         console.log('🛍️ Order items created:', orderItems)
 
-        // Enviar email de confirmación
-        await sendOrderConfirmationEmail(customer, order)
+        // Enviar email de confirmación directamente usando Resend
+        if (customer?.email) {
+          try {
+            const emailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+              },
+              body: JSON.stringify({
+                from: 'EuroSim <noreply@eurosim.click>',
+                to: [customer.email],
+                subject: '¡Gracias por tu compra!',
+                html: `
+                  <h1>¡Gracias por tu compra!</h1>
+                  <p>Hola ${customer.name},</p>
+                  <p>Hemos recibido tu pago correctamente para el pedido #${order.id}.</p>
+                  <p>Total pagado: €${(order.total_amount / 100).toFixed(2)}</p>
+                  <p>Pronto recibirás más información sobre tu pedido.</p>
+                  <br>
+                  <p>Gracias por confiar en EuroSim</p>
+                `
+              }),
+            })
+
+            if (!emailResponse.ok) {
+              console.error('❌ Error sending confirmation email:', await emailResponse.text())
+            } else {
+              console.log('✉️ Confirmation email sent successfully')
+            }
+          } catch (emailError) {
+            console.error('❌ Error in email sending:', emailError)
+          }
+        }
 
         // Registrar el evento de pago completado
         const paymentEvent = {
