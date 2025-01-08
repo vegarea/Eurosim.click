@@ -43,14 +43,24 @@ serve(async (req) => {
         throw new Error('templateId es requerido para emails normales')
       }
 
+      console.log('Buscando plantilla con ID:', templateId)
+
       const { data: template, error: templateError } = await supabase
         .from('email_templates')
         .select('*')
         .eq('id', templateId)
-        .single()
+        .eq('is_active', true)
+        .maybeSingle()
 
-      if (templateError) throw new Error(`Error al obtener plantilla: ${templateError.message}`)
-      if (!template) throw new Error('Plantilla no encontrada')
+      if (templateError) {
+        console.error('Error al obtener plantilla:', templateError)
+        throw new Error(`Error al obtener plantilla: ${templateError.message}`)
+      }
+      
+      if (!template) {
+        console.error('No se encontró la plantilla activa con ID:', templateId)
+        throw new Error('No se encontró una plantilla activa con el ID proporcionado')
+      }
 
       // Reemplazar variables en el contenido
       let processedHtml = template.content
@@ -71,6 +81,8 @@ serve(async (req) => {
       }
     }
 
+    console.log('Enviando email a:', to)
+
     // Enviar email usando Resend
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -90,6 +102,7 @@ serve(async (req) => {
     const resendResponse = await res.json()
 
     if (!res.ok) {
+      console.error('Error de Resend:', resendResponse)
       throw new Error(`Error al enviar email: ${JSON.stringify(resendResponse)}`)
     }
 
