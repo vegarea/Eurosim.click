@@ -15,7 +15,7 @@ export interface EmailTemplate {
   updated_at?: string
   created_by?: string | null
   updated_by?: string | null
-  cc_emails?: string[]
+  cc_emails?: Json
 }
 
 export const getStatusColor = (status: EmailTemplate["status"]) => {

@@ -19,15 +19,14 @@ export const getEmailTemplate = async (
       return null
     }
 
-    // Usar la nueva función de filtrado que considera 'both'
-    const applicableTemplates = filterTemplatesByTypeAndStatus(templates, type, status)
+    // Usar la función de filtrado que considera 'both'
+    const applicableTemplates = filterTemplatesByTypeAndStatus(templates as EmailTemplate[], type, status)
 
     if (applicableTemplates.length === 0) {
       console.error('❌ No se encontró plantilla para:', { type, status, is_active: true })
       return null
     }
 
-    // Si hay múltiples plantillas, usar la primera
     return applicableTemplates[0]
   } catch (error) {
     console.error('Error al obtener plantilla de email:', error)
