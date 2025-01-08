@@ -1,65 +1,57 @@
-import { GeneratedContent } from "./types.ts";
+import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.3.0"
 
-export async function generateContent(topic: string, stylePrompt: string): Promise<GeneratedContent> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `${stylePrompt}
-          Genera contenido bien estructurado usando etiquetas HTML:
-          - Usa <h1> para el título principal
-          - Usa <h2> para subtítulos principales
-          - Usa <h3> para subtítulos secundarios
-          - Usa <p> para párrafos
-          - Usa <ul> y <li> para listas
-          - Usa <strong> para texto importante
-          - Usa <em> para énfasis
-          - Añade <br> entre secciones importantes
-          Asegúrate de que el contenido sea detallado y bien organizado.
-          Divide el contenido en párrafos claros para poder insertar imágenes entre ellos.`
-        },
-        {
-          role: "user",
-          content: `Genera un artículo de blog sobre: ${topic}`
-        }
-      ],
+const configuration = new Configuration({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+})
+
+const openai = new OpenAIApi(configuration)
+
+export async function generateContent(topic: string, stylePrompt: string) {
+  const prompt = `
+    Escribe un artículo de blog sobre "${topic}".
+    
+    ${stylePrompt}
+    
+    El artículo debe incluir:
+    - Un título atractivo
+    - Un resumen (excerpt) de 2-3 oraciones
+    - Contenido estructurado con etiquetas HTML (h1, h2, p, ul, li)
+    - Al menos 3 secciones con subtítulos
+    - Conclusión
+    
+    También necesito prompts para generar imágenes relacionadas con cada sección principal.
+    
+    Formato de respuesta:
+    {
+      "title": "Título del artículo",
+      "excerpt": "Resumen del artículo",
+      "content": "Contenido HTML completo",
+      "imagePrompts": ["prompt para imagen 1", "prompt para imagen 2", ...]
+    }
+  `
+
+  try {
+    const completion = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
-      max_tokens: 1500
     })
-  });
 
-  const data = await response.json();
-  const content = data.choices[0].message.content;
+    const response = completion.data.choices[0].message?.content
+    if (!response) {
+      throw new Error('No response from OpenAI')
+    }
 
-  // Extract title from content (assuming it's the first <h1> tag)
-  const titleMatch = content.match(/<h1>(.*?)<\/h1>/);
-  const title = titleMatch ? titleMatch[1] : 'Artículo sin título';
-
-  // Generate excerpt from content (first paragraph without HTML tags)
-  const excerptMatch = content.match(/<p>(.*?)<\/p>/);
-  const excerpt = excerptMatch ? excerptMatch[1].replace(/<[^>]*>/g, '') : '';
-
-  // Generate image prompts based on content sections
-  const sections = content.split(/<h[23]>/).slice(1);
-  const imagePrompts = sections.map(section => {
-    const cleanText = section.replace(/<[^>]*>/g, '').slice(0, 100);
-    return `Genera una imagen que represente: ${cleanText}`;
-  });
-
-  return {
-    title,
-    content,
-    excerpt,
-    imagePrompts: [
-      `Imagen de portada para artículo sobre: ${title}`,
-      ...imagePrompts
-    ]
-  };
+    // Parsear la respuesta JSON
+    try {
+      return JSON.parse(response)
+    } catch (parseError) {
+      console.error('Error parsing OpenAI response:', parseError)
+      console.log('Raw response:', response)
+      throw new Error('Invalid JSON response from OpenAI')
+    }
+  } catch (error) {
+    console.error('Error calling OpenAI:', error)
+    throw error
+  }
 }

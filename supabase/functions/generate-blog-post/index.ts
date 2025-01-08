@@ -10,10 +10,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-)
+const supabaseUrl = Deno.env.get('SUPABASE_URL')
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -48,7 +52,7 @@ serve(async (req) => {
         status: 'published',
         is_ai_generated: true,
         ai_prompt: settings.style_prompt,
-        ai_model: 'gpt-4o-mini',
+        ai_model: 'gpt-4',
         views_count: 0,
         published_at: new Date().toISOString()
       })
@@ -60,64 +64,70 @@ serve(async (req) => {
 
     // Generar y subir imágenes
     try {
-      // Imagen destacada
-      const featuredImage = await generateAndUploadImage(
-        generatedContent.imagePrompts[0],
-        settings.images_style_prompt
-      )
-      console.log('Featured image generated successfully')
+      if (generatedContent.imagePrompts && generatedContent.imagePrompts.length > 0) {
+        // Imagen destacada
+        const featuredImage = await generateAndUploadImage(
+          generatedContent.imagePrompts[0],
+          settings.images_style_prompt
+        )
+        console.log('Featured image generated successfully')
 
-      const { data: dbImage, error: imageError } = await supabase
-        .from('blog_post_images')
-        .insert({
-          post_id: post.id,
-          url: featuredImage.url,
-          alt_text: generatedContent.title,
-          width: featuredImage.width,
-          height: featuredImage.height,
-          size_bytes: featuredImage.size_bytes,
-          mime_type: featuredImage.mime_type,
-          is_featured: true,
-          is_ai_generated: true,
-          ai_prompt: generatedContent.imagePrompts[0],
-          storage_path: featuredImage.storage_path
-        })
-        .select()
-        .single()
-
-      if (imageError) throw imageError
-      console.log('Featured image saved to database')
-
-      // Actualizar el post con la imagen destacada
-      await supabase
-        .from('blog_posts')
-        .update({ featured_image_id: dbImage.id })
-        .eq('id', post.id)
-
-      // Generar imágenes adicionales según la configuración
-      if (settings.images_per_paragraph > 0) {
-        for (let i = 1; i < Math.min(generatedContent.imagePrompts.length, settings.images_per_paragraph + 1); i++) {
-          const image = await generateAndUploadImage(
-            generatedContent.imagePrompts[i],
-            settings.images_style_prompt
-          )
-          
-          await supabase
+        if (featuredImage) {
+          const { data: dbImage, error: imageError } = await supabase
             .from('blog_post_images')
             .insert({
               post_id: post.id,
-              url: image.url,
-              alt_text: `Imagen ${i} para ${generatedContent.title}`,
-              width: image.width,
-              height: image.height,
-              size_bytes: image.size_bytes,
-              mime_type: image.mime_type,
-              is_featured: false,
-              position: i,
+              url: featuredImage.url,
+              alt_text: generatedContent.title,
+              width: featuredImage.width,
+              height: featuredImage.height,
+              size_bytes: featuredImage.size_bytes,
+              mime_type: featuredImage.mime_type,
+              is_featured: true,
               is_ai_generated: true,
-              ai_prompt: generatedContent.imagePrompts[i],
-              storage_path: image.storage_path
+              ai_prompt: generatedContent.imagePrompts[0],
+              storage_path: featuredImage.storage_path
             })
+            .select()
+            .single()
+
+          if (imageError) throw imageError
+          console.log('Featured image saved to database')
+
+          // Actualizar el post con la imagen destacada
+          await supabase
+            .from('blog_posts')
+            .update({ featured_image_id: dbImage.id })
+            .eq('id', post.id)
+        }
+
+        // Generar imágenes adicionales según la configuración
+        if (settings.images_per_paragraph > 0) {
+          for (let i = 1; i < Math.min(generatedContent.imagePrompts.length, settings.images_per_paragraph + 1); i++) {
+            const image = await generateAndUploadImage(
+              generatedContent.imagePrompts[i],
+              settings.images_style_prompt
+            )
+            
+            if (image) {
+              await supabase
+                .from('blog_post_images')
+                .insert({
+                  post_id: post.id,
+                  url: image.url,
+                  alt_text: `Imagen ${i} para ${generatedContent.title}`,
+                  width: image.width,
+                  height: image.height,
+                  size_bytes: image.size_bytes,
+                  mime_type: image.mime_type,
+                  is_featured: false,
+                  position: i,
+                  is_ai_generated: true,
+                  ai_prompt: generatedContent.imagePrompts[i],
+                  storage_path: image.storage_path
+                })
+            }
+          }
         }
       }
     } catch (imageError) {

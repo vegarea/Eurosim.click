@@ -1,60 +1,74 @@
-import { ImageMetadata } from "./types.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.3.0"
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-);
+const supabaseUrl = Deno.env.get('SUPABASE_URL')
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-export async function generateAndUploadImage(prompt: string, imageStylePrompt: string): Promise<ImageMetadata> {
-  console.log('Generating image with prompt:', prompt);
-  
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: `${imageStylePrompt}. ${prompt}`,
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables')
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const configuration = new Configuration({
+  apiKey: Deno.env.get('OPENAI_API_KEY'),
+})
+
+const openai = new OpenAIApi(configuration)
+
+export async function generateAndUploadImage(prompt: string, stylePrompt: string) {
+  try {
+    const fullPrompt = `${prompt}. ${stylePrompt}`
+    console.log('Generating image with prompt:', fullPrompt)
+
+    const response = await openai.createImage({
+      prompt: fullPrompt,
       n: 1,
       size: "1024x1024",
-      quality: "standard",
-    }),
-  });
+      response_format: "b64_json",
+    })
 
-  const data = await response.json();
-  if (!data.data?.[0]?.url) {
-    throw new Error('No se pudo generar la imagen');
+    if (!response.data.data[0].b64_json) {
+      throw new Error('No image data received from OpenAI')
+    }
+
+    const base64Image = response.data.data[0].b64_json
+    const buffer = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0))
+    
+    // Generar un nombre único para la imagen
+    const timestamp = new Date().getTime()
+    const randomString = Math.random().toString(36).substring(7)
+    const filename = `${timestamp}-${randomString}.png`
+    const storagePath = `blog_images/${filename}`
+
+    // Subir la imagen a Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('blog_images')
+      .upload(storagePath, buffer, {
+        contentType: 'image/png',
+        cacheControl: '3600',
+      })
+
+    if (uploadError) throw uploadError
+
+    // Obtener la URL pública de la imagen
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('blog_images')
+      .getPublicUrl(storagePath)
+
+    return {
+      url: publicUrl,
+      width: 1024,
+      height: 1024,
+      size_bytes: buffer.length,
+      mime_type: 'image/png',
+      storage_path: storagePath
+    }
+
+  } catch (error) {
+    console.error('Error generating or uploading image:', error)
+    return null
   }
-
-  // Descargar la imagen de DALL-E
-  const imageResponse = await fetch(data.data[0].url);
-  const imageBlob = await imageResponse.blob();
-
-  // Subir a Supabase Storage
-  const fileName = `${crypto.randomUUID()}.png`;
-  const { error: uploadError } = await supabase.storage
-    .from('blog_images')
-    .upload(fileName, imageBlob, {
-      contentType: 'image/png',
-      upsert: false
-    });
-
-  if (uploadError) throw uploadError;
-
-  // Obtener URL pública
-  const { data: { publicUrl } } = supabase.storage
-    .from('blog_images')
-    .getPublicUrl(fileName);
-
-  return {
-    url: publicUrl,
-    storage_path: fileName,
-    width: 1024,
-    height: 1024,
-    size_bytes: imageBlob.size,
-    mime_type: 'image/png'
-  };
 }
