@@ -1,74 +1,30 @@
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { EmailTemplateDialog } from "./emails/EmailTemplateDialog"
-import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EmailTemplate } from "./emails/types"
-import { EmailTemplateCard } from "./emails/EmailTemplateCard"
 import { EmailLogs } from "./emails/EmailLogs"
 import { ApiKeySetup } from "./emails/ApiKeySetup"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { supabase } from "@/integrations/supabase/client"
-import { useToast } from "@/components/ui/use-toast"
-import { createDefaultTemplates } from "./emails/utils/createDefaultTemplates"
 import { filterTemplatesByType } from "./emails/utils/filterTemplates"
+import { useEmailTemplates } from "./emails/hooks/useEmailTemplates"
+import { useEmailTemplate } from "./emails/hooks/useEmailTemplate"
+import { EmailTemplateList } from "./emails/components/EmailTemplateList"
 
 export function AdminEmails() {
-  const [templates, setTemplates] = useState<EmailTemplate[]>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const { toast } = useToast()
+  const { 
+    templates, 
+    isLoading, 
+    loadTemplates,
+    handleCreateDefaultTemplates 
+  } = useEmailTemplates()
 
-  useEffect(() => {
-    loadTemplates()
-  }, [])
-
-  const loadTemplates = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('email_templates')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      const transformedData = data.map(template => ({
-        ...template,
-        cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : 
-                  template.cc_emails ? JSON.parse(template.cc_emails as string) : []
-      })) as EmailTemplate[]
-
-      setTemplates(transformedData)
-    } catch (error) {
-      console.error('Error al cargar plantillas:', error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudieron cargar las plantillas de email"
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleCreateDefaultTemplates = async () => {
-    try {
-      await createDefaultTemplates()
-      toast({
-        title: "Plantillas creadas",
-        description: "Las plantillas predefinidas se han creado correctamente"
-      })
-      loadTemplates()
-    } catch (error) {
-      console.error('Error al crear plantillas:', error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudieron crear las plantillas predefinidas"
-      })
-    }
-  }
+  const {
+    selectedTemplate,
+    setSelectedTemplate,
+    isDialogOpen,
+    setIsDialogOpen,
+    handleSaveTemplate
+  } = useEmailTemplate()
 
   const handleEditTemplate = (template: EmailTemplate) => {
     setSelectedTemplate(template)
@@ -80,47 +36,10 @@ export function AdminEmails() {
     setIsDialogOpen(true)
   }
 
-  const handleSaveTemplate = async (template: EmailTemplate) => {
-    try {
-      const templateToSave = {
-        ...template,
-        cc_emails: Array.isArray(template.cc_emails) ? template.cc_emails : []
-      }
-
-      if (selectedTemplate) {
-        const { error } = await supabase
-          .from('email_templates')
-          .update(templateToSave)
-          .eq('id', template.id)
-
-        if (error) throw error
-
-        toast({
-          title: "Plantilla actualizada",
-          description: "La plantilla se actualizó correctamente"
-        })
-      } else {
-        const { error } = await supabase
-          .from('email_templates')
-          .insert(templateToSave)
-
-        if (error) throw error
-
-        toast({
-          title: "Plantilla creada",
-          description: "La plantilla se creó correctamente"
-        })
-      }
-
-      setIsDialogOpen(false)
+  const handleSave = async (template: EmailTemplate) => {
+    const success = await handleSaveTemplate(template)
+    if (success) {
       loadTemplates()
-    } catch (error) {
-      console.error('Error al guardar plantilla:', error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo guardar la plantilla"
-      })
     }
   }
 
@@ -162,37 +81,28 @@ export function AdminEmails() {
           <TabsTrigger value="logs">Logs de Envío</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-4">
-          {templates.map((template) => (
-            <EmailTemplateCard 
-              key={template.id} 
-              template={template} 
-              onEdit={handleEditTemplate}
-            />
-          ))}
+        <TabsContent value="all">
+          <EmailTemplateList 
+            templates={templates}
+            onEdit={handleEditTemplate}
+          />
         </TabsContent>
 
-        <TabsContent value="physical" className="space-y-4">
-          {filterTemplatesByType(templates, "physical").map((template) => (
-            <EmailTemplateCard 
-              key={template.id} 
-              template={template} 
-              onEdit={handleEditTemplate}
-            />
-          ))}
+        <TabsContent value="physical">
+          <EmailTemplateList 
+            templates={filterTemplatesByType(templates, "physical")}
+            onEdit={handleEditTemplate}
+          />
         </TabsContent>
 
-        <TabsContent value="esim" className="space-y-4">
-          {filterTemplatesByType(templates, "esim").map((template) => (
-            <EmailTemplateCard 
-              key={template.id} 
-              template={template} 
-              onEdit={handleEditTemplate}
-            />
-          ))}
+        <TabsContent value="esim">
+          <EmailTemplateList 
+            templates={filterTemplatesByType(templates, "esim")}
+            onEdit={handleEditTemplate}
+          />
         </TabsContent>
 
-        <TabsContent value="logs" className="space-y-4">
+        <TabsContent value="logs">
           <EmailLogs />
         </TabsContent>
       </Tabs>
@@ -201,7 +111,7 @@ export function AdminEmails() {
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         template={selectedTemplate}
-        onSave={handleSaveTemplate}
+        onSave={handleSave}
       />
     </div>
   )
