@@ -8,17 +8,19 @@ import { toast } from "sonner"
 import { TopicsManager } from "./automation/TopicsManager"
 import { GenerationSettings } from "./automation/GenerationSettings"
 
+type AutomationSettings = {
+  id: string;
+  is_active: boolean;
+  style_prompt: string;
+  generation_frequency: string;
+  topics: string[];
+  images_style_prompt: string;
+  images_per_paragraph: number;
+}
+
 export function AutomationSettings() {
   const [loading, setLoading] = useState(true)
-  const [settings, setSettings] = useState<{
-    id: string;
-    is_active: boolean;
-    style_prompt: string;
-    generation_frequency: string;
-    topics: string[];
-    images_style_prompt: string;
-    images_per_paragraph: number;
-  } | null>(null)
+  const [settings, setSettings] = useState<AutomationSettings | null>(null)
 
   useEffect(() => {
     loadSettings()
@@ -33,15 +35,20 @@ export function AutomationSettings() {
 
       if (error) throw error
 
-      // Asegurarnos de que topics sea un array de strings
-      const parsedTopics = Array.isArray(data.topics) 
-        ? data.topics.map(topic => String(topic))
-        : []
+      // Asegurarnos de que topics sea un array de strings y convertir generation_frequency a string
+      const parsedSettings: AutomationSettings = {
+        id: data.id,
+        is_active: data.is_active ?? false,
+        style_prompt: data.style_prompt,
+        generation_frequency: String(data.generation_frequency),
+        topics: Array.isArray(data.topics) 
+          ? data.topics.map(topic => String(topic))
+          : [],
+        images_style_prompt: data.images_style_prompt ?? '',
+        images_per_paragraph: data.images_per_paragraph ?? 1
+      }
 
-      setSettings({
-        ...data,
-        topics: parsedTopics
-      })
+      setSettings(parsedSettings)
     } catch (error) {
       console.error('Error loading settings:', error)
       toast.error("Error al cargar la configuración")
