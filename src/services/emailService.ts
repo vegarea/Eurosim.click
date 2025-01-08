@@ -22,7 +22,11 @@ export const getEmailTemplate = async (
     const applicableTemplates = filterTemplatesByTypeAndStatus(templates as EmailTemplate[], type, status)
 
     if (applicableTemplates.length === 0) {
-      console.error('❌ No se encontró plantilla para:', { type, status, is_active: true })
+      console.error('❌ No se encontró plantilla de email para:', { 
+        type: `${type} o both`, 
+        status, 
+        is_active: true 
+      })
       return null
     }
 
