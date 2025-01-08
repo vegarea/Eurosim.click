@@ -8,7 +8,8 @@ import {
   Truck,
   QrCode,
   BookOpen,
-  FileText
+  FileText,
+  Calendar
 } from "lucide-react"
 import {
   Sidebar,
@@ -37,6 +38,11 @@ const menuItems = [
     title: "Pedidos",
     path: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    title: "Activaciones",
+    path: "/admin/activations",
+    icon: Calendar,
   },
   {
     title: "Envíos Físicos",
