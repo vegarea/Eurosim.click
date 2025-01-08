@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -26,7 +25,7 @@ serve(async (req) => {
     const randomTopic = settings.topics[Math.floor(Math.random() * settings.topics.length)]
     console.log('Selected topic:', randomTopic)
 
-    // Generate content using OpenAI
+    // Generate content using OpenAI with better formatting instructions
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -38,13 +37,23 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: settings.style_prompt
+            content: `${settings.style_prompt}
+            Genera contenido bien estructurado usando etiquetas HTML:
+            - Usa <h1> para el título principal
+            - Usa <h2> para subtítulos principales
+            - Usa <h3> para subtítulos secundarios
+            - Usa <p> para párrafos
+            - Usa <ul> y <li> para listas
+            - Usa <strong> para texto importante
+            - Usa <em> para énfasis
+            - Añade <br> entre secciones importantes
+            Asegúrate de que el contenido sea detallado y bien organizado.`
           },
           {
             role: "user",
             content: `Genera un artículo de blog sobre: ${randomTopic}. 
                      El artículo debe tener un título atractivo, contenido detallado y un resumen breve.
-                     Devuelve un JSON con esta estructura exacta, sin markdown: 
+                     Devuelve un JSON con esta estructura exacta:
                      { 
                        "title": "título del artículo",
                        "content": "contenido completo en HTML",
@@ -97,6 +106,12 @@ serve(async (req) => {
     }
 
     console.log('Post created successfully:', post)
+
+    // Si hay configuración de imágenes, generar imágenes aquí
+    if (settings.images_per_paragraph > 0) {
+      // TODO: Implementar generación de imágenes
+      console.log('Image generation would go here')
+    }
 
     return new Response(
       JSON.stringify({ success: true, post }),
