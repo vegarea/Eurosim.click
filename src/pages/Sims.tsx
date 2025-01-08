@@ -17,13 +17,15 @@ export default function Sims() {
         
         <main>
           <SimHero />
-          <SimOptions />
-          <CountryCoverage />
-          <DeliveryBenefits />
-          <InternationalCalling />
-          <ActivationDateInfo />
-          <SimFeatures />
-          <TrustElements />
+          <div className="container mx-auto max-w-6xl px-4">
+            <SimOptions />
+            <CountryCoverage />
+            <DeliveryBenefits />
+            <InternationalCalling />
+            <ActivationDateInfo />
+            <SimFeatures />
+            <TrustElements />
+          </div>
         </main>
       </div>
     </MainLayout>
