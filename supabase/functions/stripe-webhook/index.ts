@@ -101,7 +101,7 @@ serve(async (req) => {
         // Registrar el evento de pago completado
         const paymentEvent = {
           order_id: order.id,
-          type: 'payment_completed',
+          type: 'payment_processed',
           description: 'Pago completado exitosamente',
           metadata: {
             payment_intent: session.payment_intent,
