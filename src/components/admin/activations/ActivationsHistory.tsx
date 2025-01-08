@@ -21,12 +21,15 @@ export function ActivationsHistory() {
     }
   })
 
+  if (isLoading) {
+    return <div className="flex items-center justify-center p-8">Cargando...</div>
+  }
+
   return (
     <div className="space-y-4">
       <DataTable 
         columns={columns} 
         data={orders || []} 
-        isLoading={isLoading}
       />
     </div>
   )

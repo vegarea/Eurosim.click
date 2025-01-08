@@ -35,7 +35,7 @@ export const columns: ColumnDef<Order>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       return (
-        <Badge variant={status === 'delivered' ? 'success' : 'default'}>
+        <Badge variant={status === 'delivered' ? 'secondary' : 'default'}>
           {status === 'delivered' ? 'Entregado' : 'En Proceso'}
         </Badge>
       )
