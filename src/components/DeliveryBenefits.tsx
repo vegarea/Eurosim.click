@@ -12,8 +12,8 @@ export function DeliveryBenefits() {
     },
     {
       icon: <Clock className="w-8 h-8" />,
-      title: "Entrega en 72 hrs",
-      description: "Recibe tu SIM en tiempo récord",
+      title: "Envío de 3 a 5 días",
+      description: "Hasta la puerta de tu casa",
       bgColor: "from-[#D3E4FD] to-[#C4D9F7]"
     },
     {
