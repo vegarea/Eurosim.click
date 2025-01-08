@@ -6,34 +6,10 @@ import { Mail, Check } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Order } from "@/types/database/orders"
 import { OrderStatusBadge } from "../orders/OrderStatusBadge"
-import { useOrders } from "@/contexts/OrdersContext"
+import { useESimDelivery } from "./hooks/useESimDelivery"
 
 export function AdminESimDelivery() {
-  const { toast } = useToast()
-  const { orders, updateOrder } = useOrders()
-  const eSimOrders = orders.filter(order => order.type === "esim")
-
-  // Filtrar pedidos por estado
-  const pendingOrders = eSimOrders.filter(order => order.status === "processing")
-  const completedOrders = eSimOrders.filter(order => order.status === "delivered")
-
-  const handleSendQR = (order: Order) => {
-    updateOrder(order.id, { status: "delivered" })
-
-    toast({
-      title: "QR enviado",
-      description: `El QR del pedido ${order.id} ha sido enviado por email y marcado como entregado.`
-    })
-  }
-
-  const handleMarkDelivered = (order: Order) => {
-    updateOrder(order.id, { status: "delivered" })
-
-    toast({
-      title: "Pedido entregado",
-      description: `El pedido ${order.id} ha sido marcado como entregado.`
-    })
-  }
+  const { pendingOrders, completedOrders, handleSendQR, handleMarkDelivered } = useESimDelivery()
 
   const columns = [
     {
