@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
@@ -8,19 +7,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface ContactFormData {
-  name: string
-  email: string
-  message: string
-}
-
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { name, email, message }: ContactFormData = await req.json()
+    const { name, email, message } = await req.json()
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -59,6 +53,7 @@ serve(async (req) => {
       status: 200,
     })
   } catch (error) {
+    console.error('Error al enviar email:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,

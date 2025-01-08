@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Bot, MessageCircle, Send } from "lucide-react";
 import { Header } from "@/components/Header";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { WhatsAppModal } from "@/components/chat/WhatsAppModal";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
