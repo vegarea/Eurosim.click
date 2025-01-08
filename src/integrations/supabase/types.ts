@@ -372,6 +372,7 @@ export type Database = {
       }
       email_queue: {
         Row: {
+          backoff_interval: unknown | null
           created_at: string | null
           error: string | null
           id: string
@@ -385,6 +386,7 @@ export type Database = {
           template_id: string | null
         }
         Insert: {
+          backoff_interval?: unknown | null
           created_at?: string | null
           error?: string | null
           id?: string
@@ -398,6 +400,7 @@ export type Database = {
           template_id?: string | null
         }
         Update: {
+          backoff_interval?: unknown | null
           created_at?: string | null
           error?: string | null
           id?: string
@@ -825,6 +828,15 @@ export type Database = {
       cleanup_expired_pending_orders: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      should_process_email: {
+        Args: {
+          priority: number
+          created_at: string
+          retry_count: number
+          backoff_interval: unknown
+        }
+        Returns: boolean
       }
     }
     Enums: {
