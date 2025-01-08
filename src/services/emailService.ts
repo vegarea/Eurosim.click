@@ -19,7 +19,6 @@ export const getEmailTemplate = async (
       return null
     }
 
-    // Usar la función de filtrado que considera 'both'
     const applicableTemplates = filterTemplatesByTypeAndStatus(templates as EmailTemplate[], type, status)
 
     if (applicableTemplates.length === 0) {
