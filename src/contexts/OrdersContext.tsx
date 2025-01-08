@@ -25,6 +25,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<Error | null>(null)
 
   const fetchOrders = async () => {
+    console.log('📥 Iniciando fetchOrders')
     try {
       setIsLoading(true)
       const { data, error } = await supabase
@@ -36,11 +37,15 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         `)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Error en fetchOrders:', error)
+        throw error
+      }
 
+      console.log('✅ Órdenes obtenidas:', data?.length || 0)
       setOrders(data as Order[])
     } catch (err) {
-      console.error('Error fetching orders:', err)
+      console.error('❌ Error en fetchOrders:', err)
       setError(err as Error)
       toast.error('Error al cargar los pedidos')
     } finally {
@@ -48,8 +53,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  // Suscribirse a cambios en tiempo real
   useEffect(() => {
+    console.log('🔄 Configurando suscripción a cambios en órdenes')
     const channel = supabase
       .channel('orders-changes')
       .on(
@@ -60,13 +65,14 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
           table: 'orders'
         },
         (payload) => {
-          console.log('Orden actualizada:', payload)
+          console.log('📣 Cambio detectado en órdenes:', payload)
           fetchOrders()
         }
       )
       .subscribe()
 
     return () => {
+      console.log('🔌 Desuscribiendo de cambios en órdenes')
       supabase.removeChannel(channel)
     }
   }, [])
@@ -76,6 +82,7 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const updateOrder = async (orderId: string, updates: Partial<Order>) => {
+    console.log('🔄 Iniciando updateOrder:', { orderId, updates })
     try {
       setIsLoading(true)
       const { error } = await supabase
@@ -83,16 +90,19 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         .update(updates)
         .eq('id', orderId)
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ Error en updateOrder:', error)
+        throw error
+      }
 
-      // Actualizar el estado local inmediatamente
+      console.log('✅ Orden actualizada correctamente')
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, ...updates } : order
       ))
 
       toast.success('Pedido actualizado correctamente')
     } catch (err) {
-      console.error('Error updating order:', err)
+      console.error('❌ Error en updateOrder:', err)
       toast.error('Error al actualizar el pedido')
       throw err
     } finally {
