@@ -53,7 +53,17 @@ export function OrderPaymentInfo({ order }: OrderPaymentInfoProps) {
           {order.stripe_payment_intent_id && (
             <div>
               <h3 className="font-medium mb-2">ID de Pago Stripe</h3>
-              <p className="text-sm text-gray-600">{order.stripe_payment_intent_id}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-gray-600">{order.stripe_payment_intent_id}</p>
+                <a 
+                  href={`https://dashboard.stripe.com/payments/${order.stripe_payment_intent_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline inline-flex items-center gap-1 text-sm"
+                >
+                  Ver en Stripe <ExternalLink className="h-4 w-4" />
+                </a>
+              </div>
             </div>
           )}
 
