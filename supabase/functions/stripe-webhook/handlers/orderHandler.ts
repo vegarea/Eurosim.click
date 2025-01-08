@@ -103,8 +103,61 @@ export async function handleOrderCreation(session: any, customer: any, supabase:
 
     if (eventError) {
       console.error('❌ Error creating order event:', eventError)
-      // No lanzamos el error aquí para no afectar la creación de la orden
-      // pero lo registramos para debugging
+    }
+
+    // Obtener la plantilla de email correspondiente
+    const { data: emailTemplate, error: templateError } = await supabase
+      .from('email_templates')
+      .select('*')
+      .eq('type', productType)
+      .eq('status', 'processing')
+      .eq('is_active', true)
+      .single()
+
+    if (templateError) {
+      console.error('❌ Error getting email template:', templateError)
+      throw templateError
+    }
+
+    // Preparar variables para el email
+    const emailVariables = {
+      nombre_cliente: customer.name,
+      numero_pedido: order.id,
+      fecha_pedido: new Date().toLocaleDateString(),
+      total: `$${(totalAmount / 100).toFixed(2)}`,
+      moneda: 'MXN'
+    }
+
+    // Si es SIM física, agregar variables de envío
+    if (productType === 'physical' && shippingAddress) {
+      Object.assign(emailVariables, {
+        direccion_envio: `${shippingAddress.street}, ${shippingAddress.city}, ${shippingAddress.state}, ${shippingAddress.country}, ${shippingAddress.postal_code}`
+      })
+    }
+
+    // Si es eSIM, agregar variables específicas
+    if (productType === 'esim') {
+      Object.assign(emailVariables, {
+        fecha_activacion: order.activation_date ? 
+          new Date(order.activation_date).toLocaleDateString() : 
+          'No especificada'
+      })
+    }
+
+    // Enviar el email
+    try {
+      const emailResponse = await supabase.functions.invoke('send-email', {
+        body: {
+          templateId: emailTemplate.id,
+          to: [customer.email],
+          variables: emailVariables
+        }
+      })
+
+      console.log('✉️ Email sent:', emailResponse)
+    } catch (emailError) {
+      console.error('❌ Error sending email:', emailError)
+      // No lanzamos el error para no afectar el flujo principal
     }
 
     console.log('✅ Order created successfully:', order)

@@ -75,8 +75,26 @@ serve(async (req) => {
 
       const orderItems = await handleOrderItemCreation(session, order, supabase)
       console.log('Order items created:', orderItems)
-    } else {
-      console.log(`Ignoring unhandled event type: ${event.type}`)
+
+      // Registrar el evento de pago completado
+      const paymentEvent = {
+        order_id: order.id,
+        type: 'payment_completed',
+        description: 'Pago completado exitosamente',
+        metadata: {
+          payment_intent: session.payment_intent,
+          payment_status: session.payment_status,
+          amount: session.amount_total
+        }
+      }
+
+      const { error: eventError } = await supabase
+        .from('order_events')
+        .insert(paymentEvent)
+
+      if (eventError) {
+        console.error('Error creating payment event:', eventError)
+      }
     }
 
     return new Response(
