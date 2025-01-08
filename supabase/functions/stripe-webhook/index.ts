@@ -11,7 +11,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Mejorar el manejo de CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { 
       headers: corsHeaders,
@@ -82,7 +81,6 @@ serve(async (req) => {
 
     console.log('✅ Processing event type:', event.type)
 
-    // Solo manejamos el evento checkout.session.completed
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
       console.log('📦 Processing completed checkout session:', session.id)
@@ -97,6 +95,41 @@ serve(async (req) => {
 
         const orderItems = await handleOrderItemCreation(session, order, supabase)
         console.log('🛍️ Order items created:', orderItems)
+
+        // Enviar email de confirmación directamente usando Resend
+        if (customer?.email) {
+          try {
+            const emailResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+              },
+              body: JSON.stringify({
+                from: 'EuroSim <noreply@eurosim.click>',
+                to: [customer.email],
+                subject: '¡Gracias por tu compra!',
+                html: `
+                  <h1>¡Gracias por tu compra!</h1>
+                  <p>Hola ${customer.name},</p>
+                  <p>Hemos recibido tu pago correctamente para el pedido #${order.id}.</p>
+                  <p>Total pagado: €${(order.total_amount / 100).toFixed(2)}</p>
+                  <p>Pronto recibirás más información sobre tu pedido.</p>
+                  <br>
+                  <p>Gracias por confiar en EuroSim</p>
+                `
+              }),
+            })
+
+            if (!emailResponse.ok) {
+              console.error('❌ Error sending confirmation email:', await emailResponse.text())
+            } else {
+              console.log('✉️ Confirmation email sent successfully')
+            }
+          } catch (emailError) {
+            console.error('❌ Error in email sending:', emailError)
+          }
+        }
 
         // Registrar el evento de pago completado
         const paymentEvent = {
@@ -116,21 +149,17 @@ serve(async (req) => {
 
         if (eventError) {
           console.error('❌ Error creating payment event:', eventError)
-          // No retornamos error aquí para no afectar el flujo principal
         }
 
-        // Responder exitosamente a Stripe
         return new Response(
           JSON.stringify({ received: true, order_id: order.id }), 
           { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
           }
         )
       } catch (error) {
         console.error('❌ Error processing webhook:', error)
-        // Importante: Retornamos 200 incluso en caso de error para evitar reintentos
-        // pero incluimos el error en la respuesta para debugging
         return new Response(
           JSON.stringify({ 
             received: true, 
@@ -138,25 +167,23 @@ serve(async (req) => {
             warning: 'Processed with errors' 
           }), 
           { 
-            status: 200, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
           }
         )
       }
     }
 
-    // Para otros eventos, confirmamos recepción
     return new Response(
       JSON.stringify({ received: true }), 
       { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
       }
     )
 
   } catch (error) {
     console.error('❌ Fatal error processing webhook:', error)
-    // Retornamos 200 para evitar reintentos innecesarios
     return new Response(
       JSON.stringify({ 
         received: true, 
