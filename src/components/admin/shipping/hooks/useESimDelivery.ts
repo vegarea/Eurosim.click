@@ -18,7 +18,7 @@ export function useESimDelivery() {
 
   const handleSendQR = async (order: Order) => {
     try {
-      // Primero actualizamos el estado
+      // Actualizamos el estado - esto disparará el trigger que enviará el email
       await updateOrder(order.id, { status: "delivered" })
 
       // Registramos el evento
@@ -27,50 +27,6 @@ export function useESimDelivery() {
         type: 'status_changed',
         description: 'eSIM QR enviado y pedido marcado como entregado'
       })
-
-      // Obtenemos la plantilla correcta - Modificado para usar .select() en lugar de .single()
-      const { data: templates, error: templateError } = await supabase
-        .from('email_templates')
-        .select('*')
-        .eq('type', 'esim')
-        .eq('status', 'delivered')
-        .eq('is_active', true)
-
-      if (templateError) {
-        throw new Error('Error al obtener plantillas de email')
-      }
-
-      if (!templates || templates.length === 0) {
-        throw new Error('No se encontró ninguna plantilla de email activa')
-      }
-
-      // Usamos la primera plantilla disponible
-      const template = templates[0]
-
-      const metadata = order.metadata as OrderMetadata;
-
-      // Insertamos en la cola de emails con alta prioridad
-      const { error: queueError } = await supabase.from('email_queue').insert({
-        order_id: order.id,
-        template_id: template.id,
-        status: 'pending',
-        priority: 1, // Alta prioridad para envío de QR
-        metadata: {
-          order_type: 'esim',
-          order_status: 'delivered',
-          customer_id: order.customer_id,
-          variables: {
-            nombre_cliente: order.customer?.name,
-            numero_pedido: order.id,
-            codigo_activacion: metadata?.activation_code,
-            qr_code: metadata?.qr_code_url,
-            fecha_activacion: order.activation_date,
-            instrucciones_activacion: ''
-          }
-        }
-      })
-
-      if (queueError) throw queueError
 
       toast({
         title: "QR enviado",
@@ -88,6 +44,7 @@ export function useESimDelivery() {
 
   const handleMarkDelivered = async (order: Order) => {
     try {
+      // Actualizamos el estado - esto disparará el trigger que enviará el email
       await updateOrder(order.id, { status: "delivered" })
 
       // Registramos el evento
@@ -96,50 +53,6 @@ export function useESimDelivery() {
         type: 'status_changed',
         description: 'Pedido marcado como entregado'
       })
-
-      // Obtenemos la plantilla correcta - Modificado para usar .select() en lugar de .single()
-      const { data: templates, error: templateError } = await supabase
-        .from('email_templates')
-        .select('*')
-        .eq('type', 'esim')
-        .eq('status', 'delivered')
-        .eq('is_active', true)
-
-      if (templateError) {
-        throw new Error('Error al obtener plantillas de email')
-      }
-
-      if (!templates || templates.length === 0) {
-        throw new Error('No se encontró ninguna plantilla de email activa')
-      }
-
-      // Usamos la primera plantilla disponible
-      const template = templates[0]
-
-      const metadata = order.metadata as OrderMetadata;
-
-      // Insertamos en la cola de emails
-      const { error: queueError } = await supabase.from('email_queue').insert({
-        order_id: order.id,
-        template_id: template.id,
-        status: 'pending',
-        priority: 1,
-        metadata: {
-          order_type: 'esim',
-          order_status: 'delivered',
-          customer_id: order.customer_id,
-          variables: {
-            nombre_cliente: order.customer?.name,
-            numero_pedido: order.id,
-            codigo_activacion: metadata?.activation_code,
-            qr_code: metadata?.qr_code_url,
-            fecha_activacion: order.activation_date,
-            instrucciones_activacion: ''
-          }
-        }
-      })
-
-      if (queueError) throw queueError
 
       toast({
         title: "Pedido entregado",
