@@ -47,6 +47,17 @@ export function AdminESimDelivery() {
 
       console.log('📧 Últimos logs de email:', logs)
 
+      // Verificar trigger de email
+      const { data: triggerInfo, error: triggerError } = await supabase
+        .rpc('get_trigger_info', { trigger_name: 'trigger_new_order_email' })
+
+      if (triggerError) {
+        console.error('❌ Error al verificar trigger:', triggerError)
+        throw triggerError
+      }
+
+      console.log('🔄 Información del trigger:', triggerInfo)
+
       toast({
         title: "Diagnóstico completado",
         description: "Revisa la consola para ver los resultados detallados"

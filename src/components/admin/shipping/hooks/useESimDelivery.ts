@@ -31,6 +31,20 @@ export function useESimDelivery() {
 
       console.log('✉️ Usando plantilla:', template.id)
 
+      // Verificar datos del cliente
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', order.customer_id)
+        .single()
+
+      if (customerError) {
+        console.error('❌ Error al obtener datos del cliente:', customerError)
+        throw customerError
+      }
+
+      console.log('👤 Cliente encontrado:', customer.id)
+
       // Actualizamos el estado - esto disparará el trigger que enviará el email
       await updateOrder(order.id, { status: "delivered" })
       console.log('✅ Estado actualizado a delivered')
@@ -82,6 +96,20 @@ export function useESimDelivery() {
       }
 
       console.log('✉️ Usando plantilla:', template.id)
+
+      // Verificar datos del cliente
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', order.customer_id)
+        .single()
+
+      if (customerError) {
+        console.error('❌ Error al obtener datos del cliente:', customerError)
+        throw customerError
+      }
+
+      console.log('👤 Cliente encontrado:', customer.id)
 
       // Actualizamos el estado - esto disparará el trigger que enviará el email
       await updateOrder(order.id, { status: "delivered" })
