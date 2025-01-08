@@ -28,18 +28,24 @@ export function useESimDelivery() {
         description: 'eSIM QR enviado y pedido marcado como entregado'
       })
 
-      // Obtenemos la plantilla correcta
-      const { data: template } = await supabase
+      // Obtenemos la plantilla correcta - Modificado para usar .select() en lugar de .single()
+      const { data: templates, error: templateError } = await supabase
         .from('email_templates')
         .select('*')
         .eq('type', 'esim')
         .eq('status', 'delivered')
         .eq('is_active', true)
-        .single()
 
-      if (!template) {
-        throw new Error('No se encontró la plantilla de email activa')
+      if (templateError) {
+        throw new Error('Error al obtener plantillas de email')
       }
+
+      if (!templates || templates.length === 0) {
+        throw new Error('No se encontró ninguna plantilla de email activa')
+      }
+
+      // Usamos la primera plantilla disponible
+      const template = templates[0]
 
       const metadata = order.metadata as OrderMetadata;
 
@@ -91,18 +97,24 @@ export function useESimDelivery() {
         description: 'Pedido marcado como entregado'
       })
 
-      // Obtenemos la plantilla correcta
-      const { data: template } = await supabase
+      // Obtenemos la plantilla correcta - Modificado para usar .select() en lugar de .single()
+      const { data: templates, error: templateError } = await supabase
         .from('email_templates')
         .select('*')
         .eq('type', 'esim')
         .eq('status', 'delivered')
         .eq('is_active', true)
-        .single()
 
-      if (!template) {
-        throw new Error('No se encontró la plantilla de email activa')
+      if (templateError) {
+        throw new Error('Error al obtener plantillas de email')
       }
+
+      if (!templates || templates.length === 0) {
+        throw new Error('No se encontró ninguna plantilla de email activa')
+      }
+
+      // Usamos la primera plantilla disponible
+      const template = templates[0]
 
       const metadata = order.metadata as OrderMetadata;
 
@@ -111,7 +123,7 @@ export function useESimDelivery() {
         order_id: order.id,
         template_id: template.id,
         status: 'pending',
-        priority: 1, // Cambiado a prioridad 1 también
+        priority: 1,
         metadata: {
           order_type: 'esim',
           order_status: 'delivered',
