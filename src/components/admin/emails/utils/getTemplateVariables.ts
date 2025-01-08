@@ -1,7 +1,6 @@
 import { Order } from "@/types/database/orders"
 import { Customer } from "@/types/database/customers"
-import { EmailTemplate } from "../types"
-import { OrderMetadata } from "../types"
+import { EmailTemplate, OrderMetadata } from "../types"
 
 export const getTemplateVariables = async (
   template: EmailTemplate,
