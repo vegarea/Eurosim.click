@@ -1,79 +1,105 @@
+import { 
+  LayoutDashboard, 
+  ShoppingCart, 
+  Users, 
+  Package, 
+  Mail,
+  Settings,
+  Truck,
+  QrCode,
+  BookOpen,
+  FileText
+} from "lucide-react"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar"
 import { Link } from "react-router-dom"
-import { Calendar } from "lucide-react"
+
+const menuItems = [
+  {
+    title: "Dashboard",
+    path: "/admin",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Blog",
+    path: "/admin/blog",
+    icon: BookOpen,
+  },
+  {
+    title: "Pedidos",
+    path: "/admin/orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Envíos Físicos",
+    path: "/admin/physical-shipping",
+    icon: Truck,
+  },
+  {
+    title: "Envíos E-SIM",
+    path: "/admin/esim-delivery",
+    icon: QrCode,
+  },
+  {
+    title: "Clientes",
+    path: "/admin/customers",
+    icon: Users,
+  },
+  {
+    title: "Productos",
+    path: "/admin/products",
+    icon: Package,
+  },
+  {
+    title: "Emails",
+    path: "/admin/emails",
+    icon: Mail,
+  },
+  {
+    title: "Documentación",
+    path: "/admin/documentation",
+    icon: FileText,
+  },
+  {
+    title: "Configuración",
+    path: "/admin/settings",
+    icon: Settings,
+  },
+]
 
 export function AdminSidebar() {
   return (
-    <nav className="space-y-2">
-      <Link
-        to="/admin/dashboard"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Dashboard
-      </Link>
-      <Link
-        to="/admin/blog"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Blog
-      </Link>
-      <Link
-        to="/admin/orders"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Pedidos
-      </Link>
-      <Link
-        to="/admin/physical-shipping"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Envío Físico
-      </Link>
-      <Link
-        to="/admin/esim-delivery"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Entrega eSIM
-      </Link>
-      <Link
-        to="/admin/activations"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Activaciones
-      </Link>
-      <Link
-        to="/admin/customers"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Clientes
-      </Link>
-      <Link
-        to="/admin/products"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Productos
-      </Link>
-      <Link
-        to="/admin/emails"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Emails
-      </Link>
-      <Link
-        to="/admin/settings"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-      >
-        <Calendar className="h-4 w-4" />
-        Configuración
-      </Link>
-    </nav>
+    <Sidebar>
+      <SidebarContent className="bg-gradient-to-b from-brand-500 to-brand-600">
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-white/90">Panel de Administración</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton 
+                    asChild
+                    className="text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    <Link to={item.path}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   )
 }
