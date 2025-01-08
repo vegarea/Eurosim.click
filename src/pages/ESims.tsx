@@ -6,12 +6,12 @@ import { Product } from "@/types/database/products"
 import { ProductButton } from "@/components/esim/ProductButton"
 import { PlanDetails } from "@/components/esim/PlanDetails"
 import { TrustElements } from "@/components/TrustElements"
-import { FrequentQuestions } from "@/components/FrequentQuestions"
 import { CountryCoverage } from "@/components/CountryCoverage"
 import { CommonFeatures } from "@/components/CommonFeatures"
 import { InternationalCalling } from "@/components/InternationalCalling"
 import { MainLayout } from "@/components/layouts/MainLayout"
 import { ESimHero } from "@/components/ESimHero"
+import { ESimFAQ } from "@/components/esim/ESimFAQ"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
@@ -87,7 +87,7 @@ export default function ESims() {
             <CommonFeatures />
             <InternationalCalling />
             <TrustElements />
-            <FrequentQuestions />
+            <ESimFAQ />
           </div>
         </main>
       </div>
