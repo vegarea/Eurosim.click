@@ -370,66 +370,6 @@ export type Database = {
           },
         ]
       }
-      email_queue: {
-        Row: {
-          backoff_interval: unknown | null
-          created_at: string | null
-          error: string | null
-          id: string
-          metadata: Json | null
-          next_retry_at: string | null
-          order_id: string
-          priority: number
-          processed_at: string | null
-          retry_count: number
-          status: Database["public"]["Enums"]["email_queue_status"]
-          template_id: string | null
-        }
-        Insert: {
-          backoff_interval?: unknown | null
-          created_at?: string | null
-          error?: string | null
-          id?: string
-          metadata?: Json | null
-          next_retry_at?: string | null
-          order_id: string
-          priority?: number
-          processed_at?: string | null
-          retry_count?: number
-          status?: Database["public"]["Enums"]["email_queue_status"]
-          template_id?: string | null
-        }
-        Update: {
-          backoff_interval?: unknown | null
-          created_at?: string | null
-          error?: string | null
-          id?: string
-          metadata?: Json | null
-          next_retry_at?: string | null
-          order_id?: string
-          priority?: number
-          processed_at?: string | null
-          retry_count?: number
-          status?: Database["public"]["Enums"]["email_queue_status"]
-          template_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "email_queue_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_queue_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "email_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       email_templates: {
         Row: {
           carrier_id: string | null
