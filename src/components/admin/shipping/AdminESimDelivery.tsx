@@ -15,16 +15,37 @@ export function AdminESimDelivery() {
 
   const runDiagnostic = async () => {
     try {
-      toast({
-        title: "Ejecutando diagnóstico...",
-        description: "Por favor espera mientras verificamos el sistema"
-      })
+      console.log('🔍 Iniciando diagnóstico del sistema de envío de eSIM...')
+      
+      // Verificar plantilla de email
+      const { data: template, error: templateError } = await supabase
+        .from('email_templates')
+        .select('*')
+        .eq('type', 'esim')
+        .eq('status', 'delivered')
+        .eq('is_active', true)
+        .single()
 
-      const { data, error } = await supabase.functions.invoke('diagnostic-check')
+      if (templateError) {
+        console.error('❌ Error al verificar plantilla:', templateError)
+        throw templateError
+      }
 
-      if (error) throw error
+      console.log('✅ Plantilla encontrada:', template)
 
-      console.log('Resultados del diagnóstico:', data)
+      // Verificar últimos logs de email
+      const { data: logs, error: logsError } = await supabase
+        .from('email_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+      if (logsError) {
+        console.error('❌ Error al verificar logs:', logsError)
+        throw logsError
+      }
+
+      console.log('📧 Últimos logs de email:', logs)
 
       toast({
         title: "Diagnóstico completado",
@@ -32,7 +53,7 @@ export function AdminESimDelivery() {
       })
 
     } catch (error) {
-      console.error('Error en diagnóstico:', error)
+      console.error('❌ Error en diagnóstico:', error)
       toast({
         variant: "destructive",
         title: "Error en diagnóstico",
