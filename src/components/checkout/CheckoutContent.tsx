@@ -48,8 +48,8 @@ export function CheckoutContent({
     }
   }, [step, state.customerInfo, onFormValidityChange]);
 
-  const handleFormSubmit = (values: ShippingFormValues) => {
-    console.log("Form submitted with values:", values);
+  const handleShippingSubmit = (values: ShippingFormValues) => {
+    console.log("Shipping form submitted with values:", values);
 
     if (values.shipping_address) {
       updateOrderInfo({
@@ -57,6 +57,10 @@ export function CheckoutContent({
         type: hasPhysicalSim ? "physical" : "esim"
       })
     }
+  }
+
+  const handleDocumentationSubmit = (values: DocumentationFormValues) => {
+    console.log("Documentation form submitted with values:", values);
   }
 
   const getCurrentStep = () => {
@@ -68,7 +72,7 @@ export function CheckoutContent({
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Información Personal</h2>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(handleShippingSubmit)} className="space-y-6">
                   <PersonalInfoFields form={form} />
                 </form>
               </Form>
@@ -80,7 +84,7 @@ export function CheckoutContent({
                 <h2 className="text-xl font-semibold mb-4">Dirección de Envío</h2>
                 <ShippingForm
                   form={form}
-                  onSubmit={handleFormSubmit}
+                  onSubmit={handleShippingSubmit}
                   onValidityChange={onFormValidityChange}
                   isTestMode={isTestMode}
                   testData={testData.shipping}
@@ -97,7 +101,7 @@ export function CheckoutContent({
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Información Personal</h2>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(handleShippingSubmit)} className="space-y-6">
                   <PersonalInfoFields form={form} />
                 </form>
               </Form>
@@ -112,7 +116,7 @@ export function CheckoutContent({
                 </p>
               </div>
               <DocumentationForm
-                onSubmit={handleFormSubmit}
+                onSubmit={handleDocumentationSubmit}
                 onValidityChange={onFormValidityChange}
                 isTestMode={isTestMode}
                 testData={testData.documentation}
