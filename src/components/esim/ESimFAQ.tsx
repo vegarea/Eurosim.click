@@ -24,13 +24,13 @@ const questions = [
   {
     icon: Smartphone,
     title: "¿Qué pasa si mi teléfono no es compatible?",
-    answer: "Si tu dispositivo no es compatible con eSIM, te recomendamos nuestra SIM física tradicional. Ofrecemos envío gratuito a todo México y los mismos planes de datos.",
+    answer: "Si tu dispositivo no es compatible con eSIM, te recomendamos nuestra SIM física tradicional, ofrecemos envío a todo México y los mismos planes de datos.",
     bgColor: "bg-secondary/5"
   },
   {
     icon: Clock,
     title: "¿Cuánto tiempo tarda en activarse?",
-    answer: "La eSIM se activa instantáneamente después de escanear el código QR. Recibirás el código QR por email inmediatamente después de tu compra, pero puedes elegir la fecha de inicio que prefieras.",
+    answer: "La eSIM se activa instantáneamente después de escanear el código QR. Recibirás el código QR un día antes de la fecha de activación que indiques en tu compra, así podrás comprarla ahora y quedará programada para la fecha que la necesites.",
     bgColor: "bg-primary/5"
   },
   {
