@@ -1,39 +1,24 @@
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2 } from "lucide-react";
 
-const StatusIcon = ({ status }: { status: string }) => {
-  switch (status.toLowerCase()) {
-    case "sent":
-    case "delivered":
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-    case "failed":
-      return <XCircle className="h-4 w-4 text-red-500" />;
-    case "sending":
-      return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />;
-    case "bounced":
-      return <AlertCircle className="h-4 w-4 text-orange-500" />;
-    default:
-      return <Clock className="h-4 w-4 text-blue-500" />;
-  }
-};
+const STATUS_STYLES = {
+  'delivered': 'bg-green-100 text-green-800 hover:bg-green-100',
+  'sent': 'bg-blue-100 text-blue-800 hover:bg-blue-100',
+  'failed': 'bg-red-100 text-red-800 hover:bg-red-100',
+  'bounced': 'bg-orange-100 text-orange-800 hover:bg-orange-100',
+  'complained': 'bg-red-100 text-red-800 hover:bg-red-100',
+  'opened': 'bg-purple-100 text-purple-800 hover:bg-purple-100',
+  'clicked': 'bg-indigo-100 text-indigo-800 hover:bg-indigo-100',
+} as const;
 
-export const EmailStatusBadge = ({ status }: { status: string }) => {
-  const styles = {
-    sent: "bg-green-100 text-green-800",
-    delivered: "bg-green-100 text-green-800",
-    failed: "bg-red-100 text-red-800",
-    sending: "bg-blue-100 text-blue-800",
-    bounced: "bg-orange-100 text-orange-800",
-    default: "bg-blue-100 text-blue-800",
-  };
+type EmailStatus = keyof typeof STATUS_STYLES;
 
-  const statusKey = status.toLowerCase() as keyof typeof styles;
-  const styleClass = styles[statusKey] || styles.default;
+export function EmailStatusBadge({ status }: { status: string }) {
+  const statusKey = status.toLowerCase() as EmailStatus;
+  const style = STATUS_STYLES[statusKey] || 'bg-gray-100 text-gray-800 hover:bg-gray-100';
 
   return (
-    <Badge className={`flex items-center gap-1 ${styleClass}`}>
-      <StatusIcon status={status} />
-      <span className="capitalize">{status}</span>
+    <Badge variant="secondary" className={style}>
+      {status}
     </Badge>
   );
-};
+}
