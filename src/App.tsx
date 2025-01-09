@@ -54,17 +54,17 @@ const AppContent = () => {
       <Helmet>
         {/* Google Analytics */}
         {trackingScripts.google_analytics && (
-          <script>{trackingScripts.google_analytics}</script>
+          <script dangerouslySetInnerHTML={{ __html: trackingScripts.google_analytics }} />
         )}
         
         {/* Facebook Pixel */}
         {trackingScripts.facebook_pixel && (
-          <script>{trackingScripts.facebook_pixel}</script>
+          <script dangerouslySetInnerHTML={{ __html: trackingScripts.facebook_pixel }} />
         )}
         
         {/* Otros scripts */}
         {trackingScripts.other_scripts && (
-          <script>{trackingScripts.other_scripts}</script>
+          <script dangerouslySetInnerHTML={{ __html: trackingScripts.other_scripts }} />
         )}
       </Helmet>
 
