@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2 } from "lucide-react";
 import { useEmailLogs } from "./hooks/useEmailLogs";
-import { format } from "date-fns";
+import { format, isAfter, subMinutes } from "date-fns";
 import { es } from "date-fns/locale";
 
 const StatusIcon = ({ status }: { status: string }) => {
@@ -21,7 +21,14 @@ const StatusIcon = ({ status }: { status: string }) => {
   }
 };
 
-const StatusBadge = ({ status }: { status: string }) => {
+const StatusBadge = ({ status, createdAt }: { status: string, createdAt: string }) => {
+  // Si el status es queued pero fue creado hace más de 1 minuto, 
+  // asumimos que fue enviado ya que el webhook envía inmediatamente
+  const oneMinuteAgo = subMinutes(new Date(), 1);
+  const effectiveStatus = status.toLowerCase() === 'queued' && 
+    isAfter(new Date(createdAt), oneMinuteAgo) ? 
+    'queued' : 'sent';
+
   const styles = {
     sent: "bg-green-100 text-green-800",
     failed: "bg-red-100 text-red-800",
@@ -30,13 +37,13 @@ const StatusBadge = ({ status }: { status: string }) => {
     default: "bg-orange-100 text-orange-800",
   };
 
-  const statusKey = status.toLowerCase() as keyof typeof styles;
+  const statusKey = effectiveStatus as keyof typeof styles;
   const styleClass = styles[statusKey] || styles.default;
 
   return (
     <Badge className={`flex items-center gap-1 ${styleClass}`}>
-      <StatusIcon status={status} />
-      <span className="capitalize">{status}</span>
+      <StatusIcon status={effectiveStatus} />
+      <span className="capitalize">{effectiveStatus}</span>
     </Badge>
   );
 };
@@ -86,7 +93,7 @@ export function EmailLogs() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <p className="font-medium">{log.recipient}</p>
-                  <StatusBadge status={log.status} />
+                  <StatusBadge status={log.status} createdAt={log.created_at} />
                 </div>
                 <p className="text-sm text-muted-foreground">{log.subject}</p>
                 {log.error && (
