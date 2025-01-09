@@ -1,11 +1,10 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Auth } from "@supabase/auth-ui-react"
 import { ThemeSupa } from "@supabase/auth-ui-shared"
 import { supabase } from "@/integrations/supabase/client"
 import { LogoSite } from "@/components/LogoSite"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useState } from "react"
 import { AuthError, AuthApiError } from "@supabase/supabase-js"
 
 export default function Login() {
@@ -23,11 +22,15 @@ export default function Login() {
         if (event === "SIGNED_IN") {
           setIsLoading(true)
           try {
+            if (!session?.user?.id) {
+              throw new Error("No user ID found")
+            }
+
             // Verificar si el usuario es admin
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
               .select('role')
-              .eq('id', session?.user.id)
+              .eq('id', session.user.id)
               .single()
 
             if (profileError) {
@@ -44,10 +47,18 @@ export default function Login() {
           } catch (err) {
             console.error("Error checking profile:", err)
             if (err instanceof AuthApiError) {
-              if (err.status === 400) {
-                setError("Email o contraseña incorrectos")
-              } else {
-                setError("Error verificando permisos de usuario")
+              switch (err.status) {
+                case 400:
+                  setError("Email o contraseña incorrectos")
+                  break
+                case 401:
+                  setError("No estás autorizado para acceder")
+                  break
+                case 404:
+                  setError("Usuario no encontrado")
+                  break
+                default:
+                  setError("Error de autenticación. Por favor, intenta de nuevo.")
               }
             } else {
               setError("Error verificando permisos de usuario")
@@ -82,6 +93,12 @@ export default function Login() {
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {isLoading && (
+          <Alert className="mb-6">
+            <AlertDescription>Verificando credenciales...</AlertDescription>
           </Alert>
         )}
         
