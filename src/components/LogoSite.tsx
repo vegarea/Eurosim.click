@@ -1,18 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Link } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 interface LogoSiteProps {
-  className?: string;
-  withLink?: boolean;
+  className?: string
+  withLink?: boolean
 }
 
 export function LogoSite({ className, withLink = true }: LogoSiteProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
   const [error, setError] = useState(false)
   
-  const { data: settings, isLoading } = useQuery({
+  const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       console.log("🔄 Fetching site settings for logo")
@@ -38,7 +38,7 @@ export function LogoSite({ className, withLink = true }: LogoSiteProps) {
   const handleImageError = () => {
     console.error("❌ Error loading logo image")
     setError(true)
-    setImageLoaded(true) // Remove placeholder on error
+    setImageLoaded(true)
   }
 
   const LogoContent = () => (
@@ -53,10 +53,9 @@ export function LogoSite({ className, withLink = true }: LogoSiteProps) {
       <img 
         src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className={`${className || "h-12 w-auto"} ${!imageLoaded ? 'hidden' : 'block'}`}
+        className={`${className || "h-12 w-auto"} ${!imageLoaded ? 'hidden' : ''}`}
         onLoad={handleImageLoad}
         onError={handleImageError}
-        loading="eager"
       />
     </>
   )
