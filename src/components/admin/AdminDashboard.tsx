@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { format, subDays } from "date-fns"
 import { es } from "date-fns/locale"
+import { RecentActivity } from "./dashboard/RecentActivity"
 
 export function AdminDashboard() {
   // Fetch orders data
@@ -211,32 +212,7 @@ export function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50/50 to-white">
-          <CardHeader>
-            <CardTitle>Actividad Reciente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-8">
-              {ordersData?.slice(0, 3).map((order) => (
-                <div key={order.id} className="flex items-center">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Nuevo pedido #{order.id.slice(0, 8)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(order.created_at || '').toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {(!ordersData || ordersData.length === 0) && (
-                <p className="text-sm text-muted-foreground">
-                  No hay pedidos recientes
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        <RecentActivity />
       </div>
     </div>
   )
