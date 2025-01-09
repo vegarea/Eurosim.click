@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Link } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface LogoSiteProps {
   className?: string;
@@ -10,32 +10,52 @@ interface LogoSiteProps {
 
 export function LogoSite({ className, withLink = true }: LogoSiteProps) {
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [error, setError] = useState(false)
   
-  const { data: settings } = useQuery({
+  const { data: settings, isLoading } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
+      console.log("🔄 Fetching site settings for logo")
       const { data, error } = await supabase
         .from('site_settings')
         .select('logo_url')
         .single()
       
-      if (error) throw error
+      if (error) {
+        console.error("❌ Error fetching logo:", error)
+        throw error
+      }
+      console.log("✅ Logo URL fetched:", data?.logo_url)
       return data
     }
   })
 
+  const handleImageLoad = () => {
+    console.log("✅ Logo image loaded successfully")
+    setImageLoaded(true)
+  }
+
+  const handleImageError = () => {
+    console.error("❌ Error loading logo image")
+    setError(true)
+    setImageLoaded(true) // Remove placeholder on error
+  }
+
   const LogoContent = () => (
     <>
-      {/* Placeholder mientras carga */}
-      <div 
-        className={`${!imageLoaded ? 'block' : 'hidden'} bg-gray-100 animate-pulse ${className || "h-12 w-32"}`}
-      />
+      {!imageLoaded && !error && (
+        <div 
+          className={`bg-gray-100 animate-pulse ${className || "h-12 w-32"}`}
+          aria-hidden="true"
+        />
+      )}
       
       <img 
         src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className={`${className || "h-12 w-auto"} ${imageLoaded ? 'block' : 'hidden'}`}
-        onLoad={() => setImageLoaded(true)}
+        className={`${className || "h-12 w-auto"} ${!imageLoaded ? 'hidden' : 'block'}`}
+        onLoad={handleImageLoad}
+        onError={handleImageError}
         loading="eager"
       />
     </>
@@ -48,7 +68,7 @@ export function LogoSite({ className, withLink = true }: LogoSiteProps) {
   return (
     <Link 
       to="/" 
-      className="flex items-center transition-transform hover:scale-105"
+      className="block transition-transform hover:scale-105"
     >
       <LogoContent />
     </Link>

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { LogoSite } from "@/components/LogoSite"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AuthError, AuthApiError } from "@supabase/supabase-js"
+import { Loader2 } from "lucide-react"
 
 export default function Login() {
   const navigate = useNavigate()
@@ -15,19 +16,25 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    console.log("🔄 Configurando listener de autenticación")
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth event:", event)
+        console.log("🔔 Evento de autenticación:", event, {
+          sessionId: session?.user?.id,
+          email: session?.user?.email
+        })
         
         if (event === "SIGNED_IN") {
+          console.log("✅ Usuario autenticado, verificando permisos")
           setIsLoading(true)
+          
           try {
             if (!session?.user?.id) {
-              console.error("No user ID found in session")
-              throw new Error("No user ID found")
+              console.error("❌ No se encontró ID de usuario en la sesión")
+              throw new Error("No se encontró ID de usuario")
             }
 
-            // Verificar si el usuario es admin
             const { data: profile, error: profileError } = await supabase
               .from('profiles')
               .select('role')
@@ -35,18 +42,23 @@ export default function Login() {
               .single()
 
             if (profileError) {
-              console.error("Error fetching profile:", profileError)
+              console.error("❌ Error al obtener perfil:", profileError)
               throw profileError
             }
 
+            console.log("👤 Perfil de usuario:", profile)
+
             if (profile?.role === 'admin') {
+              console.log("✅ Usuario admin verificado, redirigiendo a:", from)
               navigate(from, { replace: true })
             } else {
+              console.error("❌ Usuario no tiene permisos de administrador")
               setError("No tienes permisos de administrador")
               await supabase.auth.signOut()
             }
           } catch (err) {
-            console.error("Error checking profile:", err)
+            console.error("❌ Error en el proceso de autenticación:", err)
+            
             if (err instanceof AuthApiError) {
               switch (err.status) {
                 case 400:
@@ -64,20 +76,30 @@ export default function Login() {
             } else {
               setError("Error verificando permisos de usuario")
             }
-            await supabase.auth.signOut()
+            
+            try {
+              console.log("🔄 Cerrando sesión debido a error")
+              await supabase.auth.signOut()
+            } catch (signOutError) {
+              console.error("❌ Error al cerrar sesión:", signOutError)
+            }
           } finally {
             setIsLoading(false)
           }
         }
         
         if (event === "SIGNED_OUT") {
+          console.log("👋 Usuario cerró sesión")
           setError("")
           setIsLoading(false)
         }
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      console.log("🧹 Limpiando listener de autenticación")
+      subscription.unsubscribe()
+    }
   }, [navigate, from])
 
   return (
@@ -98,9 +120,10 @@ export default function Login() {
         )}
 
         {isLoading && (
-          <Alert className="mb-6">
-            <AlertDescription>Verificando credenciales...</AlertDescription>
-          </Alert>
+          <div className="flex items-center justify-center gap-2 mb-6 text-primary">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">Verificando credenciales...</span>
+          </div>
         )}
         
         <Auth
