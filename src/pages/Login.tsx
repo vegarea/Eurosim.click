@@ -23,6 +23,7 @@ export default function Login() {
           setIsLoading(true)
           try {
             if (!session?.user?.id) {
+              console.error("No user ID found in session")
               throw new Error("No user ID found")
             }
 
