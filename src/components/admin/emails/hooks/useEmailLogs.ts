@@ -12,7 +12,12 @@ export const useEmailLogs = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      
+      // Aseguramos que metadata sea un objeto o null
+      return data.map(log => ({
+        ...log,
+        metadata: log.metadata ? JSON.parse(JSON.stringify(log.metadata)) : null
+      }));
     },
   });
 };

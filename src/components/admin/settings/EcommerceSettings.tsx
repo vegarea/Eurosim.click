@@ -28,7 +28,7 @@ export function EcommerceSettings() {
 
   // Ejemplo de precio formateado
   const examplePrice = 1234.56
-  const formattedPrice = formatCurrency(examplePrice, currency)
+  const formattedPrice = formatCurrency(examplePrice)
 
   return (
     <Card>
