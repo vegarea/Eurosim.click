@@ -43,7 +43,15 @@ export default function Login() {
             }
           } catch (err) {
             console.error("Error checking profile:", err)
-            setError("Error verificando permisos de usuario")
+            if (err instanceof AuthApiError) {
+              if (err.status === 400) {
+                setError("Email o contraseña incorrectos")
+              } else {
+                setError("Error verificando permisos de usuario")
+              }
+            } else {
+              setError("Error verificando permisos de usuario")
+            }
             await supabase.auth.signOut()
           } finally {
             setIsLoading(false)
@@ -52,12 +60,6 @@ export default function Login() {
         
         if (event === "SIGNED_OUT") {
           setError("")
-          setIsLoading(false)
-        }
-
-        // Manejar errores específicos de autenticación
-        if (event === "USER_UPDATED" && !session) {
-          setError("Error de autenticación. Por favor, intenta de nuevo.")
           setIsLoading(false)
         }
       }

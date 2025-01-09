@@ -25,20 +25,20 @@ export function LogoSite({ className, withLink = true }: LogoSiteProps) {
   })
 
   const LogoContent = () => (
-    <div className="relative">
-      {/* Placeholder blur */}
+    <>
+      {/* Placeholder mientras carga */}
       <div 
-        className={`absolute inset-0 bg-gray-200 animate-pulse ${imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ${className || "h-12 w-auto"}`}
+        className={`${!imageLoaded ? 'block' : 'hidden'} bg-gray-100 animate-pulse ${className || "h-12 w-32"}`}
       />
       
       <img 
         src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className={`${className || "h-12 w-auto"} drop-shadow-sm ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+        className={`${className || "h-12 w-auto"} ${imageLoaded ? 'block' : 'hidden'}`}
         onLoad={() => setImageLoaded(true)}
-        loading="eager" // El logo es crítico, lo cargamos inmediatamente
+        loading="eager"
       />
-    </div>
+    </>
   )
 
   if (!withLink) {
