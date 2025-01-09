@@ -7,22 +7,16 @@ interface LogoSiteProps {
 }
 
 export function LogoSite({ className }: LogoSiteProps) {
-  const defaultLogo = "logo.png"; // Removido el slash inicial
-
   const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
         .select('logo_url')
-        .maybeSingle()
+        .single()
       
-      if (error) {
-        console.error('Error fetching logo:', error)
-        return { logo_url: defaultLogo }
-      }
-      
-      return data || { logo_url: defaultLogo }
+      if (error) throw error
+      return data
     }
   })
 
@@ -32,14 +26,9 @@ export function LogoSite({ className }: LogoSiteProps) {
       className="flex items-center transition-transform hover:scale-105"
     >
       <img 
-        src={settings?.logo_url || defaultLogo}
+        src={settings?.logo_url || "/logo.png"} 
         alt="Euro Connect" 
-        className={className || "h-12 w-auto"}
-        onError={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.src = defaultLogo;
-          console.log('Logo fallback to default:', target.src);
-        }}
+        className={className || "h-12 w-auto drop-shadow-sm"} 
       />
     </Link>
   )
