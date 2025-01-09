@@ -16,15 +16,23 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { page = 1, limit = 8 } = await req.json();
 
+    // Resend requiere POST para listar emails
     const res = await fetch("https://api.resend.com/emails", {
-      method: "GET",
+      method: "POST",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json"
       },
+      body: JSON.stringify({
+        page: page,
+        limit: limit
+      })
     });
 
     if (!res.ok) {
-      throw new Error(`Error from Resend: ${await res.text()}`);
+      const errorText = await res.text();
+      console.error("Error from Resend:", errorText);
+      throw new Error(`Error from Resend: ${errorText}`);
     }
 
     const data = await res.json();
