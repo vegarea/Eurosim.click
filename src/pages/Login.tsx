@@ -1,15 +1,86 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Auth } from "@supabase/auth-ui-react"
 import { ThemeSupa } from "@supabase/auth-ui-shared"
 import { supabase } from "@/integrations/supabase/client"
 import { AuthError, AuthApiError } from "@supabase/supabase-js"
 import { AuthContainer } from "@/components/auth/AuthContainer"
 import { AuthError as AuthErrorComponent } from "@/components/auth/AuthError"
-import { useAuthRedirect } from "@/hooks/useAuthRedirect"
+import { useNavigate } from "react-router-dom"
 
 export default function Login() {
   const [error, setError] = useState<string>("")
-  useAuthRedirect()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    console.log("🔄 Configurando listener de autenticación en Login")
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log("🔔 Evento de autenticación:", event, {
+          sessionId: session?.user?.id,
+          email: session?.user?.email,
+          browser: navigator.userAgent
+        })
+        
+        if (event === "SIGNED_IN" && session?.user?.id) {
+          console.log("✅ Usuario autenticado, verificando permisos")
+          
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session.user.id)
+              .single()
+
+            if (profileError) {
+              console.error("❌ Error al obtener perfil:", profileError)
+              throw profileError
+            }
+
+            console.log("👤 Perfil de usuario:", profile)
+
+            if (profile?.role === 'admin') {
+              console.log("✅ Usuario admin verificado, redirigiendo a /admin")
+              // Usamos replace para evitar que el usuario pueda volver atrás
+              navigate('/admin', { replace: true })
+            } else {
+              console.error("❌ Usuario no tiene permisos de administrador")
+              throw new Error("No tienes permisos de administrador")
+            }
+          } catch (error) {
+            console.error("❌ Error en verificación de permisos:", error)
+            await supabase.auth.signOut()
+            setError("No tienes permisos para acceder. Por favor, contacta al administrador.")
+          }
+        }
+      }
+    )
+
+    // Verificar si ya hay una sesión activa al cargar
+    const checkExistingSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        console.log("🔄 Sesión existente encontrada, verificando permisos")
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+
+        if (profile?.role === 'admin') {
+          console.log("✅ Redirigiendo usuario existente a /admin")
+          navigate('/admin', { replace: true })
+        }
+      }
+    }
+
+    checkExistingSession()
+
+    return () => {
+      console.log("🧹 Limpiando listener de autenticación")
+      subscription.unsubscribe()
+    }
+  }, [navigate])
 
   const handleAuthError = (error: AuthError) => {
     console.error("❌ Error de autenticación:", error)
@@ -101,7 +172,6 @@ export default function Login() {
             }
           }
         }}
-        onError={handleAuthError}
       />
     </AuthContainer>
   )
