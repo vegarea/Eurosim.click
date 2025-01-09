@@ -27,6 +27,12 @@ import "flag-icons/css/flag-icons.min.css"
 
 const queryClient = new QueryClient()
 
+interface TrackingScripts {
+  google_analytics?: string;
+  facebook_pixel?: string;
+  other_scripts?: string;
+}
+
 const AppContent = () => {
   const { data: siteSettings } = useQuery({
     queryKey: ['site-settings'],
@@ -41,7 +47,7 @@ const AppContent = () => {
     }
   })
 
-  const trackingScripts = siteSettings?.tracking_scripts || {}
+  const trackingScripts = (siteSettings?.tracking_scripts || {}) as TrackingScripts
 
   return (
     <>
