@@ -24,7 +24,7 @@ export function StatsCards({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatCurrency(totalSales)}
+            {formatCurrency(totalSales / 100)}
           </div>
           <p className="text-xs text-muted-foreground">
             Últimos 30 días

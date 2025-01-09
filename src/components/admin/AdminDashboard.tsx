@@ -29,9 +29,9 @@ export function AdminDashboard() {
     }
   })
 
-  // Calculate total sales (dividiendo por 100 para convertir de centavos a euros)
+  // Calculate total sales (mantener en centavos para precisión)
   const totalSales = ordersData?.reduce((acc, order) => 
-    order.payment_status === 'completed' ? acc + (order.total_amount / 100) : acc, 0
+    order.payment_status === 'completed' ? acc + order.total_amount : acc, 0
   ) || 0
 
   // Get active orders (processing or shipped)
@@ -57,7 +57,7 @@ export function AdminDashboard() {
     new Date(customer.created_at || '') > thirtyDaysAgo
   ) || []
 
-  // Preparar datos para el gráfico (dividiendo por 100 para convertir de centavos a euros)
+  // Preparar datos para el gráfico (mantener en centavos para precisión)
   const prepareSalesData = () => {
     const last30Days = Array.from({ length: 30 }, (_, i) => {
       const date = subDays(new Date(), i)
@@ -67,7 +67,7 @@ export function AdminDashboard() {
                order.payment_status === 'completed'
       }) || []
       
-      const dailyTotal = dayOrders.reduce((sum, order) => sum + (order.total_amount / 100), 0)
+      const dailyTotal = dayOrders.reduce((sum, order) => sum + order.total_amount, 0)
 
       return {
         date: format(date, 'dd MMM', { locale: es }),
