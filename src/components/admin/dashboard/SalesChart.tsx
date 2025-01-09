@@ -2,66 +2,52 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { formatCurrency } from "@/utils/currency"
 
+interface SalesData {
+  date: string
+  ventas: number
+}
+
 interface SalesChartProps {
-  data: Array<{
-    date: string
-    ventas: number
-  }>
+  data: SalesData[]
 }
 
 export function SalesChart({ data }: SalesChartProps) {
   return (
-    <Card className="col-span-4 hover:shadow-lg transition-shadow bg-gradient-to-br from-brand-50/50 to-white">
+    <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Resumen de Ventas</CardTitle>
+        <CardTitle>Ventas</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-[240px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data}>
-              <defs>
-                <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#E02653" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#E02653" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <XAxis 
-                dataKey="date" 
-                tick={{ fill: '#666', fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis 
-                tick={{ fill: '#666', fontSize: 12 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => formatCurrency(value)}
-              />
-              <Tooltip 
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="bg-white p-2 shadow-lg rounded-lg border">
-                        <p className="text-sm font-medium">{payload[0].payload.date}</p>
-                        <p className="text-sm text-primary">
-                          {formatCurrency(payload[0].value)}
-                        </p>
-                      </div>
-                    )
-                  }
-                  return null
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="ventas"
-                stroke="#E02653"
-                strokeWidth={2}
-                fill="url(#salesGradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+      <CardContent className="pl-2">
+        <ResponsiveContainer width="100%" height={350}>
+          <AreaChart data={data}>
+            <XAxis
+              dataKey="date"
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value: number) => formatCurrency(value)}
+            />
+            <Tooltip 
+              formatter={(value: number) => [formatCurrency(value), "Ventas"]}
+              labelFormatter={(label) => `Fecha: ${label}`}
+            />
+            <Area
+              type="monotone"
+              dataKey="ventas"
+              stroke="#adfa1d"
+              fill="#adfa1d"
+              fillOpacity={0.2}
+              strokeWidth={2}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   )
