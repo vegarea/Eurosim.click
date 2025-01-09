@@ -5,7 +5,6 @@ import { es } from "date-fns/locale"
 import { RecentActivity } from "./dashboard/RecentActivity"
 import { StatsCards } from "./dashboard/StatsCards"
 import { SalesChart } from "./dashboard/SalesChart"
-import { EmailLogsSection } from "./dashboard/EmailLogsSection"
 
 export function AdminDashboard() {
   // Fetch orders data
@@ -107,10 +106,6 @@ export function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <SalesChart data={salesData} />
         <RecentActivity />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <EmailLogsSection />
       </div>
     </div>
   )
