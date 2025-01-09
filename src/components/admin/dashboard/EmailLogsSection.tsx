@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2 } from "lucide-react"
+import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2, ExternalLink } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { 
@@ -15,6 +15,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
 
 const StatusIcon = ({ status }: { status: string }) => {
   switch (status.toLowerCase()) {
@@ -22,10 +23,10 @@ const StatusIcon = ({ status }: { status: string }) => {
       return <CheckCircle2 className="h-4 w-4 text-green-500" />
     case "failed":
       return <XCircle className="h-4 w-4 text-red-500" />
-    case "queued":
-      return <Clock className="h-4 w-4 text-yellow-500" />
     case "sending":
       return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+    case "bounced":
+      return <AlertCircle className="h-4 w-4 text-orange-500" />
     default:
       return <AlertCircle className="h-4 w-4 text-orange-500" />
   }
@@ -35,8 +36,8 @@ const StatusBadge = ({ status }: { status: string }) => {
   const styles = {
     sent: "bg-green-100 text-green-800",
     failed: "bg-red-100 text-red-800",
-    queued: "bg-yellow-100 text-yellow-800",
     sending: "bg-blue-100 text-blue-800",
+    bounced: "bg-orange-100 text-orange-800",
     default: "bg-orange-100 text-orange-800",
   }
 
@@ -119,6 +120,23 @@ export function EmailLogsSection() {
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{log.recipient}</p>
                     <StatusBadge status={log.status} />
+                    {log.metadata?.resend_id && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2"
+                        asChild
+                      >
+                        <a
+                          href={`https://resend.com/emails/${log.metadata.resend_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Ver en Resend <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">{log.subject}</p>
                   {log.error && (
@@ -138,28 +156,37 @@ export function EmailLogsSection() {
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                  />
+                  >
+                    <PaginationPrevious />
+                  </Button>
                 </PaginationItem>
                 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <PaginationItem key={page}>
-                    <PaginationLink
+                    <Button
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
                       onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
                     >
                       {page}
-                    </PaginationLink>
+                    </Button>
                   </PaginationItem>
                 ))}
                 
                 <PaginationItem>
-                  <PaginationNext 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                  />
+                  >
+                    <PaginationNext />
+                  </Button>
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
