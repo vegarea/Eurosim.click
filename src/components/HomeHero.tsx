@@ -7,14 +7,23 @@ import {
 } from "@/components/ui/dialog";
 import { SimQuiz } from "@/components/SimQuiz";
 import { useSiteImages } from "@/hooks/useSiteImages";
+import { useState, useEffect } from "react";
 
 export function HomeHero() {
   const { data: siteImages } = useSiteImages();
+  const [imageLoaded, setImageLoaded] = useState(false);
   const heroImage = siteImages?.find(img => img.location === "Hero Principal")?.currentUrl;
+
+  // Precarga la imagen del hero
+  useEffect(() => {
+    if (heroImage) {
+      const img = new Image();
+      img.src = heroImage;
+    }
+  }, [heroImage]);
 
   return (
     <div className="relative min-h-[calc(100svh-5rem)] overflow-hidden">
-      {/* Burbujas de gradiente animadas */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 -left-48 w-96 h-96 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
         <div className="absolute top-1/3 -right-48 w-96 h-96 bg-gradient-to-l from-primary/20 to-secondary/20 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -29,7 +38,6 @@ export function HomeHero() {
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 sm:py-6 lg:py-8">
         <div className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100svh-8rem)]">
-          {/* Columna de contenido */}
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6">
             <div className="inline-flex items-center rounded-full border px-4 py-1.5 text-sm font-medium bg-white/50 backdrop-blur-sm self-start">
               <span className="relative flex h-2 w-2 mr-2">
@@ -85,21 +93,29 @@ export function HomeHero() {
           {/* Columna de imagen */}
           <div className="relative order-first lg:order-last">
             <div className="relative max-w-[280px] sm:max-w-[400px] mx-auto lg:max-w-none">
-              {/* Efectos de blob animados */}
               <div className="absolute -top-3 sm:-top-4 -left-3 sm:-left-4 w-52 sm:w-72 h-52 sm:h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -top-3 sm:-top-4 -right-3 sm:-right-4 w-52 sm:w-72 h-52 sm:h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
               <div className="absolute -bottom-6 sm:-bottom-8 left-14 sm:left-20 w-52 sm:w-72 h-52 sm:h-72 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
               
-              {/* Imagen principal con marco decorativo */}
+              {/* Imagen principal con marco decorativo y placeholder */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-[2rem] sm:rounded-[2.5rem] transform rotate-6"></div>
                 <div className="relative bg-white p-2 sm:p-3 rounded-[1.75rem] sm:rounded-[2rem] shadow-xl transform -rotate-3 transition-transform hover:rotate-0 duration-500 border-3 sm:border-4 border-white">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-[1.75rem] sm:rounded-[2rem] opacity-50"></div>
+                  
+                  {/* Placeholder blur mientras carga */}
+                  <div 
+                    className={`absolute inset-0 bg-gray-200 animate-pulse rounded-[1.5rem] sm:rounded-[1.75rem] ${imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+                  />
+                  
                   <img
                     src={heroImage}
                     alt="Persona feliz usando su teléfono"
-                    className="w-full aspect-[4/3] object-cover rounded-[1.5rem] sm:rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500"
+                    className={`w-full aspect-[4/3] object-cover rounded-[1.5rem] sm:rounded-[1.75rem] transform hover:scale-[1.02] transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+                    onLoad={() => setImageLoaded(true)}
+                    loading="eager" // La imagen del hero es crítica, la cargamos inmediatamente
                   />
+                  
                   <div className="absolute -bottom-3 sm:-bottom-4 -right-3 sm:-right-4 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-lg transform rotate-3">
                     <p className="text-xs sm:text-sm font-medium text-gray-900">¡Más de 10,000 viajeros conectados! 🌍</p>
                   </div>

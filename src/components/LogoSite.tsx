@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { Link } from "react-router-dom"
+import { useState } from "react"
 
 interface LogoSiteProps {
   className?: string;
 }
 
 export function LogoSite({ className }: LogoSiteProps) {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  
   const { data: settings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
@@ -25,11 +28,20 @@ export function LogoSite({ className }: LogoSiteProps) {
       to="/" 
       className="flex items-center transition-transform hover:scale-105"
     >
-      <img 
-        src={settings?.logo_url || "/logo.png"} 
-        alt="Euro Connect" 
-        className={className || "h-12 w-auto drop-shadow-sm"} 
-      />
+      <div className="relative">
+        {/* Placeholder blur */}
+        <div 
+          className={`absolute inset-0 bg-gray-200 animate-pulse ${imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 ${className || "h-12 w-auto"}`}
+        />
+        
+        <img 
+          src={settings?.logo_url || "/logo.png"} 
+          alt="Euro Connect" 
+          className={`${className || "h-12 w-auto"} drop-shadow-sm ${imageLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}
+          onLoad={() => setImageLoaded(true)}
+          loading="eager" // El logo es crítico, lo cargamos inmediatamente
+        />
+      </div>
     </Link>
   )
 }
