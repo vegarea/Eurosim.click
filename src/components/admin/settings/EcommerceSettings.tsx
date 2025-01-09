@@ -7,12 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DollarSign, Save } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { formatCurrency } from "@/utils/currency"
+import { Switch } from "@/components/ui/switch"
 
 export function EcommerceSettings() {
   const { toast } = useToast()
   const [currency] = useState("MXN")
   const [taxRate, setTaxRate] = useState("16")
   const [isLoading, setIsLoading] = useState(false)
+  const [isSandboxMode, setIsSandboxMode] = useState(true)
 
   const handleSave = () => {
     setIsLoading(true)
@@ -73,6 +75,29 @@ export function EcommerceSettings() {
           <p className="text-sm text-muted-foreground">
             Este porcentaje se aplicará a todas las ventas
           </p>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="sandbox-mode">Modo Sandbox de Stripe</Label>
+            <Switch
+              id="sandbox-mode"
+              checked={isSandboxMode}
+              onCheckedChange={setIsSandboxMode}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {isSandboxMode 
+              ? "Usando claves de prueba (sandbox) - Ideal para desarrollo y pruebas" 
+              : "Usando claves de producción - ¡Cuidado! Se procesarán pagos reales"}
+          </p>
+          {!isSandboxMode && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-2">
+              <p className="text-sm text-yellow-800">
+                <strong>¡Atención!</strong> Has activado el modo producción. Todos los pagos serán procesados como transacciones reales.
+              </p>
+            </div>
+          )}
         </div>
 
         <Button 
