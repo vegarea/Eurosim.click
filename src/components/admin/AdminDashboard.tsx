@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, DollarSign, Users, Package } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { format, subDays } from "date-fns"
+import { es } from "date-fns/locale"
 
 export function AdminDashboard() {
   // Fetch orders data
@@ -57,6 +60,29 @@ export function AdminDashboard() {
   const recentCustomers = customersData?.filter(customer => 
     new Date(customer.created_at || '') > thirtyDaysAgo
   ) || []
+
+  // Preparar datos para el gráfico
+  const prepareSalesData = () => {
+    const last30Days = Array.from({ length: 30 }, (_, i) => {
+      const date = subDays(new Date(), i)
+      const dayOrders = ordersData?.filter(order => {
+        const orderDate = new Date(order.created_at || '')
+        return format(orderDate, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd') &&
+               order.payment_status === 'completed'
+      }) || []
+      
+      const dailyTotal = dayOrders.reduce((sum, order) => sum + (order.total_amount || 0), 0) / 100
+
+      return {
+        date: format(date, 'dd MMM', { locale: es }),
+        ventas: dailyTotal
+      }
+    }).reverse()
+
+    return last30Days
+  }
+
+  const salesData = prepareSalesData()
 
   return (
     <div className="space-y-6">
@@ -135,9 +161,52 @@ export function AdminDashboard() {
           <CardHeader>
             <CardTitle>Resumen de Ventas</CardTitle>
           </CardHeader>
-          <CardContent className="pl-2">
-            <div className="h-[240px] flex items-center justify-center text-muted-foreground">
-              Aquí irá el gráfico de ventas
+          <CardContent>
+            <div className="h-[240px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={salesData}>
+                  <defs>
+                    <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#E02653" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#E02653" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fill: '#666', fontSize: 12 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#666', fontSize: 12 }}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `€${value}`}
+                  />
+                  <Tooltip 
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white p-2 shadow-lg rounded-lg border">
+                            <p className="text-sm font-medium">{payload[0].payload.date}</p>
+                            <p className="text-sm text-primary">
+                              €{payload[0].value.toFixed(2)}
+                            </p>
+                          </div>
+                        )
+                      }
+                      return null
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="ventas"
+                    stroke="#E02653"
+                    strokeWidth={2}
+                    fill="url(#salesGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
