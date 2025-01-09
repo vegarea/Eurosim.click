@@ -10,7 +10,7 @@ import { formatCurrency } from "@/utils/currency"
 
 export function EcommerceSettings() {
   const { toast } = useToast()
-  const [currency, setCurrency] = useState("MXN")
+  const [currency] = useState("MXN")
   const [taxRate, setTaxRate] = useState("16")
   const [isLoading, setIsLoading] = useState(false)
 
@@ -28,7 +28,7 @@ export function EcommerceSettings() {
 
   // Ejemplo de precio formateado
   const examplePrice = 1234.56
-  const formattedPrice = formatCurrency(examplePrice, currency)
+  const formattedPrice = formatCurrency(examplePrice)
 
   return (
     <Card>
@@ -46,7 +46,6 @@ export function EcommerceSettings() {
           <Label htmlFor="currency">Moneda principal</Label>
           <Select 
             value={currency} 
-            onValueChange={setCurrency}
             disabled={true} // Bloqueamos temporalmente el cambio de moneda
           >
             <SelectTrigger>
