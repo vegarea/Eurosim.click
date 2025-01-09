@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -8,6 +8,7 @@ import { DollarSign, Save } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { formatCurrency } from "@/utils/currency"
 import { Switch } from "@/components/ui/switch"
+import { supabase } from "@/integrations/supabase/client"
 
 export function EcommerceSettings() {
   const { toast } = useToast()
@@ -15,17 +16,64 @@ export function EcommerceSettings() {
   const [taxRate, setTaxRate] = useState("16")
   const [isLoading, setIsLoading] = useState(false)
   const [isSandboxMode, setIsSandboxMode] = useState(true)
+  const [settingsId, setSettingsId] = useState<string | null>(null)
 
-  const handleSave = () => {
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('id, stripe_sandbox_mode')
+          .single()
+
+        if (error) throw error
+
+        if (data) {
+          setSettingsId(data.id)
+          setIsSandboxMode(data.stripe_sandbox_mode)
+        }
+      } catch (error) {
+        console.error('Error al cargar configuración:', error)
+        toast({
+          title: "Error",
+          description: "No se pudo cargar la configuración",
+          variant: "destructive",
+        })
+      }
+    }
+
+    loadSettings()
+  }, [toast])
+
+  const handleSave = async () => {
     setIsLoading(true)
-    // Simulamos una llamada a la API
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      if (!settingsId) throw new Error('No se encontró ID de configuración')
+
+      const { error } = await supabase
+        .from('site_settings')
+        .update({ 
+          stripe_sandbox_mode: isSandboxMode,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', settingsId)
+
+      if (error) throw error
+
       toast({
         title: "Configuración guardada",
         description: "Los cambios en configuración monetaria se han guardado correctamente.",
       })
-    }, 1000)
+    } catch (error) {
+      console.error('Error al guardar:', error)
+      toast({
+        title: "Error",
+        description: "No se pudieron guardar los cambios",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Ejemplo de precio formateado
@@ -48,7 +96,7 @@ export function EcommerceSettings() {
           <Label htmlFor="currency">Moneda principal</Label>
           <Select 
             value={currency} 
-            disabled={true} // Bloqueamos temporalmente el cambio de moneda
+            disabled={true}
           >
             <SelectTrigger>
               <SelectValue placeholder="Selecciona una moneda" />
