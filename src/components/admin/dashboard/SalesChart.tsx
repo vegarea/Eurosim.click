@@ -37,10 +37,10 @@ export function SalesChart({ data }: SalesChartProps) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => formatCurrency(value / 100)}
+              tickFormatter={(value) => formatCurrency(value)}
             />
             <Tooltip
-              formatter={(value: number) => [formatCurrency(value / 100), 'Ventas']}
+              formatter={(value: number) => [formatCurrency(value), 'Ventas']}
               labelFormatter={(label) => `Fecha: ${label}`}
             />
             <Area
