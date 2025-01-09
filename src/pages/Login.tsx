@@ -30,16 +30,21 @@ export default function Login() {
               .eq('id', session?.user.id)
               .single()
 
-            if (profileError) throw profileError
+            if (profileError) {
+              console.error("Error fetching profile:", profileError)
+              throw profileError
+            }
 
             if (profile?.role === 'admin') {
               navigate(from, { replace: true })
             } else {
-              navigate("/", { replace: true })
+              setError("No tienes permisos de administrador")
+              await supabase.auth.signOut()
             }
           } catch (err) {
             console.error("Error checking profile:", err)
             setError("Error verificando permisos de usuario")
+            await supabase.auth.signOut()
           } finally {
             setIsLoading(false)
           }
@@ -60,24 +65,6 @@ export default function Login() {
 
     return () => subscription.unsubscribe()
   }, [navigate, from])
-
-  const handleAuthError = (error: AuthError) => {
-    if (error instanceof AuthApiError) {
-      switch (error.status) {
-        case 400:
-          setError("Credenciales inválidas. Por favor verifica tu email y contraseña.")
-          break
-        case 422:
-          setError("El formato del email o contraseña no es válido.")
-          break
-        default:
-          setError(error.message)
-      }
-    } else {
-      setError("Error de autenticación. Por favor intenta de nuevo.")
-    }
-    setIsLoading(false)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white flex items-center justify-center p-4">
