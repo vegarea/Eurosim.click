@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -17,12 +18,12 @@ const handler = async (req: Request): Promise<Response> => {
     const { page = 1, limit = 8 } = await req.json();
     console.log("📧 Fetching Resend logs with params:", { page, limit });
 
+    // Resend API requires GET method
     const res = await fetch("https://api.resend.com/emails", {
-      method: "GET",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json"
-      }
+      },
     });
 
     if (!res.ok) {
@@ -48,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
         status: 200,
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error fetching Resend logs:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
