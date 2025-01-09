@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { formatCurrency } from "@/utils/currency"
 
 interface SalesChartProps {
   data: {
@@ -36,10 +37,10 @@ export function SalesChart({ data }: SalesChartProps) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `$${value.toLocaleString('es-MX')}`}
+              tickFormatter={(value) => formatCurrency(value / 100)}
             />
             <Tooltip
-              formatter={(value: number) => [`$${value.toLocaleString('es-MX')} MXN`, 'Ventas']}
+              formatter={(value: number) => [formatCurrency(value / 100), 'Ventas']}
               labelFormatter={(label) => `Fecha: ${label}`}
             />
             <Area
