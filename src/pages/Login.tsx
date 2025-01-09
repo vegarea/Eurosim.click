@@ -6,38 +6,54 @@ import { supabase } from "@/integrations/supabase/client"
 import { LogoSite } from "@/components/LogoSite"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useState } from "react"
-import { AuthError } from "@supabase/supabase-js"
+import { AuthError, AuthApiError } from "@supabase/supabase-js"
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const from = location.state?.from?.pathname || "/"
   const [error, setError] = useState<string>("")
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth event:", event)
+        
         if (event === "SIGNED_IN") {
-          // Verificar si el usuario es admin
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session?.user.id)
-            .single()
+          setIsLoading(true)
+          try {
+            // Verificar si el usuario es admin
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', session?.user.id)
+              .single()
 
-          if (profile?.role === 'admin') {
-            navigate(from, { replace: true })
-          } else {
-            navigate("/", { replace: true })
+            if (profileError) throw profileError
+
+            if (profile?.role === 'admin') {
+              navigate(from, { replace: true })
+            } else {
+              navigate("/", { replace: true })
+            }
+          } catch (err) {
+            console.error("Error checking profile:", err)
+            setError("Error verificando permisos de usuario")
+          } finally {
+            setIsLoading(false)
           }
         }
-        // Limpiar error cuando el usuario se desloguea
+        
         if (event === "SIGNED_OUT") {
           setError("")
+          setIsLoading(false)
         }
-        // Manejar errores de autenticación
+
+        // Manejar errores específicos de autenticación
         if (event === "USER_UPDATED" && !session) {
           setError("Error de autenticación. Por favor, intenta de nuevo.")
+          setIsLoading(false)
         }
       }
     )
@@ -45,12 +61,30 @@ export default function Login() {
     return () => subscription.unsubscribe()
   }, [navigate, from])
 
+  const handleAuthError = (error: AuthError) => {
+    if (error instanceof AuthApiError) {
+      switch (error.status) {
+        case 400:
+          setError("Credenciales inválidas. Por favor verifica tu email y contraseña.")
+          break
+        case 422:
+          setError("El formato del email o contraseña no es válido.")
+          break
+        default:
+          setError(error.message)
+      }
+    } else {
+      setError("Error de autenticación. Por favor intenta de nuevo.")
+    }
+    setIsLoading(false)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg border border-brand-100 p-8">
         <div className="mb-8 text-center">
           <div className="flex justify-center mb-6">
-            <LogoSite className="h-12" />
+            <LogoSite className="h-12" withLink={false} />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Panel de Administración</h1>
           <p className="text-gray-500">Inicia sesión para continuar</p>
