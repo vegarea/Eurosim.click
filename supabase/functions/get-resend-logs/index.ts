@@ -15,27 +15,24 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const { page = 1, limit = 8 } = await req.json();
+    console.log("📧 Fetching Resend logs with params:", { page, limit });
 
-    // Resend requiere POST para listar emails
     const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
+      method: "GET",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        page: page,
-        limit: limit
-      })
+      }
     });
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error("Error from Resend:", errorText);
+      console.error("❌ Error from Resend:", errorText);
       throw new Error(`Error from Resend: ${errorText}`);
     }
 
     const data = await res.json();
+    console.log(`✅ Retrieved ${data.data.length} emails from Resend`);
     
     // Calcular el inicio y fin para la paginación
     const start = (page - 1) * limit;
@@ -52,7 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error) {
-    console.error("Error fetching Resend logs:", error);
+    console.error("❌ Error fetching Resend logs:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
