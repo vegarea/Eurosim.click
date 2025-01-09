@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/database/products";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { ActivationDateInfo } from "@/components/esim/ActivationDateInfo";
+import { SEO } from "@/components/SEO";
 
 const Sims = () => {
   const isMobile = useIsMobile();
@@ -37,6 +38,11 @@ const Sims = () => {
 
   return (
     <MainLayout>
+      <SEO 
+        title="SIM Card para Europa | Entrega a domicilio"
+        description="Recibe tu SIM Card para Europa en la comodidad de tu casa. Cobertura garantizada en toda la UE. Envío gratis a toda la República Mexicana."
+        keywords="sim card europa, chip europa, internet europa, roaming europa"
+      />
       <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
         <Header />
         <SimHero />

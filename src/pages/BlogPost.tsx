@@ -4,6 +4,7 @@ import { MainLayout } from "@/components/layouts/MainLayout"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar, Eye } from "lucide-react"
 import { supabase } from "@/integrations/supabase/client"
+import { SEO } from "@/components/SEO"
 
 export default function BlogPost() {
   const { slug } = useParams()
@@ -39,8 +40,16 @@ export default function BlogPost() {
     },
   })
 
+  const featuredImage = post?.blog_post_images?.find(img => img.is_featured)?.url
+
   return (
     <MainLayout>
+      <SEO 
+        title={post?.seo_title || post?.title || 'Blog Post'}
+        description={post?.seo_description || post?.excerpt || ''}
+        image={featuredImage || '/og-image.png'}
+        type="article"
+      />
       <article className="container mx-auto py-12 px-4 max-w-4xl">
         {isLoading ? (
           <div className="space-y-4">
@@ -66,9 +75,9 @@ export default function BlogPost() {
               </span>
             </div>
 
-            {post.blog_post_images?.find(img => img.is_featured)?.url && (
+            {featuredImage && (
               <img
-                src={post.blog_post_images.find(img => img.is_featured)?.url}
+                src={featuredImage}
                 alt={post.title}
                 className="w-full h-[400px] object-cover rounded-lg mb-8"
               />

@@ -13,6 +13,7 @@ import { MainLayout } from "@/components/layouts/MainLayout"
 import { ESimHero } from "@/components/ESimHero"
 import { ESimFAQ } from "@/components/esim/ESimFAQ"
 import { ActivationDateInfo } from "@/components/esim/ActivationDateInfo"
+import { SEO } from "@/components/SEO"
 
 export default function ESims() {
   const [selectedPlan, setSelectedPlan] = useState<Product | null>(null)
@@ -44,6 +45,11 @@ export default function ESims() {
 
   return (
     <MainLayout>
+      <SEO 
+        title="eSIM para Europa | Conexión instantánea"
+        description="Activa tu eSIM al instante y disfruta de internet de alta velocidad en toda Europa. Compatible con iPhone y Android. Sin necesidad de SIM física."
+        keywords="esim europa, esim viaje, internet europa, datos moviles europa"
+      />
       <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
         <Header />
         
