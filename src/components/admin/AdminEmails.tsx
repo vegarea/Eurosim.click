@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { EmailTemplateDialog } from "./emails/EmailTemplateDialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EmailLogs } from "./emails/EmailLogs"
 import { ApiKeySetup } from "./emails/ApiKeySetup"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { filterTemplatesByType } from "./emails/utils/filterTemplates"
@@ -79,7 +78,6 @@ export function AdminEmails() {
           <TabsTrigger value="all">Todos los Emails</TabsTrigger>
           <TabsTrigger value="physical">SIM Física</TabsTrigger>
           <TabsTrigger value="esim">E-SIM</TabsTrigger>
-          <TabsTrigger value="logs">Logs de Envío</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all">
@@ -101,10 +99,6 @@ export function AdminEmails() {
             templates={filterTemplatesByType(templates, "esim")}
             onEdit={handleEditTemplate}
           />
-        </TabsContent>
-
-        <TabsContent value="logs">
-          <EmailLogs />
         </TabsContent>
       </Tabs>
 
