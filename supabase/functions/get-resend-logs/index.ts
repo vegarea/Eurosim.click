@@ -18,7 +18,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("📧 Fetching Resend logs with params:", { page, limit });
 
     const res = await fetch("https://api.resend.com/emails", {
-      method: "POST", // Resend requiere POST para listar emails
+      method: "GET", // Resend usa GET para listar emails
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json"
