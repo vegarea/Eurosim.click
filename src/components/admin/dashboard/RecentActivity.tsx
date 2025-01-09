@@ -4,6 +4,7 @@ import { es } from "date-fns/locale"
 import { ShoppingCart, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { supabase } from "@/integrations/supabase/client"
+import { formatCurrency } from "@/utils/currency"
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -73,7 +74,7 @@ export function RecentActivity() {
                     {order.customers?.name || 'Cliente anónimo'}
                   </p>
                   <span className="text-xs font-medium text-primary">
-                    €{(order.total_amount / 100).toFixed(2)}
+                    {formatCurrency(order.total_amount)}
                   </span>
                 </div>
               </div>

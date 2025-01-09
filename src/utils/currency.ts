@@ -1,11 +1,11 @@
-export const formatCurrency = (amount: number, currency: string = 'MXN') => {
+export const formatCurrency = (amount: number) => {
   // Dividimos por 100 ya que los precios están almacenados en centavos
   const amountInCurrency = amount / 100;
   
   return new Intl.NumberFormat('es-MX', {
     style: 'currency',
     currency: 'MXN',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(amountInCurrency);
 };
