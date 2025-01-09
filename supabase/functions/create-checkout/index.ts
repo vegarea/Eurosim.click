@@ -58,7 +58,7 @@ serve(async (req) => {
       }
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripe = new Stripe(Deno.env.get('STRIPE_LIVE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
@@ -70,8 +70,8 @@ serve(async (req) => {
       customer_birth_date: String(customerInfo.birth_date),
       customer_gender: String(customerInfo.gender),
       product_id: String(cartItems[0].product_id),
-      product_type: String(product.type), // Añadimos el tipo de producto
-      product_title: String(product.title), // Añadimos el título del producto
+      product_type: String(product.type),
+      product_title: String(product.title),
       activation_date: String(orderInfo.activation_date),
       total_amount: String(cartItems[0].total_price),
       shipping_cost: String(shippingCost)
