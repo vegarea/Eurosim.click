@@ -13,23 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const { cartItems, customerInfo, orderInfo, isSandboxMode } = await req.json()
+    const { cartItems, customerInfo, orderInfo } = await req.json()
     
     console.log('Received checkout request:', {
       cartItems,
       customerInfo,
-      orderInfo,
-      isSandboxMode
+      orderInfo
     })
-
-    // Seleccionar la clave de Stripe según el modo
-    const stripeKey = isSandboxMode 
-      ? Deno.env.get('STRIPE_SECRET_KEY')
-      : Deno.env.get('STRIPE_LIVE_SECRET_KEY')
-
-    if (!stripeKey) {
-      throw new Error('Stripe key not configured')
-    }
 
     // Crear cliente de Supabase
     const supabaseClient = createClient(
@@ -68,7 +58,7 @@ serve(async (req) => {
       }
     }
 
-    const stripe = new Stripe(stripeKey, {
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 

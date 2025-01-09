@@ -724,7 +724,6 @@ export type Database = {
           id: string
           instagram_url: string | null
           logo_url: string | null
-          stripe_sandbox_mode: boolean | null
           tiktok_url: string | null
           tracking_scripts: Json | null
           updated_at: string | null
@@ -739,7 +738,6 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           logo_url?: string | null
-          stripe_sandbox_mode?: boolean | null
           tiktok_url?: string | null
           tracking_scripts?: Json | null
           updated_at?: string | null
@@ -754,7 +752,6 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           logo_url?: string | null
-          stripe_sandbox_mode?: boolean | null
           tiktok_url?: string | null
           tracking_scripts?: Json | null
           updated_at?: string | null

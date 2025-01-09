@@ -33,8 +33,8 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Búsqueda mejorada de la orden
-        const { data: orderData, error } = await supabase
+        // Primero intentamos con la ruta JSONB completa
+        let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
             *,
@@ -46,8 +46,30 @@ export default function ThankYou() {
               metadata
             )
           `)
-          .or(`metadata->stripe_session_id.eq.${sessionId},and(metadata->>stripe_session_id.eq.${sessionId})`)
+          .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
+
+        // Si no encontramos nada, intentamos con la ruta anidada
+        if (!orderData && !error) {
+          console.log('Intentando búsqueda alternativa...')
+          const { data: altData, error: altError } = await supabase
+            .from('orders')
+            .select(`
+              *,
+              customer:customers(name, email, phone),
+              items:order_items(
+                quantity,
+                unit_price,
+                total_price,
+                metadata
+              )
+            `)
+            .eq('metadata->stripe_session_id', sessionId)
+            .maybeSingle()
+
+          if (altError) throw altError
+          orderData = altData
+        }
 
         if (error) {
           console.error('Error al buscar la orden:', error)
