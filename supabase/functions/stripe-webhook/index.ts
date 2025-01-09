@@ -112,28 +112,70 @@ serve(async (req) => {
         const emailHtml = getOrderConfirmationEmail(order, product, customer, formattedAmount)
 
         // Enviar email de confirmación usando Resend
-        try {
-          const emailResponse = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
-            },
-            body: JSON.stringify({
-              from: 'EuroSim <noreply@eurosim.click>',
-              to: [customer.email],
-              subject: '¡Gracias por tu compra en EuroSim!',
-              html: emailHtml,
-            }),
-          })
+        const emailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+          },
+          body: JSON.stringify({
+            from: 'EuroSim <noreply@eurosim.click>',
+            to: [customer.email],
+            subject: '¡Gracias por tu compra en EuroSim!',
+            html: emailHtml,
+          }),
+        })
 
-          if (!emailResponse.ok) {
-            console.error('❌ Error sending confirmation email:', await emailResponse.text())
+        if (emailResponse.ok) {
+          const resendData = await emailResponse.json();
+          console.log('✉️ Email sent successfully with Resend:', resendData);
+          
+          // Guardar el log en nuestra tabla
+          const { error: logError } = await supabase
+            .from('email_logs')
+            .insert({
+              template_id: product.id,
+              recipient: customer.email,
+              subject: '¡Gracias por tu compra en EuroSim!',
+              status: resendData.status,
+              metadata: {
+                resend_id: resendData.id,
+                order_id: order.id,
+                variables: {
+                  nombre_cliente: customer.name,
+                  numero_pedido: order.id,
+                  total: formatCurrency(order.total_amount),
+                  fecha_pedido: new Date(order.created_at).toLocaleDateString()
+                }
+              }
+            });
+
+          if (logError) {
+            console.error('❌ Error saving email log:', logError);
           } else {
-            console.log('✉️ Confirmation email sent successfully')
+            console.log('✅ Email log saved successfully');
           }
-        } catch (emailError) {
-          console.error('❌ Error in email sending:', emailError)
+        } else {
+          const errorData = await emailResponse.text();
+          console.error('❌ Error sending email:', errorData);
+          
+          // Guardar el log de error
+          const { error: logError } = await supabase
+            .from('email_logs')
+            .insert({
+              template_id: product.id,
+              recipient: customer.email,
+              subject: '¡Gracias por tu compra en EuroSim!',
+              status: 'failed',
+              error: errorData,
+              metadata: {
+                order_id: order.id
+              }
+            });
+
+          if (logError) {
+            console.error('❌ Error saving error log:', logError);
+          }
         }
 
         // Registrar el evento de pago completado
