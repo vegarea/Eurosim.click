@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/pagination";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useResendLogs } from "../emails/hooks/useResendLogs";
-import { EmailStatusBadge } from "../emails/components/EmailStatusBadge";
+import { useResendLogs } from "@/components/admin/emails/hooks/useResendLogs";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -25,7 +24,7 @@ export function EmailLogsSection() {
     return (
       <Card className="col-span-4">
         <CardHeader>
-          <CardTitle>Logs de Email</CardTitle>
+          <CardTitle>Logs de Email (Resend)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-[300px]">
@@ -40,11 +39,11 @@ export function EmailLogsSection() {
     return (
       <Card className="col-span-4">
         <CardHeader>
-          <CardTitle>Logs de Email</CardTitle>
+          <CardTitle>Logs de Email (Resend)</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-[300px] text-red-500">
-            Error al cargar los logs de email
+            Error al cargar los logs de Resend: {error.message}
           </div>
         </CardContent>
       </Card>
@@ -56,7 +55,7 @@ export function EmailLogsSection() {
   return (
     <Card className="col-span-4">
       <CardHeader>
-        <CardTitle>Logs de Email</CardTitle>
+        <CardTitle>Logs de Email (Resend)</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[300px]">
@@ -69,7 +68,15 @@ export function EmailLogsSection() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{log.to[0]}</p>
-                    <EmailStatusBadge status={log.status} />
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      log.status === 'sent' 
+                        ? 'bg-green-100 text-green-800'
+                        : log.status === 'failed'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {log.status}
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
