@@ -138,7 +138,7 @@ serve(async (req) => {
           template_id: templateId,
           recipient: to[0],
           subject: emailContent.subject,
-          status: res.ok ? 'sent' : 'failed',
+          status: res.ok ? 'delivered' : 'failed',
           error: !res.ok ? JSON.stringify(resendResponse) : null,
           cc_emails: emailContent.cc,
           metadata: {

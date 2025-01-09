@@ -16,10 +16,13 @@ import {
 } from "@/components/ui/pagination"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { EmailLog } from "../emails/types/emailLogs"
 
 const StatusIcon = ({ status }: { status: string }) => {
   switch (status.toLowerCase()) {
     case "sent":
+      return <CheckCircle2 className="h-4 w-4 text-green-500" />
+    case "delivered":
       return <CheckCircle2 className="h-4 w-4 text-green-500" />
     case "failed":
       return <XCircle className="h-4 w-4 text-red-500" />
@@ -28,17 +31,18 @@ const StatusIcon = ({ status }: { status: string }) => {
     case "bounced":
       return <AlertCircle className="h-4 w-4 text-orange-500" />
     default:
-      return <AlertCircle className="h-4 w-4 text-orange-500" />
+      return <Clock className="h-4 w-4 text-blue-500" />
   }
 }
 
 const StatusBadge = ({ status }: { status: string }) => {
   const styles = {
     sent: "bg-green-100 text-green-800",
+    delivered: "bg-green-100 text-green-800",
     failed: "bg-red-100 text-red-800",
     sending: "bg-blue-100 text-blue-800",
     bounced: "bg-orange-100 text-orange-800",
-    default: "bg-orange-100 text-orange-800",
+    default: "bg-blue-100 text-blue-800",
   }
 
   const statusKey = status.toLowerCase() as keyof typeof styles
@@ -67,7 +71,7 @@ export function EmailLogsSection() {
         .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1)
 
       if (error) throw error
-      return { logs: data || [], total: count || 0 }
+      return { logs: data as EmailLog[], total: count || 0 }
     },
   })
 

@@ -7,7 +7,11 @@ export interface EmailLog {
   subject: string;
   status: string;
   error?: string | null;
-  metadata?: Json | null;
+  metadata?: {
+    resend_id?: string;
+    variables?: Record<string, any>;
+    [key: string]: any;
+  } | null;
   created_at: string;
   cc_emails?: Json | null;
 }
