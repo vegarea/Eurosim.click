@@ -20,24 +20,6 @@ export function LogoUploader({ currentLogo }: LogoUploaderProps) {
 
     try {
       setIsUploading(true)
-      
-      // Primero, obtener el ID del registro existente
-      const { data: settings, error: fetchError } = await supabase
-        .from('site_settings')
-        .select('id')
-        .maybeSingle()
-
-      if (fetchError) throw fetchError
-
-      // Si no hay registro, crear uno nuevo
-      if (!settings) {
-        const { error: insertError } = await supabase
-          .from('site_settings')
-          .insert([{}])
-        if (insertError) throw insertError
-      }
-
-      // Subir el archivo
       const fileExt = file.name.split('.').pop()
       const fileName = `logo-${Date.now()}.${fileExt}`
       const { error: uploadError, data } = await supabase.storage
@@ -50,11 +32,10 @@ export function LogoUploader({ currentLogo }: LogoUploaderProps) {
         .from('site_assets')
         .getPublicUrl(fileName)
 
-      // Actualizar el registro con el nuevo logo
       const { error: updateError } = await supabase
         .from('site_settings')
         .update({ logo_url: publicUrl })
-        .eq('id', settings?.id || '')
+        .single()
 
       if (updateError) throw updateError
 
