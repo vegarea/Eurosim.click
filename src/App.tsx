@@ -49,25 +49,31 @@ const AppContent = () => {
 
   const trackingScripts = (siteSettings?.tracking_scripts || {}) as TrackingScripts
 
+  // Cargar Google Analytics dinámicamente
+  const loadGoogleAnalytics = (gaId: string) => {
+    const script = document.createElement('script')
+    script.async = true
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+    document.head.appendChild(script)
+
+    window.dataLayer = window.dataLayer || []
+    function gtag(...args: any[]) {
+      window.dataLayer.push(arguments)
+    }
+    gtag('js', new Date())
+    gtag('config', gaId)
+  }
+
+  // Cargar GA cuando tengamos el ID
+  React.useEffect(() => {
+    if (trackingScripts.google_analytics) {
+      const gaId = trackingScripts.google_analytics
+      loadGoogleAnalytics(gaId)
+    }
+  }, [trackingScripts.google_analytics])
+
   return (
     <>
-      <Helmet>
-        {/* Google Analytics */}
-        {trackingScripts.google_analytics && (
-          <script dangerouslySetInnerHTML={{ __html: trackingScripts.google_analytics }} />
-        )}
-        
-        {/* Facebook Pixel */}
-        {trackingScripts.facebook_pixel && (
-          <script dangerouslySetInnerHTML={{ __html: trackingScripts.facebook_pixel }} />
-        )}
-        
-        {/* Otros scripts */}
-        {trackingScripts.other_scripts && (
-          <script dangerouslySetInnerHTML={{ __html: trackingScripts.other_scripts }} />
-        )}
-      </Helmet>
-
       <TooltipProvider>
         <CartProvider>
           <OrdersProvider>
