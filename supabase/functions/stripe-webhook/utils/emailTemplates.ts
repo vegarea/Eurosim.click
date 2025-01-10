@@ -1,9 +1,4 @@
-export const getOrderConfirmationEmail = (
-  order: any,
-  product: any,
-  customer: any,
-  formattedAmount: string
-) => {
+export const getOrderConfirmationEmail = (order: any, product: any, customer: any, formattedAmount: string) => {
   const isPhysical = order.type === 'physical';
   const activationDate = order.activation_date 
     ? new Date(order.activation_date).toLocaleDateString('es-MX', {
@@ -20,7 +15,25 @@ export const getOrderConfirmationEmail = (
       <p style="margin: 5px 0;">${order.shipping_address.city}, ${order.shipping_address.state}</p>
       <p style="margin: 5px 0;">${order.shipping_address.postal_code}</p>
     </div>
+    <p style="margin-top: 15px; color: #4a5568;">
+      Tu envío se está procesando y te notificaremos por email cuando haya sido enviado con tu número de guía.
+    </p>
   ` : '';
+
+  const activationInfo = `
+    <div style="margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 8px;">
+      <h3 style="color: #1a1f2c; margin-bottom: 10px;">Fecha de Activación:</h3>
+      <p style="margin: 5px 0; font-weight: bold;">${activationDate}</p>
+      <p style="margin-top: 15px; font-weight: bold;">
+        - A partir de esta fecha comenzarán a contar los 30 días de Vigencia en tus datos asignados, podrás siempre recargar durante la vigencia.
+      </p>
+      ${!isPhysical ? `
+        <p style="margin-top: 10px; font-weight: bold;">
+          - Recuerda que recibirás tu código QR de activación vía email un día antes de tu fecha de activación además de las instrucciones simples para activar tus datos
+        </p>
+      ` : ''}
+    </div>
+  `;
 
   const processingMessage = isPhysical 
     ? "Tu SIM está procesando y recibirás un email con tu número de seguimiento en las próximas 48 hrs."
@@ -60,12 +73,8 @@ export const getOrderConfirmationEmail = (
           <p style="margin: 5px 0;"><strong>Validez:</strong> ${product.validity_days} días</p>
         </div>
 
-        <div style="margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-radius: 8px;">
-          <h3 style="color: #1a1f2c; margin-bottom: 10px;">Fecha de Activación:</h3>
-          <p style="margin: 5px 0; font-weight: bold;">${activationDate}</p>
-        </div>
-
         ${shippingSection}
+        ${activationInfo}
         
         <div style="margin-top: 30px; text-align: center;">
           <p style="color: #666;">${processingMessage}</p>
