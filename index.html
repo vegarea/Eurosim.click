@@ -15,7 +15,13 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-D8M4KM0KHM');
+      gtag('config', 'G-D8M4KM0KHM', {
+        'cookie_domain': 'lovableproject.com',
+        'debug_mode': true,
+        'transport_url': 'https://region1.google-analytics.com',
+        'allow_google_signals': false,
+        'allow_ad_personalization_signals': false
+      });
     </script>
 
     <!-- Meta Pixel Code -->
