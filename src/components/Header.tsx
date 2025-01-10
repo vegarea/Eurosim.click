@@ -19,9 +19,9 @@ export function Header() {
 
   const menuItems = [
     { label: "Inicio", href: "/" },
-    { label: "eSIMs", href: "/e-sims", icon: <Wifi className="w-4 h-4" /> },
-    { label: "SIM Card", href: "/sims", icon: <Signal className="w-4 h-4" /> },
-    { label: "Contacto", href: "/contact", icon: <MessageCircle className="w-4 h-4" /> },
+    { label: "eSIMs", href: "/e-sims", icon: <Wifi className="w-5 h-5" /> },
+    { label: "SIM Card", href: "/sims", icon: <Signal className="w-5 h-5" /> },
+    { label: "Contacto", href: "/contact", icon: <MessageCircle className="w-5 h-5" /> },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -42,7 +42,7 @@ export function Header() {
             <Link
               key={item.label}
               to={item.href}
-              className={`group flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+              className={`group flex items-center gap-2 px-3 py-2 text-base font-medium rounded-lg transition-all duration-200 ${
                 isActive(item.href)
                   ? "bg-brand-50 text-brand-600"
                   : "text-gray-600 hover:bg-gray-50"
@@ -63,10 +63,10 @@ export function Header() {
           <Button 
             variant="ghost" 
             size="sm"
-            className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-2 text-base text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-colors"
             onClick={() => setShowCoverage(true)}
           >
-            <EUFlag className="w-4 h-4" />
+            <EUFlag className="w-5 h-5" />
             <span>Cobertura en toda Europa</span>
           </Button>
 
@@ -76,9 +76,9 @@ export function Header() {
               size="sm"
               className="relative text-gray-600 hover:text-brand-600 hover:bg-brand-50"
             >
-              <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-5 w-5" />
               {cartItems > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand-600 text-[10px] font-medium text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-brand-600 text-xs font-medium text-white flex items-center justify-center">
                   {cartItems}
                 </span>
               )}
@@ -94,7 +94,7 @@ export function Header() {
               size="icon"
               className="hover:bg-brand-50 transition-colors"
             >
-              <Menu className="h-5 w-5 text-gray-700" />
+              <Menu className="h-6 w-6 text-gray-700" />
               <span className="sr-only">Toggle menu</span>
             </Button>
           </SheetTrigger>
@@ -126,23 +126,23 @@ export function Header() {
               <div className="mt-4 space-y-3">
                 <Button 
                   variant="ghost"
-                  className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                  className="w-full justify-start text-base text-gray-600 hover:text-brand-600 hover:bg-brand-50"
                   onClick={() => {
                     setIsOpen(false);
                     setShowCoverage(true);
                   }}
                 >
-                  <EUFlag className="w-4 h-4 mr-2" />
+                  <EUFlag className="w-5 h-5 mr-2" />
                   Cobertura en toda Europa
                 </Button>
                 
                 <Link to="/checkout">
                   <Button 
                     variant="ghost"
-                    className="w-full justify-start text-gray-600 hover:text-brand-600 hover:bg-brand-50"
+                    className="w-full justify-start text-base text-gray-600 hover:text-brand-600 hover:bg-brand-50"
                     onClick={() => setIsOpen(false)}
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    <ShoppingCart className="h-5 w-5 mr-2" />
                     Carrito ({cartItems})
                   </Button>
                 </Link>
