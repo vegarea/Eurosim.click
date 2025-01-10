@@ -20,7 +20,6 @@ interface EmailRequest {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -31,21 +30,18 @@ serve(async (req) => {
 
     let emailContent: { subject: string; html: string; cc?: string[] }
 
-    // Si es un email de prueba, usar el contenido proporcionado directamente
     if (isTest) {
       if (!subject || !html) {
         throw new Error('Subject y html son requeridos para emails de prueba')
       }
       emailContent = { subject, html }
     } else {
-      // Si no es de prueba, obtener la plantilla
       if (!templateId) {
         throw new Error('templateId es requerido para emails normales')
       }
 
       console.log('Buscando plantilla con ID:', templateId)
 
-      // Primero obtener la URL del logo desde site_settings
       const { data: siteSettings } = await supabase
         .from('site_settings')
         .select('logo_url')
@@ -70,24 +66,45 @@ serve(async (req) => {
         throw new Error('No se encontró una plantilla activa con el ID proporcionado')
       }
 
-      // Reemplazar variables en el contenido
       let processedHtml = template.content
       let processedSubject = template.subject
 
-      // Asegurarnos de que el logo use una URL absoluta
       const absoluteLogoUrl = logoUrl.startsWith('http') ? logoUrl : `https://eurosim.click${logoUrl}`
       processedHtml = processedHtml.replace(/src="[^"]*website\.png"/, `src="${absoluteLogoUrl}"`)
 
       // Determinar el mensaje según el tipo de producto
       const isEsim = variables?.type === 'esim'
-      const importantMessage = isEsim
-        ? "Tu compra ha sido procesada correctamente y recibirás tu código QR un día antes de tu fecha de activación con los pasos simples para que instales tu eSIM."
-        : "Tu SIM está procesando y recibirás un email con tu número de seguimiento en las próximas 48 hrs."
+      
+      // Mensaje común para ambos tipos
+      const validityMessage = `
+        <p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          - A partir de esta fecha comenzarán a contar los 30 días de Vigencia en tus datos asignados, podrás siempre recargar durante la vigencia.
+        </p>
+      `
 
-      // Reemplazar el mensaje en el HTML con estilo destacado
+      // Mensaje específico para eSIM
+      const esimMessage = `
+        <p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          ${validityMessage}
+          - Recuerda que recibirás tu código QR de activación vía email un día antes de tu fecha de activación además de las instrucciones simples para activar tus datos
+        </p>
+      `
+
+      // Mensaje específico para SIM física
+      const physicalSimMessage = `
+        <div style="margin: 20px 0;">
+          <p style="color: #666; margin-bottom: 20px;">
+            Tu envío se está procesando y te notificaremos por email cuando haya sido enviado con tu número de guía.
+          </p>
+          ${validityMessage}
+        </div>
+      `
+
+      // Reemplazar el mensaje según el tipo
+      const messageToInsert = isEsim ? esimMessage : physicalSimMessage
       processedHtml = processedHtml.replace(
         /<p style="color: #666;">(Tu compra ha sido procesada.*?|Tu SIM está procesando.*?)<\/p>/,
-        `<p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">${importantMessage}</p>`
+        messageToInsert
       )
 
       if (variables) {
@@ -107,7 +124,6 @@ serve(async (req) => {
 
     console.log('Enviando email a:', to)
 
-    // Enviar email usando Resend
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -130,7 +146,6 @@ serve(async (req) => {
       throw new Error(`Error al enviar email: ${JSON.stringify(resendResponse)}`)
     }
 
-    // Registrar el envío solo si no es una prueba
     if (!isTest && templateId) {
       const { error: logError } = await supabase
         .from('email_logs')
