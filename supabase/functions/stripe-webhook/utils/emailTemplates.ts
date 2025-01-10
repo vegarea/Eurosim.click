@@ -49,7 +49,7 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://eurosim.click/wp-content/uploads/2021/11/website.png" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
+        <img src="https://eurosim.click/logo.png" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
       </div>
       
       <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
