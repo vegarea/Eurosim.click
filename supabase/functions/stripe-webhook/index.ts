@@ -109,7 +109,9 @@ serve(async (req) => {
         }
 
         const formattedAmount = formatCurrency(order.total_amount)
-        const emailHtml = getOrderConfirmationEmail(order, product, customer, formattedAmount)
+        
+        // Importante: Esperar el resultado de getOrderConfirmationEmail
+        const emailHtml = await getOrderConfirmationEmail(order, product, customer, formattedAmount)
 
         // Enviar email de confirmación usando Resend
         try {
