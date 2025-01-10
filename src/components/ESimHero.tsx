@@ -60,14 +60,27 @@ export function ESimHero() {
                     Ver paquetes
                   </Button>
 
-                  <Button 
-                    variant="outline"
-                    size="lg"
-                    className="gap-2 text-lg h-14 border-2"
-                  >
-                    <Smartphone className="h-6 w-6" />
-                    Verifica la compatibilidad
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline"
+                        size="lg"
+                        className="gap-2 text-lg h-14 border-2"
+                      >
+                        <Smartphone className="h-6 w-6" />
+                        Verifica la compatibilidad
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                      <DialogHeader>
+                        <DialogTitle>Verificar Compatibilidad</DialogTitle>
+                        <DialogDescription>
+                          Consulta si tu dispositivo es compatible con eSIM
+                        </DialogDescription>
+                      </DialogHeader>
+                      <CompatibilityChat />
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 <Dialog>
