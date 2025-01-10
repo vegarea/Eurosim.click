@@ -69,8 +69,16 @@ serve(async (req) => {
       let processedHtml = template.content
       let processedSubject = template.subject
 
-      const absoluteLogoUrl = logoUrl.startsWith('http') ? logoUrl : `https://eurosim.click${logoUrl}`
-      processedHtml = processedHtml.replace(/src="[^"]*website\.png"/, `src="${absoluteLogoUrl}"`)
+      // Asegurarnos de que el logo use una URL absoluta y que sea la correcta
+      const absoluteLogoUrl = logoUrl.startsWith('http') 
+        ? logoUrl 
+        : `https://eurosim.click${logoUrl}`
+
+      // Reemplazar cualquier URL de logo existente con la URL absoluta
+      processedHtml = processedHtml.replace(
+        /<img[^>]*src="[^"]*"[^>]*alt="[^"]*Logo[^"]*"[^>]*>/i,
+        `<img src="${absoluteLogoUrl}" alt="Euro Connect" style="max-width: 200px; height: auto;">`
+      )
 
       // Determinar el mensaje según el tipo de producto
       const isEsim = variables?.type === 'esim'
