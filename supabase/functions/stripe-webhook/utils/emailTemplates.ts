@@ -1,4 +1,31 @@
-export const getOrderConfirmationEmail = (order: any, product: any, customer: any, formattedAmount: string) => {
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+async function getSiteLogo(): Promise<string> {
+  try {
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('logo_url')
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching logo:', error);
+      return '/logo.png'; // URL de respaldo
+    }
+
+    return data?.logo_url || '/logo.png';
+  } catch (error) {
+    console.error('Error in getSiteLogo:', error);
+    return '/logo.png';
+  }
+}
+
+export const getOrderConfirmationEmail = async (order: any, product: any, customer: any, formattedAmount: string) => {
+  const logoUrl = await getSiteLogo();
   const isPhysical = order.type === 'physical';
   const activationDate = order.activation_date 
     ? new Date(order.activation_date).toLocaleDateString('es-MX', {
@@ -49,7 +76,7 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://eurosim.click/wp-content/uploads/2021/11/website.png" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
+        <img src="${logoUrl}" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
       </div>
       
       <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
