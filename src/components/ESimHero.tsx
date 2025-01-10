@@ -49,18 +49,34 @@ export function ESimHero() {
                 Compra, recibe el QR en tu correo, y actívalo al instante. Así de fácil es tener el mejor internet en Europa, sin complicaciones ni sorpresas.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4">
-                <Button 
-                  onClick={scrollToPlans}
-                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
-                >
-                  <Package2 className="h-4 w-4" />
-                  Ver paquetes
-                </Button>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap items-center gap-4">
+                  <Button 
+                    onClick={scrollToPlans}
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2 text-lg h-14"
+                  >
+                    <Package2 className="h-6 w-6" />
+                    Ver paquetes
+                  </Button>
+
+                  <Button 
+                    variant="outline"
+                    size="lg"
+                    className="gap-2 text-lg h-14 border-2"
+                  >
+                    <Smartphone className="h-6 w-6" />
+                    Verifica la compatibilidad
+                  </Button>
+                </div>
 
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" className="gap-2">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="w-fit text-gray-600 hover:text-gray-900 gap-2"
+                    >
                       <HelpCircle className="h-4 w-4" />
                       ¿Qué es una eSIM?
                     </Button>
@@ -94,27 +110,6 @@ export function ESimHero() {
                         </div>
                       </DialogDescription>
                     </DialogHeader>
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      variant="outline"
-                      className="text-gray-600 border-gray-300 gap-2"
-                    >
-                      <Smartphone className="h-4 w-4" />
-                      Verifica la compatibilidad
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>Verificar Compatibilidad</DialogTitle>
-                      <DialogDescription>
-                        Consulta si tu dispositivo es compatible con eSIM
-                      </DialogDescription>
-                    </DialogHeader>
-                    <CompatibilityChat />
                   </DialogContent>
                 </Dialog>
               </div>
