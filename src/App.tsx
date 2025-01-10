@@ -1,3 +1,4 @@
+import React, { useEffect } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -6,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { CartProvider } from "./contexts/CartContext"
 import { OrdersProvider } from "./contexts/OrdersContext"
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute"
-import { Helmet } from 'react-helmet-async'
 import { supabase } from "@/integrations/supabase/client"
 import Index from "./pages/Index"
 import Sims from "./pages/Sims"
@@ -24,6 +24,14 @@ import Terms from "./pages/Terms"
 import Blog from "./pages/Blog"
 import BlogPost from "./pages/BlogPost"
 import "flag-icons/css/flag-icons.min.css"
+
+// Declarar el tipo global de window
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
+}
 
 const queryClient = new QueryClient()
 
@@ -57,15 +65,15 @@ const AppContent = () => {
     document.head.appendChild(script)
 
     window.dataLayer = window.dataLayer || []
-    function gtag(...args: any[]) {
+    window.gtag = function(...args: any[]) {
       window.dataLayer.push(arguments)
     }
-    gtag('js', new Date())
-    gtag('config', gaId)
+    window.gtag('js', new Date())
+    window.gtag('config', gaId)
   }
 
   // Cargar GA cuando tengamos el ID
-  React.useEffect(() => {
+  useEffect(() => {
     if (trackingScripts.google_analytics) {
       const gaId = trackingScripts.google_analytics
       loadGoogleAnalytics(gaId)
