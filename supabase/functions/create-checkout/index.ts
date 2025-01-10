@@ -58,7 +58,7 @@ serve(async (req) => {
       }
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripe = new Stripe(Deno.env.get('STRIPE_LIVE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
