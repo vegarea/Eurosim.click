@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Smartphone, HelpCircle } from "lucide-react";
+import { Smartphone, HelpCircle, Package2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,13 @@ import EUFlag from "@/components/icons/EUFlag";
 export function ESimHero() {
   const { data: siteImages } = useSiteImages();
   const heroImage = siteImages?.find(img => img.location === "Hero E-SIM")?.currentUrl;
+
+  const scrollToPlans = () => {
+    const plansSection = document.querySelector('#plans-section');
+    if (plansSection) {
+      plansSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-white to-brand-50 min-h-[90vh]">
@@ -43,6 +50,14 @@ export function ESimHero() {
               </p>
 
               <div className="flex flex-wrap items-center gap-4">
+                <Button 
+                  onClick={scrollToPlans}
+                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+                >
+                  <Package2 className="h-4 w-4" />
+                  Ver paquetes
+                </Button>
+
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
@@ -85,7 +100,8 @@ export function ESimHero() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button 
-                      className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transform transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-primary/20 gap-2"
+                      variant="outline"
+                      className="text-gray-600 border-gray-300 gap-2"
                     >
                       <Smartphone className="h-4 w-4" />
                       Verifica la compatibilidad
