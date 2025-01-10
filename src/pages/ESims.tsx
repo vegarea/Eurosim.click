@@ -56,7 +56,7 @@ export default function ESims() {
         <main>
           <ESimHero />
 
-          <section className="py-16 md:py-24 px-4">
+          <section id="plans-section" className="py-16 md:py-24 px-4">
             <div className="container mx-auto max-w-6xl">
               <h2 className="text-3xl font-bold text-center mb-8 md:mb-12">
                 Elige tu plan eSIM

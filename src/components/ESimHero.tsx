@@ -17,9 +17,12 @@ export function ESimHero() {
   const heroImage = siteImages?.find(img => img.location === "Hero E-SIM")?.currentUrl;
 
   const scrollToPlans = () => {
-    const plansSection = document.querySelector('#plans-section');
+    const plansSection = document.getElementById('plans-section');
     if (plansSection) {
-      plansSection.scrollIntoView({ behavior: 'smooth' });
+      plansSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
     }
   };
 
