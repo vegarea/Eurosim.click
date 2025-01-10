@@ -1,4 +1,4 @@
-export const getOrderConfirmationEmail = (order: any, product: any, customer: any, formattedAmount: string) => {
+export const getOrderConfirmationEmail = async (order: any, product: any, customer: any, formattedAmount: string) => {
   const isPhysical = order.type === 'physical';
   const activationDate = order.activation_date 
     ? new Date(order.activation_date).toLocaleDateString('es-MX', {
@@ -7,6 +7,14 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
         year: 'numeric'
       })
     : 'No especificada';
+
+  // Obtener el logo de la configuración del sitio
+  const { data: siteSettings } = await supabase
+    .from('site_settings')
+    .select('logo_url')
+    .single();
+
+  const logoUrl = siteSettings?.logo_url || 'https://eurosim.click/logo.png'; // URL de respaldo por si no hay logo configurado
 
   const shippingSection = isPhysical && order.shipping_address ? `
     <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
@@ -35,10 +43,6 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
     </div>
   `;
 
-  const processingMessage = isPhysical 
-    ? "Tu SIM está procesando y recibirás un email con tu número de seguimiento en las próximas 48 hrs."
-    : "Tu compra ha sido procesada correctamente y recibirás tu código QR un día antes de tu fecha de activación con los pasos simples para que instales tu eSIM.";
-
   return `
     <!DOCTYPE html>
     <html>
@@ -49,7 +53,7 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="text-align: center; margin-bottom: 30px;">
-        <img src="https://eurosim.click/logo.png" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
+        <img src="${logoUrl}" alt="EuroSim Logo" style="max-width: 200px; height: auto;">
       </div>
       
       <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -77,7 +81,9 @@ export const getOrderConfirmationEmail = (order: any, product: any, customer: an
         ${activationInfo}
         
         <div style="margin-top: 30px; text-align: center;">
-          <p style="color: #666;">${processingMessage}</p>
+          <p style="color: #666;">${isPhysical 
+            ? "Tu SIM está procesando y recibirás un email con tu número de seguimiento en las próximas 48 hrs."
+            : "Tu compra ha sido procesada correctamente y recibirás tu código QR un día antes de tu fecha de activación con los pasos simples para que instales tu eSIM."}</p>
           
           <p style="margin-top: 20px;">Si tienes dudas o preguntas sobre tu SIM no dudes en 
             <a href="https://eurosim.click/contact" style="color: #E02653; text-decoration: none;">contactarnos</a>
