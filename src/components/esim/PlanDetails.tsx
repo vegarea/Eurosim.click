@@ -45,8 +45,8 @@ export function PlanDetails({ product }: PlanDetailsProps) {
               {product.title}
             </h2>
             <p className="text-2xl font-bold text-primary flex items-baseline gap-1">
-              {amount}
-              <span className="text-sm font-normal text-gray-500">{currency}</span>
+              {formatCurrency(product.price)}
+              <span className="text-sm font-normal text-gray-500">MXN</span>
             </p>
           </div>
           

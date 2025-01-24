@@ -51,21 +51,30 @@ export function Cart() {
       <div className="border-t pt-4 space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal:</span>
-          <span>{formatCurrency(subtotal)}</span>
+          <div className="flex items-baseline gap-1">
+            <span>{formatCurrency(subtotal)}</span>
+            <span className="text-xs text-gray-500">MXN</span>
+          </div>
         </div>
         
         {hasPhysicalProducts && (
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Costo de envío:</span>
-            <span>{formatCurrency(shippingCost)}</span>
+            <div className="flex items-baseline gap-1">
+              <span>{formatCurrency(shippingCost)}</span>
+              <span className="text-xs text-gray-500">MXN</span>
+            </div>
           </div>
         )}
 
         <div className="flex justify-between text-lg font-semibold pt-2 border-t">
           <span>Total:</span>
-          <span>{formatCurrency(total)}</span>
+          <div className="flex items-baseline gap-1">
+            <span>{formatCurrency(total)}</span>
+            <span className="text-sm font-normal text-gray-500">MXN</span>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

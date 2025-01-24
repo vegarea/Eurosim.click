@@ -123,7 +123,7 @@ export function SimCard({
         <div className="mb-8 transform transition-all duration-300 hover:scale-105">
           <p className="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-baseline gap-2">
             {amount}
-            <span className="text-base font-normal text-gray-500">{currency}</span>
+            <span className="text-sm font-normal text-gray-500">MXN</span>
           </p>
         </div>
 

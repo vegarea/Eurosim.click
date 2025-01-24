@@ -27,8 +27,9 @@ export function CartItem({
             `${metadata?.data_eu_gb}GB Europa / ${metadata?.data_es_gb}GB España` : 
             'SIM Física'}
         </p>
-        <p className="mt-1 text-sm font-medium text-primary">
+        <p className="mt-1 text-sm font-medium text-primary flex items-baseline gap-1">
           {formatCurrency(item.unit_price)}
+          <span className="text-xs text-gray-500">MXN</span>
         </p>
       </div>
       
