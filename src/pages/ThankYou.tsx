@@ -12,13 +12,15 @@ import { OrderItems } from "@/components/thankyou/OrderItems"
 import type { Database } from "@/integrations/supabase/types"
 import type { UIOrder } from "@/types/ui/orders"
 
+// Define specific types for the database response
 type DbOrder = Database["public"]["Tables"]["orders"]["Row"]
 type DbCustomer = Database["public"]["Tables"]["customers"]["Row"]
 type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"]
 
-interface OrderResponse extends DbOrder {
-  customer: Pick<DbCustomer, "name" | "email" | "phone"> | null
-  items: DbOrderItem[] | null
+// Simplified type for the order response
+type OrderResponse = Omit<DbOrder, "customer" | "items"> & {
+  customer: Pick<DbCustomer, "name" | "email" | "phone"> | null;
+  items: DbOrderItem[] | null;
 }
 
 export default function ThankYou() {
@@ -114,7 +116,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData)
+        setOrderDetails(orderData as OrderResponse)
         setIsLoading(false)
       } catch (error) {
         console.error('Error final al obtener detalles de la orden:', error)
@@ -132,7 +134,7 @@ export default function ThankYou() {
     return {
       ...order,
       customer: order.customer ? {
-        id: order.customer_id || '', // Usamos el customer_id de la orden
+        id: order.customer_id || '',
         name: order.customer.name,
         email: order.customer.email,
         phone: order.customer.phone,
