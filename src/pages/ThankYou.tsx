@@ -10,14 +10,19 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 import type { Database } from "@/integrations/supabase/types"
+import type { UIOrder } from "@/types/ui/orders"
 
-type OrderWithRelations = Database["public"]["Tables"]["orders"]["Row"] & {
-  customer: Pick<Database["public"]["Tables"]["customers"]["Row"], "name" | "email" | "phone"> | null;
-  items: Array<Pick<Database["public"]["Tables"]["order_items"]["Row"], "quantity" | "unit_price" | "total_price" | "metadata">> | null;
+type DbOrder = Database["public"]["Tables"]["orders"]["Row"]
+type DbCustomer = Database["public"]["Tables"]["customers"]["Row"]
+type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"]
+
+interface OrderResponse extends DbOrder {
+  customer: Pick<DbCustomer, "name" | "email" | "phone"> | null
+  items: Pick<DbOrderItem, "quantity" | "unit_price" | "total_price" | "metadata">[] | null
 }
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<OrderWithRelations | null>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -118,6 +123,32 @@ export default function ThankYou() {
     }
   }, [location.search, navigate, retryCount, isLoading])
 
+  const orderToUI = (order: OrderResponse): UIOrder => {
+    return {
+      ...order,
+      customer: order.customer ? {
+        id: '', // Campo requerido por UIOrder
+        name: order.customer.name,
+        email: order.customer.email,
+        phone: order.customer.phone,
+        // Añadimos los campos requeridos con valores por defecto
+        passport_number: null,
+        birth_date: null,
+        gender: null,
+        default_shipping_address: null,
+        billing_address: null,
+        preferred_language: null,
+        marketing_preferences: null,
+        stripe_customer_id: null,
+        paypal_customer_id: null,
+        metadata: null,
+        created_at: null,
+        updated_at: null
+      } : undefined,
+      items: order.items || undefined
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
@@ -159,6 +190,8 @@ export default function ThankYou() {
     )
   }
 
+  const uiOrder = orderToUI(orderDetails)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
@@ -169,10 +202,10 @@ export default function ThankYou() {
             customerEmail={orderDetails.customer?.email || ''} 
           />
 
-          <OrderDetails order={orderDetails} />
+          <OrderDetails order={uiOrder} />
           
           <OrderItems 
-            order={orderDetails}
+            order={uiOrder}
             shippingCost={shippingCost}
           />
 
