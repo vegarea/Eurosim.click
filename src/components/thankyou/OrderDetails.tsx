@@ -1,8 +1,8 @@
-import { UIOrder } from "@/types/ui/orders"
+import { OrderWithRelations } from "@/types/ui/orders"
 import { ShippingAddress } from "@/types/database/common"
 
 interface OrderDetailsProps {
-  order: UIOrder;
+  order: OrderWithRelations;
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {

@@ -9,21 +9,10 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
-import type { Database } from "@/integrations/supabase/types"
-
-// Tipos base de Supabase
-type DbOrder = Database["public"]["Tables"]["orders"]["Row"]
-type DbCustomer = Database["public"]["Tables"]["customers"]["Row"]
-type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"]
-
-// Tipo para la respuesta de la orden con sus relaciones
-type OrderWithCustomer = DbOrder & {
-  customer: Pick<DbCustomer, "name" | "email" | "phone"> | null;
-  items: DbOrderItem[] | null;
-}
+import { OrderWithRelations } from "@/types/ui/orders"
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<OrderWithCustomer | null>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderWithRelations | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -85,7 +74,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData as OrderWithCustomer)
+        setOrderDetails(orderData as OrderWithRelations)
         setIsLoading(false)
       } catch (error) {
         console.error('Error final al obtener detalles de la orden:', error)

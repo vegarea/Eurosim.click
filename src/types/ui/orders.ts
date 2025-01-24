@@ -1,17 +1,10 @@
-import { Order } from "../database/orders";
-import { OrderItem } from "../database/orderItems";
-import { Customer } from "../database/customers";
+import { Database } from "@/integrations/supabase/types";
 
-export interface UIOrder extends Order {
-  customer?: Customer;
-  items?: OrderItem[];
-}
+export type DbOrder = Database["public"]["Tables"]["orders"]["Row"];
+export type DbCustomer = Database["public"]["Tables"]["customers"]["Row"];
+export type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"];
 
-export interface OrderMetadata {
-  customer_name?: string;
-  customer_email?: string;
-  customer_phone?: string;
-  title?: string;
-  description?: string;
-  [key: string]: any;
-}
+export type OrderWithRelations = DbOrder & {
+  customer: Pick<DbCustomer, "name" | "email" | "phone"> | null;
+  items: DbOrderItem[] | null;
+};
