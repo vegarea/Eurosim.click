@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { Loader2 as Loader2Icon } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
@@ -123,7 +123,7 @@ export default function ThankYou() {
         <main className="container mx-auto py-8 px-4">
           <Card className="max-w-2xl mx-auto p-8">
             <div className="text-center">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+              <Loader2Icon className="h-12 w-12 animate-spin text-primary mx-auto" />
               <p className="mt-4 text-gray-600">
                 {retryCount > 0 
                   ? `Procesando tu orden... (intento ${retryCount + 1} de 6)`
