@@ -1,30 +1,45 @@
-import { OrderWithRelations } from "@/types/ui/orders"
+import { UIOrder } from "@/types/ui/orders"
+import { formatCurrency } from "@/utils/currency"
 
 interface OrderItemsProps {
-  order: OrderWithRelations;
+  order: UIOrder;
   shippingCost?: number;
 }
 
 export function OrderItems({ order, shippingCost }: OrderItemsProps) {
   return (
-    <div className="mt-6">
-      <h3 className="text-lg font-medium">Items del pedido</h3>
-      <div className="mt-4 space-y-4">
-        {order.items?.map((item) => (
-          <div key={item.id} className="flex justify-between">
-            <span>{item.quantity}x Producto</span>
-            <span>${(item.total_price / 100).toFixed(2)}</span>
+    <div className="border-t border-gray-200 pt-6">
+      <h3 className="text-lg font-semibold mb-4">Productos</h3>
+      {order.items?.map((item, index) => {
+        const metadata = item.metadata as { product_title?: string } | null
+        return (
+          <div key={index} className="flex justify-between py-2">
+            <div>
+              <p className="font-medium">{metadata?.product_title || 'Producto'}</p>
+              <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+            </div>
+            <p className="font-medium">
+              {formatCurrency(item.total_price)}
+            </p>
           </div>
-        ))}
-        {shippingCost && (
-          <div className="flex justify-between border-t pt-4">
-            <span>Costo de envío</span>
-            <span>${(shippingCost / 100).toFixed(2)}</span>
-          </div>
-        )}
-        <div className="flex justify-between border-t pt-4 font-bold">
-          <span>Total</span>
-          <span>${(order.total_amount / 100).toFixed(2)}</span>
+        )
+      })}
+      
+      {order.type === 'physical' && shippingCost !== undefined && (
+        <div className="flex justify-between py-2 border-t border-gray-100 mt-2">
+          <p className="font-medium">Costo de envío</p>
+          <p className="font-medium">
+            {formatCurrency(shippingCost)}
+          </p>
+        </div>
+      )}
+
+      <div className="border-t border-gray-200 mt-4 pt-4">
+        <div className="flex justify-between">
+          <p className="font-semibold">Total</p>
+          <p className="font-semibold">
+            {formatCurrency(order.total_amount)}
+          </p>
         </div>
       </div>
     </div>
