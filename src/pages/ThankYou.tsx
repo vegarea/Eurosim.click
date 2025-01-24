@@ -10,21 +10,20 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 import type { Database } from "@/integrations/supabase/types"
-import type { UIOrder } from "@/types/ui/orders"
 
-// Define specific types for the database response
+// Tipos base de Supabase
 type DbOrder = Database["public"]["Tables"]["orders"]["Row"]
 type DbCustomer = Database["public"]["Tables"]["customers"]["Row"]
 type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"]
 
-// Simplified type for the order response
-type OrderResponse = Omit<DbOrder, "customer" | "items"> & {
+// Tipo para la respuesta de la orden con sus relaciones
+type OrderWithCustomer = DbOrder & {
   customer: Pick<DbCustomer, "name" | "email" | "phone"> | null;
   items: DbOrderItem[] | null;
 }
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<OrderResponse | null>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderWithCustomer | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -49,39 +48,9 @@ export default function ThankYou() {
         const { data: orderData, error } = await supabase
           .from('orders')
           .select(`
-            id,
-            customer_id,
-            product_id,
-            status,
-            type,
-            total_amount,
-            quantity,
-            payment_method,
-            payment_status,
-            stripe_payment_intent_id,
-            stripe_receipt_url,
-            paypal_order_id,
-            paypal_receipt_url,
-            shipping_address,
-            tracking_number,
-            carrier,
-            activation_date,
-            notes,
-            metadata,
-            created_at,
-            updated_at,
+            *,
             customer:customers(name, email, phone),
-            items:order_items(
-              id,
-              order_id,
-              product_id,
-              quantity,
-              unit_price,
-              total_price,
-              metadata,
-              created_at,
-              updated_at
-            )
+            items:order_items(*)
           `)
           .eq('metadata->stripe_session_id', sessionId)
           .maybeSingle()
@@ -116,7 +85,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData as OrderResponse)
+        setOrderDetails(orderData as OrderWithCustomer)
         setIsLoading(false)
       } catch (error) {
         console.error('Error final al obtener detalles de la orden:', error)
@@ -129,31 +98,6 @@ export default function ThankYou() {
       fetchOrderDetails()
     }
   }, [location.search, navigate, retryCount, isLoading])
-
-  const orderToUI = (order: OrderResponse): UIOrder => {
-    return {
-      ...order,
-      customer: order.customer ? {
-        id: order.customer_id || '',
-        name: order.customer.name,
-        email: order.customer.email,
-        phone: order.customer.phone,
-        passport_number: null,
-        birth_date: null,
-        gender: null,
-        default_shipping_address: null,
-        billing_address: null,
-        preferred_language: null,
-        marketing_preferences: null,
-        stripe_customer_id: null,
-        paypal_customer_id: null,
-        metadata: null,
-        created_at: null,
-        updated_at: null
-      } : undefined,
-      items: order.items || undefined
-    }
-  }
 
   if (isLoading) {
     return (
@@ -196,8 +140,6 @@ export default function ThankYou() {
     )
   }
 
-  const uiOrder = orderToUI(orderDetails)
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
       <Header />
@@ -208,10 +150,10 @@ export default function ThankYou() {
             customerEmail={orderDetails.customer?.email || ''} 
           />
 
-          <OrderDetails order={uiOrder} />
+          <OrderDetails order={orderDetails} />
           
           <OrderItems 
-            order={uiOrder}
+            order={orderDetails}
             shippingCost={shippingCost}
           />
 
