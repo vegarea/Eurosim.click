@@ -10,6 +10,21 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 
+declare global {
+  interface Window {
+    gtag?: (
+      command: string,
+      event: string,
+      params?: {
+        send_to?: string
+        value?: number
+        currency?: string
+        transaction_id?: string
+      }
+    ) => void
+  }
+}
+
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -33,7 +48,6 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Primero intentamos con la ruta JSONB completa
         let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
@@ -49,7 +63,6 @@ export default function ThankYou() {
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
 
-        // Si no encontramos nada, intentamos con la ruta anidada
         if (!orderData && !error) {
           console.log('Intentando búsqueda alternativa...')
           const { data: altData, error: altError } = await supabase
@@ -104,6 +117,18 @@ export default function ThankYou() {
         console.log("Orden encontrada:", orderData)
         setOrderDetails(orderData)
         setIsLoading(false)
+
+        // Enviar evento de conversión a Google Ads
+        if (window.gtag && orderData) {
+          console.log('Enviando evento de conversión a Google Ads')
+          window.gtag('event', 'conversion', {
+            'send_to': 'AW-16835770142/yiNYCJzNtpQaEJ7u9ds-',
+            'value': orderData.total_amount / 100, // Convertir de centavos a unidades
+            'currency': 'MXN',
+            'transaction_id': orderData.id
+          })
+        }
+
       } catch (error) {
         console.error('Error final al obtener detalles de la orden:', error)
         toast.error("Error al obtener los detalles de tu orden")
@@ -164,7 +189,7 @@ export default function ThankYou() {
       <main className="container mx-auto py-8 px-4">
         <Card className="max-w-2xl mx-auto p-8">
           <OrderConfirmationHeader 
-            customerEmail={orderDetails.customer?.email || ''} 
+            customerEmail={orderDetails?.customer?.email || ''} 
           />
 
           <OrderDetails order={orderDetails} />
