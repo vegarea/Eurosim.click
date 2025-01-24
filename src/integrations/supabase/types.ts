@@ -424,6 +424,30 @@ export type Database = {
         }
         Relationships: []
       }
+      exchange_rates: {
+        Row: {
+          from_currency: string
+          id: string
+          last_updated: string | null
+          rate: number
+          to_currency: string
+        }
+        Insert: {
+          from_currency: string
+          id?: string
+          last_updated?: string | null
+          rate: number
+          to_currency: string
+        }
+        Update: {
+          from_currency?: string
+          id?: string
+          last_updated?: string | null
+          rate?: number
+          to_currency?: string
+        }
+        Relationships: []
+      }
       order_events: {
         Row: {
           created_at: string
@@ -623,6 +647,7 @@ export type Database = {
           id: string
           metadata: Json | null
           price: number
+          price_eur: number | null
           status: Database["public"]["Enums"]["product_status"]
           stock: number | null
           title: string
@@ -639,6 +664,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           price: number
+          price_eur?: number | null
           status?: Database["public"]["Enums"]["product_status"]
           stock?: number | null
           title: string
@@ -655,6 +681,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           price?: number
+          price_eur?: number | null
           status?: Database["public"]["Enums"]["product_status"]
           stock?: number | null
           title?: string
@@ -790,6 +817,10 @@ export type Database = {
           backoff_interval: unknown
         }
         Returns: boolean
+      }
+      update_mxn_prices: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {
