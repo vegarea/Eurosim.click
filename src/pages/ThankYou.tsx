@@ -18,7 +18,7 @@ type DbOrderItem = Database["public"]["Tables"]["order_items"]["Row"]
 
 interface OrderResponse extends DbOrder {
   customer: Pick<DbCustomer, "name" | "email" | "phone"> | null
-  items: Pick<DbOrderItem, "quantity" | "unit_price" | "total_price" | "metadata">[] | null
+  items: DbOrderItem[] | null
 }
 
 export default function ThankYou() {
@@ -70,10 +70,15 @@ export default function ThankYou() {
             updated_at,
             customer:customers(name, email, phone),
             items:order_items(
+              id,
+              order_id,
+              product_id,
               quantity,
               unit_price,
               total_price,
-              metadata
+              metadata,
+              created_at,
+              updated_at
             )
           `)
           .eq('metadata->stripe_session_id', sessionId)
@@ -127,11 +132,10 @@ export default function ThankYou() {
     return {
       ...order,
       customer: order.customer ? {
-        id: '', // Campo requerido por UIOrder
+        id: order.customer_id || '', // Usamos el customer_id de la orden
         name: order.customer.name,
         email: order.customer.email,
         phone: order.customer.phone,
-        // Añadimos los campos requeridos con valores por defecto
         passport_number: null,
         birth_date: null,
         gender: null,
