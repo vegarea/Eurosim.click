@@ -9,9 +9,15 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
+import type { Database } from "@/integrations/supabase/types"
+
+type OrderWithRelations = Database["public"]["Tables"]["orders"]["Row"] & {
+  customer: Pick<Database["public"]["Tables"]["customers"]["Row"], "name" | "email" | "phone"> | null;
+  items: Array<Pick<Database["public"]["Tables"]["order_items"]["Row"], "quantity" | "unit_price" | "total_price" | "metadata">> | null;
+}
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderWithRelations | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -33,11 +39,30 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Primero intentamos con la ruta JSONB completa
-        let { data: orderData, error } = await supabase
+        const { data: orderData, error } = await supabase
           .from('orders')
           .select(`
-            *,
+            id,
+            customer_id,
+            product_id,
+            status,
+            type,
+            total_amount,
+            quantity,
+            payment_method,
+            payment_status,
+            stripe_payment_intent_id,
+            stripe_receipt_url,
+            paypal_order_id,
+            paypal_receipt_url,
+            shipping_address,
+            tracking_number,
+            carrier,
+            activation_date,
+            notes,
+            metadata,
+            created_at,
+            updated_at,
             customer:customers(name, email, phone),
             items:order_items(
               quantity,
@@ -46,30 +71,8 @@ export default function ThankYou() {
               metadata
             )
           `)
-          .eq('metadata->>stripe_session_id', sessionId)
+          .eq('metadata->stripe_session_id', sessionId)
           .maybeSingle()
-
-        // Si no encontramos nada, intentamos con la ruta anidada
-        if (!orderData && !error) {
-          console.log('Intentando búsqueda alternativa...')
-          const { data: altData, error: altError } = await supabase
-            .from('orders')
-            .select(`
-              *,
-              customer:customers(name, email, phone),
-              items:order_items(
-                quantity,
-                unit_price,
-                total_price,
-                metadata
-              )
-            `)
-            .eq('metadata->stripe_session_id', sessionId)
-            .maybeSingle()
-
-          if (altError) throw altError
-          orderData = altData
-        }
 
         if (error) {
           console.error('Error al buscar la orden:', error)
@@ -89,7 +92,6 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        // Si es una orden física, obtener el costo de envío
         if (orderData.type === 'physical') {
           const { data: shippingData } = await supabase
             .from('shipping_settings')
