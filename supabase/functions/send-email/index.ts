@@ -1,182 +1,140 @@
+// Follow this setup guide to integrate the Deno SDK: https://deno.land/manual/getting_started
+// Import required dependencies
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { Resend } from "https://esm.sh/resend@1.0.0";
 
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+// Initialize Resend with API key from environment variable
+const resendApiKey = Deno.env.get("RESEND_API_KEY");
+const resend = new Resend(resendApiKey);
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+// Initialize Supabase client with URL and key from environment variables
+const supabaseUrl = Deno.env.get("SUPABASE_URL");
+const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Set up CORS headers
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-interface EmailRequest {
-  templateId?: string
-  to: string[]
-  variables?: Record<string, any>
-  isTest?: boolean
-  subject?: string
-  html?: string
-}
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  console.log("Recibida solicitud en send-email");
+  
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
-    const { templateId, to, variables, isTest, subject, html } = await req.json() as EmailRequest
+    const requestData = await req.json();
+    console.log("Datos recibidos:", JSON.stringify(requestData));
 
-    let emailContent: { subject: string; html: string; cc?: string[] }
-
-    // Modo directo o de prueba (sin plantilla)
-    if (isTest || (subject && html)) {
-      if (!subject || !html) {
-        throw new Error('Subject y html son requeridos para emails directos o de prueba')
-      }
-      emailContent = { subject, html }
-    } 
-    // Modo plantilla (con templateId)
-    else {
-      if (!templateId) {
-        throw new Error('templateId es requerido para emails normales')
-      }
-
-      console.log('Buscando plantilla con ID:', templateId)
-
-      const { data: siteSettings } = await supabase
-        .from('site_settings')
-        .select('logo_url')
-        .single()
-
-      const logoUrl = siteSettings?.logo_url || '/logo.png'
-
-      const { data: template, error: templateError } = await supabase
-        .from('email_templates')
-        .select('*')
-        .eq('id', templateId)
-        .eq('is_active', true)
-        .maybeSingle()
-
-      if (templateError) {
-        console.error('Error al obtener plantilla:', templateError)
-        throw new Error(`Error al obtener plantilla: ${templateError.message}`)
+    // Check if this is a simple email (with HTML directly provided)
+    if (requestData.html) {
+      console.log("Enviando email simple con HTML proporcionado");
+      
+      const { to, subject, html, from } = requestData;
+      
+      if (!to || !to.length) {
+        throw new Error("El destinatario (to) es requerido");
       }
       
-      if (!template) {
-        console.error('No se encontró la plantilla activa con ID:', templateId)
-        throw new Error('No se encontró una plantilla activa con el ID proporcionado')
+      const fromEmail = from || "EuroSim <noreply@eurosim.com>";
+      
+      const data = await resend.emails.send({
+        from: fromEmail,
+        to: to,
+        subject: subject || "Mensaje de EuroSim",
+        html: html,
+      });
+      
+      console.log("Email enviado con éxito:", data);
+      
+      // Log the email in the database
+      await supabase.from("email_logs").insert({
+        recipient: to.join(", "),
+        subject: subject,
+        status: "sent",
+        email_type: "contact_response"
+      });
+      
+      return new Response(JSON.stringify({ success: true, data }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    } 
+    // Si se proporciona templateId, usar el flujo existente para plantillas
+    else if (requestData.templateId) {
+      console.log("Usando plantilla con ID:", requestData.templateId);
+      
+      const { data: templateData, error: templateError } = await supabase
+        .from("email_templates")
+        .select("*")
+        .eq("id", requestData.templateId)
+        .single();
+
+      if (templateError) {
+        throw new Error(`Error al obtener la plantilla: ${templateError.message}`);
       }
 
-      let processedHtml = template.content
-      let processedSubject = template.subject
-
-      // Asegurarnos de que el logo use una URL absoluta y que sea la correcta
-      const absoluteLogoUrl = logoUrl.startsWith('http') 
-        ? logoUrl 
-        : `https://eurosim.click${logoUrl}`
-
-      // Reemplazar cualquier URL de logo existente con la URL absoluta
-      processedHtml = processedHtml.replace(
-        /<img[^>]*src="[^"]*"[^>]*alt="[^"]*Logo[^"]*"[^>]*>/i,
-        `<img src="${absoluteLogoUrl}" alt="Euro Connect" style="max-width: 200px; height: auto;">`
-      )
-
-      // Si es una respuesta de contacto, agregar el mensaje original y la respuesta
-      if (variables?.mensaje_original && variables?.respuesta) {
-        const contactResponseSection = `
-          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-            <h3 style="color: #333; margin-top: 0;">Tu mensaje:</h3>
-            <p style="color: #666; font-style: italic; margin-bottom: 20px; padding: 10px; background-color: #fff; border-left: 4px solid #ddd; border-radius: 4px;">
-              ${variables.mensaje_original}
-            </p>
-            
-            <h3 style="color: #333;">Nuestra respuesta:</h3>
-            <p style="color: #333; margin-bottom: 0; padding: 10px; background-color: #fff; border-left: 4px solid #4CAF50; border-radius: 4px;">
-              ${variables.respuesta}
-            </p>
-          </div>
-        `;
-        
-        // Insertar la sección de respuesta antes del cierre del cuerpo principal
-        processedHtml = processedHtml.replace(
-          /(<\/main>|<\/body>)/i,
-          `${contactResponseSection}$1`
-        );
+      if (!templateData) {
+        throw new Error(`No se encontró la plantilla con ID: ${requestData.templateId}`);
       }
 
-      // Procesar todas las variables en la plantilla
+      const { to, variables } = requestData;
+
+      if (!to || !to.length) {
+        throw new Error("El destinatario (to) es requerido");
+      }
+
+      const subject = templateData.subject;
+      let html = templateData.html_content;
+
+      // Replace variables in the HTML content
       if (variables) {
-        Object.entries(variables).forEach(([key, value]) => {
-          const regex = new RegExp(`{${key}}`, 'g')
-          processedHtml = processedHtml.replace(regex, String(value))
-          processedSubject = processedSubject.replace(regex, String(value))
-        })
+        for (const key in variables) {
+          const regex = new RegExp(`{{${key}}}`, "g");
+          html = html.replace(regex, variables[key]);
+        }
       }
 
-      emailContent = {
-        subject: processedSubject,
-        html: processedHtml,
-        cc: Array.isArray(template.cc_emails) ? template.cc_emails : []
-      }
+      const data = await resend.emails.send({
+        from: "EuroSim <noreply@eurosim.com>",
+        to: to,
+        subject: subject,
+        html: html,
+      });
+
+      // Log the email in the database
+      await supabase.from("email_logs").insert({
+        template_id: requestData.templateId,
+        recipient: to.join(", "),
+        subject: subject,
+        status: "sent",
+      });
+      
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
-
-    console.log('Enviando email a:', to)
-
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'EuroSim <noreply@eurosim.click>',
-        to,
-        cc: emailContent.cc,
-        subject: emailContent.subject,
-        html: emailContent.html,
+    else {
+      throw new Error("Se requiere HTML o templateId para enviar el email");
+    }
+  } catch (error) {
+    console.error("Error en send-email function:", error);
+    
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || "Error desconocido al enviar email",
       }),
-    })
-
-    const resendResponse = await res.json()
-
-    if (!res.ok) {
-      console.error('Error de Resend:', resendResponse)
-      throw new Error(`Error al enviar email: ${JSON.stringify(resendResponse)}`)
-    }
-
-    if (!isTest && templateId) {
-      const { error: logError } = await supabase
-        .from('email_logs')
-        .insert({
-          template_id: templateId,
-          recipient: to[0],
-          subject: emailContent.subject,
-          status: res.ok ? 'delivered' : 'failed',
-          error: !res.ok ? JSON.stringify(resendResponse) : null,
-          cc_emails: emailContent.cc,
-          metadata: {
-            resend_id: resendResponse.id,
-            variables
-          }
-        })
-
-      if (logError) {
-        console.error('Error al registrar log:', logError)
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
       }
-    }
-
-    return new Response(JSON.stringify(resendResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (error: any) {
-    console.error('Error en send-email function:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    );
   }
-})
+});
