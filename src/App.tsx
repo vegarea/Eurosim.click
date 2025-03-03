@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -65,10 +66,11 @@ const AppContent = () => {
     document.head.appendChild(script)
 
     window.dataLayer = window.dataLayer || []
-    window.gtag = function(...args: any[]) {
-      window.dataLayer.push(arguments)
+    function gtag(...args: any[]) {
+      window.dataLayer.push(args)
     }
-    window.gtag('js', new Date())
+    // Fix for TS2345: Convert Date to string
+    window.gtag('js', new Date().toISOString())
     window.gtag('config', gaId)
   }
 

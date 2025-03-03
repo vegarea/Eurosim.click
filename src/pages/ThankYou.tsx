@@ -10,21 +10,6 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 
-declare global {
-  interface Window {
-    gtag?: (
-      command: string,
-      event: string,
-      params?: {
-        send_to?: string
-        value?: number
-        currency?: string
-        transaction_id?: string
-      }
-    ) => void
-  }
-}
-
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -47,6 +32,24 @@ export default function ThankYou() {
     const fetchOrderDetails = async () => {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
+        
+        interface OrderData {
+          id: string;
+          type: string;
+          total_amount: number;
+          metadata: Record<string, any>;
+          customer: {
+            name: string;
+            email: string;
+            phone: string;
+          } | null;
+          items: {
+            quantity: number;
+            unit_price: number;
+            total_price: number;
+            metadata: Record<string, any>;
+          }[];
+        }
         
         let { data: orderData, error } = await supabase
           .from('orders')
@@ -102,7 +105,6 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        // Si es una orden física, obtener el costo de envío
         if (orderData.type === 'physical') {
           const { data: shippingData } = await supabase
             .from('shipping_settings')
@@ -118,12 +120,11 @@ export default function ThankYou() {
         setOrderDetails(orderData)
         setIsLoading(false)
 
-        // Enviar evento de conversión a Google Ads
         if (window.gtag && orderData) {
           console.log('Enviando evento de conversión a Google Ads')
           window.gtag('event', 'conversion', {
             'send_to': 'AW-16835770142/yiNYCJzNtpQaEJ7u9ds-',
-            'value': orderData.total_amount / 100, // Convertir de centavos a unidades
+            'value': orderData.total_amount / 100,
             'currency': 'MXN',
             'transaction_id': orderData.id
           })
