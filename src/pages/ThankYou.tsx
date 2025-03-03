@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { CheckCircle2, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { formatCurrency } from "@/utils/currency"
 
 export default function ThankYou() {
   const [isLoading, setIsLoading] = useState(true)
