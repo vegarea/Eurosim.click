@@ -26,14 +26,6 @@ import Blog from "./pages/Blog"
 import BlogPost from "./pages/BlogPost"
 import "flag-icons/css/flag-icons.min.css"
 
-// Declarar el tipo global de window
-declare global {
-  interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
-  }
-}
-
 const queryClient = new QueryClient()
 
 interface TrackingScripts {
@@ -66,10 +58,7 @@ const AppContent = () => {
     document.head.appendChild(script)
 
     window.dataLayer = window.dataLayer || []
-    function gtag(...args: any[]) {
-      window.dataLayer.push(args)
-    }
-    // Fix for TS2345: Convert Date to string
+    // Usamos la función gtag definida globalmente y no redefinimos el tipo
     window.gtag('js', new Date().toISOString())
     window.gtag('config', gaId)
   }

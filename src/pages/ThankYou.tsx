@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
@@ -10,8 +11,37 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 
+// Definir interfaces más específicas y separadas para evitar referencias circulares
+interface OrderItem {
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  metadata: Record<string, any>;
+}
+
+interface OrderCustomer {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface OrderData {
+  id: string;
+  type: string;
+  total_amount: number;
+  metadata: Record<string, any>;
+  customer: OrderCustomer | null;
+  items: OrderItem[];
+  // Otras propiedades necesarias
+  status?: string;
+  tracking_number?: string;
+  carrier?: string;
+  activation_date?: string;
+  created_at?: string;
+}
+
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [orderDetails, setOrderDetails] = useState<OrderData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -32,24 +62,6 @@ export default function ThankYou() {
     const fetchOrderDetails = async () => {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
-        
-        interface OrderData {
-          id: string;
-          type: string;
-          total_amount: number;
-          metadata: Record<string, any>;
-          customer: {
-            name: string;
-            email: string;
-            phone: string;
-          } | null;
-          items: {
-            quantity: number;
-            unit_price: number;
-            total_price: number;
-            metadata: Record<string, any>;
-          }[];
-        }
         
         let { data: orderData, error } = await supabase
           .from('orders')
@@ -117,7 +129,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData)
+        setOrderDetails(orderData as OrderData)
         setIsLoading(false)
 
         if (window.gtag && orderData) {
