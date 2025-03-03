@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard, 
   ShoppingCart, 
@@ -8,7 +9,6 @@ import {
   Truck,
   QrCode,
   BookOpen,
-  FileText,
   Calendar
 } from "lucide-react"
 import {
@@ -68,11 +68,6 @@ const menuItems = [
     title: "Emails",
     path: "/admin/emails",
     icon: Mail,
-  },
-  {
-    title: "Documentación",
-    path: "/admin/documentation",
-    icon: FileText,
   },
   {
     title: "Configuración",
