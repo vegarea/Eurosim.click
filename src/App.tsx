@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
@@ -25,6 +24,14 @@ import Terms from "./pages/Terms"
 import Blog from "./pages/Blog"
 import BlogPost from "./pages/BlogPost"
 import "flag-icons/css/flag-icons.min.css"
+
+// Declarar el tipo global de window
+declare global {
+  interface Window {
+    dataLayer: any[];
+    gtag: (...args: any[]) => void;
+  }
+}
 
 const queryClient = new QueryClient()
 
@@ -58,8 +65,10 @@ const AppContent = () => {
     document.head.appendChild(script)
 
     window.dataLayer = window.dataLayer || []
-    // Usamos la función gtag definida globalmente y no redefinimos el tipo
-    window.gtag('js', new Date().toISOString())
+    window.gtag = function(...args: any[]) {
+      window.dataLayer.push(arguments)
+    }
+    window.gtag('js', new Date())
     window.gtag('config', gaId)
   }
 

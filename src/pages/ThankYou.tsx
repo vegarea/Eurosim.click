@@ -9,10 +9,24 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
-import { UIOrder } from "@/types/ui/orders"
+
+declare global {
+  interface Window {
+    gtag?: (
+      command: string,
+      event: string,
+      params?: {
+        send_to?: string
+        value?: number
+        currency?: string
+        transaction_id?: string
+      }
+    ) => void
+  }
+}
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<UIOrder | null>(null)
+  const [orderDetails, setOrderDetails] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -34,31 +48,17 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        const { data: orderData, error } = await supabase
+        let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
-            id,
-            customer_id,
-            product_id,
-            status,
-            type,
-            total_amount,
-            quantity,
-            payment_method,
-            payment_status,
-            stripe_payment_intent_id,
-            stripe_receipt_url,
-            paypal_order_id,
-            paypal_receipt_url,
-            shipping_address,
-            tracking_number,
-            carrier,
-            activation_date,
-            notes,
-            metadata,
-            created_at,
-            updated_at,
-            customer:customers(name, email, phone)
+            *,
+            customer:customers(name, email, phone),
+            items:order_items(
+              quantity,
+              unit_price,
+              total_price,
+              metadata
+            )
           `)
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
@@ -68,28 +68,14 @@ export default function ThankYou() {
           const { data: altData, error: altError } = await supabase
             .from('orders')
             .select(`
-              id,
-              customer_id,
-              product_id,
-              status,
-              type,
-              total_amount,
-              quantity,
-              payment_method,
-              payment_status,
-              stripe_payment_intent_id,
-              stripe_receipt_url,
-              paypal_order_id,
-              paypal_receipt_url,
-              shipping_address,
-              tracking_number,
-              carrier,
-              activation_date,
-              notes,
-              metadata,
-              created_at,
-              updated_at,
-              customer:customers(name, email, phone)
+              *,
+              customer:customers(name, email, phone),
+              items:order_items(
+                quantity,
+                unit_price,
+                total_price,
+                metadata
+              )
             `)
             .eq('metadata->stripe_session_id', sessionId)
             .maybeSingle()
@@ -116,24 +102,7 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        if (orderData) {
-          const { data: itemsData, error: itemsError } = await supabase
-            .from('order_items')
-            .select(`
-              quantity,
-              unit_price,
-              total_price,
-              metadata
-            `)
-            .eq('order_id', orderData.id)
-
-          if (itemsError) {
-            console.error('Error al obtener items de la orden:', itemsError)
-          } else {
-            orderData.items = itemsData
-          }
-        }
-
+        // Si es una orden física, obtener el costo de envío
         if (orderData.type === 'physical') {
           const { data: shippingData } = await supabase
             .from('shipping_settings')
@@ -146,14 +115,15 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData as UIOrder)
+        setOrderDetails(orderData)
         setIsLoading(false)
 
+        // Enviar evento de conversión a Google Ads
         if (window.gtag && orderData) {
           console.log('Enviando evento de conversión a Google Ads')
           window.gtag('event', 'conversion', {
             'send_to': 'AW-16835770142/yiNYCJzNtpQaEJ7u9ds-',
-            'value': orderData.total_amount / 100,
+            'value': orderData.total_amount / 100, // Convertir de centavos a unidades
             'currency': 'MXN',
             'transaction_id': orderData.id
           })
