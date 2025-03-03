@@ -1,22 +1,18 @@
 
-import { UIOrder } from "@/types/ui/orders"
-import { OrderItem } from "@/types/database/orderItems"
+import { ThankYouOrder, ThankYouOrderItem } from "@/types/thankyou"
 import { formatCurrency } from "@/utils/currency"
 
 interface OrderItemsProps {
-  order: UIOrder;
-  items?: OrderItem[];
+  order: ThankYouOrder;
+  items: ThankYouOrderItem[];
   shippingCost?: number;
 }
 
-export function OrderItems({ order, items = [], shippingCost }: OrderItemsProps) {
-  // Use the items prop instead of order.items
-  const itemsToRender = items;
-
+export function OrderItems({ order, items, shippingCost }: OrderItemsProps) {
   return (
     <div className="border-t border-gray-200 pt-6">
       <h3 className="text-lg font-semibold mb-4">Productos</h3>
-      {itemsToRender.map((item, index) => {
+      {items.map((item, index) => {
         const metadata = item.metadata as { product_title?: string } | null
         return (
           <div key={index} className="flex justify-between py-2">

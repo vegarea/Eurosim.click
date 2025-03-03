@@ -10,21 +10,11 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
-import { Order } from "@/types/database/orders"
-import { OrderItem } from "@/types/database/orderItems"
-import { Customer } from "@/types/database/customers"
-import { Json } from "@/types/database/common"
-
-// No necesitamos redeclarar window.gtag aquí ya que está en vite-env.d.ts
-
-// Definimos una interfaz para el objeto de orden con sus relaciones
-interface OrderWithRelations extends Order {
-  customer?: Customer;
-}
+import { ThankYouOrder, ThankYouOrderItem } from "@/types/thankyou"
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<OrderWithRelations | null>(null)
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([])
+  const [orderDetails, setOrderDetails] = useState<ThankYouOrder | null>(null)
+  const [orderItems, setOrderItems] = useState<ThankYouOrderItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -121,7 +111,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData)
+        setOrderDetails(orderData as ThankYouOrder)
         setIsLoading(false)
 
         // Enviar evento de conversión a Google Ads

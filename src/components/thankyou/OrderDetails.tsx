@@ -1,8 +1,9 @@
-import { UIOrder } from "@/types/ui/orders"
+
+import { ThankYouOrder } from "@/types/thankyou"
 import { ShippingAddress } from "@/types/database/common"
 
 interface OrderDetailsProps {
-  order: UIOrder;
+  order: ThankYouOrder;
 }
 
 export function OrderDetails({ order }: OrderDetailsProps) {
