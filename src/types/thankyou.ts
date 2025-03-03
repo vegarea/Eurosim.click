@@ -1,7 +1,7 @@
 
 import { Database } from "@/integrations/supabase/types";
 import { ShippingAddress } from "@/types/database/common";
-import { CustomerRecord } from "@/types/database/customers";
+import { Customer } from "@/types/database/customers";
 
 // Simple types with minimal properties and no complex relationships
 export interface BasicOrderInfo {
