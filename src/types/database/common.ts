@@ -4,6 +4,7 @@
  * This file contains types that match Supabase schema exactly.
  * DO NOT MODIFY without explicit user permission.
  */
+import { EventType } from "./enums"
 
 export type Json =
   | string
@@ -22,12 +23,20 @@ export interface ShippingAddress {
   phone?: string;
 }
 
+export interface OrderEventMetadata {
+  automated?: boolean;
+  oldStatus?: string;
+  newStatus?: string;
+  details?: string;
+  [key: string]: any;
+}
+
 export interface OrderEvent {
   id: string;
   order_id: string;
-  type: string;
+  type: EventType;
   description: string;
   user_id?: string;
-  metadata?: Json;
+  metadata?: OrderEventMetadata | Json;
   created_at: string;
 }
