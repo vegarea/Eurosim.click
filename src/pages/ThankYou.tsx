@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
@@ -35,7 +34,7 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        let { data: orderData, error } = await supabase
+        const { data: orderData, error } = await supabase
           .from('orders')
           .select(`
             id,
@@ -59,13 +58,7 @@ export default function ThankYou() {
             metadata,
             created_at,
             updated_at,
-            customer:customers(name, email, phone),
-            items:order_items(
-              quantity,
-              unit_price,
-              total_price,
-              metadata
-            )
+            customer:customers(name, email, phone)
           `)
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
@@ -96,13 +89,7 @@ export default function ThankYou() {
               metadata,
               created_at,
               updated_at,
-              customer:customers(name, email, phone),
-              items:order_items(
-                quantity,
-                unit_price,
-                total_price,
-                metadata
-              )
+              customer:customers(name, email, phone)
             `)
             .eq('metadata->stripe_session_id', sessionId)
             .maybeSingle()
@@ -127,6 +114,24 @@ export default function ThankYou() {
 
         if (!orderData) {
           throw new Error('No se encontró la orden después de varios intentos')
+        }
+
+        if (orderData) {
+          const { data: itemsData, error: itemsError } = await supabase
+            .from('order_items')
+            .select(`
+              quantity,
+              unit_price,
+              total_price,
+              metadata
+            `)
+            .eq('order_id', orderData.id)
+
+          if (itemsError) {
+            console.error('Error al obtener items de la orden:', itemsError)
+          } else {
+            orderData.items = itemsData
+          }
         }
 
         if (orderData.type === 'physical') {
