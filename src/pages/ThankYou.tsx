@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
@@ -10,23 +11,11 @@ import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmation
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
 
-declare global {
-  interface Window {
-    gtag?: (
-      command: string,
-      event: string,
-      params?: {
-        send_to?: string
-        value?: number
-        currency?: string
-        transaction_id?: string
-      }
-    ) => void
-  }
-}
+// No necesitamos redeclarar window.gtag aquí ya que está en vite-env.d.ts
 
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<any>(null)
+  const [orderItems, setOrderItems] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -48,17 +37,12 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
+        // Primera consulta: obtener los detalles de la orden y el cliente
         let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
             *,
-            customer:customers(name, email, phone),
-            items:order_items(
-              quantity,
-              unit_price,
-              total_price,
-              metadata
-            )
+            customer:customers(name, email, phone)
           `)
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
@@ -69,13 +53,7 @@ export default function ThankYou() {
             .from('orders')
             .select(`
               *,
-              customer:customers(name, email, phone),
-              items:order_items(
-                quantity,
-                unit_price,
-                total_price,
-                metadata
-              )
+              customer:customers(name, email, phone)
             `)
             .eq('metadata->stripe_session_id', sessionId)
             .maybeSingle()
@@ -100,6 +78,27 @@ export default function ThankYou() {
 
         if (!orderData) {
           throw new Error('No se encontró la orden después de varios intentos')
+        }
+
+        // Segunda consulta: obtener los items de la orden
+        if (orderData.id) {
+          const { data: itemsData, error: itemsError } = await supabase
+            .from('order_items')
+            .select(`
+              quantity,
+              unit_price,
+              total_price,
+              metadata
+            `)
+            .eq('order_id', orderData.id)
+          
+          if (itemsError) {
+            console.error('Error al buscar los items:', itemsError)
+          } else {
+            setOrderItems(itemsData || [])
+            // Añadir los items al objeto de orden para mantener compatibilidad
+            orderData.items = itemsData
+          }
         }
 
         // Si es una orden física, obtener el costo de envío

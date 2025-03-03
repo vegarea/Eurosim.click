@@ -25,13 +25,7 @@ import Blog from "./pages/Blog"
 import BlogPost from "./pages/BlogPost"
 import "flag-icons/css/flag-icons.min.css"
 
-// Declarar el tipo global de window
-declare global {
-  interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
-  }
-}
+// No necesitamos redeclarar window.gtag aquí ya que está en vite-env.d.ts
 
 const queryClient = new QueryClient()
 
@@ -68,7 +62,7 @@ const AppContent = () => {
     window.gtag = function(...args: any[]) {
       window.dataLayer.push(arguments)
     }
-    window.gtag('js', new Date())
+    window.gtag('js', new Date().toISOString())
     window.gtag('config', gaId)
   }
 
