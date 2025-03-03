@@ -1,102 +1,71 @@
 
-// Función edge para procesar los emails de contacto y guardarlos en la base de datos
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
+import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
+import { corsHeaders } from "../_shared/cors.ts";
+import { supabaseClient } from "../_shared/supabaseClient.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-interface ContactEmailRequest {
+interface ContactFormData {
   name: string;
   email: string;
   message: string;
 }
 
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
+serve(async (req) => {
+  // Manejar preflight CORS
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    const { name, email, message }: ContactEmailRequest = await req.json();
+    const { name, email, message } = await req.json() as ContactFormData;
 
     if (!name || !email || !message) {
-      throw new Error("Los campos nombre, email y mensaje son obligatorios");
+      return new Response(
+        JSON.stringify({ error: "Todos los campos son requeridos" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    // Guardar el mensaje en la base de datos
-    const { data: savedMessage, error: dbError } = await supabase
+    // Guardar mensaje en la base de datos
+    const { error: dbError } = await supabaseClient
       .from('contact_messages')
-      .insert([
-        { name, email, message }
-      ])
-      .select()
-      .single();
+      .insert({
+        name,
+        email,
+        message,
+        status: 'nuevo'
+      });
 
     if (dbError) {
-      console.error('Error al guardar el mensaje en la base de datos:', dbError);
-      throw dbError;
+      console.error("Error al guardar mensaje:", dbError);
+      return new Response(
+        JSON.stringify({ error: "Error al guardar el mensaje" }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    console.log('Mensaje guardado en la base de datos:', savedMessage);
+    // Aquí puedes añadir lógica para enviar email de notificación si es necesario
 
-    // Enviar el mensaje por email usando la función send-email
-    const { data: emailResponse, error: emailError } = await supabase.functions.invoke('send-email', {
-      body: {
-        to: ["admin@eurosim.com"], // Reemplazar con el email del administrador
-        subject: `Nuevo mensaje de contacto de ${name}`,
-        isContact: true,
-        html: `
-          <h1>Nuevo mensaje de contacto</h1>
-          <p><strong>Nombre:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Mensaje:</strong></p>
-          <p>${message}</p>
-        `
-      }
-    });
-
-    if (emailError) {
-      console.error('Error al enviar el email:', emailError);
-      throw emailError;
-    }
-
-    console.log('Email enviado correctamente:', emailResponse);
-    
     return new Response(
-      JSON.stringify({ success: true, message: 'Mensaje enviado correctamente' }),
+      JSON.stringify({ success: true, message: "Mensaje enviado correctamente" }),
       {
         status: 200,
-        headers: { 
-          "Content-Type": "application/json",
-          ...corsHeaders 
-        },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
-  } catch (error: any) {
-    console.error("Error en la función send-contact-email:", error);
+  } catch (error) {
+    console.error("Error en el servidor:", error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message || "Error al procesar la solicitud" 
-      }),
+      JSON.stringify({ error: "Error en el servidor" }),
       {
         status: 500,
-        headers: { 
-          "Content-Type": "application/json",
-          ...corsHeaders 
-        },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
   }
-};
-
-serve(handler);
+});

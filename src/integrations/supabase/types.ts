@@ -269,6 +269,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_archived: boolean | null
+          message: string
+          name: string
+          responded_at: string | null
+          response: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_archived?: boolean | null
+          message: string
+          name: string
+          responded_at?: string | null
+          response?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_archived?: boolean | null
+          message?: string
+          name?: string
+          responded_at?: string | null
+          response?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           billing_address: Json | null
