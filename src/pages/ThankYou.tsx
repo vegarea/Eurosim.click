@@ -10,12 +10,21 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
+import { Order } from "@/types/database/orders"
+import { OrderItem } from "@/types/database/orderItems"
+import { Customer } from "@/types/database/customers"
+import { Json } from "@/types/database/common"
 
 // No necesitamos redeclarar window.gtag aquí ya que está en vite-env.d.ts
 
+// Definimos una interfaz para el objeto de orden con sus relaciones
+interface OrderWithRelations extends Order {
+  customer?: Customer;
+}
+
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<any>(null)
-  const [orderItems, setOrderItems] = useState<any[]>([])
+  const [orderDetails, setOrderDetails] = useState<OrderWithRelations | null>(null)
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -96,8 +105,6 @@ export default function ThankYou() {
             console.error('Error al buscar los items:', itemsError)
           } else {
             setOrderItems(itemsData || [])
-            // Añadir los items al objeto de orden para mantener compatibilidad
-            orderData.items = itemsData
           }
         }
 
@@ -195,6 +202,7 @@ export default function ThankYou() {
           
           <OrderItems 
             order={orderDetails}
+            items={orderItems}
             shippingCost={shippingCost}
           />
 
