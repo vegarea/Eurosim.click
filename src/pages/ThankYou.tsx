@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
-import { ThankYouOrder, ThankYouOrderItem } from "@/types/thankyou"
+import { ThankYouOrder, ThankYouOrderItem, ThankYouCustomer } from "@/types/thankyou"
 
 export default function ThankYou() {
   const [orderDetails, setOrderDetails] = useState<ThankYouOrder | null>(null)
@@ -36,10 +36,11 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Primera consulta: obtener los detalles de la orden
+        // Primera consulta: obtener solo los campos específicos que necesitamos de la orden
+        // Esto evita inferencias de tipo circulares
         let { data: orderData, error } = await supabase
           .from('orders')
-          .select('*')
+          .select('id, customer_id, status, type, total_amount, payment_method, payment_status, shipping_address, tracking_number, carrier, metadata, created_at')
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
 
@@ -47,7 +48,7 @@ export default function ThankYou() {
           console.log('Intentando búsqueda alternativa...')
           const { data: altData, error: altError } = await supabase
             .from('orders')
-            .select('*')
+            .select('id, customer_id, status, type, total_amount, payment_method, payment_status, shipping_address, tracking_number, carrier, metadata, created_at')
             .eq('metadata->stripe_session_id', sessionId)
             .maybeSingle()
 
@@ -73,8 +74,25 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        // Ahora que tenemos la orden, obtenemos los datos del cliente si existe
-        let customerData = null
+        // Explícitamente convertimos orderData al tipo ThankYouOrder
+        const basicOrder: ThankYouOrder = {
+          id: orderData.id,
+          customer_id: orderData.customer_id,
+          status: orderData.status,
+          type: orderData.type,
+          total_amount: orderData.total_amount,
+          payment_method: orderData.payment_method,
+          payment_status: orderData.payment_status,
+          shipping_address: orderData.shipping_address,
+          tracking_number: orderData.tracking_number,
+          carrier: orderData.carrier,
+          metadata: orderData.metadata,
+          created_at: orderData.created_at,
+          customer: null
+        }
+
+        // Ahora obtenemos los datos del cliente si existe
+        let customerData: ThankYouCustomer | null = null
         if (orderData.customer_id) {
           const { data: custData, error: custError } = await supabase
             .from('customers')
@@ -84,33 +102,39 @@ export default function ThankYou() {
           
           if (custError) {
             console.error('Error al buscar el cliente:', custError)
-          } else {
-            customerData = custData
+          } else if (custData) {
+            customerData = {
+              name: custData.name,
+              email: custData.email,
+              phone: custData.phone
+            }
           }
         }
 
-        // Creamos el objeto completo de orden con los datos del cliente
-        const orderWithCustomer: ThankYouOrder = {
-          ...orderData,
+        // Asignamos los datos del cliente a la orden
+        const completeOrder: ThankYouOrder = {
+          ...basicOrder,
           customer: customerData
         }
 
-        // Segunda consulta: obtener los items de la orden
+        // Segunda consulta: obtener los items de la orden con campos específicos
         if (orderData.id) {
           const { data: itemsData, error: itemsError } = await supabase
             .from('order_items')
-            .select(`
-              quantity,
-              unit_price,
-              total_price,
-              metadata
-            `)
+            .select('quantity, unit_price, total_price, metadata')
             .eq('order_id', orderData.id)
           
           if (itemsError) {
             console.error('Error al buscar los items:', itemsError)
-          } else {
-            setOrderItems(itemsData as ThankYouOrderItem[] || [])
+          } else if (itemsData) {
+            // Explícitamente convertimos los items al tipo ThankYouOrderItem[]
+            const typedItems: ThankYouOrderItem[] = itemsData.map(item => ({
+              quantity: item.quantity,
+              unit_price: item.unit_price,
+              total_price: item.total_price,
+              metadata: item.metadata
+            }))
+            setOrderItems(typedItems)
           }
         }
 
@@ -126,8 +150,8 @@ export default function ThankYou() {
           }
         }
 
-        console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderWithCustomer)
+        console.log("Orden encontrada:", completeOrder)
+        setOrderDetails(completeOrder)
         setIsLoading(false)
 
         // Enviar evento de conversión a Google Ads
