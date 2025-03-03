@@ -1,8 +1,9 @@
+
 // Follow this setup guide to integrate the Deno SDK: https://deno.land/manual/getting_started
 // Import required dependencies
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
-import { Resend } from "https://esm.sh/resend@1.0.0";
+import { Resend } from "npm:resend@1.0.0";
 
 // Initialize Resend with API key from environment variable
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
