@@ -10,38 +10,10 @@ import { supabase } from "@/integrations/supabase/client"
 import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
 import { OrderDetails } from "@/components/thankyou/OrderDetails"
 import { OrderItems } from "@/components/thankyou/OrderItems"
-
-// Definir interfaces más específicas y separadas para evitar referencias circulares
-interface OrderItem {
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  metadata: Record<string, any>;
-}
-
-interface OrderCustomer {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-interface OrderData {
-  id: string;
-  type: string;
-  total_amount: number;
-  metadata: Record<string, any>;
-  customer: OrderCustomer | null;
-  items: OrderItem[];
-  // Otras propiedades necesarias
-  status?: string;
-  tracking_number?: string;
-  carrier?: string;
-  activation_date?: string;
-  created_at?: string;
-}
+import { UIOrder } from "@/types/ui/orders"
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<OrderData | null>(null)
+  const [orderDetails, setOrderDetails] = useState<UIOrder | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [shippingCost, setShippingCost] = useState<number>()
@@ -66,7 +38,27 @@ export default function ThankYou() {
         let { data: orderData, error } = await supabase
           .from('orders')
           .select(`
-            *,
+            id,
+            customer_id,
+            product_id,
+            status,
+            type,
+            total_amount,
+            quantity,
+            payment_method,
+            payment_status,
+            stripe_payment_intent_id,
+            stripe_receipt_url,
+            paypal_order_id,
+            paypal_receipt_url,
+            shipping_address,
+            tracking_number,
+            carrier,
+            activation_date,
+            notes,
+            metadata,
+            created_at,
+            updated_at,
             customer:customers(name, email, phone),
             items:order_items(
               quantity,
@@ -83,7 +75,27 @@ export default function ThankYou() {
           const { data: altData, error: altError } = await supabase
             .from('orders')
             .select(`
-              *,
+              id,
+              customer_id,
+              product_id,
+              status,
+              type,
+              total_amount,
+              quantity,
+              payment_method,
+              payment_status,
+              stripe_payment_intent_id,
+              stripe_receipt_url,
+              paypal_order_id,
+              paypal_receipt_url,
+              shipping_address,
+              tracking_number,
+              carrier,
+              activation_date,
+              notes,
+              metadata,
+              created_at,
+              updated_at,
               customer:customers(name, email, phone),
               items:order_items(
                 quantity,
@@ -129,7 +141,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData as OrderData)
+        setOrderDetails(orderData as UIOrder)
         setIsLoading(false)
 
         if (window.gtag && orderData) {

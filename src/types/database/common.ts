@@ -1,31 +1,33 @@
-export type { Json } from "@/integrations/supabase/types"
-import { EventType } from "./enums"
+
+/**
+ * @lovable-protected
+ * This file contains types that match Supabase schema exactly.
+ * DO NOT MODIFY without explicit user permission.
+ */
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export interface ShippingAddress {
-  street: string
-  city: string
-  state: string
-  country: string
-  postal_code: string
-  phone?: string
-}
-
-export interface OrderEventMetadata {
-  automated?: boolean
-  oldStatus?: string
-  newStatus?: string
-  details?: string
-  [key: string]: any
+  street: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country?: string;
+  phone?: string;
 }
 
 export interface OrderEvent {
-  id: string
-  order_id: string
-  type: EventType
-  description: string
-  user_id?: string | null
-  metadata?: OrderEventMetadata
-  created_at: string
+  id: string;
+  order_id: string;
+  type: string;
+  description: string;
+  user_id?: string;
+  metadata?: Json;
+  created_at: string;
 }
-
-export type { EventType }
