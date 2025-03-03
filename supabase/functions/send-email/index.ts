@@ -1,9 +1,11 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +15,7 @@ const corsHeaders = {
 interface EmailRequest {
   templateId?: string
   to: string[]
+  cc?: string[]
   variables?: Record<string, any>
   isTest?: boolean
   subject?: string
@@ -26,7 +29,7 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
-    const { templateId, to, variables, isTest, subject, html } = await req.json() as EmailRequest
+    const { templateId, to, cc, variables, isTest, subject, html } = await req.json() as EmailRequest
 
     let emailContent: { subject: string; html: string; cc?: string[] }
 
@@ -123,14 +126,31 @@ serve(async (req) => {
         })
       }
 
+      // Combinar los CC del template con los enviados en la petición
+      let ccEmails: string[] = [];
+      
+      if (Array.isArray(template.cc_emails) && template.cc_emails.length > 0) {
+        ccEmails = [...template.cc_emails];
+      }
+      
+      if (Array.isArray(cc) && cc.length > 0) {
+        ccEmails = [...ccEmails, ...cc];
+      }
+      
+      // Agregar el email de administrador si está configurado
+      if (ADMIN_EMAIL && !ccEmails.includes(ADMIN_EMAIL)) {
+        ccEmails.push(ADMIN_EMAIL);
+      }
+
       emailContent = {
         subject: processedSubject,
         html: processedHtml,
-        cc: Array.isArray(template.cc_emails) ? template.cc_emails : []
+        cc: ccEmails.length > 0 ? ccEmails : undefined
       }
     }
 
     console.log('Enviando email a:', to)
+    console.log('Con CC:', emailContent.cc || 'Sin copia')
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
