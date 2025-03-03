@@ -36,13 +36,10 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Primera consulta: obtener los detalles de la orden y el cliente
+        // Primera consulta: obtener los detalles de la orden
         let { data: orderData, error } = await supabase
           .from('orders')
-          .select(`
-            *,
-            customer:customers(name, email, phone)
-          `)
+          .select('*')
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
 
@@ -50,10 +47,7 @@ export default function ThankYou() {
           console.log('Intentando búsqueda alternativa...')
           const { data: altData, error: altError } = await supabase
             .from('orders')
-            .select(`
-              *,
-              customer:customers(name, email, phone)
-            `)
+            .select('*')
             .eq('metadata->stripe_session_id', sessionId)
             .maybeSingle()
 
@@ -79,6 +73,28 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
+        // Ahora que tenemos la orden, obtenemos los datos del cliente si existe
+        let customerData = null
+        if (orderData.customer_id) {
+          const { data: custData, error: custError } = await supabase
+            .from('customers')
+            .select('name, email, phone')
+            .eq('id', orderData.customer_id)
+            .maybeSingle()
+          
+          if (custError) {
+            console.error('Error al buscar el cliente:', custError)
+          } else {
+            customerData = custData
+          }
+        }
+
+        // Creamos el objeto completo de orden con los datos del cliente
+        const orderWithCustomer: ThankYouOrder = {
+          ...orderData,
+          customer: customerData
+        }
+
         // Segunda consulta: obtener los items de la orden
         if (orderData.id) {
           const { data: itemsData, error: itemsError } = await supabase
@@ -94,7 +110,7 @@ export default function ThankYou() {
           if (itemsError) {
             console.error('Error al buscar los items:', itemsError)
           } else {
-            setOrderItems(itemsData || [])
+            setOrderItems(itemsData as ThankYouOrderItem[] || [])
           }
         }
 
@@ -111,7 +127,7 @@ export default function ThankYou() {
         }
 
         console.log("Orden encontrada:", orderData)
-        setOrderDetails(orderData as ThankYouOrder)
+        setOrderDetails(orderWithCustomer)
         setIsLoading(false)
 
         // Enviar evento de conversión a Google Ads
