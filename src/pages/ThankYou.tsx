@@ -4,20 +4,20 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { Header } from "@/components/Header"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
 import { supabase } from "@/integrations/supabase/client"
-import { OrderConfirmationHeader } from "@/components/thankyou/OrderConfirmationHeader"
-import { OrderDetails } from "@/components/thankyou/OrderDetails"
-import { OrderItems } from "@/components/thankyou/OrderItems"
-import { ThankYouOrder, ThankYouOrderItem, ThankYouCustomer } from "@/types/thankyou"
+import { formatCurrency } from "@/utils/currency"
+import { BasicOrderInfo, BasicCustomerInfo, BasicOrderItem } from "@/types/thankyou"
 
 export default function ThankYou() {
-  const [orderDetails, setOrderDetails] = useState<ThankYouOrder | null>(null)
-  const [orderItems, setOrderItems] = useState<ThankYouOrderItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
-  const [shippingCost, setShippingCost] = useState<number>()
+  const [orderInfo, setOrderInfo] = useState<BasicOrderInfo | null>(null)
+  const [customerInfo, setCustomerInfo] = useState<BasicCustomerInfo | null>(null)
+  const [orderItems, setOrderItems] = useState<BasicOrderItem[]>([])
+  const [shippingCost, setShippingCost] = useState<number>(0)
+  
   const location = useLocation()
   const navigate = useNavigate()
   
@@ -36,31 +36,15 @@ export default function ThankYou() {
       try {
         console.log('Intento', retryCount + 1, 'de obtener detalles de la orden para sesión:', sessionId)
         
-        // Primera consulta: obtener solo los campos específicos que necesitamos de la orden
-        // Esto evita inferencias de tipo circulares
-        let { data: orderData, error } = await supabase
+        // 1. Primero obtenemos la información básica de la orden
+        const { data: orderData, error: orderError } = await supabase
           .from('orders')
-          .select('id, customer_id, status, type, total_amount, payment_method, payment_status, shipping_address, tracking_number, carrier, metadata, created_at')
+          .select('id, status, total_amount, created_at, payment_method, payment_status, type, customer_id, metadata')
           .eq('metadata->>stripe_session_id', sessionId)
           .maybeSingle()
 
-        if (!orderData && !error) {
-          console.log('Intentando búsqueda alternativa...')
-          const { data: altData, error: altError } = await supabase
-            .from('orders')
-            .select('id, customer_id, status, type, total_amount, payment_method, payment_status, shipping_address, tracking_number, carrier, metadata, created_at')
-            .eq('metadata->stripe_session_id', sessionId)
-            .maybeSingle()
-
-          if (altError) throw altError
-          orderData = altData
-        }
-
-        if (error) {
-          console.error('Error al buscar la orden:', error)
-          throw error
-        }
-
+        if (orderError) throw orderError
+        
         if (!orderData && retryCount < 5) {
           console.log('Orden no encontrada, reintentando en 3 segundos...')
           setRetryCount(prev => prev + 1)
@@ -74,71 +58,55 @@ export default function ThankYou() {
           throw new Error('No se encontró la orden después de varios intentos')
         }
 
-        // Explícitamente convertimos orderData al tipo ThankYouOrder
-        const basicOrder: ThankYouOrder = {
+        // Convertimos a nuestro tipo simplificado
+        const basicOrder: BasicOrderInfo = {
           id: orderData.id,
-          customer_id: orderData.customer_id,
           status: orderData.status,
-          type: orderData.type,
           total_amount: orderData.total_amount,
+          created_at: orderData.created_at,
           payment_method: orderData.payment_method,
           payment_status: orderData.payment_status,
-          shipping_address: orderData.shipping_address,
-          tracking_number: orderData.tracking_number,
-          carrier: orderData.carrier,
-          metadata: orderData.metadata,
-          created_at: orderData.created_at,
-          customer: null
+          type: orderData.type
         }
+        
+        setOrderInfo(basicOrder)
 
-        // Ahora obtenemos los datos del cliente si existe
-        let customerData: ThankYouCustomer | null = null
+        // 2. Si hay customer_id, obtenemos datos del cliente en una consulta separada
         if (orderData.customer_id) {
-          const { data: custData, error: custError } = await supabase
+          const { data: customerData, error: customerError } = await supabase
             .from('customers')
             .select('name, email, phone')
             .eq('id', orderData.customer_id)
             .maybeSingle()
           
-          if (custError) {
-            console.error('Error al buscar el cliente:', custError)
-          } else if (custData) {
-            customerData = {
-              name: custData.name,
-              email: custData.email,
-              phone: custData.phone
-            }
+          if (!customerError && customerData) {
+            setCustomerInfo({
+              name: customerData.name,
+              email: customerData.email,
+              phone: customerData.phone
+            })
           }
         }
 
-        // Asignamos los datos del cliente a la orden
-        const completeOrder: ThankYouOrder = {
-          ...basicOrder,
-          customer: customerData
-        }
-
-        // Segunda consulta: obtener los items de la orden con campos específicos
+        // 3. Obtenemos los items de la orden en una consulta separada
         if (orderData.id) {
           const { data: itemsData, error: itemsError } = await supabase
             .from('order_items')
             .select('quantity, unit_price, total_price, metadata')
             .eq('order_id', orderData.id)
           
-          if (itemsError) {
-            console.error('Error al buscar los items:', itemsError)
-          } else if (itemsData) {
-            // Explícitamente convertimos los items al tipo ThankYouOrderItem[]
-            const typedItems: ThankYouOrderItem[] = itemsData.map(item => ({
+          if (!itemsError && itemsData) {
+            const simplifiedItems = itemsData.map(item => ({
               quantity: item.quantity,
               unit_price: item.unit_price,
               total_price: item.total_price,
-              metadata: item.metadata
+              product_title: item.metadata?.product_title || 'Producto'
             }))
-            setOrderItems(typedItems)
+            setOrderItems(simplifiedItems)
           }
         }
 
-        // Si es una orden física, obtener el costo de envío
+        // 4. Si es una orden física, obtenemos el costo de envío
         if (orderData.type === 'physical') {
           const { data: shippingData } = await supabase
             .from('shipping_settings')
@@ -150,23 +118,20 @@ export default function ThankYou() {
           }
         }
 
-        console.log("Orden encontrada:", completeOrder)
-        setOrderDetails(completeOrder)
-        setIsLoading(false)
-
         // Enviar evento de conversión a Google Ads
         if (window.gtag && orderData) {
           console.log('Enviando evento de conversión a Google Ads')
           window.gtag('event', 'conversion', {
             'send_to': 'AW-16835770142/yiNYCJzNtpQaEJ7u9ds-',
-            'value': orderData.total_amount / 100, // Convertir de centavos a unidades
+            'value': orderData.total_amount / 100,
             'currency': 'MXN',
             'transaction_id': orderData.id
           })
         }
 
+        setIsLoading(false)
       } catch (error) {
-        console.error('Error final al obtener detalles de la orden:', error)
+        console.error('Error al obtener detalles de la orden:', error)
         toast.error("Error al obtener los detalles de tu orden")
         setIsLoading(false)
       }
@@ -200,7 +165,7 @@ export default function ThankYou() {
     )
   }
 
-  if (!orderDetails) {
+  if (!orderInfo) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-brand-50 to-white">
         <Header />
@@ -224,17 +189,67 @@ export default function ThankYou() {
       
       <main className="container mx-auto py-8 px-4">
         <Card className="max-w-2xl mx-auto p-8">
-          <OrderConfirmationHeader 
-            customerEmail={orderDetails?.customer?.email || ''} 
-          />
+          {/* Cabecera */}
+          <div className="text-center mb-8">
+            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              ¡Gracias por tu compra!
+            </h1>
+            <p className="text-gray-600 mb-2">
+              Tu pedido ha sido confirmado y procesado correctamente
+            </p>
+            {customerInfo?.email && (
+              <p className="text-sm text-gray-500">
+                Hemos enviado los detalles de tu pedido a: <span className="font-medium">{customerInfo.email}</span>
+              </p>
+            )}
+          </div>
 
-          <OrderDetails order={orderDetails} />
-          
-          <OrderItems 
-            order={orderDetails}
-            items={orderItems}
-            shippingCost={shippingCost}
-          />
+          {/* Detalles del pedido */}
+          <div className="border-t border-gray-200 pt-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Detalles del pedido</h2>
+            <div className="space-y-2">
+              <p><span className="font-medium">Número de orden:</span> {orderInfo.id}</p>
+              {customerInfo?.name && <p><span className="font-medium">Cliente:</span> {customerInfo.name}</p>}
+              {customerInfo?.email && <p><span className="font-medium">Email:</span> {customerInfo.email}</p>}
+              <p><span className="font-medium">Fecha:</span> {orderInfo.created_at ? new Date(orderInfo.created_at).toLocaleDateString() : 'N/A'}</p>
+              <p><span className="font-medium">Estado del pago:</span> {orderInfo.payment_status}</p>
+            </div>
+          </div>
+
+          {/* Productos */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-semibold mb-4">Productos</h3>
+            {orderItems.map((item, index) => (
+              <div key={index} className="flex justify-between py-2">
+                <div>
+                  <p className="font-medium">{item.product_title}</p>
+                  <p className="text-sm text-gray-600">Cantidad: {item.quantity}</p>
+                </div>
+                <p className="font-medium">
+                  {formatCurrency(item.total_price)}
+                </p>
+              </div>
+            ))}
+            
+            {orderInfo.type === 'physical' && shippingCost > 0 && (
+              <div className="flex justify-between py-2 border-t border-gray-100 mt-2">
+                <p className="font-medium">Costo de envío</p>
+                <p className="font-medium">
+                  {formatCurrency(shippingCost)}
+                </p>
+              </div>
+            )}
+
+            <div className="border-t border-gray-200 mt-4 pt-4">
+              <div className="flex justify-between">
+                <p className="font-semibold">Total</p>
+                <p className="font-semibold">
+                  {formatCurrency(orderInfo.total_amount)}
+                </p>
+              </div>
+            </div>
+          </div>
 
           <div className="mt-8 text-center">
             <Button onClick={() => navigate('/')} className="min-w-[200px]">
