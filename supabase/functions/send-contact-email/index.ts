@@ -1,71 +1,59 @@
 
-import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
-import { corsHeaders } from "../_shared/cors.ts";
-import { supabaseClient } from "../_shared/supabaseClient.ts";
-
-interface ContactFormData {
-  name: string;
-  email: string;
-  message: string;
-}
+import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
+import { corsHeaders } from "../_shared/cors.ts"
+import { supabaseAdmin } from "../_shared/supabaseClient.ts"
 
 serve(async (req) => {
-  // Manejar preflight CORS
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+  // This is needed if you're planning to invoke your function from a browser.
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { name, email, message } = await req.json() as ContactFormData;
-
+    const { name, email, message } = await req.json()
+    
     if (!name || !email || !message) {
       return new Response(
-        JSON.stringify({ error: "Todos los campos son requeridos" }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        JSON.stringify({ 
+          error: "Se requieren todos los campos: nombre, email y mensaje" 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
         }
-      );
+      )
     }
 
-    // Guardar mensaje en la base de datos
-    const { error: dbError } = await supabaseClient
+    // Guardar el mensaje en la base de datos
+    const { data, error } = await supabaseAdmin
       .from('contact_messages')
-      .insert({
-        name,
-        email,
-        message,
-        status: 'nuevo'
-      });
-
-    if (dbError) {
-      console.error("Error al guardar mensaje:", dbError);
-      return new Response(
-        JSON.stringify({ error: "Error al guardar el mensaje" }),
+      .insert([
         {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          name,
+          email,
+          message,
+          status: 'nuevo',
+          is_archived: false
         }
-      );
-    }
+      ])
+      .select()
 
-    // Aquí puedes añadir lógica para enviar email de notificación si es necesario
+    if (error) throw error
 
     return new Response(
-      JSON.stringify({ success: true, message: "Mensaje enviado correctamente" }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      JSON.stringify({ success: true, data }),
+      { 
+        status: 200, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
       }
-    );
+    )
   } catch (error) {
-    console.error("Error en el servidor:", error);
     return new Response(
-      JSON.stringify({ error: "Error en el servidor" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
       }
-    );
+    )
   }
-});
+})
