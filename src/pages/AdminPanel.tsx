@@ -10,6 +10,7 @@ import { AdminBlog } from "@/components/admin/AdminBlog"
 import { AdminPhysicalShipping } from "@/components/admin/shipping/AdminPhysicalShipping"
 import { AdminESimDelivery } from "@/components/admin/shipping/AdminESimDelivery"
 import { AdminActivations } from "@/components/admin/activations/AdminActivations"
+import { AdminMessages } from "@/components/admin/AdminMessages"
 import { Routes, Route } from "react-router-dom"
 import { OrdersProvider } from "@/contexts/OrdersContext"
 
@@ -26,6 +27,7 @@ export default function AdminPanel() {
           <Route path="esim-delivery" element={<AdminESimDelivery />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="messages" element={<AdminMessages />} />
           <Route path="emails" element={<AdminEmails />} />
           <Route path="settings" element={<AdminSettings />} />
         </Routes>

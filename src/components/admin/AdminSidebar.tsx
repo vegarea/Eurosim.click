@@ -9,7 +9,8 @@ import {
   Truck,
   QrCode,
   BookOpen,
-  Calendar
+  Calendar,
+  MessageSquare
 } from "lucide-react"
 import {
   Sidebar,
@@ -63,6 +64,11 @@ const menuItems = [
     title: "Productos",
     path: "/admin/products",
     icon: Package,
+  },
+  {
+    title: "Mensajes",
+    path: "/admin/messages",
+    icon: MessageSquare,
   },
   {
     title: "Emails",
