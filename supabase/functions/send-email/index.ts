@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
@@ -30,12 +31,15 @@ serve(async (req) => {
 
     let emailContent: { subject: string; html: string; cc?: string[] }
 
-    if (isTest) {
+    // Modo directo o de prueba (sin plantilla)
+    if (isTest || (subject && html)) {
       if (!subject || !html) {
-        throw new Error('Subject y html son requeridos para emails de prueba')
+        throw new Error('Subject y html son requeridos para emails directos o de prueba')
       }
       emailContent = { subject, html }
-    } else {
+    } 
+    // Modo plantilla (con templateId)
+    else {
       if (!templateId) {
         throw new Error('templateId es requerido para emails normales')
       }
@@ -80,41 +84,30 @@ serve(async (req) => {
         `<img src="${absoluteLogoUrl}" alt="Euro Connect" style="max-width: 200px; height: auto;">`
       )
 
-      // Determinar el mensaje según el tipo de producto
-      const isEsim = variables?.type === 'esim'
-      
-      // Mensaje común para ambos tipos
-      const validityMessage = `
-        <p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          - A partir de esta fecha comenzarán a contar los 30 días de Vigencia en tus datos asignados, podrás siempre recargar durante la vigencia.
-        </p>
-      `
+      // Si es una respuesta de contacto, agregar el mensaje original y la respuesta
+      if (variables?.mensaje_original && variables?.respuesta) {
+        const contactResponseSection = `
+          <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+            <h3 style="color: #333; margin-top: 0;">Tu mensaje:</h3>
+            <p style="color: #666; font-style: italic; margin-bottom: 20px; padding: 10px; background-color: #fff; border-left: 4px solid #ddd; border-radius: 4px;">
+              ${variables.mensaje_original}
+            </p>
+            
+            <h3 style="color: #333;">Nuestra respuesta:</h3>
+            <p style="color: #333; margin-bottom: 0; padding: 10px; background-color: #fff; border-left: 4px solid #4CAF50; border-radius: 4px;">
+              ${variables.respuesta}
+            </p>
+          </div>
+        `;
+        
+        // Insertar la sección de respuesta antes del cierre del cuerpo principal
+        processedHtml = processedHtml.replace(
+          /(<\/main>|<\/body>)/i,
+          `${contactResponseSection}$1`
+        );
+      }
 
-      // Mensaje específico para eSIM
-      const esimMessage = `
-        <p style="color: #1a1f2c; font-size: 18px; font-weight: bold; background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          ${validityMessage}
-          - Recuerda que recibirás tu código QR de activación vía email un día antes de tu fecha de activación además de las instrucciones simples para activar tus datos
-        </p>
-      `
-
-      // Mensaje específico para SIM física
-      const physicalSimMessage = `
-        <div style="margin: 20px 0;">
-          <p style="color: #666; margin-bottom: 20px;">
-            Tu envío se está procesando y te notificaremos por email cuando haya sido enviado con tu número de guía.
-          </p>
-          ${validityMessage}
-        </div>
-      `
-
-      // Reemplazar el mensaje según el tipo
-      const messageToInsert = isEsim ? esimMessage : physicalSimMessage
-      processedHtml = processedHtml.replace(
-        /<p style="color: #666;">(Tu compra ha sido procesada.*?|Tu SIM está procesando.*?)<\/p>/,
-        messageToInsert
-      )
-
+      // Procesar todas las variables en la plantilla
       if (variables) {
         Object.entries(variables).forEach(([key, value]) => {
           const regex = new RegExp(`{${key}}`, 'g')

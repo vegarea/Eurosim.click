@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { ContactMessage } from "./types"
 import { toast } from "sonner"
+import { getEmailTemplate } from "@/services/emailService"
 
 export function useContactMessages() {
   const [messages, setMessages] = useState<ContactMessage[]>([])
@@ -75,20 +76,23 @@ export function useContactMessages() {
     
     setResponding(true)
     try {
-      // Enviar respuesta por email
+      // Obtener una plantilla de contacto (puedes crear una específica para respuestas de contacto)
+      const contactTemplate = await getEmailTemplate('both', 'processing')
+      
+      if (!contactTemplate) {
+        throw new Error('No se encontró una plantilla válida para emails de contacto')
+      }
+      
+      // Enviar respuesta por email usando la plantilla
       const { data: emailData, error: emailError } = await supabase.functions.invoke('send-email', {
         body: {
+          templateId: contactTemplate.id,
           to: [selectedMessage.email],
-          subject: 'Respuesta a tu mensaje de contacto',
-          html: `
-            <h1>Hola ${selectedMessage.name},</h1>
-            <p>Hemos recibido tu mensaje y queremos responderte:</p>
-            <blockquote style="margin: 15px 0; padding: 10px; border-left: 4px solid #ddd; color: #666;">
-              ${responseText}
-            </blockquote>
-            <p>Gracias por contactarnos.</p>
-            <p>El equipo de EuroSim</p>
-          `
+          variables: {
+            nombre_cliente: selectedMessage.name,
+            mensaje_original: selectedMessage.message,
+            respuesta: responseText
+          }
         }
       })
       
@@ -123,7 +127,7 @@ export function useContactMessages() {
       setResponseText("")
     } catch (error) {
       console.error('Error al enviar respuesta:', error)
-      toast.error('Error al enviar respuesta')
+      toast.error('Error al enviar respuesta: ' + (error instanceof Error ? error.message : 'Error desconocido'))
     } finally {
       setResponding(false)
     }
