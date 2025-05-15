@@ -28,33 +28,36 @@ export function AiraloProducts() {
       const mockProducts: AiraloProduct[] = [
         {
           id: "1",
+          airalo_product_id: "airalo-001",
           name: "Europa Unlimited",
           description: "Datos ilimitados en toda Europa",
           countries: ["España", "Francia", "Italia", "Alemania"],
-          validityDays: 30,
-          dataAmount: 20,
-          price: 29.99,
+          validity_days: 30,
+          data_amount: 20,
+          price: 2999,
           currency: "EUR",
-          isPopular: true
+          is_popular: true
         },
         {
           id: "2",
+          airalo_product_id: "airalo-002",
           name: "América del Norte",
           description: "Cobertura en EEUU, Canadá y México",
           countries: ["Estados Unidos", "Canadá", "México"],
-          validityDays: 15,
-          dataAmount: 10,
-          price: 19.99,
+          validity_days: 15,
+          data_amount: 10,
+          price: 1999,
           currency: "EUR"
         },
         {
           id: "3",
+          airalo_product_id: "airalo-003",
           name: "Asia Premium",
           description: "Conexión de alta velocidad en Asia",
           countries: ["Japón", "Corea del Sur", "China", "Tailandia"],
-          validityDays: 10,
-          dataAmount: 5,
-          price: 15.99,
+          validity_days: 10,
+          data_amount: 5,
+          price: 1599,
           currency: "EUR"
         }
       ]
@@ -171,14 +174,14 @@ export function AiraloProducts() {
                         <h3 className="font-medium">{product.name}</h3>
                         <p className="text-muted-foreground text-sm">{product.description}</p>
                       </div>
-                      {product.isPopular && (
+                      {product.is_popular && (
                         <Badge className="bg-brand-500">Popular</Badge>
                       )}
                     </div>
                     
                     <div className="flex gap-2 mt-2 mb-2">
-                      <Badge variant="outline">{product.dataAmount} GB</Badge>
-                      <Badge variant="outline">{product.validityDays} días</Badge>
+                      <Badge variant="outline">{product.data_amount} GB</Badge>
+                      <Badge variant="outline">{product.validity_days} días</Badge>
                     </div>
                     
                     <div className="flex flex-wrap gap-1 mt-2">
@@ -191,7 +194,7 @@ export function AiraloProducts() {
                     
                     <div className="flex justify-between items-center mt-4">
                       <div className="font-semibold text-lg">
-                        {product.price} {product.currency}
+                        {(product.price / 100).toFixed(2)} {product.currency}
                       </div>
                       <Button size="sm">
                         Importar Producto
