@@ -111,11 +111,12 @@ export interface AiraloPackageListResponse {
 
 // Get Packages Parameters
 export interface AiraloGetPackagesParams {
+  [key: string]: string | number | boolean | undefined;
   'filter[type]'?: 'local' | 'global';
   'filter[country]'?: string;
   limit?: number;
   page?: number;
-  include?: 'topup';
+  include?: string;
 }
 
 // Order Request

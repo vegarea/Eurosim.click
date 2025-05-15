@@ -9,7 +9,8 @@ import {
   AiraloOrder,
   AiraloOrderRequest,
   AiraloESim,
-  AiraloGetPackagesParams
+  AiraloGetPackagesParams,
+  AiraloCountry
 } from "@/types/airalo/api-types";
 
 /**
@@ -334,7 +335,7 @@ export class AiraloClient {
    * Get available countries
    */
   async getCountries(): Promise<AiraloCountry[]> {
-    const response = await this.request<{countries: any[]}>('/v2/countries');
+    const response = await this.request<{countries: AiraloCountry[]}>('/v2/countries');
     
     if (response.meta === 'success' && response.data?.countries) {
       return response.data.countries;
