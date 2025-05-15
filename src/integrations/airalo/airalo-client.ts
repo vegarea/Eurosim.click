@@ -69,7 +69,8 @@ export class AiraloClient {
   private async request<T>(
     endpoint: string, 
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
-    body?: any
+    body?: any,
+    isFormData = false
   ): Promise<AiraloApiResponse<T>> {
     // Ensure client is initialized
     if (!this.initialized || !this.credentials) {
@@ -91,18 +92,39 @@ export class AiraloClient {
       const authHeader = `Bearer ${api_key}:${api_secret}`;
       
       // Build request options
+      const headers: Record<string, string> = {
+        'Authorization': authHeader,
+        'Accept': 'application/json'
+      };
+      
+      // Don't set Content-Type for FormData, let the browser set it with the boundary
+      if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+      }
+      
       const options: RequestInit = {
         method,
-        headers: {
-          'Authorization': authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+        headers
       };
       
       // Add body for POST/PUT requests
-      if (body && (method === 'POST' || method === 'PUT')) {
-        options.body = JSON.stringify(body);
+      if (body) {
+        if (isFormData) {
+          // For FormData, use the FormData object directly
+          const formData = new FormData();
+          
+          // Add each field to the FormData object
+          for (const [key, value] of Object.entries(body)) {
+            if (value !== undefined && value !== null) {
+              formData.append(key, String(value));
+            }
+          }
+          
+          options.body = formData;
+        } else if (method === 'POST' || method === 'PUT') {
+          // For JSON, stringify the body
+          options.body = JSON.stringify(body);
+        }
       }
       
       // Make the request
@@ -164,9 +186,15 @@ export class AiraloClient {
 
   /**
    * Submit an order for an eSIM package
+   * Uses multipart/form-data format as required by the Airalo API
    */
   async submitOrder(orderRequest: AiraloOrderRequest): Promise<AiraloOrder | null> {
-    const response = await this.request<AiraloOrder>('/v2/orders', 'POST', orderRequest);
+    const response = await this.request<AiraloOrder>(
+      '/v2/orders',
+      'POST',
+      orderRequest,
+      true // Use FormData for this request
+    );
     
     if (response.meta === 'success' && response.data) {
       return response.data;

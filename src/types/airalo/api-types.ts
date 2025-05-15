@@ -96,6 +96,8 @@ export interface AiraloPackage {
 // Order Request
 export interface AiraloOrderRequest {
   package_id: string;
+  quantity?: number;
+  type?: 'sim';
   contact_point?: string;
   description?: string;
   brand_settings_name?: string;
@@ -105,7 +107,7 @@ export interface AiraloOrderRequest {
 export interface AiraloOrder {
   id: string;
   code: string;
-  airalo_code: string;
+  airalo_code?: string;
   iccid: string;
   status: string;
   package: {
@@ -126,6 +128,13 @@ export interface AiraloOrder {
   created_at: string;
   expired_at?: string;
   direct_apple_installation_url?: string;
+  manual_installation?: string;
+  qrcode_installation?: string;
+  installation_guides?: {
+    [language: string]: string;
+  };
+  brand_settings_name?: string;
+  description?: string;
 }
 
 // eSIM Information
@@ -160,6 +169,7 @@ export interface AiraloESim {
   };
   msisdn?: string;
   confirmation_code?: string;
+  direct_apple_installation_url?: string;
 }
 
 // Installation Instructions

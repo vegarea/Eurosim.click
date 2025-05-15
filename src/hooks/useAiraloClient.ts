@@ -89,19 +89,30 @@ export const useAiraloClient = () => {
   };
 
   // Submit an order
-  const submitOrder = async (
-    packageId: string, 
-    contactPoint?: string,
-    description?: string
-  ): Promise<AiraloOrder | null> => {
+  const submitOrder = async ({
+    packageId,
+    quantity = 1,
+    contactPoint,
+    description,
+    brandSettingsName
+  }: {
+    packageId: string;
+    quantity?: number;
+    contactPoint?: string;
+    description?: string;
+    brandSettingsName?: string;
+  }): Promise<AiraloOrder | null> => {
     setIsLoading(true);
     setError(null);
     
     try {
       const order = await airaloClient.submitOrder({
         package_id: packageId,
+        quantity,
+        type: 'sim',
         contact_point: contactPoint,
-        description
+        description,
+        brand_settings_name: brandSettingsName
       });
       
       return order;

@@ -1,4 +1,5 @@
 
+
 # Airalo API - Endpoints
 
 This document outlines the key endpoints available in the Airalo Partner API. All endpoints use a base URL of:
@@ -52,6 +53,18 @@ Retrieve available top-up packages for an existing eSIM.
 POST /v2/orders
 ```
 Create a new eSIM order.
+
+**Parameters:**
+- `quantity` (required) - Number of items in the order (max 50)
+- `package_id` (required) - ID of the eSIM package to order
+- `type` (optional) - Type of order (only "sim" is valid, default is "sim")
+- `description` (optional) - Custom description to identify the order
+- `brand_settings_name` (optional) - Brand name for the eSIM, null for unbranded
+
+**Response includes:**
+- Order details (ID, code, price, etc.)
+- Installation instructions (QR code, manual installation)
+- Direct Apple installation URL (for iOS 17.4+)
 
 ### Get Order
 ```
@@ -110,3 +123,4 @@ Retrieve notification settings for your account.
 PUT /v2/notifications/settings
 ```
 Update notification settings for your account.
+
