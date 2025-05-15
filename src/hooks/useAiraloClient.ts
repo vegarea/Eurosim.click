@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { airaloClient } from '@/integrations/airalo/airalo-client';
-import { AiraloPackage, AiraloOrder } from '@/types/airalo/api-types';
+import { AiraloPackage, AiraloOrder, AiraloGetPackagesParams } from '@/types/airalo/api-types';
 
 /**
  * Hook for interacting with the Airalo API
@@ -54,13 +54,13 @@ export const useAiraloClient = () => {
     }
   };
 
-  // Get available packages
-  const getPackages = async (): Promise<AiraloPackage[]> => {
+  // Get available packages with filtering options
+  const getPackages = async (params?: AiraloGetPackagesParams): Promise<AiraloPackage[]> => {
     setIsLoading(true);
     setError(null);
     
     try {
-      const packages = await airaloClient.getPackages();
+      const packages = await airaloClient.getPackages(params);
       return packages;
     } catch (err) {
       setError('Failed to fetch Airalo packages.');
@@ -142,6 +142,23 @@ export const useAiraloClient = () => {
     }
   };
 
+  // Get list of orders
+  const getOrders = async (page: number = 1, limit: number = 10): Promise<AiraloOrder[]> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const orders = await airaloClient.getOrders(page, limit);
+      return orders;
+    } catch (err) {
+      setError('Failed to fetch orders.');
+      console.error(err);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Get eSIM details
   const getEsim = async (iccid: string): Promise<any | null> => {
     setIsLoading(true);
@@ -179,6 +196,40 @@ export const useAiraloClient = () => {
     }
   };
 
+  // Get top-up packages
+  const getTopupPackages = async (iccid: string): Promise<AiraloPackage[]> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const packages = await airaloClient.getTopupPackages(iccid);
+      return packages;
+    } catch (err) {
+      setError('Failed to fetch top-up packages.');
+      console.error(err);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Get available countries
+  const getCountries = async (): Promise<any[]> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const countries = await airaloClient.getCountries();
+      return countries;
+    } catch (err) {
+      setError('Failed to fetch countries.');
+      console.error(err);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isInitialized,
     isLoading,
@@ -188,7 +239,10 @@ export const useAiraloClient = () => {
     getPackageDetails,
     submitOrder,
     getOrder,
+    getOrders,
     getEsim,
-    getInstallationInstructions
+    getInstallationInstructions,
+    getTopupPackages,
+    getCountries
   };
 };

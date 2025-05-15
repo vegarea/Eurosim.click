@@ -1,5 +1,6 @@
 
 
+
 # Airalo API - Endpoints
 
 This document outlines the key endpoints available in the Airalo Partner API. All endpoints use a base URL of:
@@ -33,6 +34,24 @@ Retrieve list of operators in supported countries.
 GET /v2/packages
 ```
 Retrieve list of available eSIM packages.
+
+**Rate Limit:** 40 requests per minute.
+
+**Parameters:**
+- `filter[type]` (optional) - Filter packages by operator type. Values: "local" or "global".
+  - "global": Returns only global and regional eSIMs. 
+  - "local": Returns only country-specific packages.
+  - When not specified, returns all types of eSIMs.
+- `filter[country]` (optional) - Filter packages by country code (e.g., US, DE, GB).
+- `limit` (optional) - Number of items to return per page.
+- `page` (optional) - Page number for pagination.
+- `include` (optional) - Set to "topup" to include topup packages in the response.
+
+**Response includes:**
+- Package information (name, data amount, validity, price, etc.)
+- Country coverage
+- Operator details
+- Package type information (data, voice, text)
 
 ### Get Package Details
 ```
@@ -123,4 +142,5 @@ Retrieve notification settings for your account.
 PUT /v2/notifications/settings
 ```
 Update notification settings for your account.
+
 

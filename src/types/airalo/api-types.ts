@@ -35,6 +35,14 @@ export interface AiraloPagination {
   };
 }
 
+// Paginated Response
+export interface AiraloPaginatedResponse<T> {
+  data: T[];
+  meta: {
+    pagination: AiraloPagination;
+  };
+}
+
 // Country Information
 export interface AiraloCountry {
   id: string;
@@ -63,6 +71,8 @@ export interface AiraloOperator {
     width?: number;
     height?: number;
   };
+  type?: 'local' | 'global'; // Type of operator
+  slug?: string; // Slug identifier (e.g., 'world', 'europe', etc.)
 }
 
 // Package Information
@@ -91,6 +101,21 @@ export interface AiraloPackage {
   other_info?: string;
   plan_type: 'data' | 'data-voice' | 'data-voice-text';
   rechargeability?: boolean;
+}
+
+// Package List Response
+export interface AiraloPackageListResponse {
+  packages: AiraloPackage[];
+  pagination?: AiraloPagination;
+}
+
+// Get Packages Parameters
+export interface AiraloGetPackagesParams {
+  'filter[type]'?: 'local' | 'global';
+  'filter[country]'?: string;
+  limit?: number;
+  page?: number;
+  include?: 'topup';
 }
 
 // Order Request
