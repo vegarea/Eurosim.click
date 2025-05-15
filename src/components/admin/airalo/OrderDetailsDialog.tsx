@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, FileText, QrCode, Smartphone } from "lucide-react";
-import Image from "next/image";
 
 interface OrderDetailsDialogProps {
   open: boolean;
