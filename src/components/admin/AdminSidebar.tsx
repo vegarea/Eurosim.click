@@ -10,7 +10,8 @@ import {
   QrCode,
   BookOpen,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Globe
 } from "lucide-react"
 import {
   Sidebar,
@@ -54,6 +55,11 @@ const menuItems = [
     title: "Envíos E-SIM",
     path: "/admin/esim-delivery",
     icon: QrCode,
+  },
+  {
+    title: "Airalo",
+    path: "/admin/airalo",
+    icon: Globe,
   },
   {
     title: "Clientes",
