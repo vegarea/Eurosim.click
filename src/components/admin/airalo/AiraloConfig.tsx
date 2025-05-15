@@ -16,10 +16,10 @@ export function AiraloConfig() {
   const queryClient = useQueryClient()
   
   const [formState, setFormState] = useState<AiraloApiConfig>({
-    apiKey: "",
-    apiSecret: "",
-    apiUrl: "https://api.airalo.com/v2",
-    isActive: false
+    api_key: "",
+    api_secret: "",
+    api_url: "https://api.airalo.com/v2",
+    is_active: false
   })
   
   const [isTestingConnection, setIsTestingConnection] = useState(false)
@@ -38,10 +38,10 @@ export function AiraloConfig() {
       
       if (data) {
         setFormState({
-          apiKey: data.api_key || "",
-          apiSecret: data.api_secret || "",
-          apiUrl: data.api_url || "https://api.airalo.com/v2",
-          isActive: data.is_active || false
+          api_key: data.api_key || "",
+          api_secret: data.api_secret || "",
+          api_url: data.api_url || "https://api.airalo.com/v2",
+          is_active: data.is_active || false
         })
         return data
       }
@@ -57,10 +57,10 @@ export function AiraloConfig() {
         .from('airalo_settings')
         .upsert({
           id: "airalo-config",
-          api_key: config.apiKey,
-          api_secret: config.apiSecret,
-          api_url: config.apiUrl,
-          is_active: config.isActive
+          api_key: config.api_key,
+          api_secret: config.api_secret,
+          api_url: config.api_url,
+          is_active: config.is_active
         })
         .select()
       
@@ -95,9 +95,9 @@ export function AiraloConfig() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          apiKey: formState.apiKey,
-          apiSecret: formState.apiSecret,
-          apiUrl: formState.apiUrl,
+          apiKey: formState.api_key,
+          apiSecret: formState.api_secret,
+          apiUrl: formState.api_url,
         }),
       })
       
@@ -150,8 +150,8 @@ export function AiraloConfig() {
             <Label htmlFor="apiKey">API Key</Label>
             <Input 
               id="apiKey" 
-              value={formState.apiKey} 
-              onChange={e => setFormState({...formState, apiKey: e.target.value})}
+              value={formState.api_key} 
+              onChange={e => setFormState({...formState, api_key: e.target.value})}
               placeholder="Ingresa tu API Key de Airalo"
             />
           </div>
@@ -161,8 +161,8 @@ export function AiraloConfig() {
             <Input 
               id="apiSecret" 
               type="password"
-              value={formState.apiSecret} 
-              onChange={e => setFormState({...formState, apiSecret: e.target.value})}
+              value={formState.api_secret} 
+              onChange={e => setFormState({...formState, api_secret: e.target.value})}
               placeholder="Ingresa tu API Secret de Airalo"
             />
           </div>
@@ -171,8 +171,8 @@ export function AiraloConfig() {
             <Label htmlFor="apiUrl">URL de la API</Label>
             <Input 
               id="apiUrl" 
-              value={formState.apiUrl} 
-              onChange={e => setFormState({...formState, apiUrl: e.target.value})}
+              value={formState.api_url} 
+              onChange={e => setFormState({...formState, api_url: e.target.value})}
               placeholder="URL de la API de Airalo"
             />
           </div>
@@ -180,8 +180,8 @@ export function AiraloConfig() {
           <div className="flex items-center space-x-2">
             <Switch 
               id="isActive" 
-              checked={formState.isActive} 
-              onCheckedChange={checked => setFormState({...formState, isActive: checked})}
+              checked={formState.is_active} 
+              onCheckedChange={checked => setFormState({...formState, is_active: checked})}
             />
             <Label htmlFor="isActive">Activar integración con Airalo</Label>
           </div>
@@ -205,7 +205,7 @@ export function AiraloConfig() {
         <Button 
           variant="outline" 
           onClick={testConnection} 
-          disabled={isTestingConnection || !formState.apiKey || !formState.apiSecret}
+          disabled={isTestingConnection || !formState.api_key || !formState.api_secret}
         >
           <Globe className="mr-2 h-4 w-4" />
           Probar conexión

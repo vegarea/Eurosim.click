@@ -9,7 +9,7 @@ import { useState } from "react"
 export function AiraloReports() {
   const [period, setPeriod] = useState("month")
 
-  // Datos simulados para gráficos
+  // Datos simulados para gráficos - adaptados para nuestro componente Chart
   const salesData = {
     labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
     datasets: [
@@ -23,38 +23,25 @@ export function AiraloReports() {
     ],
   }
 
-  const regionsData = {
-    labels: ['Europa', 'América del Norte', 'Asia', 'Oceanía', 'América del Sur', 'África'],
-    datasets: [
-      {
-        label: 'Ventas por región',
-        data: [35, 25, 22, 8, 7, 3],
-        backgroundColor: [
-          '#36a2eb',
-          '#ff6384',
-          '#4bc0c0',
-          '#ffcd56',
-          '#9966ff',
-          '#ff9f40'
-        ],
-        borderWidth: 1,
-      },
-    ],
-  }
+  // Transformar los datos para que funcionen con nuestro componente recharts
+  const transformedSalesData = salesData.labels.map((month, index) => ({
+    name: month,
+    'Ventas de eSIM': salesData.datasets[0].data[index],
+  }))
+  
+  const regionsData = [
+    { name: 'Europa', value: 35 },
+    { name: 'América del Norte', value: 25 },
+    { name: 'Asia', value: 22 },
+    { name: 'Oceanía', value: 8 },
+    { name: 'América del Sur', value: 7 },
+    { name: 'África', value: 3 }
+  ]
 
-  const revenueData = {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    datasets: [
-      {
-        label: 'Ingresos (EUR)',
-        fill: true,
-        data: [500, 800, 200, 350, 150, 250, 1000, 1500, 900, 600, 850, 1200],
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgb(54, 162, 235)',
-        tension: 0.4,
-      },
-    ],
-  }
+  const revenueChartData = salesData.labels.map((month, index) => ({
+    name: month,
+    'Ingresos (EUR)': [500, 800, 200, 350, 150, 250, 1000, 1500, 900, 600, 850, 1200][index],
+  }))
 
   return (
     <div className="space-y-4">
@@ -96,19 +83,14 @@ export function AiraloReports() {
             <TabsContent value="sales" className="space-y-4">
               <div className="h-[350px]">
                 <BarChart 
-                  data={salesData}
+                  data={transformedSalesData}
                   options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                      },
-                      title: {
-                        display: true,
-                        text: 'Ventas de eSIM por mes'
+                    datasets: [
+                      {
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgb(75, 192, 192)'
                       }
-                    }
+                    ]
                   }}
                 />
               </div>
@@ -150,17 +132,18 @@ export function AiraloReports() {
                   <PieChart 
                     data={regionsData}
                     options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      plugins: {
-                        legend: {
-                          position: 'bottom',
-                        },
-                        title: {
-                          display: true,
-                          text: 'Distribución de ventas por región'
+                      datasets: [
+                        {
+                          backgroundColor: [
+                            '#36a2eb',
+                            '#ff6384',
+                            '#4bc0c0',
+                            '#ffcd56',
+                            '#9966ff',
+                            '#ff9f40'
+                          ],
                         }
-                      }
+                      ]
                     }}
                   />
                 </div>
@@ -233,19 +216,14 @@ export function AiraloReports() {
             <TabsContent value="revenue">
               <div className="h-[400px]">
                 <LineChart 
-                  data={revenueData}
+                  data={revenueChartData}
                   options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                      },
-                      title: {
-                        display: true,
-                        text: 'Ingresos mensuales de ventas eSIM'
+                    datasets: [
+                      {
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
                       }
-                    }
+                    ]
                   }}
                 />
               </div>

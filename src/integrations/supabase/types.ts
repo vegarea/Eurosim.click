@@ -69,6 +69,168 @@ export type Database = {
         }
         Relationships: []
       }
+      airalo_orders: {
+        Row: {
+          activation_code: string | null
+          activation_date: string | null
+          airalo_order_id: string | null
+          currency: string
+          customer_id: string | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          order_id: string | null
+          ordered_at: string | null
+          price: number
+          product_id: string | null
+          qr_code: string | null
+          status: string
+        }
+        Insert: {
+          activation_code?: string | null
+          activation_date?: string | null
+          airalo_order_id?: string | null
+          currency?: string
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          order_id?: string | null
+          ordered_at?: string | null
+          price: number
+          product_id?: string | null
+          qr_code?: string | null
+          status?: string
+        }
+        Update: {
+          activation_code?: string | null
+          activation_date?: string | null
+          airalo_order_id?: string | null
+          currency?: string
+          customer_id?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          order_id?: string | null
+          ordered_at?: string | null
+          price?: number
+          product_id?: string | null
+          qr_code?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airalo_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airalo_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "airalo_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "airalo_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      airalo_products: {
+        Row: {
+          airalo_product_id: string
+          countries: Json
+          created_at: string | null
+          currency: string
+          data_amount: number
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_popular: boolean | null
+          local_product_id: string | null
+          name: string
+          price: number
+          updated_at: string | null
+          validity_days: number
+        }
+        Insert: {
+          airalo_product_id: string
+          countries?: Json
+          created_at?: string | null
+          currency?: string
+          data_amount: number
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          local_product_id?: string | null
+          name: string
+          price: number
+          updated_at?: string | null
+          validity_days: number
+        }
+        Update: {
+          airalo_product_id?: string
+          countries?: Json
+          created_at?: string | null
+          currency?: string
+          data_amount?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_popular?: boolean | null
+          local_product_id?: string | null
+          name?: string
+          price?: number
+          updated_at?: string | null
+          validity_days?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "airalo_products_local_product_id_fkey"
+            columns: ["local_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      airalo_settings: {
+        Row: {
+          api_key: string
+          api_secret: string
+          api_url: string
+          created_at: string | null
+          id: string
+          is_active: boolean
+          updated_at: string | null
+        }
+        Insert: {
+          api_key: string
+          api_secret: string
+          api_url?: string
+          created_at?: string | null
+          id: string
+          is_active?: boolean
+          updated_at?: string | null
+        }
+        Update: {
+          api_key?: string
+          api_secret?: string
+          api_url?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       blog_automation_settings: {
         Row: {
           created_at: string | null
