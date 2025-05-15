@@ -238,3 +238,45 @@ export interface AiraloErrorResponse {
   message: string;
   code: number;
 }
+
+// Webhook Simulator Request Types
+export interface AiraloWebhookSimulationRequest {
+  event: 'low_data_notification' | 'expiration_notification' | 'order_activated';
+  type: 'expire_1' | 'expire_3' | 'expire_7' | 'data_20' | 'data_50' | 'data_80';
+  iccid?: string;
+}
+
+// Webhook Simulator Response
+export interface AiraloWebhookSimulationResponse {
+  success: string;
+}
+
+// Webhook Notification Types (for actual webhook handling)
+export interface AiraloWebhookNotification {
+  event: string;
+  type: string;
+  esim: AiraloESimWebhookData;
+  meta: {
+    date: string;
+    webhook_id: string;
+  };
+}
+
+// eSIM data included in webhook notifications
+export interface AiraloESimWebhookData {
+  iccid: string;
+  package: {
+    id: string;
+    name: string;
+    data: {
+      total: number; // in MB
+      remaining: number; // in MB
+      percentage: number; // percentage remaining
+    };
+    validity: {
+      days: number;
+      remaining_days: number;
+      expired_at: string; // ISO date string
+    };
+  };
+}

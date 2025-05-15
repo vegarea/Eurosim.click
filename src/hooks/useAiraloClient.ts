@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { airaloClient } from '@/integrations/airalo/airalo-client';
-import { AiraloPackage, AiraloOrder, AiraloGetPackagesParams } from '@/types/airalo/api-types';
+import { AiraloPackage, AiraloOrder, AiraloGetPackagesParams, AiraloWebhookSimulationRequest } from '@/types/airalo/api-types';
 
 /**
  * Hook for interacting with the Airalo API
@@ -230,6 +229,28 @@ export const useAiraloClient = () => {
     }
   };
 
+  // Simulate webhook
+  const simulateWebhook = async (request: AiraloWebhookSimulationRequest): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const success = await airaloClient.simulateWebhook(request);
+      
+      if (!success) {
+        setError('Failed to simulate webhook notification.');
+      }
+      
+      return success;
+    } catch (err) {
+      setError('An error occurred while simulating webhook notification.');
+      console.error(err);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     isInitialized,
     isLoading,
@@ -243,6 +264,7 @@ export const useAiraloClient = () => {
     getEsim,
     getInstallationInstructions,
     getTopupPackages,
-    getCountries
+    getCountries,
+    simulateWebhook
   };
 };

@@ -1,223 +1,275 @@
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
+import { useAiraloClient } from "@/hooks/useAiraloClient"
 import { supabase } from "@/integrations/supabase/client"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { AiraloApiConfig } from "@/types/airalo"
-import { Globe, KeyRound, ShieldCheck, CheckCircle2, XCircle } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { WebhookTester } from "./WebhookTester"
+import { AlertTriangle, CheckCircle2 } from "lucide-react"
+
+interface AiraloSettings {
+  id: string
+  is_active: boolean
+  api_key: string
+  api_secret: string
+  api_url: string
+  webhook_url?: string
+}
 
 export function AiraloConfig() {
   const { toast } = useToast()
-  const queryClient = useQueryClient()
-  
-  const [formState, setFormState] = useState<AiraloApiConfig>({
-    api_key: "",
-    api_secret: "",
-    api_url: "https://api.airalo.com/v2",
-    is_active: false
-  })
-  
-  const [isTestingConnection, setIsTestingConnection] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle")
+  const { checkConnection } = useAiraloClient()
+  const [settings, setSettings] = useState<AiraloSettings | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [testingConnection, setTestingConnection] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [activeTab, setActiveTab] = useState('general')
 
-  // Cargar configuración existente
-  const { data: config, isLoading } = useQuery({
-    queryKey: ['airalo-config'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('airalo_settings')
-        .select('*')
-        .maybeSingle()
-      
-      if (error) throw error
-      
-      if (data) {
-        setFormState({
-          api_key: data.api_key || "",
-          api_secret: data.api_secret || "",
-          api_url: data.api_url || "https://api.airalo.com/v2",
-          is_active: data.is_active || false
-        })
-        return data
+  const { register, handleSubmit, setValue, watch } = useForm<AiraloSettings>({
+    defaultValues: {
+      id: 'airalo',
+      is_active: false,
+      api_key: '',
+      api_secret: '',
+      api_url: 'https://sandbox-partners-api.airalo.com/v2',
+      webhook_url: ''
+    }
+  })
+
+  // Watch form values
+  const apiUrl = watch('api_url')
+  const isActive = watch('is_active')
+
+  // Load settings from Supabase
+  useEffect(() => {
+    const loadSettings = async () => {
+      setIsLoading(true)
+      try {
+        const { data, error } = await supabase
+          .from('airalo_settings')
+          .select('*')
+          .maybeSingle()
+
+        if (error) {
+          console.error('Error fetching Airalo settings:', error)
+          toast({
+            title: 'Error',
+            description: 'No se pudieron cargar los ajustes de Airalo',
+            variant: 'destructive',
+          })
+        } else if (data) {
+          setSettings(data as AiraloSettings)
+          
+          // Populate form with data
+          setValue('id', data.id || 'airalo')
+          setValue('is_active', data.is_active || false)
+          setValue('api_key', data.api_key || '')
+          setValue('api_secret', data.api_secret || '')
+          setValue('api_url', data.api_url || 'https://sandbox-partners-api.airalo.com/v2')
+          setValue('webhook_url', data.webhook_url || '')
+        }
+      } catch (error) {
+        console.error('Unexpected error:', error)
+      } finally {
+        setIsLoading(false)
       }
-      
-      return null
     }
-  })
 
-  // Guardar configuración
-  const saveConfigMutation = useMutation({
-    mutationFn: async (config: AiraloApiConfig) => {
-      const { data, error } = await supabase
-        .from('airalo_settings')
-        .upsert({
-          id: "airalo-config",
-          api_key: config.api_key,
-          api_secret: config.api_secret,
-          api_url: config.api_url,
-          is_active: config.is_active
-        })
-        .select()
-      
-      if (error) throw error
-      return data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['airalo-config'] })
-      toast({
-        title: "Configuración guardada",
-        description: "La configuración de Airalo se ha guardado correctamente.",
-      })
-    },
-    onError: (error) => {
-      toast({
-        title: "Error al guardar",
-        description: `Ha ocurrido un error: ${error.message}`,
-        variant: "destructive",
-      })
-    }
-  })
+    loadSettings()
+  }, [setValue, toast])
 
-  // Probar conexión
-  const testConnection = async () => {
-    setIsTestingConnection(true)
-    setConnectionStatus("idle")
-    
+  // Handle form submission
+  const onSubmit = async (data: AiraloSettings) => {
+    setIsLoading(true)
     try {
-      const response = await fetch('/api/test-airalo-connection', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          apiKey: formState.api_key,
-          apiSecret: formState.api_secret,
-          apiUrl: formState.api_url,
-        }),
-      })
-      
-      const result = await response.json()
-      
-      if (response.ok && result.success) {
-        setConnectionStatus("success")
+      const { error } = await supabase
+        .from('airalo_settings')
+        .upsert([data], { onConflict: 'id' })
+
+      if (error) {
+        console.error('Error saving Airalo settings:', error)
         toast({
-          title: "Conexión exitosa",
-          description: "La conexión con Airalo se ha establecido correctamente.",
+          title: 'Error',
+          description: 'No se pudieron guardar los ajustes de Airalo',
+          variant: 'destructive',
         })
       } else {
-        setConnectionStatus("error")
+        setSettings(data)
         toast({
-          title: "Error de conexión",
-          description: result.error || "No se pudo conectar con Airalo.",
-          variant: "destructive",
+          title: 'Éxito',
+          description: 'Configuración de Airalo guardada correctamente',
         })
       }
     } catch (error) {
-      setConnectionStatus("error")
-      toast({
-        title: "Error de conexión",
-        description: "No se pudo conectar con Airalo.",
-        variant: "destructive",
-      })
+      console.error('Unexpected error:', error)
     } finally {
-      setIsTestingConnection(false)
+      setIsLoading(false)
     }
   }
 
-  const handleSave = () => {
-    saveConfigMutation.mutate(formState)
+  // Test API connection
+  const testConnection = async () => {
+    setTestingConnection(true)
+    setConnectionStatus('idle')
+    
+    try {
+      const success = await checkConnection()
+      
+      if (success) {
+        setConnectionStatus('success')
+        toast({
+          title: 'Conexión exitosa',
+          description: 'La conexión con la API de Airalo es correcta',
+        })
+      } else {
+        setConnectionStatus('error')
+        toast({
+          title: 'Error de conexión',
+          description: 'No se pudo conectar con la API de Airalo. Verifica tus credenciales.',
+          variant: 'destructive',
+        })
+      }
+    } catch (error) {
+      setConnectionStatus('error')
+      console.error('Connection test error:', error)
+      toast({
+        title: 'Error de conexión',
+        description: 'Ocurrió un error al intentar conectar con la API de Airalo',
+        variant: 'destructive',
+      })
+    } finally {
+      setTestingConnection(false)
+    }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <KeyRound className="h-5 w-5" />
-          Configuración de la API de Airalo
-        </CardTitle>
-        <CardDescription>
-          Configura las credenciales de la API de Airalo para poder conectarte a sus servicios
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="apiKey">API Key</Label>
-            <Input 
-              id="apiKey" 
-              value={formState.api_key} 
-              onChange={e => setFormState({...formState, api_key: e.target.value})}
-              placeholder="Ingresa tu API Key de Airalo"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="apiSecret">API Secret</Label>
-            <Input 
-              id="apiSecret" 
-              type="password"
-              value={formState.api_secret} 
-              onChange={e => setFormState({...formState, api_secret: e.target.value})}
-              placeholder="Ingresa tu API Secret de Airalo"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="apiUrl">URL de la API</Label>
-            <Input 
-              id="apiUrl" 
-              value={formState.api_url} 
-              onChange={e => setFormState({...formState, api_url: e.target.value})}
-              placeholder="URL de la API de Airalo"
-            />
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Switch 
-              id="isActive" 
-              checked={formState.is_active} 
-              onCheckedChange={checked => setFormState({...formState, is_active: checked})}
-            />
-            <Label htmlFor="isActive">Activar integración con Airalo</Label>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuración de Airalo</CardTitle>
+          <CardDescription>
+            Configura las credenciales para integrar con la API de Airalo para eSIMs internacionales.
+          </CardDescription>
+        </CardHeader>
         
-        {connectionStatus === "success" && (
-          <div className="bg-green-50 text-green-700 p-3 rounded-md flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5" />
-            <span>Conexión exitosa con Airalo</span>
-          </div>
-        )}
-        
-        {connectionStatus === "error" && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-md flex items-center gap-2">
-            <XCircle className="h-5 w-5" />
-            <span>Error al conectar con Airalo. Verifica tus credenciales.</span>
-          </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={testConnection} 
-          disabled={isTestingConnection || !formState.api_key || !formState.api_secret}
-        >
-          <Globe className="mr-2 h-4 w-4" />
-          Probar conexión
-        </Button>
-        <Button 
-          onClick={handleSave} 
-          disabled={saveConfigMutation.isPending}
-        >
-          <ShieldCheck className="mr-2 h-4 w-4" />
-          Guardar configuración
-        </Button>
-      </CardFooter>
-    </Card>
+        <Tabs defaultValue="general" value={activeTab} onValueChange={setActiveTab}>
+          <CardContent>
+            <TabsList className="mb-4">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="general">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch id="is-active" {...register('is_active')} defaultChecked={settings?.is_active} />
+                  <Label htmlFor="is-active">Activar integración con Airalo</Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="api_url">URL de la API</Label>
+                  <Input 
+                    id="api_url" 
+                    {...register('api_url')} 
+                    defaultValue={settings?.api_url || 'https://sandbox-partners-api.airalo.com/v2'}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    {apiUrl.includes('sandbox') ? 
+                      'Usando entorno de pruebas (sandbox)' : 
+                      '⚠️ Usando entorno de producción'}
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="api_key">API Key</Label>
+                  <Input 
+                    id="api_key" 
+                    type="password" 
+                    {...register('api_key')}
+                    defaultValue={settings?.api_key}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="api_secret">API Secret</Label>
+                  <Input 
+                    id="api_secret" 
+                    type="password" 
+                    {...register('api_secret')}
+                    defaultValue={settings?.api_secret}
+                  />
+                </div>
+                
+                <div className="flex justify-between items-center pt-4">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={testConnection}
+                    disabled={testingConnection || !isActive}
+                  >
+                    {testingConnection ? 'Probando...' : 'Probar conexión'}
+                  </Button>
+                  
+                  {connectionStatus === 'success' && (
+                    <div className="flex items-center text-green-500">
+                      <CheckCircle2 className="w-5 h-5 mr-1" />
+                      <span>Conexión exitosa</span>
+                    </div>
+                  )}
+                  
+                  {connectionStatus === 'error' && (
+                    <div className="flex items-center text-destructive">
+                      <AlertTriangle className="w-5 h-5 mr-1" />
+                      <span>Error de conexión</span>
+                    </div>
+                  )}
+                  
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? 'Guardando...' : 'Guardar configuración'}
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="webhooks">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="webhook_url">URL del Webhook</Label>
+                    <Input 
+                      id="webhook_url" 
+                      {...register('webhook_url')}
+                      defaultValue={settings?.webhook_url || ''}
+                      placeholder="https://tu-dominio.com/api/airalo-webhook"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Esta URL recibirá las notificaciones de Airalo cuando ocurran eventos como baja disponibilidad de datos o expiración próxima.
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    type="button" 
+                    onClick={handleSubmit(onSubmit)} 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Guardando...' : 'Guardar URL de Webhook'}
+                  </Button>
+                </div>
+                
+                <div className="pt-4 border-t">
+                  <WebhookTester />
+                </div>
+              </div>
+            </TabsContent>
+          </CardContent>
+        </Tabs>
+      </Card>
+    </div>
   )
 }

@@ -143,4 +143,32 @@ PUT /v2/notifications/settings
 ```
 Update notification settings for your account.
 
+## Webhook Management
+
+### Simulate Webhook
+```
+POST /v2/simulator/webhook
+```
+Simulate a webhook notification to test your webhook endpoint.
+
+**Parameters:**
+- `event` (required) - Event type to simulate (e.g., "low_data_notification")
+- `type` (required) - Notification type (e.g., "expire_1", "data_80")
+- `iccid` (optional) - ICCID of the eSIM to use in the notification
+
+**Available Event Types:**
+- `low_data_notification` - Simulates notifications for low data threshold reached
+- `expiration_notification` - Simulates notifications for upcoming eSIM expiration
+- `order_activated` - Simulates notification when an order is activated
+
+**Available Type Values:**
+- For expiration: `expire_1`, `expire_3`, `expire_7` (days before expiration)
+- For low data: `data_20`, `data_50`, `data_80` (percentage of data used)
+
+**Response:**
+```
+{
+  "success": "Notification sent"
+}
+```
 

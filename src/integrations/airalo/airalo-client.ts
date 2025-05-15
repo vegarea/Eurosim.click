@@ -10,7 +10,9 @@ import {
   AiraloOrderRequest,
   AiraloESim,
   AiraloGetPackagesParams,
-  AiraloCountry
+  AiraloCountry,
+  AiraloWebhookSimulationRequest,
+  AiraloWebhookSimulationResponse
 } from "@/types/airalo/api-types";
 
 /**
@@ -342,6 +344,20 @@ export class AiraloClient {
     }
     
     return [];
+  }
+
+  /**
+   * Simulate a webhook notification
+   * Useful for testing webhook integrations
+   */
+  async simulateWebhook(request: AiraloWebhookSimulationRequest): Promise<boolean> {
+    const response = await this.request<AiraloWebhookSimulationResponse>(
+      '/v2/simulator/webhook',
+      'POST',
+      request
+    );
+    
+    return response.meta === 'success';
   }
 }
 
