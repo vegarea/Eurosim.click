@@ -19,7 +19,7 @@ interface AiraloSettings {
   api_key: string
   api_secret: string
   api_url: string
-  webhook_url?: string
+  webhook_url?: string | null
 }
 
 export function AiraloConfig() {
