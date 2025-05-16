@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -98,6 +99,67 @@ export interface Database {
           metadata?: Json | null
           created_at?: string | null
           updated_at?: string | null
+        }
+      }
+      airalo_settings: {
+        Row: {
+          id: string
+          is_active: boolean
+          api_key: string
+          api_secret: string
+          api_url: string
+          webhook_url: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          is_active?: boolean
+          api_key: string
+          api_secret: string
+          api_url?: string
+          webhook_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          api_key?: string
+          api_secret?: string
+          api_url?: string
+          webhook_url?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+      }
+      airalo_webhook_logs: {
+        Row: {
+          id: string
+          event_type: string
+          payload: Json
+          received_at: string
+          processed_at: string | null
+          is_processed: boolean | null
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          event_type: string
+          payload: Json
+          received_at: string
+          processed_at?: string | null
+          is_processed?: boolean | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          event_type?: string
+          payload?: Json
+          received_at?: string
+          processed_at?: string | null
+          is_processed?: boolean | null
+          notes?: string | null
         }
       }
       orders: {
