@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useToast } from "@/components/ui/use-toast"
@@ -9,18 +8,12 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useAiraloClient } from "@/hooks/useAiraloClient"
 import { supabase } from "@/integrations/supabase/client"
+import { Database } from "@/integrations/supabase/generated-types"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { WebhookTester } from "./WebhookTester"
 import { AlertTriangle, CheckCircle2 } from "lucide-react"
 
-interface AiraloSettings {
-  id: string
-  is_active: boolean
-  api_key: string
-  api_secret: string
-  api_url: string
-  webhook_url?: string | null
-}
+type AiraloSettings = Database['public']['Tables']['airalo_settings']['Row']
 
 export function AiraloConfig() {
   const { toast } = useToast()
@@ -38,7 +31,7 @@ export function AiraloConfig() {
       api_key: '',
       api_secret: '',
       api_url: 'https://sandbox-partners-api.airalo.com/v2',
-      webhook_url: ''
+      webhook_url: null
     }
   })
 
@@ -64,15 +57,16 @@ export function AiraloConfig() {
             variant: 'destructive',
           })
         } else if (data) {
-          setSettings(data as AiraloSettings)
+          const typedData = data as AiraloSettings
+          setSettings(typedData)
           
           // Populate form with data
-          setValue('id', data.id || 'airalo')
-          setValue('is_active', data.is_active || false)
-          setValue('api_key', data.api_key || '')
-          setValue('api_secret', data.api_secret || '')
-          setValue('api_url', data.api_url || 'https://sandbox-partners-api.airalo.com/v2')
-          setValue('webhook_url', data.webhook_url || '')
+          setValue('id', typedData.id || 'airalo')
+          setValue('is_active', typedData.is_active || false)
+          setValue('api_key', typedData.api_key || '')
+          setValue('api_secret', typedData.api_secret || '')
+          setValue('api_url', typedData.api_url || 'https://sandbox-partners-api.airalo.com/v2')
+          setValue('webhook_url', typedData.webhook_url || null)
         }
       } catch (error) {
         console.error('Unexpected error:', error)
